@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:ground_titanium"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:silt"
+	},
+	"output":{
+		"item": "assemblylinemachines:silt_titanium"
+	},
+	"stirs": 10,
+	"fluid": "water",
+	"mix_color": "#ffffff"
+}

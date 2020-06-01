@@ -1,0 +1,9 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "assemblylinemachines:block/gearbox_top",
+        "front": "assemblylinemachines:block/gearbox_side",
+        "side": "assemblylinemachines:block/gearbox",
+		"bottom": "assemblylinemachines:block/machine_basic_top"
+    }
+}

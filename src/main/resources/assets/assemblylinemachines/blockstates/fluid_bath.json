@@ -1,0 +1,14 @@
+{
+	"variants":{
+		"fluid=none,status=none": {"model": "assemblylinemachines:block/fluid_bath_empty"},
+		"fluid=none,status=fail": {"model": "assemblylinemachines:block/fluid_bath_empty"},
+		"fluid=none,status=success": {"model": "assemblylinemachines:block/fluid_bath_empty"},
+		"fluid=water,status=none": {"model": "assemblylinemachines:block/fluid_bath_water"},
+		"fluid=water,status=fail": {"model": "assemblylinemachines:block/fluid_bath_sludge"},
+		"fluid=water,status=success": {"model": "assemblylinemachines:block/fluid_bath_water"},
+		"fluid=lava,status=none": {"model": "assemblylinemachines:block/fluid_bath_lava"},
+		"fluid=lava,status=fail": {"model": "assemblylinemachines:block/fluid_bath_sludge"},
+		"fluid=lava,status=success": {"model": "assemblylinemachines:block/fluid_bath_lava_tinted"}
+	}
+	
+}

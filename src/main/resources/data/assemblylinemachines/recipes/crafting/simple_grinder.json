@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"rdr",
+		"iii"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_ingot"
+		},
+		"i":{
+			"tag": "forge:ingots/iron"
+		},
+		"r":{
+			"tag": "forge:dusts/redstone"
+		},
+		"d":{
+			"item": "assemblylinemachines:hand_grinder"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:simple_grinder"
+	}
+}

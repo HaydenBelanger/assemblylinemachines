@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:gold_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_gold",
+		"count": 2
+	},
+	"grinds": 6,
+	"bladetype": "titanium"
+}

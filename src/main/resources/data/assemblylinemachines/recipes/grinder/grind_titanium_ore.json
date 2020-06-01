@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:titanium_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_titanium",
+		"count": 2
+	},
+	"grinds": 14,
+	"bladetype": "titanium"
+}

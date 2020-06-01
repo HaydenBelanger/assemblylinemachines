@@ -1,0 +1,26 @@
+{
+  "parent": "assemblylinemachines:smelt_titanium",
+  "display": {
+    "icon": {
+      "item": "assemblylinemachines:fluid_bath"
+    },
+    "title": "Cleaning Up",
+    "description": "Craft a Fluid Bath, a tool to mix and stir ingredients together.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "cri": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "assemblylinemachines:fluid_bath"
+          }
+        ]
+      }
+    }
+  }
+}

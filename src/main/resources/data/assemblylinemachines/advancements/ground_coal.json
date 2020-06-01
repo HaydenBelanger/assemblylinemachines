@@ -1,0 +1,26 @@
+{
+  "parent": "assemblylinemachines:pure_gold_blade",
+  "display": {
+    "icon": {
+      "item": "assemblylinemachines:ground_coal"
+    },
+    "title": "Ground Coal",
+    "description": "Using your new blade, you can grind Coal to get Ground Coal.",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "cri": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "assemblylinemachines:ground_coal"
+          }
+        ]
+      }
+    }
+  }
+}

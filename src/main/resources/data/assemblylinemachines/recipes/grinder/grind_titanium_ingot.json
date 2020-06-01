@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:titanium_ingot"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_titanium"
+	},
+	"grinds": 7,
+	"bladetype": "titanium"
+}

@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:steel_ingot"
+	},
+	"output":{
+		"item": "assemblylinemachines:steel_rod",
+		"count": 2
+	},
+	"grinds": 6,
+	"bladetype": "puregold",
+	"machine_required": true
+}

@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "minecraft:logs"
+	},
+	"output":{
+		"item": "assemblylinemachines:wooden_board",
+		"count": 8
+	},
+	"grinds": 15,
+	"bladetype": "puregold"
+}

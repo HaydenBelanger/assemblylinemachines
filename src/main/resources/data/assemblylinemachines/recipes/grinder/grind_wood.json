@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "minecraft:planks"
+	},
+	"output":{
+		"item": "assemblylinemachines:wooden_board",
+		"count": 2
+	},
+	"grinds": 5,
+	"bladetype": "puregold"
+}

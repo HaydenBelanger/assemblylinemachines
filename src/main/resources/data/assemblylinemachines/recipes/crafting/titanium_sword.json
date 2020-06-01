@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"x",
+		"x",
+		"s"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:titanium_ingot"
+		},
+		"s":{
+			"tag": "forge:rods/wooden"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:titanium_sword"
+	}
+}

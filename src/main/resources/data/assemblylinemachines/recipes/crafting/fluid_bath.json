@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"w w",
+		"t t",
+		"www"
+	],
+	"key":{
+		"t":{
+			"item": "assemblylinemachines:titanium_ingot"
+		},
+		"w":{
+			"tag": "minecraft:planks"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:fluid_bath"
+	}
+}

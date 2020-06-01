@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:silt_iron"
+	},
+	"result": "assemblylinemachines:pure_iron",
+	"cookingtime": 200
+}

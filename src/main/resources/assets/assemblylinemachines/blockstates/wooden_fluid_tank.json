@@ -1,0 +1,8 @@
+{
+	"variants":{
+		"fluid=none": {"model": "assemblylinemachines:block/wooden_fluid_tank_empty"},
+		"fluid=water": {"model": "assemblylinemachines:block/wooden_fluid_tank_water"},
+		"fluid=lava": {"model": "assemblylinemachines:block/wooden_fluid_tank_lava"}
+	}
+	
+}

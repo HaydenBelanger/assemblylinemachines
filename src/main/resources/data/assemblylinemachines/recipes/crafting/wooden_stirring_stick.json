@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" xx",
+		" xx",
+		"x  "
+	],
+	"key":{
+		"x":{
+			"tag": "forge:rods/wooden"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:wooden_stirring_stick"
+	}
+}

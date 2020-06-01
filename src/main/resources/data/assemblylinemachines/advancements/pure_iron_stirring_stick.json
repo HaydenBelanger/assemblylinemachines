@@ -1,0 +1,26 @@
+{
+  "parent": "assemblylinemachines:pure_iron",
+  "display": {
+    "icon": {
+      "item": "assemblylinemachines:pure_iron_stirring_stick"
+    },
+    "title": "Advanced Stir",
+    "description": "Craft a more advanced Stirring Stick.",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "cri": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "assemblylinemachines:pure_iron_stirring_stick"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "minecraft:sand"
+	},
+	"input_b":{
+		"item": "minecraft:gravel"
+	},
+	"output":{
+		"item": "assemblylinemachines:silt"
+	},
+	"stirs": 4,
+	"fluid": "water",
+	"mix_color": "#b8b4ab"
+}

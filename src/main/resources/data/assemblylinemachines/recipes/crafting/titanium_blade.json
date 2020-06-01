@@ -1,0 +1,15 @@
+ {
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" x ",
+		"x x"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:titanium_blade_piece"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:titanium_blade"
+	}
+}

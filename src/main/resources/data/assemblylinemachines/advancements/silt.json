@@ -1,0 +1,26 @@
+{
+  "parent": "assemblylinemachines:fluid_bath",
+  "display": {
+    "icon": {
+      "item": "assemblylinemachines:silt_brick"
+    },
+    "title": "Extra Thick",
+    "description": "Make Silt Brick out of 4 Silt, obtained by bathing a Gravel and Sand and stirring.",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "cri": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "assemblylinemachines:silt_brick"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:ground_coal"
+	},
+	"input_b":{
+		"tag": "forge:dusts/redstone"
+	},
+	"output":{
+		"item": "assemblylinemachines:empowered_coal"
+	},
+	"stirs": 5,
+	"fluid": "lava",
+	"mix_color": "0",
+	"machine_required": true
+}

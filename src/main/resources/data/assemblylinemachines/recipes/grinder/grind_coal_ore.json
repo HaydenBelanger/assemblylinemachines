@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:coal_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_coal",
+		"count": 4
+	},
+	"grinds": 7,
+	"bladetype": "puregold"
+}

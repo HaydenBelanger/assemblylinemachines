@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:silt_titanium"
+	},
+	"result": "assemblylinemachines:pure_titanium",
+	"cookingtime": 200
+}

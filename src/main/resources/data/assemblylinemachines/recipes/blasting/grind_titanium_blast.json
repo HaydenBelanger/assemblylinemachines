@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:ground_titanium"
+	},
+	"result": "assemblylinemachines:titanium_ingot",
+	"cookingtime": 100
+}

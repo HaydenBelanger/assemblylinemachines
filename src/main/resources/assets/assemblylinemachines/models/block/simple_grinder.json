@@ -1,0 +1,8 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "assemblylinemachines:block/machine_basic_top",
+        "front": "assemblylinemachines:block/simple_grinder",
+        "side": "assemblylinemachines:block/machine_basic_side"
+    }
+}

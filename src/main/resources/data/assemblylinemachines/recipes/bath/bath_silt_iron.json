@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:ground_iron"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:silt"
+	},
+	"output":{
+		"item": "assemblylinemachines:silt_iron"
+	},
+	"stirs": 10,
+	"fluid": "water",
+	"mix_color": "#e6e6e6"
+}

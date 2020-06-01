@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ttt",
+		"wbw",
+		"ttt"
+	],
+	"key":{
+		"t":{
+			"item": "assemblylinemachines:wooden_board"
+		},
+		"w":{
+			"tag": "forge:glass_panes"
+		},
+		"b":{
+			"item": "minecraft:bucket"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:wooden_fluid_tank"
+	}
+}

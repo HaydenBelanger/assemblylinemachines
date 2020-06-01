@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"rbr",
+		"iii"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_ingot"
+		},
+		"i":{
+			"tag": "forge:ingots/iron"
+		},
+		"r":{
+			"item": "assemblylinemachines:steel_rod"
+		},
+		"b":{
+			"item": "assemblylinemachines:fluid_bath"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:simple_fluid_mixer"
+	}
+}

@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:iron_ingot"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_iron"
+	},
+	"grinds": 5,
+	"bladetype": "titanium"
+}
