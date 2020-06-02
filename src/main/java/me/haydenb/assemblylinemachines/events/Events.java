@@ -1,8 +1,8 @@
 package me.haydenb.assemblylinemachines.events;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.util.Direction;

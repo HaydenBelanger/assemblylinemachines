@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.misc;
+package me.haydenb.assemblylinemachines.util;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.item.ItemGroup;

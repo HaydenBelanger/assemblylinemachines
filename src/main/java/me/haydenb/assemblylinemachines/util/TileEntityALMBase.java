@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.misc;
+package me.haydenb.assemblylinemachines.util;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;

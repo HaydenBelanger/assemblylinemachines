@@ -1,13 +1,11 @@
-package me.haydenb.assemblylinemachines.misc;
+package me.haydenb.assemblylinemachines.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.TESimpleFluidMixer;
-import me.haydenb.assemblylinemachines.misc.Utils.Pair;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import net.minecraft.block.BlockState;
+import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -26,22 +24,13 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.InvWrapper;
 
-public abstract class TileEntityALMMachine<A extends Container> extends LockableLootTileEntity implements IInventory {
-	
+public abstract class AbstractALMMachine<A extends Container> extends LockableLootTileEntity {
+
 	protected NonNullList<ItemStack> contents;
 	protected int playersUsing;
-	protected IItemHandlerModifiable items = createHandler();
-	protected LazyOptional<IItemHandlerModifiable> itemHandler = LazyOptional.of(() -> items);
 	protected int slotCount;
 	protected String name;
 	protected int containerId;
@@ -53,13 +42,15 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 	 * Container and MUST have constructor of A(int windowId, PlayerInventory pInv,
 	 * this.class te) or it WILL NOT WORK.
 	 * 
-	 * @param tileEntityTypeIn The specified Tile Entity Type object as obtained from the Registry.
-	 * @param slotCount The number of slots this inventory will have.
-	 * @param name The friendly name the GUI will show.
-	 * @param containerId The ID of the container you wish to use.
-	 * @param clazz The class to construct on createMenu(). View warning above!
+	 * @param tileEntityTypeIn The specified Tile Entity Type object as obtained
+	 *                         from the Registry.
+	 * @param slotCount        The number of slots this inventory will have.
+	 * @param name             The friendly name the GUI will show.
+	 * @param containerId      The ID of the container you wish to use.
+	 * @param clazz            The class to construct on createMenu(). View warning
+	 *                         above!
 	 */
-	public TileEntityALMMachine(TileEntityType<?> tileEntityTypeIn, int slotCount, String name, int containerId,
+	public AbstractALMMachine(TileEntityType<?> tileEntityTypeIn, int slotCount, String name, int containerId,
 			Class<A> clazz) {
 		super(tileEntityTypeIn);
 		this.containerId = containerId;
@@ -100,7 +91,13 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 	public NonNullList<ItemStack> getItems() {
 		return contents;
 	}
-	
+
+	public abstract boolean isAllowedInSlot(int slot, ItemStack stack);
+
+	@Override
+	public boolean isItemValidForSlot(int index, ItemStack stack) {
+		return isAllowedInSlot(index, stack);
+	}
 
 	@Override
 	public void setItems(NonNullList<ItemStack> arg0) {
@@ -174,51 +171,35 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 
 	public void toggleGUI() {
 		if (this.getBlockState().getBlock() instanceof BlockSimpleFluidMixer) {
-			world.addBlockEvent(pos, this.getBlockState().getBlock(), containerId,
-					playersUsing);
+			world.addBlockEvent(pos, this.getBlockState().getBlock(), containerId, playersUsing);
 			world.notifyNeighborsOfStateChange(pos, this.getBlockState().getBlock());
 		}
 	}
 
-	public static int getPlayersUsing(IBlockReader reader, BlockPos pos) {
-		BlockState bs = reader.getBlockState(pos);
-		if (bs.hasTileEntity()) {
-			if (reader.getTileEntity(pos) instanceof TESimpleFluidMixer) {
-				TESimpleFluidMixer tsfm = (TESimpleFluidMixer) reader.getTileEntity(pos);
-				return tsfm.playersUsing;
+	public static class SlotWithRestrictions extends Slot {
+
+		private final AbstractALMMachine<?> check;
+		private final int slot;
+		private final int maxStackLimit;
+
+		public SlotWithRestrictions(IInventory inventoryIn, int index, int xPosition, int yPosition,
+				AbstractALMMachine<?> check, int slotLimit) {
+			super(inventoryIn, index, xPosition, yPosition);
+			this.slot = index;
+			this.check = check;
+			this.maxStackLimit = slotLimit;
+		}
+
+		@Override
+		public boolean isItemValid(ItemStack stack) {
+			return check.isAllowedInSlot(slot, stack);
+		}
+		
+		@Override
+			public int getSlotStackLimit() {
+				return maxStackLimit;
 			}
-		}
-		return 0;
-	}
 
-	@Override
-	public void updateContainingBlockInfo() {
-		super.updateContainingBlockInfo();
-		if (itemHandler != null) {
-			itemHandler.invalidate();
-			itemHandler = null;
-		}
-	}
-
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return itemHandler.cast();
-		}
-
-		return super.getCapability(cap);
-	}
-
-	private IItemHandlerModifiable createHandler() {
-		return new InvWrapper(this);
-	}
-
-	@Override
-	public void remove() {
-		super.remove();
-		if (itemHandler != null) {
-			itemHandler.invalidate();
-		}
 	}
 
 	// CONTAINER DYNAMIC
@@ -266,7 +247,7 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 				ItemStack itemstack1 = slot.getStack();
 				itemstack = itemstack1.copy();
 				if (index < 36) {
-					if (!this.mergeItemStack(itemstack1, 36, this.inventorySlots.size(), true)) {
+					if (!this.mergeItemStack(itemstack1, 36, this.inventorySlots.size(), false)) {
 						return ItemStack.EMPTY;
 					}
 				} else if (!this.mergeItemStack(itemstack1, 0, 36, false)) {
@@ -285,14 +266,15 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 
 	}
 
-	//SCREEN DYNAMIC
+	// SCREEN DYNAMIC
 	public static class ScreenALMBase<T extends Container> extends ContainerScreen<T> {
 		private final ResourceLocation bg;
 		private final Pair<Integer, Integer> titleTextLoc;
 		private final Pair<Integer, Integer> invTextLoc;
 		public boolean renderTitles;
-		public ScreenALMBase(T screenContainer, PlayerInventory inv,
-				ITextComponent titleIn, Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
+
+		public ScreenALMBase(T screenContainer, PlayerInventory inv, ITextComponent titleIn,
+				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
 				String guipath, boolean hasCool) {
 			super(screenContainer, inv, titleIn);
 			this.guiLeft = 0;
@@ -302,10 +284,10 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 			this.titleTextLoc = titleTextLoc;
 			this.invTextLoc = invTextLoc;
 			String a = "";
-			if(hasCool == true && ConfigHolder.COMMON.coolDudeMode.get() == true) {
+			if (hasCool == true && ConfigHolder.COMMON.coolDudeMode.get() == true) {
 				a = "cool/";
 				renderTitles = false;
-			}else {
+			} else {
 				renderTitles = true;
 			}
 			bg = new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/" + a + guipath + ".png");
@@ -321,9 +303,10 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-			if(renderTitles == true) {
+			if (renderTitles == true) {
 				this.font.drawString(this.title.getFormattedText(), titleTextLoc.x, titleTextLoc.y, 4210752);
-				this.font.drawString(this.playerInventory.getDisplayName().getFormattedText(), invTextLoc.x, invTextLoc.y, 4210752);
+				this.font.drawString(this.playerInventory.getDisplayName().getFormattedText(), invTextLoc.x,
+						invTextLoc.y, 4210752);
 			}
 		}
 
@@ -335,7 +318,7 @@ public abstract class TileEntityALMMachine<A extends Container> extends Lockable
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			this.blit(x, y, 0, 0, this.xSize, this.ySize);
-			
+
 		}
 	}
 

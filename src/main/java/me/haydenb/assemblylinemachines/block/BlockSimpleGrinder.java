@@ -1,26 +1,25 @@
 package me.haydenb.assemblylinemachines.block;
 
+import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine;
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.misc.Utils;
-import me.haydenb.assemblylinemachines.misc.Utils.Pair;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.ALMMachineNoExtract;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
+import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -30,28 +29,21 @@ import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleGrinder extends Block implements ICrankableBlock{
+public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder> implements ICrankableBlock{
 	
 
 	public BlockSimpleGrinder() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL));
+				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_grinder", TESimpleGrinder.class);
 		this.setDefaultState(this.stateContainer.getBaseState().with(Utils.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 
@@ -65,44 +57,8 @@ public class BlockSimpleGrinder extends Block implements ICrankableBlock{
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
 	}
-
-	@Override
-	public boolean hasTileEntity(BlockState state) {
-		if(state.getBlock() == this) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return Registry.getTileEntity("simple_grinder").create();
-	}
-
-	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-
-		if(!world.isRemote) {
-			if(world.getTileEntity(pos) instanceof TESimpleGrinder) {
-				NetworkHooks.openGui((ServerPlayerEntity) player, (TESimpleGrinder) world.getTileEntity(pos), buf -> buf.writeBlockPos(pos));
-			}
-		}
-		return ActionResultType.CONSUME;
-	}
 	
-	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if(state.getBlock() != newState.getBlock()) {
-			if(worldIn.getTileEntity(pos) instanceof TESimpleGrinder) {
-				TESimpleGrinder tefm = (TESimpleGrinder) worldIn.getTileEntity(pos);
-				InventoryHelper.dropItems(worldIn, pos, tefm.getItems());
-				worldIn.removeTileEntity(pos);
-			}
-		}
-	}
-	
-	public static class TESimpleGrinder extends TileEntityALMMachine<ContainerSimpleGrinder> implements ITickableTileEntity, ICrankableMachine{
+	public static class TESimpleGrinder extends ALMMachineNoExtract<ContainerSimpleGrinder> implements ITickableTileEntity, ICrankableMachine{
 		
 		public int timer;
 		public int cranks;
@@ -251,7 +207,7 @@ public class BlockSimpleGrinder extends Block implements ICrankableBlock{
 		}
 		
 		@Override
-		public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(slot == 0) {
 				if(stack.getItem() instanceof ItemGrindingBlade) {
 					return true;
@@ -272,8 +228,9 @@ public class BlockSimpleGrinder extends Block implements ICrankableBlock{
 		public ContainerSimpleGrinder(final int windowId, final PlayerInventory playerInventory, final TESimpleGrinder tileEntity) {
 			super(Registry.getContainerType("simple_grinder"), windowId, 2, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
+			
+			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, INPUT_A_POS.x, INPUT_A_POS.y, tileEntity, 1));
 			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.x, INPUT_B_POS.y));
-			this.addSlot(new BladeSlot(this.tileEntity, 0, INPUT_A_POS.x, INPUT_A_POS.y));
 		}
 		
 		
@@ -282,26 +239,6 @@ public class BlockSimpleGrinder extends Block implements ICrankableBlock{
 		}
 		
 		
-		
-	}
-	
-	public static class BladeSlot extends Slot{
-
-		public BladeSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
-			super(inventoryIn, index, xPosition, yPosition);
-		}
-		
-		public boolean isItemValid(ItemStack stack) {
-			if(stack.getItem() instanceof ItemGrindingBlade) {
-				return true;
-			}
-			return false;
-		}
-		
-		@Override
-		public int getSlotStackLimit() {
-			return 1;
-		}
 		
 	}
 	

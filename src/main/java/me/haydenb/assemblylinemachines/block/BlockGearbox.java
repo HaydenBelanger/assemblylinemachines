@@ -3,27 +3,24 @@ package me.haydenb.assemblylinemachines.block;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
-import me.haydenb.assemblylinemachines.item.ItemGearboxUpgrade;
-import me.haydenb.assemblylinemachines.item.ItemGearboxUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine;
-import me.haydenb.assemblylinemachines.misc.Utils;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.misc.Utils.Pair;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.ALMMachineNoExtract;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine;
+import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
+import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -32,31 +29,25 @@ import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.fml.network.NetworkHooks;
 
-public class BlockGearbox extends Block {
+public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox> {
 
 	private static final Random RAND = new Random();
 	
 	public BlockGearbox() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(1f, 2f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL));
+				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "gearbox", TEGearbox.class);
 		this.setDefaultState(
 				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(Utils.MACHINE_ACTIVE, false));
 	}
@@ -65,20 +56,6 @@ public class BlockGearbox extends Block {
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
 
 		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(Utils.MACHINE_ACTIVE);
-	}
-
-	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-
-		if(!world.isRemote) {
-			if(world.getTileEntity(pos) instanceof TEGearbox) {
-				
-				NetworkHooks.openGui((ServerPlayerEntity) player, (TEGearbox) world.getTileEntity(pos), buf -> buf.writeBlockPos(pos));
-			}
-		}
-		
-		return ActionResultType.CONSUME;
 	}
 
 	@Override
@@ -95,28 +72,7 @@ public class BlockGearbox extends Block {
 		return stateIn;
 	}
 	
-	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return Registry.getTileEntity("gearbox").create();
-	}
-	
-	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if(state.getBlock() != newState.getBlock()) {
-			if(worldIn.getTileEntity(pos) instanceof TEGearbox) {
-				TEGearbox teg = (TEGearbox) worldIn.getTileEntity(pos);
-				InventoryHelper.dropItems(worldIn, pos, teg.getItems());
-				worldIn.removeTileEntity(pos);
-			}
-		}
-	}
-	
-	public static class TEGearbox extends TileEntityALMMachine<ContainerGearbox> implements ITickableTileEntity{
+	public static class TEGearbox extends ALMMachineNoExtract<ContainerGearbox> implements ITickableTileEntity{
 		
 		public int timer = 0;
 		public float maxBurnTime = 0;
@@ -244,12 +200,11 @@ public class BlockGearbox extends Block {
 		}
 		
 		@Override
-		public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(slot == 0) {
-				if(stack.getItem() instanceof ItemGearboxUpgrade) {
+				if(stack.getItem() instanceof ItemUpgrade) {
 					return true;
 				}
-				return false;
 			}else {
 				if(Upgrades.match(contents.get(0)) == Upgrades.COMPATABILITY) {
 					if(ForgeHooks.getBurnTime(stack) != 0) {
@@ -261,9 +216,10 @@ public class BlockGearbox extends Block {
 					}
 				}
 				
-				return false;
 			}
+			return false;
 		}
+		
 		
 		@Override
 		public NonNullList<ItemStack> getItems() {
@@ -289,8 +245,8 @@ public class BlockGearbox extends Block {
 		public ContainerGearbox(final int windowId, final PlayerInventory playerInventory, final TEGearbox tileEntity) {
 			super(Registry.getContainerType("gearbox"), windowId, 2, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new FuelSlot(this.tileEntity, 1, INPUT_POS.x, INPUT_POS.y));
-			this.addSlot(new UpgradeSlot(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y));
+			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity, 1));
+			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.x, INPUT_POS.y, tileEntity, 64));
 		}
 		
 		
@@ -301,49 +257,6 @@ public class BlockGearbox extends Block {
 		
 		
 		
-	}
-	
-	public static class UpgradeSlot extends Slot{
-
-		public UpgradeSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
-			super(inventoryIn, index, xPosition, yPosition);
-		}
-		
-		public boolean isItemValid(ItemStack stack) {
-			if(stack.getItem() instanceof ItemGearboxUpgrade) {
-				return true;
-			}
-			return false;
-		}
-		
-		@Override
-		public int getSlotStackLimit() {
-			return 1;
-		}
-		
-		
-	}
-	
-	public static class FuelSlot extends Slot{
-		private final IInventory inv;
-		public FuelSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
-			super(inventoryIn, index, xPosition, yPosition);
-			inv = inventoryIn;
-		}
-		
-		public boolean isItemValid(ItemStack stack) {
-		
-			if(Upgrades.match(inv.getStackInSlot(0)) == Upgrades.COMPATABILITY) {
-				if(ForgeHooks.getBurnTime(stack) != 0) {
-					return true;
-				}
-			}else {
-				if(stack.getItem() instanceof ItemGearboxFuel) {
-					return true;
-				}
-			}
-			return false;
-		};
 	}
 	
 	@OnlyIn(Dist.CLIENT)

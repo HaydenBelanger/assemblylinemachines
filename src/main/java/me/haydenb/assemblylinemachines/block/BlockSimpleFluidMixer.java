@@ -1,26 +1,24 @@
 package me.haydenb.assemblylinemachines.block;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.misc.FluidProperty;
-import me.haydenb.assemblylinemachines.misc.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.misc.TileEntityALMMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.misc.Utils;
-import me.haydenb.assemblylinemachines.misc.Utils.Pair;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.util.ALMMachineNoExtract;
+import me.haydenb.assemblylinemachines.util.FluidProperty;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine;
+import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
+import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -30,31 +28,25 @@ import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleFluidMixer extends Block implements ICrankableBlock{
+public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFluidMixer.TESimpleFluidMixer> implements ICrankableBlock{
 	
 
 	public BlockSimpleFluidMixer() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL));
+				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_fluid_mixer", BlockSimpleFluidMixer.TESimpleFluidMixer.class);
 		this.setDefaultState(this.stateContainer.getBaseState().with(FluidProperty.FLUID, Fluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 
@@ -67,42 +59,6 @@ public class BlockSimpleFluidMixer extends Block implements ICrankableBlock{
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
-	}
-
-	@Override
-	public boolean hasTileEntity(BlockState state) {
-		if(state.getBlock() == this) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return Registry.getTileEntity("simple_fluid_mixer").create();
-	}
-
-	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-
-		if(!world.isRemote) {
-			if(world.getTileEntity(pos) instanceof TESimpleFluidMixer) {
-				NetworkHooks.openGui((ServerPlayerEntity) player, (TESimpleFluidMixer) world.getTileEntity(pos), buf -> buf.writeBlockPos(pos));
-			}
-		}
-		return ActionResultType.CONSUME;
-	}
-	
-	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if(state.getBlock() != newState.getBlock()) {
-			if(worldIn.getTileEntity(pos) instanceof TESimpleFluidMixer) {
-				TESimpleFluidMixer tefm = (TESimpleFluidMixer) worldIn.getTileEntity(pos);
-				InventoryHelper.dropItems(worldIn, pos, tefm.getItems());
-				worldIn.removeTileEntity(pos);
-			}
-		}
 	}
 	
 	@Override
@@ -118,8 +74,7 @@ public class BlockSimpleFluidMixer extends Block implements ICrankableBlock{
 		
 		return stateIn;
 	}
-	
-	public static class TESimpleFluidMixer extends TileEntityALMMachine<ContainerSimpleFluidMixer> implements ITickableTileEntity, ICrankableMachine{
+	public static class TESimpleFluidMixer extends ALMMachineNoExtract<ContainerSimpleFluidMixer> implements ITickableTileEntity, ICrankableMachine{
 		
 		public IFluidTank tank;
 		public int timer;
@@ -141,6 +96,11 @@ public class BlockSimpleFluidMixer extends Block implements ICrankableBlock{
 			this(Registry.getTileEntity("simple_fluid_mixer"));
 		}
 
+		@Override
+		public boolean isAllowedInSlot(int slot, ItemStack stack) {
+			return true;
+		}
+		
 		@Override
 		public boolean perform() {
 			if(output == null || pendingOutput == true) {
@@ -311,8 +271,8 @@ public class BlockSimpleFluidMixer extends Block implements ICrankableBlock{
 		public ContainerSimpleFluidMixer(final int windowId, final PlayerInventory playerInventory, final TESimpleFluidMixer tileEntity) {
 			super(Registry.getContainerType("simple_fluid_mixer"), windowId, 2, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.x, INPUT_B_POS.y));
 			this.addSlot(new Slot(this.tileEntity, 0, INPUT_A_POS.x, INPUT_A_POS.y));
+			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.x, INPUT_B_POS.y));
 		}
 		
 		public ContainerSimpleFluidMixer(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {

@@ -11,23 +11,23 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-public class ItemGearboxUpgrade extends Item {
+public class ItemUpgrade extends Item {
 
 	final String[] positives;
 	final String[] negatives;
-	public ItemGearboxUpgrade(String[] positives, String[] negatives) {
+	public ItemUpgrade(String[] positives, String[] negatives) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
 		this.positives = positives;
 		this.negatives = negatives;
 	}
 	
-	public ItemGearboxUpgrade(String positive, String negative) {
+	public ItemUpgrade(String positive, String negative) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
 		this.positives = new String[] {positive};
 		this.negatives = new String[] {negative};
 	}
 	
-	public ItemGearboxUpgrade(String positive) {
+	public ItemUpgrade(String positive) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
 		this.positives = new String[] {positive};
 		this.negatives = null;
@@ -50,7 +50,12 @@ public class ItemGearboxUpgrade extends Item {
 	
 	public static enum Upgrades{
 		EFFICIENCY(Registry.getItem("gearbox_upgrade_efficiency")), POWER(Registry.getItem("gearbox_upgrade_speed")), 
-		COMPATABILITY(Registry.getItem("gearbox_upgrade_compatability")), LIMITER(Registry.getItem("gearbox_upgrade_limiter")), NONE(null);
+		COMPATABILITY(Registry.getItem("gearbox_upgrade_compatability")), LIMITER(Registry.getItem("gearbox_upgrade_limiter")),
+		
+		PIPE_SPEED(Registry.getItem("item_pipe_upgrade_speed")), PIPE_STACK(Registry.getItem("item_pipe_upgrade_stack")), 
+		PIPE_FILTER(Registry.getItem("item_pipe_upgrade_filter")), PIPE_REDSTONE(Registry.getItem("item_pipe_upgrade_redstone")),
+		
+		NONE(null);
 		
 		public final Item i;
 		

@@ -3,10 +3,10 @@ package me.haydenb.assemblylinemachines.block;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.misc.ICrankableMachine;
-import me.haydenb.assemblylinemachines.misc.Utils;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.util.ICrankableMachine;
+import me.haydenb.assemblylinemachines.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

@@ -1,19 +1,20 @@
 package me.haydenb.assemblylinemachines.block.pipe;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.google.common.base.Supplier;
 
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
-import me.haydenb.assemblylinemachines.misc.Utils;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
@@ -65,8 +66,10 @@ public class PipeBase<T> extends Block {
 	@Override
 	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if(state.getBlock() != newState.getBlock()) {
-			if(worldIn.getTileEntity(pos) instanceof IPipeConnector) {
+			if(worldIn.getTileEntity(pos) instanceof ItemPipeConnectorTileEntity) {
+				ItemPipeConnectorTileEntity tefm = (ItemPipeConnectorTileEntity) worldIn.getTileEntity(pos);
 				worldIn.removeTileEntity(pos);
+				InventoryHelper.dropItems(worldIn, pos, tefm.getItems());
 			}
 		}
 	}
@@ -83,6 +86,7 @@ public class PipeBase<T> extends Block {
 						TileEntity te = world.getTileEntity(pos);
 						if(te != null && te instanceof ItemPipeConnectorTileEntity) {
 							NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
+							return ActionResultType.CONSUME;
 						}
 					}
 				}
@@ -198,16 +202,15 @@ public class PipeBase<T> extends Block {
 		}
 	}
 
-	public <M> void pathToNearest(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, int distance, TreeMap<Target, IPipeConnector> foundTileEntities) {
+	public void pathToNearest(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, int distance, TreeSet<ItemPipeConnectorTileEntity> targets) {
 		BlockState bs = world.getBlockState(curPos);
 		for (Direction k : Direction.values()) {
 			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
 			if(pco == PipeConnOptions.CONNECTOR && !initial.equals(curPos)) {
-				System.out.println(initial + " = " + curPos);
 				TileEntity te = world.getTileEntity(curPos);
-				if(te != null && te instanceof IPipeConnector) {
-					IPipeConnector ipc = (IPipeConnector) te;
-					foundTileEntities.put(new Target(distance, ipc.getPriority()), ipc);
+				if(te != null && te instanceof ItemPipeConnectorTileEntity) {
+					ItemPipeConnectorTileEntity ipc = (ItemPipeConnectorTileEntity) te;
+					targets.add(ipc);
 				}
 				
 			}else if (pco == PipeConnOptions.PIPE) {
@@ -218,7 +221,7 @@ public class PipeBase<T> extends Block {
 						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
 						if (t.type == this.type) {
 							distance++;
-							t.pathToNearest(world, targPos, checked, initial, distance, foundTileEntities);
+							t.pathToNearest(world, targPos, checked, initial, distance, targets);
 						}
 
 					}
@@ -235,8 +238,8 @@ public class PipeBase<T> extends Block {
 			if(pco == PipeConnOptions.CONNECTOR && !updated.contains(curPos)) {
 				updated.add(curPos);
 				TileEntity te = world.getTileEntity(curPos);
-				if(te != null && te instanceof IPipeConnector) {
-					((IPipeConnector) te).updateTargets(this);
+				if(te != null && te instanceof ItemPipeConnectorTileEntity) {
+					((ItemPipeConnectorTileEntity) te).updateTargets(this);
 				}
 				
 			}else if (pco == PipeConnOptions.PIPE) {
@@ -280,17 +283,6 @@ public class PipeBase<T> extends Block {
 
 	public static enum Type {
 		POWER, FLUID, ITEM;
-	}
-	
-	public static class Target{
-		
-		public final int distance;
-		public final Integer priority;
-		
-		Target(int distance, int priority) {
-			this.distance = distance;
-			this.priority = priority;
-		}
 	}
 
 }

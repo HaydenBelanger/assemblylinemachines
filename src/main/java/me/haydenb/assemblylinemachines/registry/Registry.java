@@ -35,15 +35,15 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
-import me.haydenb.assemblylinemachines.item.ItemGearboxUpgrade;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
-import me.haydenb.assemblylinemachines.misc.CreativeTab;
-import me.haydenb.assemblylinemachines.misc.FluidProperty;
-import me.haydenb.assemblylinemachines.misc.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.misc.ItemTiers;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.util.CreativeTab;
+import me.haydenb.assemblylinemachines.util.FluidProperty;
+import me.haydenb.assemblylinemachines.util.ItemTiers;
+import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -138,10 +138,16 @@ public class Registry {
 		createItem("wooden_board");
 		
 		createItem("empowered_coal", new ItemGearboxFuel(3200));
-		createItem("gearbox_upgrade_limiter", new ItemGearboxUpgrade("Gearbox will only burn fuel while action is required."));
-		createItem("gearbox_upgrade_efficiency", new ItemGearboxUpgrade("Gearbox will use greatly less fuel.", "Gearbox will run half as quickly."));
-		createItem("gearbox_upgrade_speed", new ItemGearboxUpgrade("Gearbox will run much faster.", "Gearbox will use twice as much fuel."));
-		createItem("gearbox_upgrade_compatability", new ItemGearboxUpgrade("Gearbox can use any burnable fuel."));
+		createItem("gearbox_upgrade_limiter", new ItemUpgrade("Gearbox will only burn fuel while action is required."));
+		createItem("gearbox_upgrade_efficiency", new ItemUpgrade("Gearbox will use greatly less fuel.", "Gearbox will run half as quickly."));
+		createItem("gearbox_upgrade_speed", new ItemUpgrade("Gearbox will run much faster.", "Gearbox will use twice as much fuel."));
+		createItem("gearbox_upgrade_compatability", new ItemUpgrade("Gearbox can use any burnable fuel."));
+		
+		
+		createItem("item_pipe_upgrade_speed", new ItemUpgrade("Item Pipe will perform more quickly."));
+		createItem("item_pipe_upgrade_stack", new ItemUpgrade("Item Pipe will take bigger stacks per operation."));
+		createItem("item_pipe_upgrade_filter", new ItemUpgrade("Item Pipe's available filter space will be expanded."));
+		createItem("item_pipe_upgrade_redstone", new ItemUpgrade("Item Pipe will get Redstone control."));
 		
 		createItem("wooden_stirring_stick", new ToolStirringStick(35, TemperatureResistance.COLD));
 		createItem("pure_iron_stirring_stick", new ToolStirringStick(135, TemperatureResistance.HOT));

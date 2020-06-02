@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
-import me.haydenb.assemblylinemachines.misc.FluidProperty.Fluids;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
