@@ -2,7 +2,7 @@
 	"parent": "block/cube",
 	"textures": {
 		"0": "assemblylinemachines:block/energy_pipe_base",
-		"particle": "assemblylinemachines:block/pipe_base_base"
+		"particle": "assemblylinemachines:block/energy_base_base"
 	},
 	"elements": [
 		{

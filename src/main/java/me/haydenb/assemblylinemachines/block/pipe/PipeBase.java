@@ -28,6 +28,7 @@ import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -84,9 +85,23 @@ public class PipeBase<T> extends Block {
 							.get(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
 
 						TileEntity te = world.getTileEntity(pos);
-						if(te != null && te instanceof ItemPipeConnectorTileEntity) {
+						if(te instanceof ItemPipeConnectorTileEntity) {
 							NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
 							return ActionResultType.CONSUME;
+						}else if(te instanceof FluidPipeConnectorTileEntity) {
+							FluidPipeConnectorTileEntity fpcte = (FluidPipeConnectorTileEntity) te;
+							if(player.isSneaking()) {
+								fpcte.updateTargets(this);
+								player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
+							}else {
+								fpcte.outputMode = !fpcte.outputMode;
+								fpcte.sendUpdates();
+								if(fpcte.outputMode) {
+									player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+								}else {
+									player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+								}
+							}
 						}
 					}
 				}
@@ -188,6 +203,17 @@ public class PipeBase<T> extends Block {
 			}
 		}
 
+		if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR) {
+			
+			TileEntity te = world.getTileEntity(currentPos.offset(facing));
+			if (te != null) {
+				if (te.getCapability(cap.get(), facing.getOpposite()).orElse(null) != null) {
+					return stateIn;
+
+				}
+			}
+		}
+		
 		if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.NONE) {
 			if(!world.isRemote) {
 				updateAllAlongPath(world, currentPos, new ArrayList<>(), new ArrayList<>());
@@ -201,8 +227,26 @@ public class PipeBase<T> extends Block {
 			return stateIn;
 		}
 	}
+	
+	@Override
+	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
+			boolean isMoving) {
+		if(!worldIn.isRemote) {
+			TileEntity te = worldIn.getTileEntity(pos);
+			if(te != null && te instanceof ItemPipeConnectorTileEntity) {
+				ItemPipeConnectorTileEntity ipcte = (ItemPipeConnectorTileEntity) te;
+				if(ipcte.isRedstoneActive() && worldIn.isBlockPowered(pos)) {
+					ipcte.setRedstoneActive(true);
+					ipcte.sendUpdates();
+				}else {
+					ipcte.setRedstoneActive(false);
+					ipcte.sendUpdates();
+				}
+			}
+		}
+	}
 
-	public void pathToNearest(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, int distance, TreeSet<ItemPipeConnectorTileEntity> targets) {
+	public void pathToNearestItem(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<ItemPipeConnectorTileEntity> targets) {
 		BlockState bs = world.getBlockState(curPos);
 		for (Direction k : Direction.values()) {
 			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
@@ -220,8 +264,35 @@ public class PipeBase<T> extends Block {
 					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
 						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
 						if (t.type == this.type) {
-							distance++;
-							t.pathToNearest(world, targPos, checked, initial, distance, targets);
+							t.pathToNearestItem(world, targPos, checked, initial, targets);
+						}
+
+					}
+				}
+
+			}
+		}
+	}
+	
+	public void pathToNearestFluid(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<FluidPipeConnectorTileEntity> targets) {
+		BlockState bs = world.getBlockState(curPos);
+		for (Direction k : Direction.values()) {
+			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
+			if(pco == PipeConnOptions.CONNECTOR && !initial.equals(curPos)) {
+				TileEntity te = world.getTileEntity(curPos);
+				if(te != null && te instanceof FluidPipeConnectorTileEntity) {
+					FluidPipeConnectorTileEntity ipc = (FluidPipeConnectorTileEntity) te;
+					targets.add(ipc);
+				}
+				
+			}else if (pco == PipeConnOptions.PIPE) {
+				BlockPos targPos = curPos.offset(k);
+				if (!checked.contains(targPos)) {
+					checked.add(targPos);
+					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
+						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
+						if (t.type == this.type) {
+							t.pathToNearestFluid(world, targPos, checked, initial, targets);
 						}
 
 					}
@@ -238,8 +309,13 @@ public class PipeBase<T> extends Block {
 			if(pco == PipeConnOptions.CONNECTOR && !updated.contains(curPos)) {
 				updated.add(curPos);
 				TileEntity te = world.getTileEntity(curPos);
-				if(te != null && te instanceof ItemPipeConnectorTileEntity) {
-					((ItemPipeConnectorTileEntity) te).updateTargets(this);
+				if(te != null) {
+					if(te instanceof ItemPipeConnectorTileEntity) {
+						((ItemPipeConnectorTileEntity) te).updateTargets(this);
+					}else if(te instanceof FluidPipeConnectorTileEntity) {
+						((FluidPipeConnectorTileEntity) te).updateTargets(this);
+					}
+					
 				}
 				
 			}else if (pco == PipeConnOptions.PIPE) {

@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "assemblylinemachines:block/crankmill" },
+        "facing=south": { "model": "assemblylinemachines:block/crankmill", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/crankmill", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/crankmill", "y": 90 }
+    }
+}

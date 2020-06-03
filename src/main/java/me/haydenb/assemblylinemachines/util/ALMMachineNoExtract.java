@@ -30,26 +30,16 @@ public abstract class ALMMachineNoExtract<A extends Container> extends AbstractA
 	}
 	
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		return this.getCapability(cap);
-	}
-	
-	@Override
-	public void updateContainingBlockInfo() {
-		super.updateContainingBlockInfo();
-		if(itemHandler != null) {
-			itemHandler.invalidate();
-			itemHandler = null;
-		}
-	}
-	
-	
-	@Override
 	public void remove() {
 		super.remove();
 		if(itemHandler != null) {
 			itemHandler.invalidate();
 		}
+	}
+
+	@Override
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+		return this.getCapability(cap);
 	}
 	
 	private static class NoExtractItemHandler extends InvWrapper {

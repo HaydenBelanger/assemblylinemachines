@@ -179,7 +179,7 @@ public abstract class AbstractALMMachine<A extends Container> extends LockableLo
 	public static class SlotWithRestrictions extends Slot {
 
 		private final AbstractALMMachine<?> check;
-		private final int slot;
+		protected final int slot;
 		private final int maxStackLimit;
 
 		public SlotWithRestrictions(IInventory inventoryIn, int index, int xPosition, int yPosition,

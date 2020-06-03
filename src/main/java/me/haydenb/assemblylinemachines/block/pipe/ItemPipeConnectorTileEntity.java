@@ -21,6 +21,7 @@ import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -29,6 +30,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -46,9 +48,13 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 	private boolean outputMode = false;
 	private boolean nearestFirst = true;
 	private boolean whitelist = false;
+	private boolean redstone = false;
+	private boolean isRedstonePowered = false;
 	private int priority = 0;
 
 	private int timer = 0;
+	private int nTimer = 50;
+	private double pendingCooldown = 0;
 
 	private IItemHandler output = null;
 
@@ -57,22 +63,22 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 				@Override
 				public int compare(ItemPipeConnectorTileEntity o1, ItemPipeConnectorTileEntity o2) {
-					if(o1.getPriority() > o2.getPriority()) {
+					if (o1.getPriority() > o2.getPriority()) {
 						return 1;
-					}else if(o1.getPriority() < o2.getPriority()) {
+					} else if (o1.getPriority() < o2.getPriority()) {
 						return -1;
-					}else {
-						if(nearestFirst) {
-							
-							if(pos.distanceSq(o1.pos) > pos.distanceSq(o2.pos)) {
+					} else {
+						if (nearestFirst) {
+
+							if (pos.distanceSq(o1.pos) > pos.distanceSq(o2.pos)) {
 								return -1;
-							}else {
+							} else {
 								return 1;
 							}
-						}else {
-							if(pos.distanceSq(o2.pos) > pos.distanceSq(o1.pos)) {
+						} else {
+							if (pos.distanceSq(o2.pos) > pos.distanceSq(o1.pos)) {
 								return -1;
-							}else {
+							} else {
 								return 1;
 							}
 						}
@@ -80,7 +86,6 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 				}
 
 			});
-	
 
 	private boolean targetsUpdated = false;
 
@@ -96,30 +101,35 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 	public void updateTargets(PipeBase<?> pb) {
 		if (!world.isRemote) {
 			targets.clear();
-			pb.pathToNearest(world, pos, new ArrayList<>(), pos, 1, targets);
+			pb.pathToNearestItem(world, pos, new ArrayList<>(), pos, targets);
 			sendUpdates();
 		}
 
 	}
-	
-	public boolean nearestFirst() {
-		return nearestFirst;
+
+	public boolean isRedstoneActive() {
+		return redstone;
+	}
+
+	public void setRedstoneActive(boolean b) {
+		isRedstonePowered = b;
 	}
 
 	public int getPriority() {
 		return priority;
 	}
-	
+
 	@Override
 	public boolean isAllowedInSlot(int slot, ItemStack stack) {
-		if(slot >= 9 && slot <= 12) {
-			
-			if(stack.getItem() instanceof ItemUpgrade) {
+		if (slot >= 9 && slot <= 12) {
+
+			if (stack.getItem() instanceof ItemUpgrade) {
 				return true;
 			}
-		}else {
-			if(!stack.hasTag() && !stack.isDamaged()) {
-				return true;
+		} else {
+
+			if (stack == null || (!stack.hasTag() && !stack.isDamaged())) {
+				return enableFilterSlot(slot, this);
 			}
 		}
 		return false;
@@ -144,6 +154,15 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		if (compound.contains("assemblylinemachines:priority")) {
 			priority = compound.getInt("assemblylinemachines:priority");
 		}
+		if (compound.contains("assemblylinemachines:redstone")) {
+			redstone = compound.getBoolean("assemblylinemachines:redstone");
+		}
+		if (compound.contains("assemblylinemachines:redstoneispowered")) {
+			isRedstonePowered = compound.getBoolean("assemblylinemachines:redstoneispowered");
+		}
+		if (compound.contains("assemblylinemachines:pendingcooldown")) {
+			pendingCooldown = compound.getDouble("assemblylinemachines:cooldown");
+		}
 	}
 
 	@Override
@@ -153,7 +172,10 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		compound.putBoolean("assemblylinemachines:output", outputMode);
 		compound.putBoolean("assemblylinemachines:nearest", nearestFirst);
 		compound.putBoolean("assemblylinemachines:whitelist", whitelist);
+		compound.putBoolean("assemblylinemachines:redstone", redstone);
+		compound.putBoolean("assemblylinemachines:redstoneispowered", isRedstonePowered);
 		compound.putInt("assemblylinemachines:priority", priority);
+		compound.putDouble("assemblylinemachines:pendingcooldown", pendingCooldown);
 		return super.write(compound);
 	}
 
@@ -161,62 +183,126 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 	public void tick() {
 
 		if (!world.isRemote) {
-			if (targetsUpdated == false) {
-				targetsUpdated = true;
-				updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
-				((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(this.world, this.pos,
-						new ArrayList<>(), new ArrayList<>());
-			}
+
 			if (outputMode == true) {
-				if (timer++ == 40) {
+				if (timer++ == nTimer) {
 					timer = 0;
-					if (output == null && connectToOutput() == false) {
-						return;
-					}
-					if (output != null) {
-						int max = 10;
-						for (int i = 0; i < output.getSlots(); i++) {
-							ItemStack origStack = output.getStackInSlot(i);
-							if (origStack != ItemStack.EMPTY) {
-								ItemStack copyStack = origStack.copy();
-								if(copyStack.getCount() > max) {
-									copyStack.setCount(max);
-								}
-								int origSize = copyStack.getCount();
-								int extracted = 0;
-								int ix = 0;
-								for(ItemPipeConnectorTileEntity t : targets.descendingSet()) {
-									ix++;
-									System.out.println(ix + ": PRIORITY " + t.getPriority() + " DISTANCE " + pos.distanceSq(t.pos));
-								}
-								for (ItemPipeConnectorTileEntity ipc : targets.descendingSet()) {
-									if (ipc != null) {
-										extracted =+ ipc.attemptAcceptItem(copyStack);
-										
-										if (extracted == origSize || extracted > max) {
-											break;
-										}
-									}
+					if (pendingCooldown-- <= 0) {
+						pendingCooldown = 0;
+						switch (getUpgradeAmount(Upgrades.PIPE_SPEED)) {
+						case 3:
+							nTimer = 10;
+							break;
+						case 2:
+							nTimer = 20;
+							break;
+						case 1:
+							nTimer = 35;
+							break;
+						default:
+							nTimer = 50;
+						}
+
+						if (targetsUpdated == false) {
+							targetsUpdated = true;
+							updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
+							((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(this.world, this.pos,
+									new ArrayList<>(), new ArrayList<>());
+						}
+
+						if (output == null && connectToOutput() == false) {
+							return;
+						}
+						if (output != null) {
+							if (redstone == true) {
+								if (getUpgradeAmount(Upgrades.PIPE_REDSTONE) == 0) {
+									redstone = false;
+								} else if (isRedstonePowered == false) {
+									return;
 								}
 
-								if(extracted != 0) {
-									
-									output.extractItem(i, extracted, false);
-									break;
-								}
-								
 							}
 
-						}
-					}
+							int max = 0;
+							switch (getUpgradeAmount(Upgrades.PIPE_STACK)) {
+							case 3:
+								max = 64;
+								break;
+							case 2:
+								max = 32;
+								break;
+							case 1:
+								max = 16;
+								break;
+							default:
+								max = 8;
+							}
+							for (int i = 0; i < output.getSlots(); i++) {
+								ItemStack origStack = output.getStackInSlot(i);
+								if (origStack != ItemStack.EMPTY && checkWhiteBlackList(origStack)) {
+									ItemStack copyStack = origStack.copy();
+									if (copyStack.getCount() > max) {
+										copyStack.setCount(max);
+									}
+									int origSize = copyStack.getCount();
+									int extracted = 0;
 
+									double waitTime = 0;
+									for (ItemPipeConnectorTileEntity ipc : targets.descendingSet()) {
+										if (ipc != null) {
+											extracted = +ipc.attemptAcceptItem(copyStack);
+
+											double thisdist = pos.distanceSq(ipc.pos);
+											if (thisdist > waitTime) {
+												waitTime = thisdist;
+											}
+											if (extracted == origSize || extracted >= max) {
+												break;
+											}
+											
+										}
+									}
+
+									if (extracted != 0) {
+										pendingCooldown = (waitTime * extracted) / 140;
+										output.extractItem(i, extracted, false);
+										break;
+									}
+
+								}
+
+							}
+
+							sendUpdates();
+						}
+
+					}
 				}
 			}
 		}
 	}
-	
+
+	@Override
+	public NonNullList<ItemStack> getItems() {
+		for (int i = 0; i < 9; i++) {
+			if (contents.get(i) != ItemStack.EMPTY && enableFilterSlot(i, this) == false) {
+				Utils.spawnItem(contents.get(i), pos.up(), world);
+				contents.set(i, ItemStack.EMPTY);
+			}
+		}
+
+		return contents;
+	}
+
 	public int getUpgradeAmount(Upgrades upgrade) {
-		return 0;
+		int ii = 0;
+		for (int i = 9; i < 12; i++) {
+			if (Upgrades.match(contents.get(i)) == upgrade) {
+				ii++;
+			}
+		}
+
+		return ii;
 	}
 
 	public int attemptAcceptItem(ItemStack stack) {
@@ -228,10 +314,14 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			return 0;
 		}
 
+		if (checkWhiteBlackList(stack) == false) {
+			return 0;
+		}
+
 		int added = 0;
 		for (int i = 0; i < output.getSlots(); i++) {
 			int acc = stack.getCount() - output.insertItem(i, stack, false).getCount();
-			
+
 			if (acc != 0) {
 				added += acc;
 				break;
@@ -240,6 +330,24 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 		return added;
 
+	}
+
+	private boolean checkWhiteBlackList(ItemStack stack) {
+		for (int i = 0; i < 9; i++) {
+			if (whitelist) {
+				if (stack.getItem() == contents.get(i).getItem()) {
+					return true;
+				}
+			} else {
+				if (stack.getItem() == contents.get(i).getItem()) {
+					return false;
+				}
+			}
+		}
+		if (!whitelist) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean connectToOutput() {
@@ -285,12 +393,14 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 					PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			for (int row = 0; row < 3; ++row) {
 				for (int col = 0; col < 3; ++col) {
-					this.addSlot(new AbstractALMMachine.SlotWithRestrictions(tileEntity, (row * 3) + col, 55 + (18 * col), 21 + (18 * row), tileEntity, 1));
+					this.addSlot(new FilterPipeValidatorSlot(tileEntity, (row * 3) + col, 55 + (18 * col),
+							21 + (18 * row), tileEntity, 1));
 				}
 			}
 
 			for (int row = 0; row < 3; ++row) {
-				this.addSlot(new AbstractALMMachine.SlotWithRestrictions(tileEntity, row + 9, 149, 21 + (row * 18), tileEntity, 1));
+				this.addSlot(new AbstractALMMachine.SlotWithRestrictions(tileEntity, row + 9, 149, 21 + (row * 18),
+						tileEntity, 1));
 			}
 
 		}
@@ -301,7 +411,20 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 					Utils.getTileEntity(playerInventory, data, ItemPipeConnectorTileEntity.class));
 		}
 
-		
+		private static class FilterPipeValidatorSlot extends SlotWithRestrictions {
+
+			public FilterPipeValidatorSlot(IInventory inventoryIn, int index, int xPosition, int yPosition,
+					AbstractALMMachine<?> check, int slotLimit) {
+				super(inventoryIn, index, xPosition, yPosition, check, slotLimit);
+			}
+
+			@Override
+			public boolean isEnabled() {
+				return isItemValid(null);
+			}
+
+		}
+
 		@Override
 		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
 			ItemStack itemstack = ItemStack.EMPTY;
@@ -362,11 +485,12 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 				sendPipeUpdatePacket(tsfm.pos, "nearest");
 			}), new SupplierWrapper("Nearest First", "Farthest First", () -> tsfm.nearestFirst)));
 			/*
-			 * Button For RR Mode if I ever figure it out.
-			b.put("rr", new Pair<>(new ItemPipeButton(x + 43, y + 31, 177, 31, null, (button) -> {
-				sendPipeUpdatePacket(tsfm.pos, "roundrobin");
-			}), new SupplierWrapper("Round-Robin Enabled", "Round-Robin Disabled", () -> tsfm.rrMode)));
-			*/
+			 * Button For RR Mode if I ever figure it out. b.put("rr", new Pair<>(new
+			 * ItemPipeButton(x + 43, y + 31, 177, 31, null, (button) -> {
+			 * sendPipeUpdatePacket(tsfm.pos, "roundrobin"); }), new
+			 * SupplierWrapper("Round-Robin Enabled", "Round-Robin Disabled", () ->
+			 * tsfm.rrMode)));
+			 */
 			b.put("filter", new Pair<>(new ItemPipeButton(x + 43, y + 65, 177, 41, null, (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "whitelist");
 			}), new SupplierWrapper("Whitelist", "Blacklist", () -> tsfm.whitelist)));
@@ -384,6 +508,9 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			b.put("refresh", new Pair<>(new ItemPipeButton(x + 158, y + 10, "Refresh Connection Map", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "refresh");
 			}), null));
+			b.put("redstone", new Pair<>(new ItemPipeRedstoneButton(x + 43, y + 42, 177, 51, null, (button) -> {
+				sendPipeUpdatePacket(tsfm.pos, "redstone");
+			}, tsfm), new SupplierWrapper("Enabled on Redstone Signal", "Always Active", () -> tsfm.redstone)));
 			for (Pair<ItemPipeButton, SupplierWrapper> bb : b.values()) {
 				this.addButton(bb.x);
 			}
@@ -394,17 +521,19 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 			for (Pair<ItemPipeButton, SupplierWrapper> bb : b.values()) {
-				if (mouseX >= bb.x.x && mouseX <= bb.x.x + 8 && mouseY >= bb.x.y && mouseY <= bb.x.y + 8) {
-					int x = (this.width - this.xSize) / 2;
-					int y = (this.height - this.ySize) / 2;
-					if (bb.y != null) {
-						this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
-					} else {
-						this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
-					}
+				if (!(bb.x instanceof ItemPipeRedstoneButton)
+						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled())
+					if (mouseX >= bb.x.x && mouseX <= bb.x.x + 8 && mouseY >= bb.x.y && mouseY <= bb.x.y + 8) {
+						int x = (this.width - this.xSize) / 2;
+						int y = (this.height - this.ySize) / 2;
+						if (bb.y != null) {
+							this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
+						} else {
+							this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
+						}
 
-					break;
-				}
+						break;
+					}
 			}
 
 			this.font.drawString(this.title.getFormattedText(), 11, 6, 4210752);
@@ -416,15 +545,27 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			for (Pair<ItemPipeButton, SupplierWrapper> bb : b.values()) {
-
-				if (bb.y != null && bb.y.supplier.get()) {
-					super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, 8, 8);
+				if (!(bb.x instanceof ItemPipeRedstoneButton)
+						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled()) {
+					if (bb.y != null && bb.y.supplier.get()) {
+						super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, 8, 8);
+					}
+				} else {
+					super.blit(x + 43, y + 42, 9, 12, 8, 8);
 				}
 
 			}
-			
-			//Covers the Round Robin button.
-			super.blit(x+43, y+31, 9, 12, 8, 8);
+
+			// Covers the Round Robin button.
+			super.blit(x + 43, y + 31, 9, 12, 8, 8);
+
+			for (int row = 0; row < 3; ++row) {
+				for (int col = 0; col < 3; ++col) {
+					if (enableFilterSlot((row * 3) + col, tsfm) == false) {
+						super.blit(x + 55 + (18 * col), y + 21 + (18 * row), 186, 0, 16, 16);
+					}
+				}
+			}
 
 			this.drawCenteredString(this.font, this.tsfm.priority + "", x + 133, y + 43, 0xffffff);
 		}
@@ -447,6 +588,34 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 		@Override
 		public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
+		}
+
+	}
+
+	public static class ItemPipeRedstoneButton extends ItemPipeButton {
+		private final ItemPipeConnectorTileEntity ipcte;
+
+		public ItemPipeRedstoneButton(int widthIn, int heightIn, int blitx, int blity, String text, IPressable onPress,
+				ItemPipeConnectorTileEntity ipcte) {
+			super(widthIn, heightIn, blitx, blity, text, onPress);
+			this.ipcte = ipcte;
+		}
+
+		public ItemPipeRedstoneButton(int widthIn, int heightIn, String text, IPressable onPress,
+				ItemPipeConnectorTileEntity ipcte) {
+			this(widthIn, heightIn, 0, 0, text, onPress, ipcte);
+		}
+
+		@Override
+		protected boolean isValidClickButton(int p_isValidClickButton_1_) {
+			return isRedstoneControlEnabled();
+		}
+
+		private boolean isRedstoneControlEnabled() {
+			if (ipcte.getUpgradeAmount(Upgrades.PIPE_REDSTONE) > 0) {
+				return true;
+			}
+			return false;
 		}
 
 	}
@@ -486,7 +655,8 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 	public static void updateDataFromPacket(PacketData pd, World world) {
 
 		if (pd.getCategory().equals("item_pipe_gui")) {
-			TileEntity te = world.getTileEntity(pd.get("location", BlockPos.class));
+			BlockPos pos = pd.get("location", BlockPos.class);
+			TileEntity te = world.getTileEntity(pos);
 			if (te != null && te instanceof ItemPipeConnectorTileEntity) {
 				ItemPipeConnectorTileEntity ipcte = (ItemPipeConnectorTileEntity) te;
 
@@ -501,37 +671,65 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 				} else if (b.equals("nearest")) {
 					ipcte.nearestFirst = !ipcte.nearestFirst;
 					ipcte.updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
-				} /*else if (b.equals("roundrobin")) {
-
-					ipcte.rrMode = !ipcte.rrMode;
-
-					if (ipcte.rrMode == true) {
-						ipcte.nearestFirst = true;
-						ipcte.updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
-					}
-				}*/ else if (b.equals("whitelist")) {
+				} /*
+					 * else if (b.equals("roundrobin")) {
+					 * 
+					 * ipcte.rrMode = !ipcte.rrMode;
+					 * 
+					 * if (ipcte.rrMode == true) { ipcte.nearestFirst = true;
+					 * ipcte.updateTargets((PipeBase<?>) Registry.getBlock("item_pipe")); } }
+					 */ else if (b.equals("whitelist")) {
 					ipcte.whitelist = !ipcte.whitelist;
 
 				} else if (b.equals("priorityup")) {
-					if(ipcte.priority < 99) {
+					if (ipcte.priority < 99) {
 						ipcte.priority++;
-						((PipeBase<?>)Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(), new ArrayList<>(), new ArrayList<>());
+						((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(),
+								new ArrayList<>(), new ArrayList<>());
 					}
 				} else if (b.equals("prioritydown")) {
-					if(ipcte.priority > -99) {
+					if (ipcte.priority > -99) {
 						ipcte.priority--;
-						((PipeBase<?>)Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(), new ArrayList<>(), new ArrayList<>());
+						((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(),
+								new ArrayList<>(), new ArrayList<>());
 					}
-					
+
 				} else if (b.equals("priorityzero")) {
 					ipcte.priority = 0;
-					((PipeBase<?>)Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(), new ArrayList<>(), new ArrayList<>());
+					((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(),
+							new ArrayList<>(), new ArrayList<>());
 				} else if (b.equals("refresh")) {
 					ipcte.updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
+				} else if (b.equals("redstone")) {
+					ipcte.redstone = !ipcte.redstone;
+					if (ipcte.redstone && world.isBlockPowered(pos)) {
+						ipcte.isRedstonePowered = true;
+					}
 				}
 
 				ipcte.sendUpdates();
 			}
 		}
+	}
+
+	private static boolean enableFilterSlot(int slot, ItemPipeConnectorTileEntity te) {
+
+		if (slot == 4) {
+			return true;
+		} else if (slot == 3 || slot == 5) {
+			if (te.getUpgradeAmount(Upgrades.PIPE_FILTER) >= 1) {
+				return true;
+			}
+		} else if (slot == 1 || slot == 7) {
+			if (te.getUpgradeAmount(Upgrades.PIPE_FILTER) >= 2) {
+				return true;
+			}
+		} else {
+			if (te.getUpgradeAmount(Upgrades.PIPE_FILTER) >= 3) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

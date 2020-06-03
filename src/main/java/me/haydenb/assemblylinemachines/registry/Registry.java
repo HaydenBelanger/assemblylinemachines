@@ -25,6 +25,12 @@ import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder;
 import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ContainerSimpleGrinder;
 import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ScreenSimpleGrinder;
 import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
+import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
+import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.TEBasicBatteryCell;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.TECoalGenerator;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator;
 import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
@@ -185,6 +191,10 @@ public class Registry {
 		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.FLUID));
 		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.POWER));
 		
+		createBlock("basic_battery_cell", new BlockBasicBatteryCell());
+		createBlock("coal_generator", new BlockCoalGenerator());
+		createBlock("crankmill", new BlockCrankmill());
+		
 		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT));
 		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD));
 		
@@ -209,8 +219,12 @@ public class Registry {
 		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"));
 		createTileEntity("gearbox", TEGearbox.class);
 		createTileEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
-		createTileEntity("fluid_connector_item", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"));
-		createTileEntity("energy_connector_item", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"));
+		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"));
+		createTileEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"));
+		
+		createTileEntity("basic_battery_cell", TEBasicBatteryCell.class);
+		createTileEntity("coal_generator", TECoalGenerator.class);
+		createTileEntity("crankmill", TECrankmill.class);
 		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}

@@ -25,6 +25,8 @@ public abstract class TEContainingBlock extends Block{
 	private final VoxelShape shape;
 	private final boolean shouldRotate;
 	private final Direction dir;
+	
+	private static final VoxelShape NO_SHAPE_CUBE = Block.makeCuboidShape(0, 0, 0, 16, 16, 16);
 	public TEContainingBlock(Properties properties, String teName) {
 		super(properties);
 		this.teName = teName;
@@ -79,7 +81,7 @@ public abstract class TEContainingBlock extends Block{
 				return shape;
 			}
 		}else {
-			return Block.makeCuboidShape(0, 0, 0, 16, 16, 16);
+			return NO_SHAPE_CUBE;
 		}
 	}
 	

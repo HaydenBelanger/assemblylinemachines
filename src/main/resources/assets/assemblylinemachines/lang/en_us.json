@@ -34,6 +34,10 @@
 	"item.assemblylinemachines.gearbox_upgrade_efficiency": "Gearbox Upgrade: Efficiency",
 	"item.assemblylinemachines.gearbox_upgrade_speed": "Gearbox Upgrade: Speed",
 	"item.assemblylinemachines.gearbox_upgrade_limiter": "Gearbox Upgrade: Cycle Limiter",
+	"item.assemblylinemachines.item_pipe_upgrade_speed": "Item Pipe Upgrade: Speed",
+	"item.assemblylinemachines.item_pipe_upgrade_stack": "Item Pipe Upgrade: Stack Size",
+	"item.assemblylinemachines.item_pipe_upgrade_filter": "Item Pipe Upgrade: Filter",
+	"item.assemblylinemachines.item_pipe_upgrade_redstone": "Item Pipe Upgrade: Redstone Control",
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
@@ -52,5 +56,11 @@
 	"block.assemblylinemachines.crank": "Crank",
 	"block.assemblylinemachines.simple_fluid_mixer": "Simple Fluid Mixer",
 	"block.assemblylinemachines.simple_grinder": "Simple Grinder",
-	"block.assemblylinemachines.gearbox": "Gearbox"
+	"block.assemblylinemachines.gearbox": "Gearbox",
+	"block.assemblylinemachines.item_pipe": "Basic Item Pipe",
+	"block.assemblylinemachines.fluid_pipe": "Basic Fluid Pipe",
+	"block.assemblylinemachines.energy_pipe": "Basic Energy Pipe",
+	"block.assemblylinemachines.crankmill": "Crankmill",
+	"block.assemblylinemachines.basic_energy_cell": "Basic Energy Cell",
+	"block.assemblylinemachines.coal_generator": "Coal Generator"
 }
