@@ -1,3 +1,3 @@
 {
-	"parent": "assemblylinemachines:block/fluid_bath_empty"
+	"parent": "assemblylinemachines:block/bath/fluid_bath_empty"
 }

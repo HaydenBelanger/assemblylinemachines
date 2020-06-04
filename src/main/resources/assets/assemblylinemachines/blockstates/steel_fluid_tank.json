@@ -1,8 +1,12 @@
 {
-	"variants":{
-		"fluid=none": {"model": "assemblylinemachines:block/steel_fluid_tank_empty"},
-		"fluid=water": {"model": "assemblylinemachines:block/steel_fluid_tank_water"},
-		"fluid=lava": {"model": "assemblylinemachines:block/steel_fluid_tank_lava"}
-	}
+	"multipart":[
+		{"apply":{"model": "assemblylinemachines:block/tank/steel_frame"}},
+		{   "when": { "fluid": "lava" },
+            "apply": { "model": "assemblylinemachines:block/tank/fluids/lava"}
+        },
+        {   "when": { "fluid": "water" },
+            "apply": { "model": "assemblylinemachines:block/tank/fluids/water"}
+        }
+	]
 	
 }

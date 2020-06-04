@@ -1,5 +1,7 @@
 package me.haydenb.assemblylinemachines.util;
 
+import org.apache.commons.text.WordUtils;
+
 import net.minecraft.fluid.Fluid;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.util.IStringSerializable;
@@ -10,38 +12,37 @@ public class FluidProperty {
 	
 	
 	public static enum Fluids implements IStringSerializable {
-		NONE("none", null, null), WATER("water", net.minecraft.fluid.Fluids.WATER, "Water"), LAVA("lava", net.minecraft.fluid.Fluids.LAVA, "Lava");
+		NONE(null), WATER(net.minecraft.fluid.Fluids.WATER), LAVA(net.minecraft.fluid.Fluids.LAVA);
 
-		private String t;
 		private Fluid f;
-		private String ff;
 		
-		Fluids(String t, Fluid f, String ff){
-			this.t = t;
+		Fluids(Fluid f){
 			this.f = f;
-			this.ff = ff;
 		}
 		@Override
 		public String getName() {
-			return t;
+			return toString().toLowerCase();
 		}
 		
 		public Fluid getAssocFluid() {
 			return f;
+			
 		}
 		
 		public String getFriendlyName() {
-			return ff;
+			return WordUtils.capitalizeFully(toString().replace("_", " "));
 		}
 		
 		public static Fluids getAssocFluids(Fluid f) {
-			if(f == WATER.getAssocFluid()) {
-				return WATER;
-			}else if(f == LAVA.getAssocFluid()) {
-				return LAVA;
-			}else {
-				return NONE;
+			
+			for(Fluids ff : values()) {
+				if(ff.getAssocFluid() != null) {
+					if(ff.getAssocFluid().equals(f)){
+						return ff;
+					}
+				}
 			}
+			return NONE;
 			
 		}
 	}

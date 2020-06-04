@@ -26,7 +26,7 @@ public abstract class ALMMachineNoExtract<A extends Container> extends AbstractA
 			return itemHandler.cast();
 		}
 		
-		return super.getCapability(cap);
+		return LazyOptional.empty();
 	}
 	
 	@Override

@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines.block;
 import java.text.DecimalFormat;
 import java.util.stream.Stream;
 
+import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank.FluidTankHandler;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.FluidProperty;
@@ -13,6 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -22,8 +24,6 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.IBooleanFunction;
@@ -36,8 +36,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullConsumer;
+import net.minecraftforge.fluids.FluidActionResult;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -128,102 +129,40 @@ public class BlockFluidTank extends Block {
 			if (player.getActiveHand() == Hand.MAIN_HAND) {
 				if (world.getTileEntity(pos) instanceof TEFluidTank) {
 					TEFluidTank entity = (TEFluidTank) world.getTileEntity(pos);
-					IFluidHandler handler = entity.getRightClickObtainedHandler();
+					FluidTankHandler handler = entity.fluids;
 					if (handler != null) {
 						if (player.isSneaking()) {
 							FluidStack f = handler.getFluidInTank(0);
-							Fluids ff;
-							if (f == null || f.isEmpty()) {
-								ff = Fluids.NONE;
+							Fluids ff = Fluids.getAssocFluids(f.getFluid());
+							if (ff.equals(Fluids.NONE)) {
 								player.sendStatusMessage(new StringTextComponent("This tank is empty."), true);
 							} else {
-								if (f.getFluid() == Fluids.LAVA.getAssocFluid()) {
-									ff = Fluids.LAVA;
-								} else {
-									ff = Fluids.WATER;
-								}
 								player.sendStatusMessage(
 										new StringTextComponent(FORMAT.format(f.getAmount()) + "/"
 												+ FORMAT.format(handler.getTankCapacity(0)) + " mB " + ff.getFriendlyName()),
 										true);
 							}
-
-							if (state.get(FluidProperty.FLUID) != ff) {
-								world.setBlockState(pos, state.with(FluidProperty.FLUID, ff));
-							}
 						} else {
 							ItemStack is = player.getHeldItemMainhand();
 
-							Fluids ff = null;
-							if (is.getItem() == Items.BUCKET) {
-								FluidStack f = handler.drain(1000, FluidAction.SIMULATE);
-								if (f.getAmount() < 1000) {
-									player.sendStatusMessage(
-											new StringTextComponent("This tank is too empty for this."), true);
-								} else {
+							if(is.getItem() == Items.BUCKET) {
+								
+								FluidActionResult far = FluidUtil.tryFillContainer(is, handler, 1000, player, true);
+								if(far.isSuccess()) {
 									is.shrink(1);
-									if (f.getFluid() == Fluids.LAVA.getAssocFluid()) {
-										ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.LAVA_BUCKET));
-										world.playSound(null, pos, SoundEvents.ITEM_BUCKET_FILL_LAVA,
-												SoundCategory.BLOCKS, 1f, 1f);
-									} else {
-										ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.WATER_BUCKET));
-										world.playSound(null, pos, SoundEvents.ITEM_BUCKET_FILL, SoundCategory.BLOCKS,
-												1f, 1f);
-									}
-
-									handler.drain(1000, FluidAction.EXECUTE);
-									entity.sendUpdates();
-
-									if (handler.getFluidInTank(0).getAmount() == 0) {
-										ff = Fluids.NONE;
-									}
-
+									ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
 								}
-							} else if (is.getItem() == Items.LAVA_BUCKET || is.getItem() == Items.WATER_BUCKET) {
-								FluidStack fsi = null;
-								if (is.getItem() == Items.LAVA_BUCKET) {
-									if (handler.getFluidInTank(0).getAmount() == 0) {
-										ff = Fluids.LAVA;
-									}
-									fsi = new FluidStack(Fluids.LAVA.getAssocFluid(), 1000);
-								} else if (is.getItem() == Items.WATER_BUCKET) {
-									if (handler.getFluidInTank(0).getAmount() == 0) {
-										ff = Fluids.WATER;
-									}
-									fsi = new FluidStack(Fluids.WATER.getAssocFluid(), 1000);
-								}
-								if (fsi.getFluid() == Fluids.LAVA.getAssocFluid()
-										&& _tempres != TemperatureResistance.HOT) {
-									player.sendStatusMessage(
-											new StringTextComponent("This fluid is too hot for this tank."), true);
-									ff = null;
-								} else if (!entity.isEmpty() && fsi.getFluid() != handler.getFluidInTank(0).getFluid()) {
-									player.sendStatusMessage(
-											new StringTextComponent("This tank doesn't have this fluid in it."), true);
-									ff = null;
-								} else {
-									if (fsi != null) {
-										if (handler.fill(fsi, FluidAction.SIMULATE) < 1000) {
-											player.sendStatusMessage(
-													new StringTextComponent("This tank is too full for this."), true);
-											ff = null;
-										} else {
-											ItemHandlerHelper.giveItemToPlayer(player, is.getContainerItem());
-											is.shrink(1);
-											world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY,
-													SoundCategory.BLOCKS, 1f, 1f);
-											handler.fill(fsi, FluidAction.EXECUTE);
-											entity.sendUpdates();
-										}
-
+								
+								
+							}else {
+								if(handler.fill(FluidUtil.getFluidContained(is).orElse(FluidStack.EMPTY), FluidAction.SIMULATE, player) == 1000) {
+									FluidActionResult far = FluidUtil.tryEmptyContainer(is, handler, 1000, player, true);
+									if(far.isSuccess()) {
+										is.shrink(1);
+										ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
 									}
 								}
-
-							}
-
-							if (ff != null) {
-								world.setBlockState(pos, state.with(FluidProperty.FLUID, ff));
+								
 							}
 						}
 					}
@@ -239,94 +178,10 @@ public class BlockFluidTank extends Block {
 		private FluidStack fluid = FluidStack.EMPTY;
 		private int capacity = 0;
 		private TemperatureResistance trs = TemperatureResistance.COLD;
-		protected IFluidHandler fluids = new IFluidHandler() {
-
-			@Override
-			public boolean isFluidValid(int tank, FluidStack stack) {
-				if (stack.getFluid() == Fluids.LAVA.getAssocFluid()
-						|| stack.getFluid() == Fluids.WATER.getAssocFluid()) {
-					return true;
-				}
-				return false;
-			}
-
-			@Override
-			public int getTanks() {
-				return 1;
-			}
-
-			@Override
-			public int getTankCapacity(int tank) {
-				return capacity;
-			}
-
-			@Override
-			public FluidStack getFluidInTank(int tank) {
-				return fluid;
-			}
-
-			@Override
-			public int fill(FluidStack resource, FluidAction action) {
-				if (!fluid.isEmpty()) {
-					if (resource.getFluid() != fluid.getFluid()) {
-						return 0;
-					}
-				}
-				if (resource.getFluid() == Fluids.LAVA.getAssocFluid() && trs == TemperatureResistance.COLD) {
-					return 0;
-				}
-				int attemptedInsert = resource.getAmount();
-				int rmCapacity = capacity - fluid.getAmount();
-				if (rmCapacity < attemptedInsert) {
-					attemptedInsert = rmCapacity;
-				}
-
-				if (action != FluidAction.SIMULATE) {
-					if (fluid.isEmpty()) {
-						fluid = resource;
-					} else {
-						fluid.setAmount(fluid.getAmount() + attemptedInsert);
-					}
-					Fluids ff = Fluids.getAssocFluids(fluid.getFluid());
-					if (attemptedInsert != 0 && getBlockState().get(FluidProperty.FLUID) != ff) {
-						world.setBlockState(pos, getBlockState().with(FluidProperty.FLUID, ff));
-						sendUpdates();
-					}
-				}
-				
-				sendUpdates();
-				return attemptedInsert;
-			}
-
-			@Override
-			public FluidStack drain(int maxDrain, FluidAction action) {
-				if (fluid.getAmount() < maxDrain) {
-					maxDrain = fluid.getAmount();
-				}
-
-				if (action != FluidAction.SIMULATE) {
-					fluid.setAmount(fluid.getAmount() - maxDrain);
-				}
-
-				if (fluid.getAmount() <= 0) {
-					fluid = FluidStack.EMPTY;
-
-					if (getBlockState().get(FluidProperty.FLUID) != Fluids.NONE) {
-						world.setBlockState(pos, getBlockState().with(FluidProperty.FLUID, Fluids.NONE));
-					}
-				}
-
-				sendUpdates();
-				return new FluidStack(fluid.getFluid(), maxDrain);
-			}
-
-			@Override
-			public FluidStack drain(FluidStack resource, FluidAction action) {
-				return drain(resource.getAmount(), action);
-			}
-		};
+		
+		FluidTankHandler fluids = new FluidTankHandler(this);
+		
 		protected LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> fluids);
-		private IFluidHandler rightClickObtainedHandler = null;
 
 		public TEFluidTank(final TileEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn);
@@ -354,35 +209,16 @@ public class BlockFluidTank extends Block {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			System.out.println(handler);
 			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
 				return handler.cast();
 			}
-			return super.getCapability(cap);
+			
+			return LazyOptional.empty();
 		}
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 			return this.getCapability(cap);
-		}
-
-		public IFluidHandler getRightClickObtainedHandler() {
-			if (rightClickObtainedHandler == null) {
-				LazyOptional<IFluidHandler> opt = this.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-				if (opt.orElse(null) != null) {
-					opt.addListener(new NonNullConsumer<LazyOptional<IFluidHandler>>() {
-
-						@Override
-						public void accept(LazyOptional<IFluidHandler> t) {
-							rightClickObtainedHandler = null;
-
-						}
-					});
-
-					rightClickObtainedHandler = opt.orElse(null);
-				}
-			}
-			return rightClickObtainedHandler;
 		}
 		
 		
@@ -410,6 +246,119 @@ public class BlockFluidTank extends Block {
 
 		public boolean isEmpty() {
 			return fluid.isEmpty();
+		}
+		
+		
+		public static class FluidTankHandler implements IFluidHandler{
+
+			private final TEFluidTank te;
+			FluidTankHandler(TEFluidTank te){
+				this.te = te;
+			}
+			@Override
+			public boolean isFluidValid(int tank, FluidStack stack) {
+				Fluids ff = Fluids.getAssocFluids(stack.getFluid());
+				if(ff != Fluids.NONE) {
+					return true;
+				}
+				return false;
+			}
+
+			@Override
+			public int getTanks() {
+				return 1;
+			}
+
+			@Override
+			public int getTankCapacity(int tank) {
+				return te.capacity;
+			}
+
+			@Override
+			public FluidStack getFluidInTank(int tank) {
+				return te.fluid;
+			}
+
+			public int fill(FluidStack resource, FluidAction action, PlayerEntity player) {
+				if (!te.fluid.isEmpty()) {
+					if (resource.getFluid() != te.fluid.getFluid()) {
+						sendIfNotNull(player, "This is not the same fluid.");
+						return 0;
+					}
+				}
+				
+				Fluids ff = Fluids.getAssocFluids(resource.getFluid());
+				if(ff == Fluids.NONE) {
+					sendIfNotNull(player, "This tank cannot store this fluid.");
+					return 0;
+				}
+				
+				if (resource.getFluid().getAttributes().getTemperature() >= 800 && te.trs == TemperatureResistance.COLD) {
+					sendIfNotNull(player, "This fluid is too hot for this tank");
+					return 0;
+				}
+				int attemptedInsert = resource.getAmount();
+				int rmCapacity = te.capacity - te.fluid.getAmount();
+				if (rmCapacity < attemptedInsert) {
+					attemptedInsert = rmCapacity;
+				}
+
+				if (action != FluidAction.SIMULATE) {
+					if (te.fluid.isEmpty()) {
+						te.fluid = resource;
+					} else {
+						te.fluid.setAmount(te.fluid.getAmount() + attemptedInsert);
+					}
+					if (attemptedInsert != 0 && te.getBlockState().get(FluidProperty.FLUID) != ff) {
+						te.world.setBlockState(te.pos, te.getBlockState().with(FluidProperty.FLUID, ff));
+						te.sendUpdates();
+					}
+				}
+				
+				te.sendUpdates();
+				return attemptedInsert;
+			}
+			@Override
+			public int fill(FluidStack resource, FluidAction action) {
+				return fill(resource, action, null);
+			}
+
+			@Override
+			public FluidStack drain(int maxDrain, FluidAction action) {
+				
+				
+				if (te.fluid.getAmount() < maxDrain) {
+					maxDrain = te.fluid.getAmount();
+				}
+
+				Fluid f = te.fluid.getFluid();
+				if (action != FluidAction.SIMULATE) {
+					te.fluid.setAmount(te.fluid.getAmount() - maxDrain);
+				}
+
+				if (te.fluid.getAmount() <= 0) {
+					te.fluid = FluidStack.EMPTY;
+
+					if (te.getBlockState().get(FluidProperty.FLUID) != Fluids.NONE) {
+						te.world.setBlockState(te.pos, te.getBlockState().with(FluidProperty.FLUID, Fluids.NONE));
+					}
+				}
+
+				te.sendUpdates();
+				return new FluidStack(f, maxDrain);
+			}
+
+			@Override
+			public FluidStack drain(FluidStack resource, FluidAction action) {
+				return drain(resource.getAmount(), action);
+			}
+			
+			private void sendIfNotNull(PlayerEntity player, String message) {
+				if(player != null) {
+					player.sendStatusMessage(new StringTextComponent(message), true);
+				}
+			}
+			
 		}
 
 	}

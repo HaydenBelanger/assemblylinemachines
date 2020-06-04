@@ -1,3 +1,3 @@
 {
-	"parent": "assemblylinemachines:block/simple_grinder"
+	"parent": "assemblylinemachines:block/grinder/simple_grinder"
 }

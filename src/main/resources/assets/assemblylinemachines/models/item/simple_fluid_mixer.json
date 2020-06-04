@@ -1,3 +1,3 @@
 {
-	"parent": "assemblylinemachines:block/simple_fluid_mixer"
+	"parent": "assemblylinemachines:block/mixer/simple_fluid_mixer"
 }

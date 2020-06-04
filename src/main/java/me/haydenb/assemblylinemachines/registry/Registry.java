@@ -27,10 +27,10 @@ import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ScreenSimpleGrin
 import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.TEBasicBatteryCell;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.TECoalGenerator;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator;
 import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
@@ -41,15 +41,15 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.util.CreativeTab;
 import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.ItemTiers;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
+import me.haydenb.assemblylinemachines.util.ItemTiers;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -85,6 +85,7 @@ import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -258,6 +259,11 @@ public class Registry {
 		
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
 		event.getRegistry().register(BathCrafting.SERIALIZER.setRegistryName("bath"));
+		
+	}
+	
+	@SubscribeEvent
+	public static void modelBaking(ModelBakeEvent event) {
 		
 	}
 	

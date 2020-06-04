@@ -113,10 +113,8 @@ public class FluidPipeConnectorTileEntity extends TileEntityALMBase implements I
 								
 								for(FluidPipeConnectorTileEntity tpc : targets.descendingSet()) {
 									if(tpc != null) {
-										System.out.println("Attempting insert on " + pos + "...");
 										extracted =+ tpc.attemptAcceptFluid(copyStack);
 										
-										System.out.println("Extract amount = " + extracted);
 										double thisdist = pos.distanceSq(tpc.pos);
 										
 										if(thisdist > waitTime) {
