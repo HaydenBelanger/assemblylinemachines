@@ -24,6 +24,11 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.item.*;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.packets.HashPacketImpl.DecoderConsumer;
+import me.haydenb.assemblylinemachines.packets.HashPacketImpl.EncoderConsumer;
+import me.haydenb.assemblylinemachines.packets.HashPacketImpl.MessageHandler;
+import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
@@ -76,7 +81,9 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.network.IContainerFactory;
+import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -278,6 +285,12 @@ public class Registry {
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
 		event.getRegistry().register(BathCrafting.SERIALIZER.setRegistryName("bath"));
 		
+	}
+	
+	@SubscribeEvent
+	public static void commonSetup(FMLCommonSetupEvent event) {
+		HashPacketImpl.INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);
+		HashPacketImpl.INSTANCE.registerMessage(HashPacketImpl.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
 	}
 	
 	@OnlyIn(Dist.CLIENT)

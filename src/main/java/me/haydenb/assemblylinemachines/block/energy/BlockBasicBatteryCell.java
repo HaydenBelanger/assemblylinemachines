@@ -324,6 +324,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			this.drawCenteredString(this.font, Utils.FORMAT.format(tsfm.fept), x + 122, y + 38, 0xffffff);
 		}
 
+		@OnlyIn(Dist.CLIENT)
 		public static void sendCellUpdatePacket(BlockPos pos, String button) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
@@ -331,6 +332,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			HashPacketImpl.INSTANCE.sendToServer(pd);
 		}
 		
+		@OnlyIn(Dist.CLIENT)
 		public static void sendCellUpdatePacket(BlockPos pos, String button, Boolean shifting, Boolean ctrling) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
