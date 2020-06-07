@@ -1,0 +1,46 @@
+{
+	"type": "minecraft:block",
+	"pools": [
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "assemblylinemachines:black_granite",
+					"conditions":[
+						{
+							"condition": "match_tool",
+							"predicate":{
+								"item": "assemblylinemachines:crank_pickaxe",
+								"nbt": "{\"assemblylinemachines:hascranks\": true}"
+							}
+						},
+						{
+							"condition": "block_state_property",
+							"block": "assemblylinemachines:black_granite",
+							"properties":{
+								"natural": true
+							}
+						}
+						
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "assemblylinemachines:black_granite",
+					"conditions":[
+						{
+							"condition": "block_state_property",
+							"block": "assemblylinemachines:black_granite",
+							"properties":{
+								"natural": false
+							}
+						}
+						
+					]
+				}
+				
+			]
+		}
+	]
+}

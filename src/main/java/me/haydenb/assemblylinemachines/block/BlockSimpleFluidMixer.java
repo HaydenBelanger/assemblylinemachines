@@ -2,16 +2,16 @@ package me.haydenb.assemblylinemachines.block;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.util.ALMMachineNoExtract;
 import me.haydenb.assemblylinemachines.util.FluidProperty;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine;
 import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.util.AbstractALMMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
+import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
+import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -74,6 +74,17 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 		
 		return stateIn;
 	}
+	
+	@Override
+	public boolean validSide(BlockState state, Direction dir) {
+		return true;
+	}
+	
+	@Override
+	public boolean needsGearbox() {
+		return false;
+	}
+	
 	public static class TESimpleFluidMixer extends ALMMachineNoExtract<ContainerSimpleFluidMixer> implements ITickableTileEntity, ICrankableMachine{
 		
 		public IFluidTank tank;

@@ -1,0 +1,9 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "assemblylinemachines:block/simple_crank_charger",
+        "front": "assemblylinemachines:block/machine_basic_side",
+        "side": "assemblylinemachines:block/machine_basic_side",
+		"bottom": "assemblylinemachines:block/machine_basic_top"
+    }
+}

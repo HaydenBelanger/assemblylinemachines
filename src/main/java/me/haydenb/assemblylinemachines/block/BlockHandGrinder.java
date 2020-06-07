@@ -7,9 +7,9 @@ import java.util.List;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TileEntityALMBase;
 import me.haydenb.assemblylinemachines.util.Utils;
 import me.haydenb.assemblylinemachines.util.Utils.Triplet;
+import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -195,7 +195,7 @@ public class BlockHandGrinder extends Block {
 		
 	}
 	
-	public static class TEHandGrinder extends TileEntityALMBase {
+	public static class TEHandGrinder extends ALMTileEntity {
 
 		private ItemStack blade = null;
 		HashMap<String, Triplet<ItemStack, Integer, ItemStack>> progress = new HashMap<>();

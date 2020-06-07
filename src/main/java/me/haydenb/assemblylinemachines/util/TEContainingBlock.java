@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.util;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;

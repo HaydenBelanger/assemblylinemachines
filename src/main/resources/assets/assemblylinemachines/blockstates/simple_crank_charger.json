@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "assemblylinemachines:block/simple_crank_charger" }
+    }
+}

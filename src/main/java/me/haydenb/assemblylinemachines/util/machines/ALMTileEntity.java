@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.util;
+package me.haydenb.assemblylinemachines.util.machines;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -6,9 +6,9 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 
-public class TileEntityALMBase extends TileEntity {
+public class ALMTileEntity extends TileEntity {
 	
-	public TileEntityALMBase(TileEntityType<?> tileEntityTypeIn) {
+	public ALMTileEntity(TileEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn);
 	}
 

@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:pure_titanium"
+		},
+		{
+			"tag": "assemblylinemachines:crafting/hammers"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:titanium_plate",
+		"count": 5
+	}
+}

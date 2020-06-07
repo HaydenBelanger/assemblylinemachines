@@ -38,6 +38,21 @@
 	"item.assemblylinemachines.item_pipe_upgrade_stack": "Item Pipe Upgrade: Stack Size",
 	"item.assemblylinemachines.item_pipe_upgrade_filter": "Item Pipe Upgrade: Filter",
 	"item.assemblylinemachines.item_pipe_upgrade_redstone": "Item Pipe Upgrade: Redstone Control",
+	"item.assemblylinemachines.crank_pickaxe": "Crank-Powered Pickaxe",
+	"item.assemblylinemachines.crank_axe": "Crank-Powered Greataxe",
+	"item.assemblylinemachines.crank_sword": "Crank-Powered Broadsword",
+	"item.assemblylinemachines.crank_shovel": "Crank-Powered Shovel",
+	"item.assemblylinemachines.crank_hoe": "Crank-Powered Hoe",
+	"item.assemblylinemachines.crank_hammer": "Crank-Powered Hammer",
+	"item.assemblylinemachines.steel_hammer": "Steel Hammer",
+	"item.assemblylinemachines.iron_plate": "Iron Plate",
+	"item.assemblylinemachines.gold_plate": "Gold Plate",
+	"item.assemblylinemachines.titanium_plate": "Titanium Plate",
+	"item.assemblylinemachines.gold_gear": "Gold Gear",
+	"item.assemblylinemachines.titanium_gear": "Titanium Gear",
+	"item.assemblylinemachines.steel_gear": "Steel Gear",
+	"item.assemblylinemachines.iron_gear": "Iron Gear",
+	
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
@@ -56,11 +71,17 @@
 	"block.assemblylinemachines.crank": "Crank",
 	"block.assemblylinemachines.simple_fluid_mixer": "Simple Fluid Mixer",
 	"block.assemblylinemachines.simple_grinder": "Simple Grinder",
+	"block.assemblylinemachines.simple_crank_charger": "Simple Crank Charger",
 	"block.assemblylinemachines.gearbox": "Gearbox",
 	"block.assemblylinemachines.item_pipe": "Basic Item Pipe",
 	"block.assemblylinemachines.fluid_pipe": "Basic Fluid Pipe",
 	"block.assemblylinemachines.energy_pipe": "Basic Energy Pipe",
 	"block.assemblylinemachines.crankmill": "Crankmill",
-	"block.assemblylinemachines.basic_energy_cell": "Basic Energy Cell",
-	"block.assemblylinemachines.coal_generator": "Coal Generator"
+	"block.assemblylinemachines.basic_battery_cell": "Basic Battery Cell",
+	"block.assemblylinemachines.coal_generator": "Coal Generator",
+	"block.assemblylinemachines.black_granite": "Black Granite",
+	"block.assemblylinemachines.smooth_black_granite": "Black Granite Block",
+	"block.assemblylinemachines.chiselled_black_granite": "Chiselled Black Granite",
+	"block.assemblylinemachines.brick_black_granite": "Black Granite Bricks",
+	"block.assemblylinemachines.pillar_black_granite": "Black Granite Pillar"
 }

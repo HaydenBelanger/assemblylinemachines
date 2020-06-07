@@ -4,54 +4,32 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.BlockCrank;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath.BathStatus;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
-import me.haydenb.assemblylinemachines.block.BlockFluidTank;
+import me.haydenb.assemblylinemachines.block.*;
+import me.haydenb.assemblylinemachines.block.BlockFluidBath.*;
 import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank;
-import me.haydenb.assemblylinemachines.block.BlockGearbox;
-import me.haydenb.assemblylinemachines.block.BlockGearbox.ContainerGearbox;
-import me.haydenb.assemblylinemachines.block.BlockGearbox.ScreenGearbox;
-import me.haydenb.assemblylinemachines.block.BlockGearbox.TEGearbox;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.ContainerSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.ScreenSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.TESimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ContainerSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ScreenSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
-import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
+import me.haydenb.assemblylinemachines.block.BlockGearbox.*;
+import me.haydenb.assemblylinemachines.block.BlockHandGrinder.*;
+import me.haydenb.assemblylinemachines.block.BlockSimpleCrankCharger.TESimpleCrankCharger;
+import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.*;
+import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.*;
+import me.haydenb.assemblylinemachines.block.energy.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ContainerBasicBatteryCell;
+import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ScreenBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.TEBasicBatteryCell;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.TECoalGenerator;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
-import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
-import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorScreen;
-import me.haydenb.assemblylinemachines.block.pipe.PipeBase;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
+import me.haydenb.assemblylinemachines.block.pipe.*;
+import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.*;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
-import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
-import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.ToolStirringStick;
+import me.haydenb.assemblylinemachines.crafting.*;
+import me.haydenb.assemblylinemachines.item.*;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.util.CreativeTab;
-import me.haydenb.assemblylinemachines.util.FluidProperty;
+import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.util.ItemTiers;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.IHasContainer;
@@ -85,7 +63,6 @@ import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -140,9 +117,18 @@ public class Registry {
 		createItem("pure_gold");
 		createItem("pure_titanium");
 		
-		createItem("steel_plate");
 		createItem("steel_rod");
+		
+		createItem("steel_plate");
 		createItem("wooden_board");
+		createItem("iron_plate");
+		createItem("gold_plate");
+		createItem("titanium_plate");
+		
+		createItem("gold_gear");
+		createItem("steel_gear");
+		createItem("iron_gear");
+		createItem("titanium_gear");
 		
 		createItem("empowered_coal", new ItemGearboxFuel(3200));
 		createItem("gearbox_upgrade_limiter", new ItemUpgrade("Gearbox will only burn fuel while action is required."));
@@ -169,8 +155,16 @@ public class Registry {
 		createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
 		createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
 		
-		event.getRegistry().registerAll(itemRegistry.values().toArray(new Item[itemRegistry.size()]));
+		createItem("crank_sword", CrankTool.makeCrankTool(ItemTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
+		createItem("crank_axe", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
+		createItem("crank_pickaxe", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
+		createItem("crank_shovel", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
+		createItem("crank_hoe", CrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, HoeItem.class));
+		createItem("crank_hammer", CrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
 		
+		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 0, -3.5f, new Item.Properties().group(creativeTab)));
+		
+		event.getRegistry().registerAll(itemRegistry.values().toArray(new Item[itemRegistry.size()]));
 		
 	}
 	
@@ -185,6 +179,8 @@ public class Registry {
 		
 		createBlock("crank", new BlockCrank());
 		createBlock("gearbox", new BlockGearbox());
+		
+		createBlock("simple_crank_charger", new BlockSimpleCrankCharger());
 		createBlock("simple_fluid_mixer", new BlockSimpleFluidMixer());
 		createBlock("simple_grinder", new BlockSimpleGrinder());
 		
@@ -192,20 +188,28 @@ public class Registry {
 		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.FLUID));
 		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.POWER));
 		
-		createBlock("basic_battery_cell", new BlockBasicBatteryCell());
-		createBlock("coal_generator", new BlockCoalGenerator());
-		createBlock("crankmill", new BlockCrankmill());
 		
 		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT));
 		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD));
 		
 		createBlock("silt", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_brick", Material.ROCK, 4f, 12f, 0, ToolType.PICKAXE, SoundType.STONE);
+		
 		createBlock("steel_block", Material.IRON, 7f, 30f, 3, ToolType.PICKAXE, SoundType.METAL);
+		
+		createBlock("black_granite", new BlockBlackGranite());
+		createBlock("smooth_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("brick_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("chiselled_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("pillar_black_granite", new RotatedPillarBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
 		
 		createBlock("silt_iron", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_gold", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_titanium", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
+		
+		createBlock("basic_battery_cell", new BlockBasicBatteryCell());
+		createBlock("coal_generator", new BlockCoalGenerator());
+		createBlock("crankmill", new BlockCrankmill());
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
@@ -215,10 +219,15 @@ public class Registry {
 	public static void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
 		createTileEntity("hand_grinder", TEHandGrinder.class);
 		createTileEntity("fluid_bath", TEFluidBath.class);
+		
 		createTileEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
 		createTileEntity("simple_grinder", TESimpleGrinder.class);
-		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"));
+		createTileEntity("simple_crank_charger", TESimpleCrankCharger.class);
+		
 		createTileEntity("gearbox", TEGearbox.class);
+		
+		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"));
+		
 		createTileEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
 		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"));
 		createTileEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"));
@@ -237,10 +246,15 @@ public class Registry {
 		createContainer("gearbox", 1052, ContainerGearbox.class);
 		createContainer("pipe_connector_item", 1053, ItemPipeConnectorContainer.class);
 		
+		createContainer("coal_generator", 1054, ContainerCoalGenerator.class);
+		createContainer("crankmill", 1055, ContainerCrankmill.class);
+		createContainer("basic_battery_cell", 1056, ContainerBasicBatteryCell.class);
+		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
 		RenderTypeLookup.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.getCutout());
@@ -250,6 +264,10 @@ public class Registry {
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
 		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
 		registerScreen("pipe_connector_item", ItemPipeConnectorContainer.class, ItemPipeConnectorScreen.class);
+		
+		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
+		registerScreen("crankmill", ContainerCrankmill.class, ScreenCrankmill.class);
+		registerScreen("basic_battery_cell", ContainerBasicBatteryCell.class, ScreenBasicBatteryCell.class);
 	}
 	
 	@SubscribeEvent
@@ -262,14 +280,10 @@ public class Registry {
 		
 	}
 	
-	@SubscribeEvent
-	public static void modelBaking(ModelBakeEvent event) {
-		
-	}
-	
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void registerBlockColorHandlers(ColorHandlerEvent.Block event) {
+		
 		
 		event.getBlockColors().register(new IBlockColor() {
 			
@@ -413,6 +427,7 @@ public class Registry {
 		containerIdRegistry.put(containerRegistry.get(name), id);
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	@SuppressWarnings("unchecked")
 	//Use carefully! Unchecked
 	public static <T extends Container, F extends Screen & IHasContainer<T>> void registerScreen(String name, Class<T> ctc, Class<F> scc) {

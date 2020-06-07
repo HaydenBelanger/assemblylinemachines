@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeSet;
-import java.util.function.Supplier;
-
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
@@ -13,12 +11,13 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.ALMMachineNoExtract;
-import me.haydenb.assemblylinemachines.util.AbstractALMMachine;
 import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.AbstractALMMachine.*;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import net.minecraft.client.gui.widget.button.Button;
+import me.haydenb.assemblylinemachines.util.Utils.SimpleButton;
+import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
+import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
+import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
+import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -457,7 +456,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 		ItemPipeConnectorTileEntity tsfm;
 		ItemPipeConnectorContainer container;
-		private final HashMap<String, Pair<ItemPipeButton, SupplierWrapper>> b;
+		private final HashMap<String, Pair<SimpleButton, SupplierWrapper>> b;
 
 		public ItemPipeConnectorScreen(ItemPipeConnectorContainer screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
@@ -474,44 +473,44 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			this.renderTitles = false;
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
-			b.put("input", new Pair<>(new ItemPipeButton(x + 32, y + 20, 177, 1, null, (button) -> {
+			b.put("input", new Pair<>(new SimpleButton(x + 32, y + 20, 177, 1, null, (button) -> {
 
 				sendPipeUpdatePacket(tsfm.pos, "input");
 			}), new SupplierWrapper("Input Enabled", "Input Disabled", () -> tsfm.inputMode)));
-			b.put("output", new Pair<>(new ItemPipeButton(x + 43, y + 20, 177, 11, null, (button) -> {
+			b.put("output", new Pair<>(new SimpleButton(x + 43, y + 20, 177, 11, null, (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "output");
 			}), new SupplierWrapper("Output Enabled", "Output Disabled", () -> tsfm.outputMode)));
-			b.put("target", new Pair<>(new ItemPipeButton(x + 32, y + 31, 177, 21, null, (button) -> {
+			b.put("target", new Pair<>(new SimpleButton(x + 32, y + 31, 177, 21, null, (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "nearest");
 			}), new SupplierWrapper("Nearest First", "Farthest First", () -> tsfm.nearestFirst)));
 			/*
 			 * Button For RR Mode if I ever figure it out. b.put("rr", new Pair<>(new
-			 * ItemPipeButton(x + 43, y + 31, 177, 31, null, (button) -> {
+			 * SimpleButton(x + 43, y + 31, 177, 31, null, (button) -> {
 			 * sendPipeUpdatePacket(tsfm.pos, "roundrobin"); }), new
 			 * SupplierWrapper("Round-Robin Enabled", "Round-Robin Disabled", () ->
 			 * tsfm.rrMode)));
 			 */
-			b.put("filter", new Pair<>(new ItemPipeButton(x + 43, y + 65, 177, 41, null, (button) -> {
+			b.put("filter", new Pair<>(new SimpleButton(x + 43, y + 65, 177, 41, null, (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "whitelist");
 			}), new SupplierWrapper("Whitelist", "Blacklist", () -> tsfm.whitelist)));
-			b.put("priorityup", new Pair<>(new ItemPipeButton(x + 111, y + 32, "Priority Increase", (button) -> {
+			b.put("priorityup", new Pair<>(new SimpleButton(x + 111, y + 32, "Priority Increase", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "priorityup");
 
 			}), null));
-			b.put("prioritydown", new Pair<>(new ItemPipeButton(x + 111, y + 43, "Priority Decrease", (button) -> {
+			b.put("prioritydown", new Pair<>(new SimpleButton(x + 111, y + 43, "Priority Decrease", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "prioritydown");
 
 			}), null));
-			b.put("priorityzero", new Pair<>(new ItemPipeButton(x + 111, y + 54, "Priority Reset", (button) -> {
+			b.put("priorityzero", new Pair<>(new SimpleButton(x + 111, y + 54, "Priority Reset", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "priorityzero");
 			}), null));
-			b.put("refresh", new Pair<>(new ItemPipeButton(x + 158, y + 10, "Refresh Connection Map", (button) -> {
+			b.put("refresh", new Pair<>(new SimpleButton(x + 158, y + 10, "Refresh Connection Map", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "refresh");
 			}), null));
 			b.put("redstone", new Pair<>(new ItemPipeRedstoneButton(x + 43, y + 42, 177, 51, null, (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "redstone");
 			}, tsfm), new SupplierWrapper("Enabled on Redstone Signal", "Always Active", () -> tsfm.redstone)));
-			for (Pair<ItemPipeButton, SupplierWrapper> bb : b.values()) {
+			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				this.addButton(bb.x);
 			}
 
@@ -520,7 +519,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-			for (Pair<ItemPipeButton, SupplierWrapper> bb : b.values()) {
+			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (!(bb.x instanceof ItemPipeRedstoneButton)
 						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled())
 					if (mouseX >= bb.x.x && mouseX <= bb.x.x + 8 && mouseY >= bb.x.y && mouseY <= bb.x.y + 8) {
@@ -544,7 +543,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
-			for (Pair<ItemPipeButton, SupplierWrapper> bb : b.values()) {
+			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (!(bb.x instanceof ItemPipeRedstoneButton)
 						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled()) {
 					if (bb.y != null && bb.y.supplier.get()) {
@@ -572,27 +571,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 	}
 
-	public static class ItemPipeButton extends Button {
-		private final int blitx;
-		private final int blity;
-
-		public ItemPipeButton(int widthIn, int heightIn, int blitx, int blity, String text, IPressable onPress) {
-			super(widthIn, heightIn, 8, 8, text, onPress);
-			this.blitx = blitx;
-			this.blity = blity;
-		}
-
-		public ItemPipeButton(int widthIn, int heightIn, String text, IPressable onPress) {
-			this(widthIn, heightIn, 0, 0, text, onPress);
-		}
-
-		@Override
-		public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
-		}
-
-	}
-
-	public static class ItemPipeRedstoneButton extends ItemPipeButton {
+	public static class ItemPipeRedstoneButton extends SimpleButton {
 		private final ItemPipeConnectorTileEntity ipcte;
 
 		public ItemPipeRedstoneButton(int widthIn, int heightIn, int blitx, int blity, String text, IPressable onPress,
@@ -616,29 +595,6 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 				return true;
 			}
 			return false;
-		}
-
-	}
-
-	private static class SupplierWrapper {
-
-		private final String trueText;
-		private final String falseText;
-		private final Supplier<Boolean> supplier;
-
-		public SupplierWrapper(String trueText, String falseText, Supplier<Boolean> supplier) {
-			this.trueText = trueText;
-			this.falseText = falseText;
-			this.supplier = supplier;
-
-		}
-
-		public String getTextFromSupplier() {
-			if (supplier.get()) {
-				return trueText;
-			} else {
-				return falseText;
-			}
 		}
 
 	}

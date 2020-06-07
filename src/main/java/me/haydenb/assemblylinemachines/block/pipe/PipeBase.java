@@ -71,6 +71,8 @@ public class PipeBase<T> extends Block {
 				ItemPipeConnectorTileEntity tefm = (ItemPipeConnectorTileEntity) worldIn.getTileEntity(pos);
 				worldIn.removeTileEntity(pos);
 				InventoryHelper.dropItems(worldIn, pos, tefm.getItems());
+			}else if(worldIn.getTileEntity(pos) instanceof FluidPipeConnectorTileEntity || worldIn.getTileEntity(pos) instanceof EnergyPipeConnectorTileEntity) {
+				worldIn.removeTileEntity(pos);
 			}
 		}
 	}
@@ -90,6 +92,20 @@ public class PipeBase<T> extends Block {
 							return ActionResultType.CONSUME;
 						}else if(te instanceof FluidPipeConnectorTileEntity) {
 							FluidPipeConnectorTileEntity fpcte = (FluidPipeConnectorTileEntity) te;
+							if(player.isSneaking()) {
+								fpcte.updateTargets(this);
+								player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
+							}else {
+								fpcte.outputMode = !fpcte.outputMode;
+								fpcte.sendUpdates();
+								if(fpcte.outputMode) {
+									player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+								}else {
+									player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+								}
+							}
+						}else if(te instanceof EnergyPipeConnectorTileEntity) {
+							EnergyPipeConnectorTileEntity fpcte = (EnergyPipeConnectorTileEntity) te;
 							if(player.isSneaking()) {
 								fpcte.updateTargets(this);
 								player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
@@ -293,6 +309,34 @@ public class PipeBase<T> extends Block {
 						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
 						if (t.type == this.type) {
 							t.pathToNearestFluid(world, targPos, checked, initial, targets);
+						}
+
+					}
+				}
+
+			}
+		}
+	}
+	
+	public void pathToNearestEnergy(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<EnergyPipeConnectorTileEntity> targets) {
+		BlockState bs = world.getBlockState(curPos);
+		for (Direction k : Direction.values()) {
+			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
+			if(pco == PipeConnOptions.CONNECTOR && !initial.equals(curPos)) {
+				TileEntity te = world.getTileEntity(curPos);
+				if(te != null && te instanceof EnergyPipeConnectorTileEntity) {
+					EnergyPipeConnectorTileEntity ipc = (EnergyPipeConnectorTileEntity) te;
+					targets.add(ipc);
+				}
+				
+			}else if (pco == PipeConnOptions.PIPE) {
+				BlockPos targPos = curPos.offset(k);
+				if (!checked.contains(targPos)) {
+					checked.add(targPos);
+					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
+						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
+						if (t.type == this.type) {
+							t.pathToNearestEnergy(world, targPos, checked, initial, targets);
 						}
 
 					}

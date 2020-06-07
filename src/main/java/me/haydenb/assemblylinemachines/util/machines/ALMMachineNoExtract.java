@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.util;
+package me.haydenb.assemblylinemachines.util.machines;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;

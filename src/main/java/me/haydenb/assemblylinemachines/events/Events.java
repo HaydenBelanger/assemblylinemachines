@@ -4,6 +4,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.util.Direction;
 import net.minecraftforge.event.world.BlockEvent;
@@ -20,11 +21,15 @@ public class Events {
 			if(event.getState().getBlock() == Registry.getBlock("crank")) {
 				boolean b = false;
 				for(Direction d : dirs) {
-					Block block = event.getWorld().getBlockState(event.getPos().offset(d)).getBlock();
+					BlockState state = event.getWorld().getBlockState(event.getPos().offset(d));
+					Block block = state.getBlock();
 					if(block != null && block instanceof ICrankableBlock) {
-						b = true;
-						event.getWorld().setBlockState(event.getPos(), event.getState().with(HorizontalBlock.HORIZONTAL_FACING, d.getOpposite()), 2);
-						break;
+						if(((ICrankableBlock) block).validSide(state, d.getOpposite()) && !((ICrankableBlock) block).needsGearbox()) {
+							b = true;
+							event.getWorld().setBlockState(event.getPos(), event.getState().with(HorizontalBlock.HORIZONTAL_FACING, d.getOpposite()), 2);
+							break;
+						}
+						
 					}
 				}
 				if(b == false) {
@@ -35,11 +40,15 @@ public class Events {
 			else if(event.getState().getBlock() == Registry.getBlock("gearbox")) {
 				boolean b = false;
 				for(Direction d : dirs) {
-					Block block = event.getWorld().getBlockState(event.getPos().offset(d)).getBlock();
+					BlockState state = event.getWorld().getBlockState(event.getPos().offset(d));
+					Block block = state.getBlock();
 					if(block != null && block instanceof ICrankableBlock) {
-						b = true;
-						event.getWorld().setBlockState(event.getPos(), event.getState().with(HorizontalBlock.HORIZONTAL_FACING, d), 2);
-						break;
+						if(((ICrankableBlock) block).validSide(state, d.getOpposite())) {
+							b = true;
+							event.getWorld().setBlockState(event.getPos(), event.getState().with(HorizontalBlock.HORIZONTAL_FACING, d), 2);
+							break;
+						}
+						
 					}
 				}
 				if(b == false) {

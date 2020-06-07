@@ -84,7 +84,6 @@ public class HashPacketImpl {
 		@Override
 		public PacketData apply(PacketBuffer t) {
 			
-			
 			PacketData pd = new PacketData(t.readString());
 			
 			int max = t.readInt();

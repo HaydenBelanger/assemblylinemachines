@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.util;
+package me.haydenb.assemblylinemachines.util.machines;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 

@@ -6,7 +6,7 @@ import java.util.TreeSet;
 
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TileEntityALMBase;
+import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -19,7 +19,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
-public class FluidPipeConnectorTileEntity extends TileEntityALMBase implements ITickableTileEntity{
+public class FluidPipeConnectorTileEntity extends ALMTileEntity implements ITickableTileEntity{
 
 	
 	public boolean outputMode = false;

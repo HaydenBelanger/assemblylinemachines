@@ -8,8 +8,8 @@ import me.haydenb.assemblylinemachines.item.ToolStirringStick;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.TileEntityALMBase;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
+import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -241,7 +241,7 @@ public class BlockFluidBath extends Block {
 
 	}
 
-	public static class TEFluidBath extends TileEntityALMBase implements IInventory {
+	public static class TEFluidBath extends ALMTileEntity implements IInventory {
 
 		private int stirsRemaining = -1;
 		private Fluids fluid = Fluids.NONE;
