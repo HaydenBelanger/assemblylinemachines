@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"srs",
+		"rpr",
+		"drd"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"d":{
+			"item": "minecraft:diamond"
+		},
+		"r":{
+			"item": "minecraft:redstone"
+		},
+		"p":{
+			"tag": "assemblylinemachines:crafting/gears/precious"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:basic_battery_cell"
+	}
+}

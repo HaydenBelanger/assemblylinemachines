@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"gfg",
+		"iqi",
+		"rrr"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"q":{
+			"item": "assemblylinemachines:black_granite"
+		},
+		"f":{
+			"item": "minecraft:blast_furnace"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/precious"
+		},
+		"r":{
+			"item": "minecraft:redstone"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:coal_generator"
+	}
+}

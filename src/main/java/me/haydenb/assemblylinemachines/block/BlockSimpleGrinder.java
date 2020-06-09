@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.block;
 import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
@@ -102,7 +101,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 		@Override
 		public void tick() {
 			
-			if(timer++ == ConfigHolder.COMMON.ticksPerOperationSimple.get()) {
+			if(timer++ == 20) {
 				if(!world.isRemote) {
 					timer = 0;
 					if(output != null) {
@@ -131,7 +130,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 								}
 							}
 						}else {
-							if(cranks >= ConfigHolder.COMMON.simpleGrinderCranks.get()) {
+							if(cranks >= 3) {
 								cranks = 0;
 								if(progress == cycles) {
 									pendingOutput = true;
@@ -140,6 +139,9 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 								ItemStack isa = contents.get(0);
 								if(isa.isDamageable() && isa.getItem() instanceof ItemGrindingBlade) {
 									isa.setDamage(isa.getDamage() + 1);
+									if(isa.getDamage() >= isa.getMaxDamage()) {
+										contents.set(0, ItemStack.EMPTY);
+									}
 									progress++;
 									sendupdate = true;
 								}
@@ -169,7 +171,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 										isb = null;
 										isa = null;
 										output = crafting.getRecipeOutput().copy();
-										cycles = crafting.getGrinds() * ConfigHolder.COMMON.simpleGrinderGrinds.get();
+										cycles = crafting.getGrinds() * 2;
 										progress = 0;
 										pendingOutput = false;
 										sendUpdates();

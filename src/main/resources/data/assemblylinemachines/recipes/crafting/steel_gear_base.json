@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" x ",
+		"xyx",
+		" x "
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"y":{
+			"tag": "forge:rods/wooden"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:steel_gear",
+		"count": 3
+	}
+}

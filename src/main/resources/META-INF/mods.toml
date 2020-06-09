@@ -20,13 +20,13 @@ displayName="Assembly Line Machines" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
 #updateJSONURL="http://myurl.me/" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
-#displayURL="https://www.haydenb.me/" #optional
+displayURL="https://github.com/HaydenBelanger/assembly_line_machines" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="examplemod.png" #optional
+logoFile="logo.png" #optional
 # A text field displayed in the mod UI
-#credits="Thanks for this example mod goes to Java" #optional
+credits="Huge thanks to NinjaKittens, also known as Dax Flame, for texturing and modelling." #optional
 # A text field displayed in the mod UI
-#authors="Love, Cheese and small house plants" #optional
+authors="Haydenman2" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
 This mod adds many machines to the game, many of which centered around creating and operating a factory.

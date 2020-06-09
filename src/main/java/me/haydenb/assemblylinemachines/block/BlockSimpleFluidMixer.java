@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.block;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.util.FluidProperty;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine;
 import me.haydenb.assemblylinemachines.util.Utils;
@@ -124,7 +123,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 		
 		@Override
 		public void tick() {
-			if(timer++ == ConfigHolder.COMMON.ticksPerOperationSimple.get()) {
+			if(timer++ == 20) {
 				if(!world.isRemote) {
 					timer = 0;
 					
@@ -157,7 +156,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 							
 						}else {
 							
-							if(cranks >= ConfigHolder.COMMON.simpleFluidMixerCranks.get()) {
+							if(cranks >= 3) {
 								cranks = 0;
 								if(progress == cycles) {
 									pendingOutput = true;
@@ -207,7 +206,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 										isa = null;
 										isb = null;
 										output = crafting.getRecipeOutput().copy();
-										cycles = crafting.getStirs() * ConfigHolder.COMMON.simpleFluidMixerStirs.get();
+										cycles = crafting.getStirs() * 2;
 										f = crafting.getFluid();
 										pendingOutput = false;
 										sendUpdates();

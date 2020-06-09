@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xx",
+		" s",
+		" s"
+	],
+	"key":{
+		"x":{
+			"tag": "assemblylinemachines:crafting/gears/precious"
+		},
+		"s":{
+			"item": "assemblylinemachines:steel_rod"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:crank_hoe"
+	}
+}

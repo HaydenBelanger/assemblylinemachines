@@ -207,6 +207,80 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			}
 			
 		}
+		
+		public static void updateDataFromPacket(PacketData pd, World world) {
+			if (pd.getCategory().equals("battery_cell_gui")) {
+				BlockPos pos = pd.get("location", BlockPos.class);
+				TileEntity te = world.getTileEntity(pos);
+				if (te != null && te instanceof TEBasicBatteryCell) {
+					TEBasicBatteryCell tebbc = (TEBasicBatteryCell) te;
+
+					String b = pd.get("button", String.class);
+
+					if (b.equals("up")) {
+						ManagedDirection mdir = ManagedDirection.TOP;
+						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
+					} else if (b.equals("down")) {
+						ManagedDirection mdir = ManagedDirection.BOTTOM;
+						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
+					} else if (b.equals("left")) {
+						ManagedDirection mdir = ManagedDirection.LEFT;
+						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
+					} else if (b.equals("right")) {
+						ManagedDirection mdir = ManagedDirection.RIGHT;
+						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
+					} else if (b.equals("back")) {
+						ManagedDirection mdir = ManagedDirection.BACK;
+						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
+					}else if (b.equals("feptup")) {
+						Boolean bl = pd.get("shifting", Boolean.class);
+						Boolean cr = pd.get("ctrling", Boolean.class);
+						
+						int lim;
+						if(bl == true && cr == true) {
+							lim = 1;
+						}else if(bl == true) {
+							lim = 50;
+						}else if(cr == true){
+							lim = 200;
+						}else {
+							lim = 100;
+						}
+						
+						if((tebbc.fept + lim) > 2000) {
+							tebbc.fept = 2000;
+						}else {
+							tebbc.fept += lim;
+						}
+					}else if (b.equals("feptdown")) {
+						Boolean bl = pd.get("shifting", Boolean.class);
+						Boolean cr = pd.get("ctrling", Boolean.class);
+						
+						int lim;
+						if(bl == true && cr == true) {
+							lim = 1;
+						}else if(bl == true) {
+							lim = 50;
+						}else if(cr == true){
+							lim = 200;
+						}else {
+							lim = 100;
+						}
+						
+						if((tebbc.fept - lim) < 0) {
+							tebbc.fept = 0;
+						}else {
+							tebbc.fept -= lim;
+						}
+					}else if (b.equals("automode")) {
+						tebbc.autoIn = !tebbc.autoIn;
+					}
+					
+					tebbc.sendUpdates();
+					tebbc.getWorld().notifyNeighbors(pos, tebbc.getBlockState().getBlock());
+				}
+			}
+		}
 
 	}
 
@@ -338,80 +412,6 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			pd.writeBoolean("shifting", shifting);
 			pd.writeBoolean("ctrling", ctrling);
 			HashPacketImpl.INSTANCE.sendToServer(pd);
-		}
-
-		public static void updateDataFromPacket(PacketData pd, World world) {
-			if (pd.getCategory().equals("battery_cell_gui")) {
-				BlockPos pos = pd.get("location", BlockPos.class);
-				TileEntity te = world.getTileEntity(pos);
-				if (te != null && te instanceof TEBasicBatteryCell) {
-					TEBasicBatteryCell tebbc = (TEBasicBatteryCell) te;
-
-					String b = pd.get("button", String.class);
-
-					if (b.equals("up")) {
-						ManagedDirection mdir = ManagedDirection.TOP;
-						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
-					} else if (b.equals("down")) {
-						ManagedDirection mdir = ManagedDirection.BOTTOM;
-						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
-					} else if (b.equals("left")) {
-						ManagedDirection mdir = ManagedDirection.LEFT;
-						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
-					} else if (b.equals("right")) {
-						ManagedDirection mdir = ManagedDirection.RIGHT;
-						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
-					} else if (b.equals("back")) {
-						ManagedDirection mdir = ManagedDirection.BACK;
-						tebbc.setDirection(mdir, !tebbc.getDirectionEnabled(mdir));
-					}else if (b.equals("feptup")) {
-						Boolean bl = pd.get("shifting", Boolean.class);
-						Boolean cr = pd.get("ctrling", Boolean.class);
-						
-						int lim;
-						if(bl == true && cr == true) {
-							lim = 1;
-						}else if(bl == true) {
-							lim = 50;
-						}else if(cr == true){
-							lim = 200;
-						}else {
-							lim = 100;
-						}
-						
-						if((tebbc.fept + lim) > 2000) {
-							tebbc.fept = 2000;
-						}else {
-							tebbc.fept += lim;
-						}
-					}else if (b.equals("feptdown")) {
-						Boolean bl = pd.get("shifting", Boolean.class);
-						Boolean cr = pd.get("ctrling", Boolean.class);
-						
-						int lim;
-						if(bl == true && cr == true) {
-							lim = 1;
-						}else if(bl == true) {
-							lim = 50;
-						}else if(cr == true){
-							lim = 200;
-						}else {
-							lim = 100;
-						}
-						
-						if((tebbc.fept - lim) < 0) {
-							tebbc.fept = 0;
-						}else {
-							tebbc.fept -= lim;
-						}
-					}else if (b.equals("automode")) {
-						tebbc.autoIn = !tebbc.autoIn;
-					}
-					
-					tebbc.sendUpdates();
-					tebbc.getWorld().notifyNeighbors(pos, tebbc.getBlockState().getBlock());
-				}
-			}
 		}
 
 	}

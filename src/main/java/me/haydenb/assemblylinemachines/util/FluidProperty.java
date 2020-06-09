@@ -1,11 +1,12 @@
 package me.haydenb.assemblylinemachines.util;
 
-import org.apache.commons.text.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.util.IStringSerializable;
 
+@SuppressWarnings("deprecation")
 public class FluidProperty {
 
 	public static final EnumProperty<Fluids> FLUID = EnumProperty.create("fluid", Fluids.class);
@@ -30,7 +31,7 @@ public class FluidProperty {
 		}
 		
 		public String getFriendlyName() {
-			return WordUtils.capitalizeFully(toString().replace("_", " "));
+			return WordUtils.capitalizeFully(toString().toLowerCase());
 		}
 		
 		public static Fluids getAssocFluids(Fluid f) {

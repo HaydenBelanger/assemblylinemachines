@@ -52,7 +52,16 @@
 	"item.assemblylinemachines.titanium_gear": "Titanium Gear",
 	"item.assemblylinemachines.steel_gear": "Steel Gear",
 	"item.assemblylinemachines.iron_gear": "Iron Gear",
-	
+	"item.assemblylinemachines.steel_sword": "Steel Sword",
+	"item.assemblylinemachines.steel_axe": "Steel Axe",
+	"item.assemblylinemachines.steel_pickaxe": "Steel Pickaxe",
+	"item.assemblylinemachines.steel_shovel": "Steel Shovel",
+	"item.assemblylinemachines.steel_hoe": "Steel Hoe",
+	"item.assemblylinemachines.steel_helmet": "Steel Helmet",
+	"item.assemblylinemachines.steel_chestplate": "Steel Chestplate",
+	"item.assemblylinemachines.steel_leggings": "Steel Leggings",
+	"item.assemblylinemachines.steel_boots": "Steel Boots",
+	"item.assemblylinemachines.titanium_hammer": "Titanium Hammer",
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
@@ -83,5 +92,7 @@
 	"block.assemblylinemachines.smooth_black_granite": "Black Granite Block",
 	"block.assemblylinemachines.chiselled_black_granite": "Chiselled Black Granite",
 	"block.assemblylinemachines.brick_black_granite": "Black Granite Bricks",
-	"block.assemblylinemachines.pillar_black_granite": "Black Granite Pillar"
+	"block.assemblylinemachines.pillar_black_granite": "Black Granite Pillar",
+	"block.assemblylinemachines.slab_black_granite": "Black Granite Slab",
+	"block.assemblylinemachines.stair_black_granite": "Black Granite Stairs"
 }

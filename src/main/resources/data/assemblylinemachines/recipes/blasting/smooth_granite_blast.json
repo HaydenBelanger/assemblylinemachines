@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:black_granite"
+	},
+	"result": "assemblylinemachines:smooth_black_granite",
+	"experience": 1,
+	"cookingtime": 100
+}

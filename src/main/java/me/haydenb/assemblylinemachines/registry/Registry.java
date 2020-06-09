@@ -1,41 +1,74 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.*;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath.*;
+import me.haydenb.assemblylinemachines.block.BlockBlackGranite;
+import me.haydenb.assemblylinemachines.block.BlockCrank;
+import me.haydenb.assemblylinemachines.block.BlockFluidBath;
+import me.haydenb.assemblylinemachines.block.BlockFluidBath.BathStatus;
+import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.block.BlockFluidTank;
 import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank;
-import me.haydenb.assemblylinemachines.block.BlockGearbox.*;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.*;
+import me.haydenb.assemblylinemachines.block.BlockGearbox;
+import me.haydenb.assemblylinemachines.block.BlockGearbox.ContainerGearbox;
+import me.haydenb.assemblylinemachines.block.BlockGearbox.ScreenGearbox;
+import me.haydenb.assemblylinemachines.block.BlockGearbox.TEGearbox;
+import me.haydenb.assemblylinemachines.block.BlockHandGrinder;
+import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
+import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
+import me.haydenb.assemblylinemachines.block.BlockSimpleCrankCharger;
 import me.haydenb.assemblylinemachines.block.BlockSimpleCrankCharger.TESimpleCrankCharger;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.*;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.*;
-import me.haydenb.assemblylinemachines.block.energy.*;
+import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.ContainerSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.ScreenSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.TESimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder;
+import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ContainerSimpleGrinder;
+import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ScreenSimpleGrinder;
+import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
+import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ContainerBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ScreenBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.TEBasicBatteryCell;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
-import me.haydenb.assemblylinemachines.block.pipe.*;
-import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.ContainerCoalGenerator;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.ScreenCoalGenerator;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.TECoalGenerator;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ContainerCrankmill;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ScreenCrankmill;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
+import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
+import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
+import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
+import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
+import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorScreen;
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
-import me.haydenb.assemblylinemachines.crafting.*;
-import me.haydenb.assemblylinemachines.item.*;
+import me.haydenb.assemblylinemachines.crafting.BathCrafting;
+import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
+import me.haydenb.assemblylinemachines.item.CrankTool;
+import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
+import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
+import me.haydenb.assemblylinemachines.item.ItemHammer;
+import me.haydenb.assemblylinemachines.item.ItemTiers;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.ToolStirringStick;
 import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.DecoderConsumer;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.EncoderConsumer;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.MessageHandler;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.util.CreativeTab;
+import me.haydenb.assemblylinemachines.util.FluidProperty;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.RotatedPillarBlock;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.StairsBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
@@ -81,9 +114,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.network.IContainerFactory;
-import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -91,7 +122,13 @@ import net.minecraftforge.items.IItemHandler;
 public class Registry {
 	
 	//REGISTRY
-	private static final HashMap<String, Item> itemRegistry = new HashMap<>();
+	private static final TreeMap<String, Item> itemRegistry = new TreeMap<>(new Comparator<String>() {
+
+		@Override
+		public int compare(String o1, String o2) {
+			return o1.compareTo(o2);
+		}
+	});
 	private static final HashMap<String, Block> blockRegistry = new HashMap<>();
 	
 	private static final HashMap<String, TileEntityType<?>> teRegistry = new HashMap<>();
@@ -161,6 +198,7 @@ public class Registry {
 		createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
 		createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
 		createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
+		createItem("titanium_hammer", new ItemHammer(ItemTiers.TITANIUM, 8, -3.2f, new Item.Properties().group(creativeTab)));
 		
 		createItem("crank_sword", CrankTool.makeCrankTool(ItemTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
 		createItem("crank_axe", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
@@ -169,9 +207,20 @@ public class Registry {
 		createItem("crank_hoe", CrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, HoeItem.class));
 		createItem("crank_hammer", CrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
 		
-		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 0, -3.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_sword", new SwordItem(ItemTiers.STEEL, 2, -1.9f, new Item.Properties().group(creativeTab)));
+		createItem("steel_axe", new AxeItem(ItemTiers.STEEL, 4, -3.9f, new Item.Properties().group(creativeTab)));
+		createItem("steel_pickaxe", new PickaxeItem(ItemTiers.STEEL, 0, -1.9f, new Item.Properties().group(creativeTab)));
+		createItem("steel_shovel", new ShovelItem(ItemTiers.STEEL, 0, -1.7f, new Item.Properties().group(creativeTab)));
+		createItem("steel_helmet", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
+		createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
+		createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
+		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
+		createItem("steel_hoe", new HoeItem(ItemTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
 		
-		event.getRegistry().registerAll(itemRegistry.values().toArray(new Item[itemRegistry.size()]));
+		for(String i : itemRegistry.keySet()) {
+			event.getRegistry().register(itemRegistry.get(i));
+		}
 		
 	}
 	
@@ -209,6 +258,8 @@ public class Registry {
 		createBlock("brick_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
 		createBlock("chiselled_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
 		createBlock("pillar_black_granite", new RotatedPillarBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("slab_black_granite", new SlabBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("stair_black_granite", new StairsBlock(() -> Registry.getBlock("smooth_black_granite").getDefaultState(), Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
 		
 		createBlock("silt_iron", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_gold", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
@@ -285,12 +336,6 @@ public class Registry {
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
 		event.getRegistry().register(BathCrafting.SERIALIZER.setRegistryName("bath"));
 		
-	}
-	
-	@SubscribeEvent
-	public static void commonSetup(FMLCommonSetupEvent event) {
-		HashPacketImpl.INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);
-		HashPacketImpl.INSTANCE.registerMessage(HashPacketImpl.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
 	}
 	
 	@OnlyIn(Dist.CLIENT)

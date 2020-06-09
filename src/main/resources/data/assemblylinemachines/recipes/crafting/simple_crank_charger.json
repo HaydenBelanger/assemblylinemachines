@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"iei",
+		"igi",
+		"igi"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"e":{
+			"item": "assemblylinemachines:empowered_coal"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:simple_crank_charger"
+	}
+}

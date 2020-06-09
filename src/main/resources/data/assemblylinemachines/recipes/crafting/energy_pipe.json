@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"iwi",
+		"qqq",
+		"iwi"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"q":{
+			"item": "assemblylinemachines:black_granite"
+		},
+		"w":{
+			"item": "minecraft:redstone"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:energy_pipe",
+		"count": 8
+	}
+}

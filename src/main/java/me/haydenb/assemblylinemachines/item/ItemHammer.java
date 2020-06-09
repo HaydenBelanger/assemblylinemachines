@@ -49,14 +49,5 @@ public class ItemHammer extends SwordItem {
 		return stack;
 	}
 	
-	@Override
-	public boolean hasContainerItem() {
-		return true;
-	}
-	
-	@Override
-	public boolean hasContainerItem(ItemStack stack) {
-		return true;
-	}
 }
 

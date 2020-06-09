@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"igi",
+		"iqi",
+		"iri"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"q":{
+			"item": "assemblylinemachines:black_granite"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/precious"
+		},
+		"r":{
+			"item": "minecraft:redstone_block"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:crankmill"
+	}
+}

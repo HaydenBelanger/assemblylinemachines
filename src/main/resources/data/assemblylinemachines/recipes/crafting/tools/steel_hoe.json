@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xx",
+		" s",
+		" s"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:steel_ingot"
+		},
+		"s":{
+			"tag": "forge:rods/wooden"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:steel_hoe"
+	}
+}

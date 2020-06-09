@@ -6,18 +6,21 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class HashPacketImpl {
 
-	public static SimpleChannel INSTANCE;
+	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);
 	public static int ID = 0;
 	
 	
@@ -80,16 +83,16 @@ public class HashPacketImpl {
 		@Override
 		public PacketData apply(PacketBuffer t) {
 			
-			PacketData pd = new PacketData(t.readString());
+			PacketData pd = new PacketData(t.readString(32767));
 			
 			int max = t.readInt();
 			for(int i = 0; i < max; i++) {
 				
-				String key = t.readString();
+				String key = t.readString(32767);
 				int id = t.readInt();
 				
 				if(id == 0) {
-					pd.writeString(key, t.readString());
+					pd.writeString(key, t.readString(32767));
 				}else if(id == 1) {
 					pd.writeInteger(key, t.readInt());
 				}else if(id == 2) {

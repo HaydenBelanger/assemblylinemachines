@@ -1,0 +1,14 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:iron_gear"
+		},
+		{
+			"item": "assemblylinemachines:gold_plate"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:gold_gear"
+	}
+}

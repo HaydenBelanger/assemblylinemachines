@@ -15,6 +15,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
@@ -82,40 +83,42 @@ public class PipeBase<T> extends Block {
 			Hand handIn, BlockRayTraceResult hit) {
 		if (!world.isRemote) {
 			if (handIn == Hand.MAIN_HAND) {
-				for (Direction d : Direction.values()) {
-					if (world.getBlockState(pos)
-							.get(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
+				if(!(player.getHeldItemMainhand().getItem() instanceof BlockItem) || !(((BlockItem) player.getHeldItemMainhand().getItem()).getBlock() instanceof PipeBase<?>)) {
+					for (Direction d : Direction.values()) {
+						if (world.getBlockState(pos)
+								.get(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
 
-						TileEntity te = world.getTileEntity(pos);
-						if(te instanceof ItemPipeConnectorTileEntity) {
-							NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
-							return ActionResultType.CONSUME;
-						}else if(te instanceof FluidPipeConnectorTileEntity) {
-							FluidPipeConnectorTileEntity fpcte = (FluidPipeConnectorTileEntity) te;
-							if(player.isSneaking()) {
-								fpcte.updateTargets(this);
-								player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
-							}else {
-								fpcte.outputMode = !fpcte.outputMode;
-								fpcte.sendUpdates();
-								if(fpcte.outputMode) {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+							TileEntity te = world.getTileEntity(pos);
+							if(te instanceof ItemPipeConnectorTileEntity) {
+								NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
+								return ActionResultType.CONSUME;
+							}else if(te instanceof FluidPipeConnectorTileEntity) {
+								FluidPipeConnectorTileEntity fpcte = (FluidPipeConnectorTileEntity) te;
+								if(player.isSneaking()) {
+									fpcte.updateTargets(this);
+									player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
 								}else {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+									fpcte.outputMode = !fpcte.outputMode;
+									fpcte.sendUpdates();
+									if(fpcte.outputMode) {
+										player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+									}else {
+										player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+									}
 								}
-							}
-						}else if(te instanceof EnergyPipeConnectorTileEntity) {
-							EnergyPipeConnectorTileEntity fpcte = (EnergyPipeConnectorTileEntity) te;
-							if(player.isSneaking()) {
-								fpcte.updateTargets(this);
-								player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
-							}else {
-								fpcte.outputMode = !fpcte.outputMode;
-								fpcte.sendUpdates();
-								if(fpcte.outputMode) {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+							}else if(te instanceof EnergyPipeConnectorTileEntity) {
+								EnergyPipeConnectorTileEntity fpcte = (EnergyPipeConnectorTileEntity) te;
+								if(player.isSneaking()) {
+									fpcte.updateTargets(this);
+									player.sendStatusMessage(new StringTextComponent("Reloaded connections with this Connector."), true);
 								}else {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+									fpcte.outputMode = !fpcte.outputMode;
+									fpcte.sendUpdates();
+									if(fpcte.outputMode) {
+										player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+									}else {
+										player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+									}
 								}
 							}
 						}

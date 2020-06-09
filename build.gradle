@@ -29,12 +29,6 @@ artifacts {
 	archives sourcesJar
 }
 
-configurations{
-
-	shade
-	compile.extendsFrom shade
-}
-
 // Process resources on build
 processResources {
 	// This will ensure that this task is redone when the versions change.
@@ -121,26 +115,13 @@ dependencies {
             name = "ModMaven"
             url = "https://modmaven.k-4u.nl"
         }
-        mavenCentral()
     }
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
 
 	//JEI
     compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
-    
-    //Apache Commons-Text
-    compile group: 'org.apache.commons', name: 'commons-text', version: '1.8'
-    shade group: 'org.apache.commons', name: 'commons-text', version: '1.8'
 
-}
-
-jar {
-    configurations.shade.each { dep ->
-    	from(project.zipTree(dep)){
-    		exclude 'META-INF', 'META-INF/**'
-    	}
-    }
 }
 
 def reobfFile = file("$buildDir/reobfJar/output.jar")
