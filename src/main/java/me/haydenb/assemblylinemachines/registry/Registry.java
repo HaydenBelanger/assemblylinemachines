@@ -20,16 +20,6 @@ import me.haydenb.assemblylinemachines.block.BlockGearbox.TEGearbox;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleCrankCharger;
-import me.haydenb.assemblylinemachines.block.BlockSimpleCrankCharger.TESimpleCrankCharger;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.ContainerSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.ScreenSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer.TESimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ContainerSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.ScreenSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ContainerBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ScreenBasicBatteryCell;
@@ -42,6 +32,36 @@ import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ContainerCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ScreenCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleCrankCharger;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleCrankCharger.TESimpleCrankCharger;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer.ContainerSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer.ScreenSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer.TESimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.ContainerSimpleGrinder;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.ScreenSimpleGrinder;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.TESimpleGrinder;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.ContainerElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.ScreenElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.ContainerElectricFurnace;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.ScreenElectricFurnace;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.TEElectricFurnace;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.ContainerElectricGrinder;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.ScreenElectricGrinder;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.TEElectricGrinder;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.ContainerAutocraftingTable;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.ScreenAutocraftingTable;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.TEAutocraftingTable;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.ContainerElectricPurifier;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.ScreenElectricPurifier;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.TEElectricPurifier;
 import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
@@ -51,6 +71,7 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
+import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
 import me.haydenb.assemblylinemachines.item.CrankTool;
 import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
@@ -160,6 +181,7 @@ public class Registry {
 		createItem("pure_iron");
 		createItem("pure_gold");
 		createItem("pure_titanium");
+		createItem("pure_steel");
 		
 		createItem("steel_rod");
 		
@@ -175,19 +197,25 @@ public class Registry {
 		createItem("titanium_gear");
 		
 		createItem("empowered_coal", new ItemGearboxFuel(3200));
-		createItem("gearbox_upgrade_limiter", new ItemUpgrade("Gearbox will only burn fuel while action is required."));
-		createItem("gearbox_upgrade_efficiency", new ItemUpgrade("Gearbox will use greatly less fuel.", "Gearbox will run half as quickly."));
-		createItem("gearbox_upgrade_speed", new ItemUpgrade("Gearbox will run much faster.", "Gearbox will use twice as much fuel."));
-		createItem("gearbox_upgrade_compatability", new ItemUpgrade("Gearbox can use any burnable fuel."));
+		createItem("gearbox_upgrade_limiter", new ItemUpgrade(false, "Gearbox will only burn fuel while action is required."));
+		createItem("gearbox_upgrade_efficiency", new ItemUpgrade(false, "Gearbox will use greatly less fuel.", "Gearbox will run half as quickly."));
+		createItem("gearbox_upgrade_compatability", new ItemUpgrade(false, "Gearbox can use any burnable fuel."));
 		
 		
-		createItem("item_pipe_upgrade_speed", new ItemUpgrade("Item Pipe will perform more quickly."));
-		createItem("item_pipe_upgrade_stack", new ItemUpgrade("Item Pipe will take bigger stacks per operation."));
-		createItem("item_pipe_upgrade_filter", new ItemUpgrade("Item Pipe's available filter space will be expanded."));
-		createItem("item_pipe_upgrade_redstone", new ItemUpgrade("Item Pipe will get Redstone control."));
+		createItem("item_pipe_upgrade_stack", new ItemUpgrade(true, "Item Pipe will take larger stacks."));
+		createItem("item_pipe_upgrade_filter", new ItemUpgrade(true, "Item Pipe's filter space will grow."));
+		createItem("item_pipe_upgrade_redstone", new ItemUpgrade(false, "Item Pipe will get Redstone control."));
 		
+		createItem("upgrade_speed", new ItemUpgrade(true, "Device will operate much quicker.", "Device may use more fuel or power."));
+		
+		createItem("autocrafting_upgrade_sustained", new ItemUpgrade(true, new String[] {"Autocrafting Table won't use power."}, new String[] {"No other upgrades will function.", "Autocrafting Table will run slower."}));
+		createItem("autocrafting_upgrade_recipes", new ItemUpgrade(true, "The Autocrafting Table will gain extra recipes."));
+		
+		createItem("machine_upgrade_conservation", new ItemUpgrade(true, "Certain Machines have chance to not use item."));
 		createItem("wooden_stirring_stick", new ToolStirringStick(35, TemperatureResistance.COLD));
 		createItem("pure_iron_stirring_stick", new ToolStirringStick(135, TemperatureResistance.HOT));
+		
+		
 		
 		createItem("titanium_sword", new SwordItem(ItemTiers.TITANIUM, 2, -1.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM, 4, -3.5f, new Item.Properties().group(creativeTab)));
@@ -250,6 +278,8 @@ public class Registry {
 		
 		createBlock("silt", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_brick", Material.ROCK, 4f, 12f, 0, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("slab_silt_brick", new SlabBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(4f, 12f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("stair_silt_brick", new StairsBlock(() -> Registry.getBlock("smooth_black_granite").getDefaultState(), Block.Properties.create(Material.ROCK).hardnessAndResistance(4f, 12f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
 		
 		createBlock("steel_block", Material.IRON, 7f, 30f, 3, ToolType.PICKAXE, SoundType.METAL);
 		
@@ -268,6 +298,13 @@ public class Registry {
 		createBlock("basic_battery_cell", new BlockBasicBatteryCell());
 		createBlock("coal_generator", new BlockCoalGenerator());
 		createBlock("crankmill", new BlockCrankmill());
+		
+		createBlock("electric_furnace", new BlockElectricFurnace());
+		createBlock("electric_purifier", new BlockElectricPurifier());
+		createBlock("electric_grinder", new BlockElectricGrinder());
+		createBlock("electric_fluid_mixer", new BlockElectricFluidMixer());
+		
+		createBlock("autocrafting_table", new BlockAutocraftingTable());
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
@@ -294,6 +331,13 @@ public class Registry {
 		createTileEntity("coal_generator", TECoalGenerator.class);
 		createTileEntity("crankmill", TECrankmill.class);
 		
+		createTileEntity("electric_furnace", TEElectricFurnace.class);
+		createTileEntity("electric_purifier", TEElectricPurifier.class);
+		createTileEntity("electric_grinder", TEElectricGrinder.class);
+		createTileEntity("electric_fluid_mixer", TEElectricFluidMixer.class);
+		
+		createTileEntity("autocrafting_table", TEAutocraftingTable.class);
+		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
 	
@@ -308,6 +352,13 @@ public class Registry {
 		createContainer("crankmill", 1055, ContainerCrankmill.class);
 		createContainer("basic_battery_cell", 1056, ContainerBasicBatteryCell.class);
 		
+		createContainer("electric_furnace", 1057, ContainerElectricFurnace.class);
+		createContainer("electric_purifier", 1058, ContainerElectricPurifier.class);
+		createContainer("electric_grinder", 1059, ContainerElectricGrinder.class);
+		createContainer("electric_fluid_mixer", 1060, ContainerElectricFluidMixer.class);
+		
+		createContainer("autocrafting_table", 1061, ContainerAutocraftingTable.class);
+		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
 	}
@@ -317,8 +368,9 @@ public class Registry {
 	public static void clientSetup(FMLClientSetupEvent event) {
 		RenderTypeLookup.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(getBlock("autocrafting_table"), RenderType.getCutout());
 		
-		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class);
+		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
 		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
 		registerScreen("pipe_connector_item", ItemPipeConnectorContainer.class, ItemPipeConnectorScreen.class);
@@ -326,6 +378,12 @@ public class Registry {
 		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
 		registerScreen("crankmill", ContainerCrankmill.class, ScreenCrankmill.class);
 		registerScreen("basic_battery_cell", ContainerBasicBatteryCell.class, ScreenBasicBatteryCell.class);
+		registerScreen("electric_furnace", ContainerElectricFurnace.class, ScreenElectricFurnace.class);
+		registerScreen("electric_purifier", ContainerElectricPurifier.class, ScreenElectricPurifier.class);
+		
+		registerScreen("electric_grinder", ContainerElectricGrinder.class, ScreenElectricGrinder.class);
+		registerScreen("electric_fluid_mixer", ContainerElectricFluidMixer.class, ScreenElectricFluidMixer.class);
+		registerScreen("autocrafting_table", ContainerAutocraftingTable.class, ScreenAutocraftingTable.class);
 	}
 	
 	@SubscribeEvent
@@ -335,6 +393,9 @@ public class Registry {
 		
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
 		event.getRegistry().register(BathCrafting.SERIALIZER.setRegistryName("bath"));
+		
+		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(PurifierCrafting.PURIFIER_RECIPE.toString()), PurifierCrafting.PURIFIER_RECIPE);
+		event.getRegistry().register(PurifierCrafting.SERIALIZER.setRegistryName("purifier"));
 		
 	}
 	

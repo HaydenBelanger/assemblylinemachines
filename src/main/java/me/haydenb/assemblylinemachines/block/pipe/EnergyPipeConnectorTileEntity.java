@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
 
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -38,7 +42,7 @@ public class EnergyPipeConnectorTileEntity extends ALMTileEntity implements ITic
 				}
 
 			});
-	private boolean targetsUpdated = false;
+	
 
 	public EnergyPipeConnectorTileEntity(TileEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn);
@@ -47,13 +51,6 @@ public class EnergyPipeConnectorTileEntity extends ALMTileEntity implements ITic
 
 	public EnergyPipeConnectorTileEntity() {
 		this(Registry.getTileEntity("pipe_connector_energy"));
-	}
-
-	public void updateTargets(PipeBase<?> pb) {
-		if (!world.isRemote) {
-			targets.clear();
-			pb.pathToNearestEnergy(world, pos, new ArrayList<>(), pos, targets);
-		}
 	}
 
 	@Override
@@ -79,21 +76,18 @@ public class EnergyPipeConnectorTileEntity extends ALMTileEntity implements ITic
 	public void tick() {
 		if (!world.isRemote) {
 			if (outputMode == true) {
-				if (timer++ == 5) {
+				if (timer++ == 2) {
 					timer = 0;
 					if (pendingCooldown-- <= 0) {
 						pendingCooldown = 0;
-						if (targetsUpdated == false) {
-							targetsUpdated = true;
-							updateTargets((PipeBase<?>) Registry.getBlock("energy_pipe"));
-							((PipeBase<?>) Registry.getBlock("energy_pipe")).updateAllAlongPath(this.world, this.pos,
-									new ArrayList<>(), new ArrayList<>());
-						}
+						
+						targets.clear();
+						pathToNearestEnergy(world, pos, new ArrayList<>(), pos, targets);
 
 						if (output == null && connectToOutput() == false) {
 							return;
 						}
-						int max = output.extractEnergy(2000, true);
+						int max = output.extractEnergy(400, true);
 						if (max != 0) {
 							int extracted = 0;
 							double waitTime = 0;
@@ -126,6 +120,34 @@ public class EnergyPipeConnectorTileEntity extends ALMTileEntity implements ITic
 			}
 		}
 
+	}
+	
+	public void pathToNearestEnergy(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<EnergyPipeConnectorTileEntity> targets) {
+		BlockState bs = world.getBlockState(curPos);
+		for (Direction k : Direction.values()) {
+			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
+			if(pco == PipeConnOptions.CONNECTOR && !initial.equals(curPos)) {
+				TileEntity te = world.getTileEntity(curPos);
+				if(te != null && te instanceof EnergyPipeConnectorTileEntity) {
+					EnergyPipeConnectorTileEntity ipc = (EnergyPipeConnectorTileEntity) te;
+					targets.add(ipc);
+				}
+				
+			}else if (pco == PipeConnOptions.PIPE) {
+				BlockPos targPos = curPos.offset(k);
+				if (!checked.contains(targPos)) {
+					checked.add(targPos);
+					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
+						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
+						if (t.type == Type.POWER) {
+							pathToNearestEnergy(world, targPos, checked, initial, targets);
+						}
+
+					}
+				}
+
+			}
+		}
 	}
 
 	public int attemptAcceptPower(int energy) {

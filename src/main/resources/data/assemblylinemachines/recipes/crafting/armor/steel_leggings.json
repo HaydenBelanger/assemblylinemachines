@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"x":{
-			"item": "assemblylinemachines:titanium_ingot"
+			"item": "assemblylinemachines:steel_ingot"
 		}
 	},
 	"result":{
-		"item": "assemblylinemachines:titanium_leggings"
+		"item": "assemblylinemachines:steel_leggings"
 	}
 }

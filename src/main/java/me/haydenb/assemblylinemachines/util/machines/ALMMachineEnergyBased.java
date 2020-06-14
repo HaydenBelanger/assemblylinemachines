@@ -1,5 +1,7 @@
 package me.haydenb.assemblylinemachines.util.machines;
 
+import java.util.ArrayList;
+
 import me.haydenb.assemblylinemachines.util.Utils;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.client.gui.screen.Screen;
@@ -17,6 +19,7 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 
 	public EnergyProperties properties;
 	public int amount = 0;
+	public float fept = 0;
 	public boolean enabled = true;
 	protected IEnergyStorage energy = new IEnergyStorage() {
 		
@@ -90,11 +93,15 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 		if(compound.contains("assemblylinemachines:stored")) {
 			amount = compound.getInt("assemblylinemachines:stored");
 		}
+		if(compound.contains("assemblylinemachines:fept")) {
+			fept = compound.getFloat("assemblylinemachines:fept");
+		}
 	}
 	
 	@Override
 	public CompoundNBT write(CompoundNBT compound) {
 		compound.putInt("assemblylinemachines:stored", amount);
+		compound.putFloat("assemblylinemachines:fept", fept);
 		return super.write(compound);
 	}
 	
@@ -132,14 +139,29 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 
 		private final Pair<Integer, Integer> energyMeterLoc;
 		private final ALMMachineEnergyBased<T> machine;
+		private final boolean usesfept;
+		private final int startx;
 		
 		public ScreenALMEnergyBased(T screenContainer, PlayerInventory inv, ITextComponent titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
 				String guipath, boolean hasCool, Pair<Integer, Integer> energyMeterLoc,
-				ALMMachineEnergyBased<T> machine) {
+				ALMMachineEnergyBased<T> machine, boolean usesfept) {
 			super(screenContainer, inv, titleIn, size, titleTextLoc, invTextLoc, guipath, hasCool);
 			this.energyMeterLoc = energyMeterLoc;
+			this.startx = 176;
 			this.machine = machine;
+			this.usesfept = usesfept;
+		}
+		
+		public ScreenALMEnergyBased(T screenContainer, PlayerInventory inv, ITextComponent titleIn,
+				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
+				String guipath, boolean hasCool, Pair<Integer, Integer> energyMeterLoc,
+				ALMMachineEnergyBased<T> machine, int startx, boolean usesfept) {
+			super(screenContainer, inv, titleIn, size, titleTextLoc, invTextLoc, guipath, hasCool);
+			this.energyMeterLoc = energyMeterLoc;
+			this.startx = startx;
+			this.machine = machine;
+			this.usesfept = usesfept;
 		}
 		
 		@Override
@@ -151,7 +173,14 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 			if (mouseX >= x + energyMeterLoc.x && mouseY >= y + energyMeterLoc.y && mouseX <= x + energyMeterLoc.x + 15 && mouseY <= y + energyMeterLoc.y + 51) {
 
 				if(Screen.hasShiftDown()) {
-					this.renderTooltip(Utils.FORMAT.format(machine.amount) + "/" + Utils.FORMAT.format(machine.properties.capacity) + "FE",
+					ArrayList<String> str = new ArrayList<>();
+					str.add(Utils.FORMAT.format(machine.amount) + "/" + Utils.FORMAT.format(machine.properties.capacity) + "FE");
+					if(usesfept) {
+						
+						
+						str.add(Utils.FEPT_FORMAT.format(machine.fept) + " FE/tick");
+					}
+					this.renderTooltip(str,
 							mouseX - x, mouseY - y);
 				}else {
 					this.renderTooltip(Utils.format(machine.amount) + "/" + Utils.format(machine.properties.capacity) + "FE",
@@ -168,7 +197,7 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			int prog = Math.round(((float) machine.amount / (float) machine.properties.capacity) * 52F);
-			super.blit(x + energyMeterLoc.x, y + energyMeterLoc.y + (52 - prog), 176, (52 - prog), 16, prog);
+			super.blit(x + energyMeterLoc.x, y + energyMeterLoc.y + (52 - prog), startx, (52 - prog), 16, prog);
 		}
 		
 		

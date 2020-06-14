@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sxs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:titanium_plate"
+		},
+		"x":{
+			"item": "minecraft:hopper"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:item_pipe_upgrade_filter"
+	}
+}

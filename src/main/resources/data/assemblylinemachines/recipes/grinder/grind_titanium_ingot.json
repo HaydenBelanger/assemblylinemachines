@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "forge:ingots/gold"
+		"tag": "forge:ingots/titanium"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_titanium"

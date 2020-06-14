@@ -40,17 +40,17 @@ import net.minecraftforge.common.ToolType;
 
 public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerator.TECoalGenerator>{
 
-	private static final VoxelShape SHAPE_S = Stream.of(
-			Block.makeCuboidShape(14, 9, 3, 16, 16, 13),
+	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.makeCuboidShape(0, 9, 3, 2, 16, 13),
-			Block.makeCuboidShape(3, 9, 0, 13, 16, 2),
+			Block.makeCuboidShape(14, 9, 3, 16, 16, 13),
+			Block.makeCuboidShape(3, 9, 14, 13, 16, 16),
 			Block.makeCuboidShape(0, 0, 0, 16, 9, 16),
 			Block.makeCuboidShape(2, 9, 2, 14, 16, 14)
 			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	
-	private static final VoxelShape SHAPE_N = Utils.rotateShape(Direction.SOUTH, Direction.NORTH, SHAPE_S);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.SOUTH, Direction.EAST, SHAPE_S);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.SOUTH, Direction.WEST, SHAPE_S);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	
 	private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###");
 	
@@ -183,9 +183,9 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerCoalGenerator(final int windowId, final PlayerInventory playerInventory, final TECoalGenerator tileEntity) {
-			super(Registry.getContainerType("coal_generator"), windowId, 1, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("coal_generator"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity, 64));
+			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity));
 		}
 		
 		
@@ -201,7 +201,7 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 		
 		public ScreenCoalGenerator(ContainerCoalGenerator screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "coal_generator", false, new Pair<>(14, 17), screenContainer.tileEntity);
+			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "coal_generator", false, new Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
 		

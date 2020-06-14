@@ -1,0 +1,38 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/cube",
+	"textures": {
+		"10": "assemblylinemachines:block/battery_cell/rods/rod_50",
+		"11": "assemblylinemachines:block/battery_cell/rods/rod_50d",
+		"12": "assemblylinemachines:block/battery_cell/rods/rod_50l",
+		"particle": "assemblylinemachines:block/machine_basic_top"
+	},
+	"elements": [
+		{
+			"name": "Battery2",
+			"from": [10, 3, 0],
+			"to": [12, 13, 2],
+			"rotation": {"angle": 0, "axis": "y", "origin": [18, 11, 8]},
+			"faces": {
+				"north": {"uv": [4, 3, 6, 13], "texture": "#10"},
+				"east": {"uv": [7, 3, 9, 13], "texture": "#12"},
+				"west": {"uv": [7, 3, 9, 13], "texture": "#11"},
+				"up": {"uv": [4, 2, 6, 4], "rotation": 180, "texture": "#10"},
+				"down": {"uv": [4, 11, 6, 13], "rotation": 180, "texture": "#10"}
+			}
+		},
+		{
+			"name": "Battery1",
+			"from": [4, 3, 0],
+			"to": [6, 13, 2],
+			"rotation": {"angle": 0, "axis": "y", "origin": [12, 11, 8]},
+			"faces": {
+				"north": {"uv": [4, 3, 6, 13], "texture": "#10"},
+				"east": {"uv": [7, 3, 9, 13], "texture": "#12"},
+				"west": {"uv": [7, 3, 9, 13], "texture": "#11"},
+				"up": {"uv": [4, 2, 6, 4], "rotation": 180, "texture": "#10"},
+				"down": {"uv": [4, 11, 6, 13], "rotation": 180, "texture": "#10"}
+			}
+		}
+	]
+}

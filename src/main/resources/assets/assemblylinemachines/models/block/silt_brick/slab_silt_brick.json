@@ -1,0 +1,8 @@
+{
+    "parent": "block/slab",
+    "textures": {
+        "bottom": "assemblylinemachines:block/silt_brick",
+        "top": "assemblylinemachines:block/silt_brick",
+        "side": "assemblylinemachines:block/silt_brick"
+    }
+}

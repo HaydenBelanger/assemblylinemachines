@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"igi",
+		"grg",
+		"igi"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"g":{
+			"item": "assemblylinemachines:gold_plate"
+		},
+		"r":{
+			"tag": "forge:storage_blocks/lapis"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:gearbox_upgrade_efficiency"
+	}
+}

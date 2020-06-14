@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:ingots/pure_gold",
+	"#forge:ingots/pure_iron",
+	"#forge:ingots/pure_titanium",
+	"#forge:ingots/titanium",
+	"#forge:ingots/steel",
+	"#forge:ingots/pure_steel"
+  ]
+}

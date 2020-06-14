@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/silt_brick"
+			"model": "assemblylinemachines:block/silt_brick/silt_brick"
 		}
 	}
 	

@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:purifier",
+	"part_a":{
+		"item": "minecraft:soul_sand"
+	},
+	"part_b":{
+		"tag": "forge:netherrack"
+	},
+	"tobepurified":{
+		"item": "minecraft:granite"
+	},
+	"output":{
+		"item": "assemblylinemachines:black_granite"
+	},
+	"time": 150
+}

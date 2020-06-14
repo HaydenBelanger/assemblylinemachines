@@ -1,6 +1,8 @@
 package me.haydenb.assemblylinemachines.util.machines;
 
 import java.util.HashMap;
+
+import me.haydenb.assemblylinemachines.util.Utils;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
@@ -78,7 +80,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 			if(sided.canExtractFromSide(slot, side)) {
 				return super.extractItem(slot, amount, simulate);
 			}else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 			
 		}
@@ -86,9 +88,10 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 			if(sided.canInsertToSide(slot, side)) {
+				
 				return super.insertItem(slot, stack, simulate);
 			}else {
-				return null;
+				return stack;
 			}
 		}
 		
@@ -110,6 +113,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 			
 			if(simulate == false) {
 				sided.amount += maxReceive;
+				recalcBattery();
 				sided.sendUpdates();
 			}
 			
@@ -138,6 +142,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 			
 			if(simulate == false) {
 				sided.amount -= maxExtract;
+				recalcBattery();
 				sided.sendUpdates();
 			}
 			
@@ -158,6 +163,16 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 				return sided.properties.out;
 			}
 			return false;
+		}
+		
+		private void recalcBattery(){
+			
+			if(sided.getBlockState().has(Utils.BATTERY_PERCENT_STATE)) {
+				int fx = (int) Math.floor(((double) sided.amount / (double) sided.properties.capacity) * 4d);
+				if(sided.getBlockState().get(Utils.BATTERY_PERCENT_STATE) != fx) {
+					sided.world.setBlockState(sided.pos, sided.getBlockState().with(Utils.BATTERY_PERCENT_STATE, fx));
+				}
+			}
 		}
 	}
 }

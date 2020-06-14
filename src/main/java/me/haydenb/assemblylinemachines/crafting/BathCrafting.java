@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
 import net.minecraft.inventory.IInventory;
@@ -67,7 +68,19 @@ public class BathCrafting implements IRecipe<IInventory>{
 						return true;
 					}
 				}
-			}else{
+			}else if(inv instanceof TEElectricFluidMixer){
+				if(inputa.test(inv.getStackInSlot(1))) {
+					if(inputb.test(inv.getStackInSlot(2))) {
+						return true;
+					}
+				}
+				
+				if(inputa.test(inv.getStackInSlot(2))) {
+					if(inputb.test(inv.getStackInSlot(1))) {
+						return true;
+					}
+				}
+			}else {
 				if(inputa.test(inv.getStackInSlot(0))) {
 					if(inputb.test(inv.getStackInSlot(1))) {
 						return true;
@@ -129,10 +142,11 @@ public class BathCrafting implements IRecipe<IInventory>{
 		nnl.add(inputa);
 		nnl.add(inputb);
 		Item mixerHandler = Registry.getItem("simple_fluid_mixer");
+		Item electricMixer = Registry.getItem("electric_fluid_mixer");
 		if(this.machineReqd) {
-			nnl.add(Ingredient.fromItems(mixerHandler));
+			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer));
 		}else {
-			nnl.add(Ingredient.fromItems(mixerHandler, Registry.getItem("fluid_bath")));
+			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer, Registry.getItem("fluid_bath")));
 		}
 		return nnl;
 	}

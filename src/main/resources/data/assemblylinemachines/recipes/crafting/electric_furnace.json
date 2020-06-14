@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sgs",
+		"gqg",
+		"ldl"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"d":{
+			"item": "minecraft:furnace"
+		},
+		"l":{
+			"item": "minecraft:bricks"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		},
+		"q":{
+			"item": "assemblylinemachines:black_granite"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:electric_furnace"
+	}
+}

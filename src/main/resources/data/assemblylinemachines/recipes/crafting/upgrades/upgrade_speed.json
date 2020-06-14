@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" g ",
+		"gxg",
+		" g "
+	],
+	"key":{
+		"g":{
+			"item": "assemblylinemachines:gold_plate"
+		},
+		"x":{
+			"item": "minecraft:sugar"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:upgrade_speed"
+	}
+}

@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.util.machines;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.BlockSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -180,39 +180,40 @@ public abstract class AbstractALMMachine<A extends Container> extends LockableLo
 
 		private final AbstractALMMachine<?> check;
 		protected final int slot;
-		private final int maxStackLimit;
+		private final boolean outputSlot;
 
 		public SlotWithRestrictions(IInventory inventoryIn, int index, int xPosition, int yPosition,
-				AbstractALMMachine<?> check, int slotLimit) {
+				AbstractALMMachine<?> check, boolean outputSlot) {
 			super(inventoryIn, index, xPosition, yPosition);
 			this.slot = index;
 			this.check = check;
-			this.maxStackLimit = slotLimit;
+			this.outputSlot = outputSlot;
+		}
+		
+		public SlotWithRestrictions(IInventory inventoryIn, int index, int xPosition, int yPosition,
+				AbstractALMMachine<?> check) {
+			this(inventoryIn, index, xPosition, yPosition, check, false);
 		}
 
 		@Override
 		public boolean isItemValid(ItemStack stack) {
+			if(outputSlot) {
+				return false;
+			}
 			return check.isAllowedInSlot(slot, stack);
 		}
-		
-		@Override
-			public int getSlotStackLimit() {
-				return maxStackLimit;
-			}
 
 	}
 
 	// CONTAINER DYNAMIC
 	public static class ContainerALMBase<T extends TileEntity> extends Container {
 
-		protected final int invenSize;
 		protected final IWorldPosCallable canInteract;
 		public final T tileEntity;
 
-		protected ContainerALMBase(ContainerType<?> type, int id, int invenSize, T te, PlayerInventory pInv,
+		protected ContainerALMBase(ContainerType<?> type, int id, T te, PlayerInventory pInv,
 				Pair<Integer, Integer> pmain, Pair<Integer, Integer> phot) {
 			super(type, id);
-			this.invenSize = invenSize;
 			this.canInteract = IWorldPosCallable.of(te.getWorld(), te.getPos());
 			this.tileEntity = te;
 			bindPlayerInventory(pInv, pmain.x, pmain.y, phot.y, phot.x);

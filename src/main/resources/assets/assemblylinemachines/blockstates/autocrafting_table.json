@@ -1,0 +1,12 @@
+{
+    "variants": {
+        "facing=north,active=false": { "model": "assemblylinemachines:block/autocrafting_table" },
+        "facing=south,active=false": { "model": "assemblylinemachines:block/autocrafting_table", "y": 180 },
+        "facing=west,active=false":  { "model": "assemblylinemachines:block/autocrafting_table", "y": 270 },
+        "facing=east,active=false":  { "model": "assemblylinemachines:block/autocrafting_table", "y": 90 },
+		"facing=north,active=true": { "model": "assemblylinemachines:block/autocrafting_table_active" },
+        "facing=south,active=true": { "model": "assemblylinemachines:block/autocrafting_table_active", "y": 180 },
+        "facing=west,active=true":  { "model": "assemblylinemachines:block/autocrafting_table_active", "y": 270 },
+        "facing=east,active=true":  { "model": "assemblylinemachines:block/autocrafting_table_active", "y": 90 }
+    }
+}

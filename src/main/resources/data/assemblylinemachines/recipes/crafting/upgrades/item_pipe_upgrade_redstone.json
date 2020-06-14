@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sxs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:titanium_plate"
+		},
+		"x":{
+			"tag": "forge:dusts/redstone"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:item_pipe_upgrade_redstone"
+	}
+}

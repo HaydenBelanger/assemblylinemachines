@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeSet;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
@@ -18,6 +19,7 @@ import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
 import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
 import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
 import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.*;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -86,7 +88,6 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 			});
 
-	private boolean targetsUpdated = false;
 
 	public ItemPipeConnectorTileEntity(TileEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn, 12, "Item Pipe Connector", Registry.getContainerId("pipe_connector_item"),
@@ -95,15 +96,6 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 	public ItemPipeConnectorTileEntity() {
 		this(Registry.getTileEntity("pipe_connector_item"));
-	}
-
-	public void updateTargets(PipeBase<?> pb) {
-		if (!world.isRemote) {
-			targets.clear();
-			pb.pathToNearestItem(world, pos, new ArrayList<>(), pos, targets);
-			sendUpdates();
-		}
-
 	}
 
 	public boolean isRedstoneActive() {
@@ -188,7 +180,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 					timer = 0;
 					if (pendingCooldown-- <= 0) {
 						pendingCooldown = 0;
-						switch (getUpgradeAmount(Upgrades.PIPE_SPEED)) {
+						switch (getUpgradeAmount(Upgrades.UNIVERSAL_SPEED)) {
 						case 3:
 							nTimer = 10;
 							break;
@@ -202,12 +194,8 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 							nTimer = 50;
 						}
 
-						if (targetsUpdated == false) {
-							targetsUpdated = true;
-							updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
-							((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(this.world, this.pos,
-									new ArrayList<>(), new ArrayList<>());
-						}
+						targets.clear();
+						pathToNearestItem(world, pos, new ArrayList<>(), pos, targets);
 
 						if (output == null && connectToOutput() == false) {
 							return;
@@ -291,6 +279,34 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		}
 
 		return contents;
+	}
+	
+	public void pathToNearestItem(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<ItemPipeConnectorTileEntity> targets) {
+		BlockState bs = world.getBlockState(curPos);
+		for (Direction k : Direction.values()) {
+			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
+			if(pco == PipeConnOptions.CONNECTOR && !initial.equals(curPos)) {
+				TileEntity te = world.getTileEntity(curPos);
+				if(te != null && te instanceof ItemPipeConnectorTileEntity) {
+					ItemPipeConnectorTileEntity ipc = (ItemPipeConnectorTileEntity) te;
+					targets.add(ipc);
+				}
+				
+			}else if (pco == PipeConnOptions.PIPE) {
+				BlockPos targPos = curPos.offset(k);
+				if (!checked.contains(targPos)) {
+					checked.add(targPos);
+					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
+						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
+						if (t.type == Type.ITEM) {
+							pathToNearestItem(world, targPos, checked, initial, targets);
+						}
+
+					}
+				}
+
+			}
+		}
 	}
 
 	public int getUpgradeAmount(Upgrades upgrade) {
@@ -388,18 +404,18 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 		public ItemPipeConnectorContainer(final int windowId, final PlayerInventory playerInventory,
 				final ItemPipeConnectorTileEntity tileEntity) {
-			super(Registry.getContainerType("pipe_connector_item"), windowId, 2, tileEntity, playerInventory,
+			super(Registry.getContainerType("pipe_connector_item"), windowId, tileEntity, playerInventory,
 					PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			for (int row = 0; row < 3; ++row) {
 				for (int col = 0; col < 3; ++col) {
 					this.addSlot(new FilterPipeValidatorSlot(tileEntity, (row * 3) + col, 55 + (18 * col),
-							21 + (18 * row), tileEntity, 1));
+							21 + (18 * row), tileEntity));
 				}
 			}
 
 			for (int row = 0; row < 3; ++row) {
 				this.addSlot(new AbstractALMMachine.SlotWithRestrictions(tileEntity, row + 9, 149, 21 + (row * 18),
-						tileEntity, 1));
+						tileEntity));
 			}
 
 		}
@@ -413,8 +429,8 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		private static class FilterPipeValidatorSlot extends SlotWithRestrictions {
 
 			public FilterPipeValidatorSlot(IInventory inventoryIn, int index, int xPosition, int yPosition,
-					AbstractALMMachine<?> check, int slotLimit) {
-				super(inventoryIn, index, xPosition, yPosition, check, slotLimit);
+					AbstractALMMachine<?> check) {
+				super(inventoryIn, index, xPosition, yPosition, check);
 			}
 
 			@Override
@@ -504,9 +520,11 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			b.put("priorityzero", new Pair<>(new SimpleButton(x + 111, y + 54, "Priority Reset", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "priorityzero");
 			}), null));
+			/*
 			b.put("refresh", new Pair<>(new SimpleButton(x + 158, y + 10, "Refresh Connection Map", (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "refresh");
 			}), null));
+			*/
 			b.put("redstone", new Pair<>(new ItemPipeRedstoneButton(x + 43, y + 42, 177, 51, null, (button) -> {
 				sendPipeUpdatePacket(tsfm.pos, "redstone");
 			}, tsfm), new SupplierWrapper("Enabled on Redstone Signal", "Always Active", () -> tsfm.redstone)));
@@ -519,6 +537,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+			this.font.drawString(this.title.getFormattedText(), 11, 6, 4210752);
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (!(bb.x instanceof ItemPipeRedstoneButton)
 						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled())
@@ -534,8 +553,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 						break;
 					}
 			}
-
-			this.font.drawString(this.title.getFormattedText(), 11, 6, 4210752);
+			
 		}
 
 		@Override
@@ -555,8 +573,9 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 			}
 
-			// Covers the Round Robin button.
+			// Covers the Round Robin and Refresh button.
 			super.blit(x + 43, y + 31, 9, 12, 8, 8);
+			super.blit(x + 158, y + 10, 9, 12, 8, 8);
 
 			for (int row = 0; row < 3; ++row) {
 				for (int col = 0; col < 3; ++col) {
@@ -626,7 +645,6 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 					ipcte.outputMode = !ipcte.outputMode;
 				} else if (b.equals("nearest")) {
 					ipcte.nearestFirst = !ipcte.nearestFirst;
-					ipcte.updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
 				} /*
 					 * else if (b.equals("roundrobin")) {
 					 * 
@@ -640,22 +658,14 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 				} else if (b.equals("priorityup")) {
 					if (ipcte.priority < 99) {
 						ipcte.priority++;
-						((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(),
-								new ArrayList<>(), new ArrayList<>());
 					}
 				} else if (b.equals("prioritydown")) {
 					if (ipcte.priority > -99) {
 						ipcte.priority--;
-						((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(),
-								new ArrayList<>(), new ArrayList<>());
 					}
 
 				} else if (b.equals("priorityzero")) {
 					ipcte.priority = 0;
-					((PipeBase<?>) Registry.getBlock("item_pipe")).updateAllAlongPath(world, te.getPos(),
-							new ArrayList<>(), new ArrayList<>());
-				} else if (b.equals("refresh")) {
-					ipcte.updateTargets((PipeBase<?>) Registry.getBlock("item_pipe"));
 				} else if (b.equals("redstone")) {
 					ipcte.redstone = !ipcte.redstone;
 					if (ipcte.redstone && world.isBlockPowered(pos)) {

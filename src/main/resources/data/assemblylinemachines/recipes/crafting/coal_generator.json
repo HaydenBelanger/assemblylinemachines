@@ -19,7 +19,7 @@
 			"tag": "assemblylinemachines:crafting/gears/precious"
 		},
 		"r":{
-			"item": "minecraft:redstone"
+			"tag": "forge:dusts/redstone"
 		}
 	},
 	"result":{

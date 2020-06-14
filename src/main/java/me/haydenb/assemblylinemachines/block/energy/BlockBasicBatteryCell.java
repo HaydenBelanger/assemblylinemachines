@@ -76,7 +76,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "basic_battery_cell", null, true,
 				Direction.NORTH, TEBasicBatteryCell.class);
 		this.setDefaultState(
-				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(Utils.BATTERY_PERCENT_STATE, 0));
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(Utils.BATTERY_PERCENT_STATE);
 	}
 
 	public static class TEBasicBatteryCell extends ALMManagedSidedMachineBlock<ContainerBasicBatteryCell> implements ITickableTileEntity {
@@ -112,7 +112,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 		private int timer = 0;
 		public TEBasicBatteryCell(final TileEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn, 0, "Basic Battery Cell", Registry.getContainerId("basic_battery_cell"),
-					ContainerBasicBatteryCell.class, new EnergyProperties(true, true, 250000));
+					ContainerBasicBatteryCell.class, new EnergyProperties(true, true, 2500000));
 		}
 
 		public TEBasicBatteryCell() {
@@ -134,8 +134,8 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 		@Override
 		public void read(CompoundNBT compound) {
 			super.read(compound);
-			if(compound.contains("assemblylinemachines:fept")) {
-				fept = compound.getInt("assemblylinemachines:fept");
+			if(compound.contains("assemblylinemachines:fptout")) {
+				fept = compound.getInt("assemblylinemachines:fptout");
 			}
 			if(compound.contains("assemblylinemachines:in")) {
 				autoIn = compound.getBoolean("assemblylinemachines:in");
@@ -145,7 +145,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 		@Override
 		public CompoundNBT write(CompoundNBT compound) {
 			
-			compound.putInt("assemblylinemachines:fept", fept);
+			compound.putInt("assemblylinemachines:fptout", fept);
 			compound.putBoolean("assemblylinemachines:in", autoIn);
 			return super.write(compound);
 		}
@@ -291,7 +291,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 
 		public ContainerBasicBatteryCell(final int windowId, final PlayerInventory playerInventory,
 				final TEBasicBatteryCell tileEntity) {
-			super(Registry.getContainerType("basic_battery_cell"), windowId, 0, tileEntity, playerInventory,
+			super(Registry.getContainerType("basic_battery_cell"), windowId, tileEntity, playerInventory,
 					PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 		}
 
@@ -310,7 +310,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 		public ScreenBasicBatteryCell(ContainerBasicBatteryCell screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73),
-					"basic_battery_cell", false, new Pair<>(75, 17), screenContainer.tileEntity);
+					"basic_battery_cell", false, new Pair<>(75, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 			b = new HashMap<>();
 		}

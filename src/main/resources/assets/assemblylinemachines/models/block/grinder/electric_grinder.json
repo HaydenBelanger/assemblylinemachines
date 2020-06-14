@@ -1,0 +1,113 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/machine_basic_side",
+		"1": "assemblylinemachines:block/machine_basic_top",
+		"3": "assemblylinemachines:block/electric_grinder",
+		"5": "assemblylinemachines:block/electric_furnace_inset_idle",
+		"particle": "assemblylinemachines:block/machine_basic_side"
+	},
+	"elements": [
+		{
+			"name": "Bottom",
+			"from": [0, 14, 0],
+			"to": [16, 16, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 22, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 2], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 2], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 2], "texture": "#0"},
+				"west": {"uv": [0, 0, 16, 2], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [0, 0, 0],
+			"to": [16, 3, 16],
+			"faces": {
+				"north": {"uv": [0, 13, 16, 16], "texture": "#3"},
+				"east": {"uv": [0, 13, 16, 16], "texture": "#0"},
+				"south": {"uv": [0, 13, 16, 16], "texture": "#0"},
+				"west": {"uv": [0, 13, 16, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Sides",
+			"from": [0, 3, 1],
+			"to": [16, 14, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 10, 9]},
+			"faces": {
+				"north": {"uv": [0, 2, 16, 13], "texture": "#5"},
+				"east": {"uv": [0, 2, 15, 14], "texture": "#0"},
+				"south": {"uv": [0, 2, 16, 13], "texture": "#0"},
+				"west": {"uv": [1, 2, 16, 14], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Front",
+			"from": [0, 6, 0],
+			"to": [16, 14, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"north": {"uv": [0, 2, 16, 10], "texture": "#3"},
+				"east": {"uv": [0, 2, 1, 11], "texture": "#0"},
+				"west": {"uv": [0, 2, 1, 11], "texture": "#0"},
+				"down": {"uv": [0, 0, 16, 1], "texture": "#1"}
+			}
+		},
+		{
+			"name": "FrontRad1",
+			"from": [0, 3, 0],
+			"to": [3, 6, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 11, 8]},
+			"faces": {
+				"north": {"uv": [13, 10, 16, 13], "texture": "#3"},
+				"east": {"uv": [0, 0, 1, 3], "texture": "#1"},
+				"west": {"uv": [0, 11, 1, 14], "texture": "#0"}
+			}
+		},
+		{
+			"name": "FrontRad2",
+			"from": [13, 3, 0],
+			"to": [16, 6, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [21, 11, 8]},
+			"faces": {
+				"north": {"uv": [0, 10, 3, 13], "texture": "#3"},
+				"east": {"uv": [0, 11, 1, 14], "texture": "#0"},
+				"west": {"uv": [0, 0, 1, 3], "texture": "#1"}
+			}
+		},
+		{
+			"name": "FrontRad3",
+			"from": [9, 3, 0],
+			"to": [12, 6, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [17, 11, 8]},
+			"faces": {
+				"north": {"uv": [4, 10, 7, 13], "texture": "#3"},
+				"east": {"uv": [0, 0, 1, 3], "texture": "#1"},
+				"west": {"uv": [0, 0, 1, 3], "texture": "#1"}
+			}
+		},
+		{
+			"name": "FrontRad4",
+			"from": [4, 3, 0],
+			"to": [7, 6, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [12, 11, 8]},
+			"faces": {
+				"north": {"uv": [9, 10, 12, 13], "texture": "#3"},
+				"east": {"uv": [0, 0, 1, 3], "texture": "#1"},
+				"west": {"uv": [0, 0, 1, 3], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0, 1, 2, 3, 4, 5, 6, 7]
+		}
+	]
+}

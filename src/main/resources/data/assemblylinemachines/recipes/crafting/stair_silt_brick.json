@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"x  ",
+		"xx ",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:silt_brick"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:stair_silt_brick",
+		"count": 4
+	}
+}

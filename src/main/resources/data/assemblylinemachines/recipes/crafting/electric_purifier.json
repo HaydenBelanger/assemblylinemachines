@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sgs",
+		"gqg",
+		"dld"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:titanium_plate"
+		},
+		"d":{
+			"tag": "forge:gems/diamond"
+		},
+		"l":{
+			"tag": "forge:storage_blocks/lapis"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/precious"
+		},
+		"q":{
+			"item": "assemblylinemachines:black_granite"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:electric_purifier"
+	}
+}

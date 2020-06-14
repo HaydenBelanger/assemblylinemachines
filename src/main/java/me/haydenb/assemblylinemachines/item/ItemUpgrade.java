@@ -15,20 +15,24 @@ public class ItemUpgrade extends Item {
 
 	final String[] positives;
 	final String[] negatives;
-	public ItemUpgrade(String[] positives, String[] negatives) {
+	final boolean stackable;
+	public ItemUpgrade(boolean stackable, String[] positives, String[] negatives) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
+		this.stackable = stackable;
 		this.positives = positives;
 		this.negatives = negatives;
 	}
 	
-	public ItemUpgrade(String positive, String negative) {
+	public ItemUpgrade(boolean stackable, String positive, String negative) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
+		this.stackable = stackable;
 		this.positives = new String[] {positive};
 		this.negatives = new String[] {negative};
 	}
 	
-	public ItemUpgrade(String positive) {
+	public ItemUpgrade(boolean stackable, String positive) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
+		this.stackable = stackable;
 		this.positives = new String[] {positive};
 		this.negatives = null;
 	}
@@ -36,6 +40,9 @@ public class ItemUpgrade extends Item {
 	
 	@Override
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		if(stackable) {
+			tooltip.add(new StringTextComponent("This upgrade's effect can be stacked.").applyTextStyle(TextFormatting.DARK_GRAY));
+		}
 		for(String s : positives) {
 			tooltip.add(new StringTextComponent(s).applyTextStyle(TextFormatting.GREEN));
 		}
@@ -49,11 +56,17 @@ public class ItemUpgrade extends Item {
 	}
 	
 	public static enum Upgrades{
-		EFFICIENCY(Registry.getItem("gearbox_upgrade_efficiency")), POWER(Registry.getItem("gearbox_upgrade_speed")), 
-		COMPATABILITY(Registry.getItem("gearbox_upgrade_compatability")), LIMITER(Registry.getItem("gearbox_upgrade_limiter")),
+		GB_EFFICIENCY(Registry.getItem("gearbox_upgrade_efficiency")),
+		GB_COMPATABILITY(Registry.getItem("gearbox_upgrade_compatability")), GB_LIMITER(Registry.getItem("gearbox_upgrade_limiter")),
 		
-		PIPE_SPEED(Registry.getItem("item_pipe_upgrade_speed")), PIPE_STACK(Registry.getItem("item_pipe_upgrade_stack")), 
+		PIPE_STACK(Registry.getItem("item_pipe_upgrade_stack")), 
 		PIPE_FILTER(Registry.getItem("item_pipe_upgrade_filter")), PIPE_REDSTONE(Registry.getItem("item_pipe_upgrade_redstone")),
+		
+		UNIVERSAL_SPEED(Registry.getItem("upgrade_speed")),
+		
+		MACHINE_CONSERVATION(Registry.getItem("machine_upgrade_conservation")),
+		
+		AC_SUSTAINED(Registry.getItem("autocrafting_upgrade_sustained")), AC_RECIPES(Registry.getItem("autocrafting_upgrade_recipes")),
 		
 		NONE(null);
 		

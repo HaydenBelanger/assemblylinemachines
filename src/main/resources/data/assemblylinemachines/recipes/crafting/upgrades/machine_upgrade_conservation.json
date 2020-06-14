@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sxs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"x":{
+			"item": "minecraft:quartz_block"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:machine_upgrade_conservation"
+	}
+}

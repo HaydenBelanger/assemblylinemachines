@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"igi",
+		"geg",
+		"igi"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"g":{
+			"item": "assemblylinemachines:gold_plate"
+		},
+		"e":{
+			"tag": "forge:gems/emerald"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:gearbox_upgrade_limiter"
+	}
+}

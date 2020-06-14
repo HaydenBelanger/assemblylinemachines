@@ -13,7 +13,7 @@
 			"item": "assemblylinemachines:black_granite"
 		},
 		"w":{
-			"item": "minecraft:redstone"
+			"tag": "forge:dusts/redstone"
 		}
 	},
 	"result":{

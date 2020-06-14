@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -27,7 +28,7 @@ public abstract class TEContainingBlock extends Block{
 	private final boolean shouldRotate;
 	private final Direction dir;
 	
-	private static final VoxelShape NO_SHAPE_CUBE = Block.makeCuboidShape(0, 0, 0, 16, 16, 16);
+	private static final VoxelShape NO_SHAPE_CUBE = VoxelShapes.fullCube();
 	public TEContainingBlock(Properties properties, String teName) {
 		super(properties);
 		this.teName = teName;

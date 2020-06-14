@@ -32,9 +32,8 @@
 	"item.assemblylinemachines.empowered_coal": "Empowered Coal",
 	"item.assemblylinemachines.gearbox_upgrade_compatability": "Gearbox Upgrade: Fuel Compatability",
 	"item.assemblylinemachines.gearbox_upgrade_efficiency": "Gearbox Upgrade: Efficiency",
-	"item.assemblylinemachines.gearbox_upgrade_speed": "Gearbox Upgrade: Speed",
+	"item.assemblylinemachines.upgrade_speed": "Upgrade: Speed",
 	"item.assemblylinemachines.gearbox_upgrade_limiter": "Gearbox Upgrade: Cycle Limiter",
-	"item.assemblylinemachines.item_pipe_upgrade_speed": "Item Pipe Upgrade: Speed",
 	"item.assemblylinemachines.item_pipe_upgrade_stack": "Item Pipe Upgrade: Stack Size",
 	"item.assemblylinemachines.item_pipe_upgrade_filter": "Item Pipe Upgrade: Filter",
 	"item.assemblylinemachines.item_pipe_upgrade_redstone": "Item Pipe Upgrade: Redstone Control",
@@ -62,6 +61,8 @@
 	"item.assemblylinemachines.steel_leggings": "Steel Leggings",
 	"item.assemblylinemachines.steel_boots": "Steel Boots",
 	"item.assemblylinemachines.titanium_hammer": "Titanium Hammer",
+	"item.assemblylinemachines.pure_steel": "Pure Steel",
+	"item.assemblylinemachines.machine_upgrade_conservation": "Machine Upgrade: Conservation",
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
@@ -94,5 +95,9 @@
 	"block.assemblylinemachines.brick_black_granite": "Black Granite Bricks",
 	"block.assemblylinemachines.pillar_black_granite": "Black Granite Pillar",
 	"block.assemblylinemachines.slab_black_granite": "Black Granite Slab",
-	"block.assemblylinemachines.stair_black_granite": "Black Granite Stairs"
+	"block.assemblylinemachines.electric_furnace": "Electric Furnace",
+	"block.assemblylinemachines.electric_purifier": "Electric Purifier",
+	"block.assemblylinemachines.stair_black_granite": "Black Granite Stairs",
+	"block.assemblylinemachines.slab_silt_brick": "Silt Brick Slab",
+	"block.assemblylinemachines.stair_silt_brick": "Silt Brick Stairs"
 }

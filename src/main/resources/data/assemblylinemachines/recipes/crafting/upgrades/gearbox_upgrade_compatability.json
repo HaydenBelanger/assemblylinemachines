@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"igi",
+		"gdg",
+		"igi"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"g":{
+			"item": "assemblylinemachines:gold_plate"
+		},
+		"d":{
+			"tag": "forge:gems/diamond"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:gearbox_upgrade_compatability"
+	}
+}

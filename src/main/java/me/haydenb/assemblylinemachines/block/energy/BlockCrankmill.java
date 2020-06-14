@@ -139,13 +139,13 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 		public void read(CompoundNBT compound) {
 			super.read(compound);
 			if(compound.contains("assemblylinemachines:fept")) {
-				fePerTick = compound.getString("assemblylinemachines:fept");
+				fePerTick = compound.getString("assemblylinemachines:fepts");
 			}
 		}
 		
 		@Override
 		public CompoundNBT write(CompoundNBT compound) {
-			compound.putString("assemblylinemachines:fept", fePerTick);
+			compound.putString("assemblylinemachines:fepts", fePerTick);
 			return super.write(compound);
 		}
 
@@ -176,8 +176,12 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 		@Override
 		public void tick() {
 			
-			if(timer++ == 1000) {
-				timer = 500;
+			if(timer++ == 120) {
+				timer = 0;
+				if(!fePerTick.equals("0/t")) {
+					fePerTick = "0/t";
+					sendUpdates();
+				}
 			}
 			
 		}
@@ -200,7 +204,7 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 
 		public ContainerCrankmill(final int windowId, final PlayerInventory playerInventory,
 				final TECrankmill tileEntity) {
-			super(Registry.getContainerType("crankmill"), windowId, 0, tileEntity, playerInventory, PLAYER_INV_POS,
+			super(Registry.getContainerType("crankmill"), windowId, tileEntity, playerInventory, PLAYER_INV_POS,
 					PLAYER_HOTBAR_POS);
 		}
 
@@ -216,7 +220,7 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 
 		public ScreenCrankmill(ContainerCrankmill screenContainer, PlayerInventory inv, ITextComponent titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73),
-					"crankmill", false, new Pair<>(14, 17), screenContainer.tileEntity);
+					"crankmill", false, new Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
 

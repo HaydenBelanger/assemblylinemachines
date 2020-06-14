@@ -94,10 +94,11 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(input);
 		Item grinderHandler = Registry.getItem("simple_grinder");
+		Item electricGrinder = Registry.getItem("electric_grinder");
 		if(this.machineReqd) {
-			nnl.add(Ingredient.fromItems(grinderHandler));
+			nnl.add(Ingredient.fromItems(grinderHandler, electricGrinder));
 		}else {
-			nnl.add(Ingredient.fromItems(grinderHandler, Registry.getItem("hand_grinder")));
+			nnl.add(Ingredient.fromItems(grinderHandler, electricGrinder, Registry.getItem("hand_grinder")));
 		}
 		nnl.add(Blades.getAllBladesAtMinTier(getBlade().tier));
 		return nnl;

@@ -131,11 +131,11 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 						Upgrades u = Upgrades.match(contents.get(0));
 						int mul;
 						switch (u) {
-						case POWER:
+						case UNIVERSAL_SPEED:
 							nTimer = 20;
 							mul = 120;
 							break;
-						case EFFICIENCY:
+						case GB_EFFICIENCY:
 							nTimer = 80;
 							mul = 20;
 							break;
@@ -154,7 +154,7 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 								world.playSound(null, pos, SoundEvents.BLOCK_WOOD_STEP, SoundCategory.BLOCKS, 0.4f, 1f + getPitchNext());
 								
 							}else {
-								if(u != Upgrades.LIMITER) {
+								if(u != Upgrades.GB_LIMITER) {
 									burnTime = burnTime - mul;
 									sendUpdate = true;
 									world.playSound(null, pos, SoundEvents.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 0.4f, 1f);
@@ -206,7 +206,7 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 					return true;
 				}
 			}else {
-				if(Upgrades.match(contents.get(0)) == Upgrades.COMPATABILITY) {
+				if(Upgrades.match(contents.get(0)) == Upgrades.GB_COMPATABILITY) {
 					if(ForgeHooks.getBurnTime(stack) != 0) {
 						return true;
 					}
@@ -224,7 +224,7 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		@Override
 		public NonNullList<ItemStack> getItems() {
 			if(contents.get(1) != ItemStack.EMPTY && contents.get(1).getItem() != Items.AIR && !(contents.get(1).getItem() instanceof ItemGearboxFuel)) {
-				if(Upgrades.match(contents.get(0)) != Upgrades.COMPATABILITY) {
+				if(Upgrades.match(contents.get(0)) != Upgrades.GB_COMPATABILITY) {
 					Utils.spawnItem(contents.get(1), pos.up(), world);
 					contents.set(1, ItemStack.EMPTY);
 					burnTime = 0;
@@ -243,10 +243,10 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerGearbox(final int windowId, final PlayerInventory playerInventory, final TEGearbox tileEntity) {
-			super(Registry.getContainerType("gearbox"), windowId, 2, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("gearbox"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity, 1));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.x, INPUT_POS.y, tileEntity, 64));
+			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity));
+			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.x, INPUT_POS.y, tileEntity));
 		}
 		
 		
