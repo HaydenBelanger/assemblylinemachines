@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class ALMManagedSidedMachineBlock<A extends Container> extends ALMAbstractSidedEnergyItemBlock<A> {
 
@@ -15,7 +16,7 @@ public class ALMManagedSidedMachineBlock<A extends Container> extends ALMAbstrac
 
 
 
-	public ALMManagedSidedMachineBlock(TileEntityType<?> tileEntityTypeIn, int slotCount, String name,
+	public ALMManagedSidedMachineBlock(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name,
 			int containerId, Class<A> clazz, EnergyProperties properties) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz, properties);
 	}

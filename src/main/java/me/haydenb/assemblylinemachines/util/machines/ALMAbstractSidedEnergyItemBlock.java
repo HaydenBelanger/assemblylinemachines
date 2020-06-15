@@ -7,6 +7,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -19,7 +20,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 	
 	protected HashMap<Direction, LazyOptional<SidedCheckingHandler>> lazies = new HashMap<>();
 	
-	public ALMAbstractSidedEnergyItemBlock(TileEntityType<?> tileEntityTypeIn, int slotCount, String name,
+	public ALMAbstractSidedEnergyItemBlock(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name,
 			int containerId, Class<A> clazz, EnergyProperties properties) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz, properties);
 	}
@@ -107,8 +108,8 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 				return 0;
 			}
 			
-			if(sided.properties.capacity < maxReceive + sided.amount) {
-				maxReceive = sided.properties.capacity - sided.amount;
+			if(sided.properties.getCapacity() < maxReceive + sided.amount) {
+				maxReceive = sided.properties.getCapacity() - sided.amount;
 			}
 			
 			if(simulate == false) {
@@ -122,7 +123,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 		
 		@Override
 		public int getMaxEnergyStored() {
-			return sided.properties.capacity;
+			return sided.properties.getCapacity();
 		}
 		
 		@Override
@@ -152,7 +153,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 		@Override
 		public boolean canReceive() {
 			if(sided.canExtractFromSide(0, side)) {
-				return sided.properties.in;
+				return sided.properties.getIn();
 			}
 			return false;
 		}
@@ -160,7 +161,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 		@Override
 		public boolean canExtract() {
 			if(sided.canInsertToSide(-1, side)) {
-				return sided.properties.out;
+				return sided.properties.getOut();
 			}
 			return false;
 		}
@@ -168,7 +169,7 @@ public abstract class ALMAbstractSidedEnergyItemBlock<A extends Container> exten
 		private void recalcBattery(){
 			
 			if(sided.getBlockState().has(Utils.BATTERY_PERCENT_STATE)) {
-				int fx = (int) Math.floor(((double) sided.amount / (double) sided.properties.capacity) * 4d);
+				int fx = (int) Math.floor(((double) sided.amount / (double) sided.properties.getCapacity()) * 4d);
 				if(sided.getBlockState().get(Utils.BATTERY_PERCENT_STATE) != fx) {
 					sided.world.setBlockState(sided.pos, sided.getBlockState().with(Utils.BATTERY_PERCENT_STATE, fx));
 				}

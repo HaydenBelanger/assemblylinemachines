@@ -48,6 +48,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -146,7 +147,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 		protected LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> fluids);
 		
 		public TEElectricFluidMixer(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 6, "Electric Fluid Mixer", Registry.getContainerId("electric_fluid_mixer"), ContainerElectricFluidMixer.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 6, (TranslationTextComponent) Registry.getBlock("electric_fluid_mixer").getNameTextComponent(), Registry.getContainerId("electric_fluid_mixer"), ContainerElectricFluidMixer.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricFluidMixer() {

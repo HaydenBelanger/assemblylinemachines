@@ -8,6 +8,7 @@ import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
 import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.Utils.Localization;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import me.haydenb.assemblylinemachines.util.Utils.SimpleButton;
 import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
@@ -36,6 +37,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -111,7 +113,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 		private boolean autoIn = true;
 		private int timer = 0;
 		public TEBasicBatteryCell(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 0, "Basic Battery Cell", Registry.getContainerId("basic_battery_cell"),
+			super(tileEntityTypeIn, 0, (TranslationTextComponent) Registry.getBlock("basic_battery_cell").getNameTextComponent(), Registry.getContainerId("basic_battery_cell"),
 					ContainerBasicBatteryCell.class, new EnergyProperties(true, true, 2500000));
 		}
 
@@ -323,38 +325,38 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			b.put("up", new Pair<>(new SimpleButton(x + 51, y + 28, 177, 83, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "up");
-			}), new SupplierWrapper("Top Face Enabled", "Top Face Disabled",
+			}), new SupplierWrapper(Localization.TOP_ENBD.getFormattedText(), Localization.TOP_DSBD.getFormattedText(),
 					() -> tsfm.getDirectionEnabled(ManagedDirection.TOP))));
 			b.put("down", new Pair<>(new SimpleButton(x + 51, y + 50, 177, 73, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "down");
-			}), new SupplierWrapper("Bottom Face Enabled", "Bottom Face Disabled",
+			}), new SupplierWrapper(Localization.BOT_ENBD.getFormattedText(), Localization.BOT_DSBD.getFormattedText(),
 					() -> tsfm.getDirectionEnabled(ManagedDirection.BOTTOM))));
 			b.put("left", new Pair<>(new SimpleButton(x + 40, y + 39, 177, 103, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "left");
-			}), new SupplierWrapper("Left Face Enabled", "Left Face Disabled",
+			}), new SupplierWrapper(Localization.LFT_ENBD.getFormattedText(), Localization.LFT_DSBD.getFormattedText(),
 					() -> tsfm.getDirectionEnabled(ManagedDirection.LEFT))));
 			b.put("right", new Pair<>(new SimpleButton(x + 62, y + 39, 177, 93, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "right");
-			}), new SupplierWrapper("Right Face Enabled", "Right Face Disabled",
+			}), new SupplierWrapper(Localization.RGT_ENBD.getFormattedText(), Localization.RGT_DSBD.getFormattedText(),
 					() -> tsfm.getDirectionEnabled(ManagedDirection.RIGHT))));
 			b.put("back", new Pair<>(new SimpleButton(x + 51, y + 39, 177, 63, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "back");
-			}), new SupplierWrapper("Back Face Enabled", "Back Face Disabled",
+			}), new SupplierWrapper(Localization.BCK_ENBD.getFormattedText(), Localization.BCK_DSBD.getFormattedText(),
 					() -> tsfm.getDirectionEnabled(ManagedDirection.BACK))));
 			b.put("automode", new Pair<>(new SimpleButton(x + 95, y + 16, 177, 53, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "automode");
-			}), new SupplierWrapper("Auto-Input Enabled", "Auto-Output Enabled",
+			}), new SupplierWrapper(Localization.AUTO_IN.getFormattedText(), Localization.AUTO_OUT.getFormattedText(),
 					() -> tsfm.autoIn)));
-			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, "Decrease Throughput", (button) -> {
+			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, Localization.THP_DCRS.getFormattedText(), (button) -> {
 				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.hasShiftDown(), Screen.hasControlDown());
 
 			}), null));
-			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, "Increase Throughput", (button) -> {
+			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, Localization.THP_INCS.getFormattedText(), (button) -> {
 				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.hasShiftDown(), Screen.hasControlDown());
 
 			}), null));

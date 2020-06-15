@@ -5,6 +5,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -15,7 +16,7 @@ public abstract class ALMMachineNoExtract<A extends Container> extends AbstractA
 	
 	protected NoExtractItemHandler items = new NoExtractItemHandler(this);
 	protected LazyOptional<NoExtractItemHandler> itemHandler = LazyOptional.of(() -> items);
-	public ALMMachineNoExtract(TileEntityType<?> tileEntityTypeIn, int slotCount, String name, int containerId,
+	public ALMMachineNoExtract(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name, int containerId,
 			Class<A> clazz) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz);
 	}

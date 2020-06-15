@@ -10,6 +10,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -30,7 +31,7 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 			}
 			
 			if(properties.capacity < maxReceive + amount) {
-				maxReceive = properties.capacity - amount;
+				maxReceive = properties.getCapacity() - amount;
 			}
 			
 			if(simulate == false) {
@@ -43,7 +44,7 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 		
 		@Override
 		public int getMaxEnergyStored() {
-			return properties.capacity;
+			return properties.getCapacity();
 		}
 		
 		@Override
@@ -70,18 +71,18 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 		
 		@Override
 		public boolean canReceive() {
-			return properties.in;
+			return properties.getIn();
 		}
 		
 		@Override
 		public boolean canExtract() {
-			return properties.out;
+			return properties.getOut();
 		}
 	};
 	protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
 	
 	
-	public ALMMachineEnergyBased(TileEntityType<?> tileEntityTypeIn, int slotCount, String name, int containerId,
+	public ALMMachineEnergyBased(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name, int containerId,
 			Class<A> clazz, EnergyProperties properties) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz);
 		this.properties = properties;
@@ -124,23 +125,35 @@ public abstract class ALMMachineEnergyBased<A extends Container> extends ALMMach
 	
 	
 	public static class EnergyProperties{
-		public final boolean in;
-		public final boolean out;
-		public final int capacity;
+		private boolean in;
+		private boolean out;
+		private int capacity;
 		
 		public EnergyProperties(boolean in, boolean out, int capacity) {
 			this.in = in;
 			this.out = out;
 			this.capacity = capacity;
 		}
+		
+		public int getCapacity() {
+			return capacity;
+		}
+		
+		public boolean getIn() {
+			return in;
+		}
+		
+		public boolean getOut() {
+			return out;
+		}
 	}
 	
 	public static class ScreenALMEnergyBased<T extends Container> extends ScreenALMBase<T>{
 
-		private final Pair<Integer, Integer> energyMeterLoc;
-		private final ALMMachineEnergyBased<T> machine;
-		private final boolean usesfept;
-		private final int startx;
+		protected final Pair<Integer, Integer> energyMeterLoc;
+		protected final ALMMachineEnergyBased<T> machine;
+		protected final boolean usesfept;
+		protected final int startx;
 		
 		public ScreenALMEnergyBased(T screenContainer, PlayerInventory inv, ITextComponent titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,

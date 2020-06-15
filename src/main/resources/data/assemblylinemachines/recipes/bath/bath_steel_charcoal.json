@@ -1,15 +1,15 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"item": "assemblylinemachines:ground_iron"
+		"tag": "forge:dusts/iron"
 	},
 	"input_b":{
-		"item": "assemblylinemachines:ground_coal"
+		"tag": "forge:dusts/charcoal"
 	},
 	"output":{
 		"item": "assemblylinemachines:steel_ingot"
 	},
-	"stirs": 9,
+	"stirs": 5,
 	"fluid": "lava",
 	"mix_color": "#8a8a8a"
 }

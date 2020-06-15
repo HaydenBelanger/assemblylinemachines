@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:dusts/redstone"
+	},
+	"part_b":{
+		"tag": "forge:dusts/coal"
+	},
+	"output":{
+		"item": "assemblylinemachines:empowered_coal"
+	},
+	"time": 200
+}

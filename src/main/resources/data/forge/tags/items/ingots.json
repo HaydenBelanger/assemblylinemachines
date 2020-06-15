@@ -6,6 +6,7 @@
 	"#forge:ingots/pure_titanium",
 	"#forge:ingots/titanium",
 	"#forge:ingots/steel",
-	"#forge:ingots/pure_steel"
+	"#forge:ingots/pure_steel",
+	"#forge:ingots/mystium"
   ]
 }

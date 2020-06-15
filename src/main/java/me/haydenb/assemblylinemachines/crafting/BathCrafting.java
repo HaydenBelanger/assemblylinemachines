@@ -194,6 +194,7 @@ public class BathCrafting implements IRecipe<IInventory>{
 				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, color, machineReqd);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Bath Crafting Recipe from JSON: " + e.getMessage());
+				e.printStackTrace();
 				return null;
 			}
 			

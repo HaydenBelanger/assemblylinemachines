@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.block.machines;
+package me.haydenb.assemblylinemachines.block.machines.crank;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.util.FluidProperty;
@@ -30,6 +30,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -99,7 +100,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 		public int cranks;
 		
 		public TESimpleFluidMixer(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, "Simple Fluid Mixer", Registry.getContainerId("simple_fluid_mixer"), ContainerSimpleFluidMixer.class);
+			super(tileEntityTypeIn, 2, (TranslationTextComponent) Registry.getBlock("simple_fluid_mixer").getNameTextComponent(), Registry.getContainerId("simple_fluid_mixer"), ContainerSimpleFluidMixer.class);
 		}
 		
 		public TESimpleFluidMixer() {

@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"item": "assemblylinemachines:ground_coal"
+		"tag": "forge:dusts/coal"
 	},
 	"input_b":{
 		"tag": "forge:dusts/redstone"

@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "assemblylinemachines:titanium_ore"
+		"tag": "forge:ores/titanium"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_titanium",

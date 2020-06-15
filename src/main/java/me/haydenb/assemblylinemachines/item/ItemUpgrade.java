@@ -3,37 +3,43 @@ package me.haydenb.assemblylinemachines.item;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.Utils.Localization;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class ItemUpgrade extends Item {
 
-	final String[] positives;
-	final String[] negatives;
+	
+	private static final ITextComponent CAN_STACK = Localization.get("tooltip", "upgrade_canstack").applyTextStyle(TextFormatting.DARK_GRAY);
+	
+	final TranslationTextComponent[] positives;
+	final TranslationTextComponent[] negatives;
+	
+	
 	final boolean stackable;
-	public ItemUpgrade(boolean stackable, String[] positives, String[] negatives) {
+	public ItemUpgrade(boolean stackable, TranslationTextComponent[] positives, TranslationTextComponent[] negatives) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
 		this.stackable = stackable;
 		this.positives = positives;
 		this.negatives = negatives;
 	}
 	
-	public ItemUpgrade(boolean stackable, String positive, String negative) {
+	public ItemUpgrade(boolean stackable, TranslationTextComponent positive, TranslationTextComponent negative) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
 		this.stackable = stackable;
-		this.positives = new String[] {positive};
-		this.negatives = new String[] {negative};
+		this.positives = new TranslationTextComponent[] {positive};
+		this.negatives = new TranslationTextComponent[] {negative};
 	}
 	
-	public ItemUpgrade(boolean stackable, String positive) {
+	public ItemUpgrade(boolean stackable, TranslationTextComponent positive) {
 		super(new Item.Properties().maxStackSize(1).group(Registry.creativeTab));
 		this.stackable = stackable;
-		this.positives = new String[] {positive};
+		this.positives = new TranslationTextComponent[] {positive};
 		this.negatives = null;
 	}
 	
@@ -41,15 +47,15 @@ public class ItemUpgrade extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if(stackable) {
-			tooltip.add(new StringTextComponent("This upgrade's effect can be stacked.").applyTextStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(CAN_STACK);
 		}
-		for(String s : positives) {
-			tooltip.add(new StringTextComponent(s).applyTextStyle(TextFormatting.GREEN));
+		for(TranslationTextComponent s : positives) {
+			tooltip.add(s.applyTextStyle(TextFormatting.GREEN));
 		}
 		
 		if(negatives != null) {
-			for(String s : negatives) {
-				tooltip.add(new StringTextComponent(s).applyTextStyle(TextFormatting.DARK_RED));
+			for(TranslationTextComponent s : negatives) {
+				tooltip.add(s.applyTextStyle(TextFormatting.DARK_RED));
 			}
 			super.addInformation(stack, worldIn, tooltip, flagIn);
 		}

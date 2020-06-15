@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
 import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.Utils.Localization;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased;
 import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
@@ -32,6 +33,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -94,7 +96,7 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 		private int timer = 0;
 		
 		public TECoalGenerator(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 1, "Coal Generator", Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000));
+			super(tileEntityTypeIn, 1, (TranslationTextComponent) Registry.getBlock("coal_generator").getNameTextComponent(), Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000));
 		}
 		
 		public TECoalGenerator() {
@@ -133,7 +135,7 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 		public void tick() {
 			if(timer++ == 2) {
 				timer = 0;
-				if(amount < properties.capacity) {
+				if(amount < properties.getCapacity()) {
 					boolean sendUpdates = false;
 					if(remGen <= 0) {
 						
@@ -160,8 +162,8 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 						
 						remGen -= max;
 						amount += max;
-						if(amount > properties.capacity) {
-							amount = properties.capacity;
+						if(amount > properties.getCapacity()) {
+							amount = properties.getCapacity();
 						}
 						sendUpdates = true;
 					}
@@ -211,8 +213,8 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 			int y = (this.height - this.ySize) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
 				List<String> tt = getTooltipFromItem(stack);
-				tt.add(1, "§e" + FORMAT.format(ForgeHooks.getBurnTime(stack) * 10) + "FE Total");
-				tt.add(1, "§a15 FE/t");
+				tt.add(1, "§e" + FORMAT.format(ForgeHooks.getBurnTime(stack) * 10) + " " + Localization.FE_TOTAL.getFormattedText());
+				tt.add(1, "§a15 " + Localization.FEPT.getFormattedText());
 				this.renderTooltip(tt, mouseX, mouseY);
 				return;
 			}
@@ -232,9 +234,9 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 			}
 			
 			if(tsfm.remGen == 0) {
-				this.drawCenteredString(this.font, "0/t", x+111, y+38, 0xffffff);
+				this.drawCenteredString(this.font, "0" + Localization.PERTICK.getFormattedText(), x+111, y+38, 0xffffff);
 			}else {
-				this.drawCenteredString(this.font, "+15/t", x+111, y+38, 0x76f597);
+				this.drawCenteredString(this.font, "+15" + Localization.PERTICK.getFormattedText(), x+111, y+38, 0x76f597);
 			}
 			
 			

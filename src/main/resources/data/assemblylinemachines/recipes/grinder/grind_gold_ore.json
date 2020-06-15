@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:gold_ore"
+		"tag": "forge:ores/gold"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_gold",

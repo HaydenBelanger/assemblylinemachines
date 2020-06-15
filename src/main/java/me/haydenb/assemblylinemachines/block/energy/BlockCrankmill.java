@@ -8,6 +8,7 @@ import me.haydenb.assemblylinemachines.util.ICrankableMachine;
 import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
 import me.haydenb.assemblylinemachines.util.Utils;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.util.Utils.Localization;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased;
 import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
@@ -20,7 +21,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -32,6 +32,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -115,10 +116,9 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 		public int rfDif = 0;
 		public int prevAmount = 0;
 		private int timer = 0;
-		private String fePerTick = "0/t";
 		
 		public TECrankmill(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 0, "Crankmill", Registry.getContainerId("crankmill"), ContainerCrankmill.class,
+			super(tileEntityTypeIn, 0, (TranslationTextComponent) Registry.getBlock("crankmill").getNameTextComponent(), Registry.getContainerId("crankmill"), ContainerCrankmill.class,
 					new EnergyProperties(false, true, 12000));
 		}
 
@@ -133,33 +133,18 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 			}
 			return false;
 		}
-		
-		
-		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
-			if(compound.contains("assemblylinemachines:fept")) {
-				fePerTick = compound.getString("assemblylinemachines:fepts");
-			}
-		}
-		
-		@Override
-		public CompoundNBT write(CompoundNBT compound) {
-			compound.putString("assemblylinemachines:fepts", fePerTick);
-			return super.write(compound);
-		}
 
 		@Override
 		public boolean perform() {
 			int max = 750;
-			if (amount + max > properties.capacity) {
-				max = properties.capacity - amount;
+			if (amount + max > properties.getCapacity()) {
+				max = properties.getCapacity() - amount;
 			}
 
 			if (max == 0) {
 				timer = 0;
-				if(!fePerTick.equals("0/t")) {
-					fePerTick = "0/t";
+				if(fept != 0) {
+					fept = 0;
 					sendUpdates();
 				}
 				
@@ -167,7 +152,8 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 			}
 
 			amount += max;
-			fePerTick  = "+" + FORMAT.format((double) 700 / (double) timer) + "/t";
+			
+			fept  = (float) 700 / (float) timer;
 			timer = 0;
 			sendUpdates();
 			return true;
@@ -178,8 +164,8 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 			
 			if(timer++ == 120) {
 				timer = 0;
-				if(!fePerTick.equals("0/t")) {
-					fePerTick = "0/t";
+				if(fept != 0) {
+					fept = 0;
 					sendUpdates();
 				}
 			}
@@ -230,11 +216,11 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			
-			if(tsfm.fePerTick.equals("0/t")) {
-				this.drawCenteredString(this.font, "0/t", x+114, y+38, 0xffffff);
+			if(tsfm.fept == 0) {
+				this.drawCenteredString(this.font, "0" + Localization.PERTICK.getFormattedText(), x+114, y+38, 0xffffff);
 			}else {
 				super.blit(x+74, y+33, 176, 52, 18, 18);
-				this.drawCenteredString(this.font, tsfm.fePerTick, x+114, y+38, 0x76f597);
+				this.drawCenteredString(this.font, "+" + FORMAT.format(tsfm.fept) + Localization.PERTICK.getFormattedText(), x+114, y+38, 0x76f597);
 			}
 			
 

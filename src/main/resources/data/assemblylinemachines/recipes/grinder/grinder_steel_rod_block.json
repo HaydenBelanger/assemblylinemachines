@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "assemblylinemachines:steel_block"
+		"tag": "forge:storage_blocks/steel"
 	},
 	"output":{
 		"item": "assemblylinemachines:steel_rod",

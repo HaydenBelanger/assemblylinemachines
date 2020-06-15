@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "assemblylinemachines:steel_ingot"
+		"tag": "forge:ingots/steel"
 	},
 	"output":{
 		"item": "assemblylinemachines:steel_rod",

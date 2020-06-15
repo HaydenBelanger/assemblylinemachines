@@ -1,6 +1,6 @@
-package me.haydenb.assemblylinemachines.block.machines;
+package me.haydenb.assemblylinemachines.block.machines.crank;
 
-import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.TESimpleGrinder;
+import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -30,6 +30,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
@@ -81,7 +82,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 		
 		
 		public TESimpleGrinder(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, "Simple Grinder", Registry.getContainerId("simple_grinder"), ContainerSimpleGrinder.class);
+			super(tileEntityTypeIn, 2, (TranslationTextComponent) Registry.getBlock("simple_grinder").getNameTextComponent(), Registry.getContainerId("simple_grinder"), ContainerSimpleGrinder.class);
 		}
 		
 		public TESimpleGrinder() {

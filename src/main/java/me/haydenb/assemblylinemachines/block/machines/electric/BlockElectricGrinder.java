@@ -34,6 +34,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -96,7 +97,7 @@ public class BlockElectricGrinder extends GUIContainingBasicBlock<BlockElectricG
 		private ItemStack output = null;
 		
 		public TEElectricGrinder(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 5, "Electric Grinder", Registry.getContainerId("electric_grinder"), ContainerElectricGrinder.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 5, (TranslationTextComponent) Registry.getBlock("electric_grinder").getNameTextComponent(), Registry.getContainerId("electric_grinder"), ContainerElectricGrinder.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricGrinder() {

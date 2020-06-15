@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:coal_ore"
+		"tag": "forge:ores/coal"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_coal",

@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:iron_ore"
+		"tag": "forge:ores/iron"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_iron",

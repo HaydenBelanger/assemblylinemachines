@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.block.machines;
+package me.haydenb.assemblylinemachines.block.machines.crank;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.ICrankableMachine;

@@ -1,12 +1,13 @@
 package me.haydenb.assemblylinemachines.util;
 
-import java.util.Map.Entry;
-import java.util.function.Supplier;
 import java.text.DecimalFormat;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -19,6 +20,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
@@ -165,5 +167,46 @@ public class Utils {
 		public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
 		}
 
+	}
+	
+	
+	
+	public static class Localization{
+		
+		//Sided face controls
+		public static final TranslationTextComponent TOP_ENBD = get("gui", "top_enabled");
+		public static final TranslationTextComponent BOT_ENBD = get("gui", "bottom_enabled");
+		public static final TranslationTextComponent LFT_ENBD = get("gui", "left_enabled");
+		public static final TranslationTextComponent RGT_ENBD = get("gui", "right_enabled");
+		public static final TranslationTextComponent BCK_ENBD = get("gui", "back_enabled");
+		public static final TranslationTextComponent FRT_ENBD = get("gui", "front_enabled");
+		public static final TranslationTextComponent TOP_DSBD = get("gui", "top_disabled");
+		public static final TranslationTextComponent BOT_DSBD = get("gui", "bottom_disabled");
+		public static final TranslationTextComponent LFT_DSBD = get("gui", "left_disabled");
+		public static final TranslationTextComponent RGT_DSBD = get("gui", "right_disabled");
+		public static final TranslationTextComponent BCK_DSBD = get("gui", "back_disabled");
+		public static final TranslationTextComponent FRT_DSBD = get("gui", "front_disabled");
+		
+		//Battery controls
+		public static final TranslationTextComponent THP_DCRS = get("gui", "tp_decrease");
+		public static final TranslationTextComponent THP_INCS = get("gui", "tp_increase");
+		public static final TranslationTextComponent AUTO_IN = get("gui", "auto_in");
+		public static final TranslationTextComponent AUTO_OUT = get("gui", "auto_out");
+		
+		//FE-Specific 
+		public static final TranslationTextComponent FE_TOTAL = get("gui", "fe_total_coal");
+		public static final TranslationTextComponent FE = get("gui", "fe");
+		public static final TranslationTextComponent FEPT = get("gui", "fept");
+		public static final TranslationTextComponent PERTICK = get("gui", "pt");
+		
+		public static TranslationTextComponent get(String type, String key) {
+			
+			return new TranslationTextComponent(type + "." + AssemblyLineMachines.MODID + "." + key);
+		}
+		
+		public static String getString(String type, String key) {
+			
+			return new TranslationTextComponent(type + "." + AssemblyLineMachines.MODID + "." + key).getFormattedText();
+		}
 	}
 }

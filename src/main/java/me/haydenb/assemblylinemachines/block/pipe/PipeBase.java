@@ -14,6 +14,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
@@ -67,8 +68,12 @@ public class PipeBase<T> extends Block {
 		if(state.getBlock() != newState.getBlock()) {
 			if(worldIn.getTileEntity(pos) instanceof ItemPipeConnectorTileEntity) {
 				ItemPipeConnectorTileEntity tefm = (ItemPipeConnectorTileEntity) worldIn.getTileEntity(pos);
-				worldIn.removeTileEntity(pos);
+				for (int i = 0; i < 9; i++) {
+					tefm.setInventorySlotContents(i, ItemStack.EMPTY);
+				}
 				InventoryHelper.dropItems(worldIn, pos, tefm.getItems());
+				worldIn.removeTileEntity(pos);
+				
 			}else if(worldIn.getTileEntity(pos) instanceof FluidPipeConnectorTileEntity || worldIn.getTileEntity(pos) instanceof EnergyPipeConnectorTileEntity) {
 				worldIn.removeTileEntity(pos);
 			}

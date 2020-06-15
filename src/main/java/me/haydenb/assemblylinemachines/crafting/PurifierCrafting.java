@@ -128,6 +128,7 @@ public class PurifierCrafting implements IRecipe<IInventory>{
 				return new PurifierCrafting(recipeId, ingredienta, ingredientb, tobepurified, output, time);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Purifier recipe from JSON: " + e.getMessage());
+				e.printStackTrace();
 				return null;
 			}
 			

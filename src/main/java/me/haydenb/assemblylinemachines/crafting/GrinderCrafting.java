@@ -108,11 +108,6 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 	public ResourceLocation getId() {
 		return id;
 	}
-	
-	@Override
-	public String toString() {
-		return "SHARPENER RECIPE: [input = " + input.toString() + ", output = " + output.toString() + ", grinds = " + grinds + ", tier = " + tier.toString() + "]";
-	}
 
 	@Override
 	public IRecipeSerializer<?> getSerializer() {
@@ -155,6 +150,7 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 				return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Grinder Crafting Recipe from JSON: " + e.getMessage());
+				e.printStackTrace();
 				return null;
 			}
 			

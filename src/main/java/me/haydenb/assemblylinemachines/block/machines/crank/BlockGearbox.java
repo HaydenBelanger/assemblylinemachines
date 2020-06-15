@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.block;
+package me.haydenb.assemblylinemachines.block.machines.crank;
 
 import java.util.Random;
 
@@ -35,6 +35,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -80,7 +81,7 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		public int nTimer = 40;
 		public ICrankableMachine mch;
 		public TEGearbox(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, "Gearbox", Registry.getContainerId("gearbox"), ContainerGearbox.class);
+			super(tileEntityTypeIn, 2, (TranslationTextComponent) Registry.getBlock("gearbox").getNameTextComponent(), Registry.getContainerId("gearbox"), ContainerGearbox.class);
 		}
 		
 		public TEGearbox() {

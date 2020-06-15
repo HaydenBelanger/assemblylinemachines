@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:gold_ingot"
+		"tag": "forge:ingots/gold"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_gold"

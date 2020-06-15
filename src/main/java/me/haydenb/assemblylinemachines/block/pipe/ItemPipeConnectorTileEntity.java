@@ -23,6 +23,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -34,6 +35,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -90,7 +92,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 
 	public ItemPipeConnectorTileEntity(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn, 12, "Item Pipe Connector", Registry.getContainerId("pipe_connector_item"),
+		super(tileEntityTypeIn, 12, (TranslationTextComponent) Registry.getBlock("item_pipe").getNameTextComponent(), Registry.getContainerId("pipe_connector_item"),
 				ItemPipeConnectorContainer.class);
 	}
 
@@ -273,7 +275,6 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 	public NonNullList<ItemStack> getItems() {
 		for (int i = 0; i < 9; i++) {
 			if (contents.get(i) != ItemStack.EMPTY && enableFilterSlot(i, this) == false) {
-				Utils.spawnItem(contents.get(i), pos.up(), world);
 				contents.set(i, ItemStack.EMPTY);
 			}
 		}
@@ -440,6 +441,24 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 
 		}
 
+		@Override
+		public ItemStack slotClick(int slot, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+			if(slot > 35 && slot < 45) {
+				ItemStack is = player.inventory.getItemStack();
+				if(!is.isEmpty()) {
+					tileEntity.setInventorySlotContents(slot - 36, new ItemStack(is.getItem(), 1));
+				}else {
+					tileEntity.setInventorySlotContents(slot - 36, ItemStack.EMPTY);
+				}
+				
+				return ItemStack.EMPTY;
+				
+			}else {
+				return super.slotClick(slot, dragType, clickTypeIn, player);
+			}
+			
+		}
+		
 		@Override
 		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
 			ItemStack itemstack = ItemStack.EMPTY;

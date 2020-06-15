@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "forge:gems/lapis"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_lapis_lazuli"
+	},
+	"grinds": 2,
+	"bladetype": "puregold",
+	"machine_required": true
+}

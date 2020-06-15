@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:ingots/iron"
+	},
+	"part_b":{
+		"tag": "forge:dusts/charcoal"
+	},
+	"output":{
+		"item": "assemblylinemachines:steel_ingot"
+	},
+	"time": 200
+}

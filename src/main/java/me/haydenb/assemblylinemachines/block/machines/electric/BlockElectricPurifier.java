@@ -35,7 +35,10 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -99,7 +102,7 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 		
 		
 		public TEElectricPurifier(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 7, "Electric Purifier", Registry.getContainerId("electric_purifier"), ContainerElectricPurifier.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 7, (TranslationTextComponent) Registry.getBlock("electric_purifier").getNameTextComponent(), Registry.getContainerId("electric_purifier"), ContainerElectricPurifier.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricPurifier() {
@@ -243,6 +246,7 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 			if(output != null) {
 				CompoundNBT sub = new CompoundNBT();
 				output.write(sub);
+				compound.put("assemblylinemachines:output", sub);
 				
 			}
 			return super.write(compound);
@@ -272,6 +276,7 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 		
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	public static class ScreenElectricPurifier extends ScreenALMEnergyBased<ContainerElectricPurifier>{
 		TEElectricPurifier tsfm;
 		

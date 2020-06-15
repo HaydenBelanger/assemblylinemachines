@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:dusts/mystium"
+	},
+	"part_b":{
+		"tag": "forge:ingots/pure_gold"
+	},
+	"output":{
+		"item": "assemblylinemachines:mystium_ingot"
+	},
+	"time": 600
+}

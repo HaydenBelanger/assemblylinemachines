@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:charcoal"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_charcoal"
+	},
+	"grinds": 2,
+	"bladetype": "puregold"
+}

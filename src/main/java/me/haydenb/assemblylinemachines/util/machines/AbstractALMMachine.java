@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.util.machines;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -25,14 +25,14 @@ import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class AbstractALMMachine<A extends Container> extends LockableLootTileEntity {
 
 	protected NonNullList<ItemStack> contents;
 	protected int playersUsing;
 	protected int slotCount;
-	protected String name;
+	protected TranslationTextComponent name;
 	protected int containerId;
 	protected Class<A> clazz;
 
@@ -50,7 +50,7 @@ public abstract class AbstractALMMachine<A extends Container> extends LockableLo
 	 * @param clazz            The class to construct on createMenu(). View warning
 	 *                         above!
 	 */
-	public AbstractALMMachine(TileEntityType<?> tileEntityTypeIn, int slotCount, String name, int containerId,
+	public AbstractALMMachine(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name, int containerId,
 			Class<A> clazz) {
 		super(tileEntityTypeIn);
 		this.containerId = containerId;
@@ -107,7 +107,7 @@ public abstract class AbstractALMMachine<A extends Container> extends LockableLo
 
 	@Override
 	public ITextComponent getDefaultName() {
-		return new StringTextComponent(name);
+		return name;
 	}
 
 	@Override
@@ -270,9 +270,9 @@ public abstract class AbstractALMMachine<A extends Container> extends LockableLo
 	// SCREEN DYNAMIC
 	public static class ScreenALMBase<T extends Container> extends ContainerScreen<T> {
 		private final ResourceLocation bg;
-		private final Pair<Integer, Integer> titleTextLoc;
-		private final Pair<Integer, Integer> invTextLoc;
-		public boolean renderTitles;
+		protected final Pair<Integer, Integer> titleTextLoc;
+		protected final Pair<Integer, Integer> invTextLoc;
+		protected boolean renderTitles;
 
 		public ScreenALMBase(T screenContainer, PlayerInventory inv, ITextComponent titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,

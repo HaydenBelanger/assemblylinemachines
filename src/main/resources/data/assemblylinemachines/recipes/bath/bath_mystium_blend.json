@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "forge:dusts/redstone"
+	},
+	"input_b":{
+		"tag": "forge:dusts/lapis"
+	},
+	"output":{
+		"item": "assemblylinemachines:mystium_blend",
+		"count": 2
+	},
+	"stirs": 5,
+	"fluid": "lava",
+	"mix_color": "#000000",
+	"machine_required": true
+}

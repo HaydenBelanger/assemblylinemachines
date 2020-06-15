@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.block;
+package me.haydenb.assemblylinemachines.block.machines.crank;
 
 import java.util.Random;
 import java.util.stream.Stream;

@@ -1,15 +1,18 @@
 package me.haydenb.assemblylinemachines.block.machines.electric;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
 import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.Utils.Localization;
 import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import me.haydenb.assemblylinemachines.util.Utils.SimpleButton;
 import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
@@ -22,6 +25,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
@@ -135,9 +139,15 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 	
 	public static class TEAutocraftingTable extends ALMManagedSidedMachineBlock<ContainerAutocraftingTable> implements ITickableTileEntity{
 		
+		private static final Integer[] grnSlots = {17, 18, 26, 27};
+		private static final Integer[] magSlots = {19, 20, 28, 29};
+		private static final Integer[] orgSlots = {21, 22, 30, 31};
+		private static final Integer[] allSlots = Stream.of(grnSlots, magSlots, orgSlots).flatMap(Stream::of).toArray(Integer[]::new);
 		private HashMap<Integer, ICraftingRecipe> validRecipes = new HashMap<>();
 		private HashMap<Integer, ResourceLocation> rawBuiltRecipes = new HashMap<>();
+		
 		private byte[] outputMode = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		private byte[] slotTargets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		private ICraftingRecipe prevEnteredRecipe;
 		private int selectedRecipe = 0;
 		private int timer = 0;
@@ -145,7 +155,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		private int changeModelTimer = 0;
 		
 		public TEAutocraftingTable(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 32, "Autocrafting", Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 100000));
+			super(tileEntityTypeIn, 32, Localization.get("gui", "autocrafter_title"), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000));
 		}
 		
 		public TEAutocraftingTable() {
@@ -154,7 +164,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 
 		@Override
 		public boolean canInsertToSide(int slot, Direction direction) {
-			return slot > 13;
+			return (slot > 13 && slot < 17) || (slot > 22 && slot < 26);
 		}
 		
 		@Override
@@ -164,8 +174,10 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 				if(timer++ == nTimer) {
 					timer = 0;
 					
+					int availRecip = getUpgradeAmount(Upgrades.AC_RECIPES);
 					
 					int mul;
+					
 					
 					boolean devicePerformed = false;
 					if(getUpgradeAmount(Upgrades.AC_SUSTAINED) > 0) {
@@ -194,6 +206,11 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 					
 					int cost = 0;
 					for(Integer nX : validRecipes.keySet()) {
+						
+						if((nX > 1 && availRecip < 1) || (nX > 3 && availRecip < 2) || (nX > 5) && availRecip < 3) {
+							validRecipes.remove(nX);
+							break;
+						}
 						ICraftingRecipe recipe = validRecipes.get(nX);
 						int tCost = 0;
 						boolean validRecipe = true;
@@ -259,7 +276,21 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 								}
 							}else {
 								
-								for(int x = 14; x < 32; x++) {
+								Integer[] vals;
+								switch(slotTargets[nX]){
+								case 3:
+									vals = orgSlots;
+									break;
+								case 2:
+									vals = magSlots;
+									break;
+								case 1:
+									vals = grnSlots;
+									break;
+								default:
+									vals = allSlots;
+								}
+								for(int x : vals) {
 									if(getStackInSlot(x).isEmpty()) {
 										for(ItemStack i : shrinkStacks.keySet()) {
 											i.shrink(shrinkStacks.get(i));
@@ -335,6 +366,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			}
 			
 			compound.putByteArray("assemblylinemachines:outputmodes", outputMode);
+			compound.putByteArray("assemblylinemachines:slottargets", slotTargets);
 			return super.write(compound);
 		}
 		
@@ -370,6 +402,9 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			if(compound.contains("assemblylinemachines:outputmodes")) {
 				outputMode = compound.getByteArray("assemblylinemachines:outputmodes");
 			}
+			if(compound.contains("assemblylinemachines:slottargets")) {
+				slotTargets = compound.getByteArray("assemblylinemachines:slottargets");
+			}
 		}
 		
 		@Override
@@ -385,6 +420,20 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			}
 		}
 		
+		@Override
+		public boolean isAllowedInSlot(int slot, ItemStack stack) {
+			
+			if(slot > 10 && slot <= 13) {
+				if(stack.getItem() instanceof ItemUpgrade) {
+					return true;
+				}
+				return false;
+			}else {
+				return (slot > 13 && slot < 17) || (slot > 22 && slot < 26);
+			}
+			
+		}
+		
 		public int getUpgradeAmount(Upgrades upgrade) {
 			int ii = 0;
 			for (int i = 11; i < 14; i++) {
@@ -396,7 +445,6 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			return ii;
 		}
 		
-
 	}
 	
 	public static class ContainerAutocraftingTable extends ContainerALMBase<TEAutocraftingTable> {
@@ -409,8 +457,10 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		public ContainerAutocraftingTable(final int windowId, final PlayerInventory playerInventory, final TEAutocraftingTable tileEntity) {
 			super(Registry.getContainerType("autocrafting_table"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
+			//Output slot
 			this.addSlot(new SlotWithRestrictions(tileEntity, 0, 158, 30, tileEntity, true));
 			
+			//3x3 grid slots
 			for (int row = 0; row < 3; ++row) {
 				for (int col = 0; col < 3; ++col) {
 					this.addSlot(new SlotWithRestrictions(tileEntity, 1 + (row * 3) + col, 98 + (18 * col),
@@ -418,16 +468,30 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 				}
 			}
 			
+			//Recipe view, upgrades slots
 			this.addSlot(new SlotWithRestrictions(tileEntity, 10, 77, 48, tileEntity));
 			this.addSlot(new SlotWithRestrictions(tileEntity, 11, 203, 12, tileEntity));
 			this.addSlot(new SlotWithRestrictions(tileEntity, 12, 203, 30, tileEntity));
 			this.addSlot(new SlotWithRestrictions(tileEntity, 13, 203, 48, tileEntity));
 			
+			//Fill input slots
 			for (int row = 0; row < 2; ++row) {
-				for (int col = 0; col < 9; ++col) {
-					this.addSlot(new SlotWithRestrictions(tileEntity, 14 + (row * 9) + col, 62 + (18 * col),
+				for (int col = 0; col < 3; ++col) {
+					this.addSlot(new SlotWithRestrictions(tileEntity, 14 + (row * 9) + col, 61 + (18 * col),
 							69 + (18 * row), tileEntity));
 				}
+			}
+			
+			//Fill inter. slots, row one 
+			for (int col = 0; col < 6; ++col) {
+				this.addSlot(new SlotWithRestrictions(tileEntity, 17 + col, 116 + (18 * col),
+						69, tileEntity));
+			}
+			
+			//Fill inter. slots, row two
+			for (int col = 0; col < 6; ++col) {
+				this.addSlot(new SlotWithRestrictions(tileEntity, 26 + col, 116 + (18 * col),
+						87, tileEntity));
 			}
 			
 			if(tileEntity.validRecipes.containsKey(tileEntity.selectedRecipe) == false) {
@@ -458,6 +522,46 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 				return ItemStack.EMPTY;
 			}else if(slot == 46) {
 				return ItemStack.EMPTY;
+			}else if(slot > 46 && slot < 50){
+				
+				ItemStack st = super.slotClick(slot, dragType, clickTypeIn, player);
+				
+				int availRecip = tileEntity.getUpgradeAmount(Upgrades.AC_RECIPES);
+				int nX = tileEntity.selectedRecipe;
+				if((nX > 1 && availRecip < 1) || (nX > 3 && availRecip < 2) || (nX > 5) && availRecip < 3) {
+					tileEntity.selectedRecipe = 0;
+					tileEntity.sendUpdates();
+					for(int i = 1; i < 10; i++) {
+						tileEntity.setInventorySlotContents(i, ItemStack.EMPTY);
+					}
+					tileEntity.setInventorySlotContents(10, ItemStack.EMPTY);
+					
+					if(tileEntity.validRecipes.containsKey(tileEntity.selectedRecipe)) {
+						tileEntity.validRecipes.remove(tileEntity.selectedRecipe);
+					}else {
+						if(tileEntity.prevEnteredRecipe != null) {
+							tileEntity.validRecipes.put(tileEntity.selectedRecipe, tileEntity.prevEnteredRecipe);
+							for(Ingredient ing : tileEntity.prevEnteredRecipe.getIngredients()) {
+								for(int i = 1; i < 10; i++) {
+									ItemStack stack = tileEntity.getStackInSlot(i);
+									if(ing.getMatchingStacks().length > 0) {
+										if(stack.isEmpty()) {
+											tileEntity.setInventorySlotContents(i, ing.getMatchingStacks()[0].copy());
+											break;
+										}else if(ItemHandlerHelper.canItemStacksStack(stack, ing.getMatchingStacks()[0])) {
+											tileEntity.getStackInSlot(i).grow(1);
+											break;
+										}
+									}
+									
+								}
+							}
+							tileEntity.setInventorySlotContents(10, tileEntity.prevEnteredRecipe.getRecipeOutput());
+							tileEntity.prevEnteredRecipe = null;
+						}
+					}
+				}
+				return st;
 			}else {
 				return super.slotClick(slot, dragType, clickTypeIn, player);
 			}
@@ -571,6 +675,8 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		TEAutocraftingTable tsfm;
 		private final HashMap<String, Pair<SimpleButton, SupplierWrapper>> b;
 		
+		private SimpleButton bSwitch;
+		
 		public ScreenAutocraftingTable(ContainerAutocraftingTable screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(230, 202), new Pair<>(11, 6), new Pair<>(62, 109), "autocrafting_table", false, new Pair<>(14, 17), screenContainer.tileEntity, 230, true);
@@ -590,57 +696,232 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			for (int row = 0; row < 5; ++row) {
 				for (int col = 0; col < 2; ++col) {
 					int bnum = (row * 2) + col;
-					b.put("b" + bnum, new Pair<>(new SimpleButton(x + 33 + (col * 11), y + 17 + (row * 11), 231 + (col * 11), 66 + (row * 11), null, (button) -> {
+					b.put("b" + bnum, new Pair<>(new AutocraftingSlotButton(x + 33 + (col * 11), y + 17 + (row * 11), 231 + (col * 11), 53 + (row * 11), null, (button) -> {
 
 						sendACChangeRecipePacket(tsfm.getPos(), bnum);
-					}), new SupplierWrapper("Recipe " + bnum, "Recipe " + bnum, () -> bnum == tsfm.selectedRecipe)));
+					}, tsfm, bnum), new SupplierWrapper("Recipe " + bnum, "Recipe " + bnum, () -> bnum == tsfm.selectedRecipe)));
 				}
 			}
 			
 			
-			b.put("setrecipe", new Pair<>(new SimpleButton(x + 83, y + 14, 244, 53, 11, 11, null, (button) -> {
+			b.put("setrecipe", new Pair<>(new SimpleButton(x + 83, y + 14, 244, 203, 11, 11, null, (button) -> {
 
 				tryLockInRecipe(tsfm.getPos());
 			}), new SupplierWrapper("Clear Recipe", "Save Recipe", () -> tsfm.validRecipes.containsKey(tsfm.selectedRecipe))));
 			
-			b.put("output", new Pair<>(new SimpleButton(x + 154, y + 14, 231, 53, 11, 11, null, (button) -> {
+			b.put("output", new Pair<>(new SimpleButton(x + 154, y + 14, 231, 203, 11, 11, null, (button) -> {
 
-				sendOutputModeChangeRequest(tsfm.getPos(), tsfm.selectedRecipe);
+				sendOutputModeChangeRequest(tsfm.getPos(), tsfm.selectedRecipe, "setoutputmode");
 			}), new SupplierWrapper("Output to Output Slot", "Output to Internal Inventory", () -> tsfm.outputMode[tsfm.selectedRecipe] != 0)));
+			
+			bSwitch = new SimpleButton(x + 154, y + 51, 0, 0, 11, 11, null, (button) -> {
+
+				sendOutputModeChangeRequest(tsfm.getPos(), tsfm.selectedRecipe, "settargetslots");
+			});
 			
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				this.addButton(bb.x);
 			}
 			
+			this.addButton(bSwitch);
+			
 		}
 		
+		private static class AutocraftingSlotButton extends SimpleButton{
+
+			private final TEAutocraftingTable te;
+			private final int number;
+			public AutocraftingSlotButton(int widthIn, int heightIn, int blitx, int blity, String text,
+					IPressable onPress, TEAutocraftingTable te, int number) {
+				super(widthIn, heightIn, blitx, blity, text, onPress);
+				this.te = te;
+				this.number = number;
+			}
+			
+			@Override
+			protected boolean isValidClickButton(int p_isValidClickButton_1_) {
+				
+				return isEnabledSlot();
+				
+			}
+			
+			
+			private boolean isEnabledSlot(){
+				if(number < 2) {
+					return true;
+				}else {
+					
+					if(te.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
+						if(number < 4) {
+							return te.getUpgradeAmount(Upgrades.AC_RECIPES) > 0;
+						}else if(number < 6) {
+							return te.getUpgradeAmount(Upgrades.AC_RECIPES) > 1;
+						}else {
+							return te.getUpgradeAmount(Upgrades.AC_RECIPES) > 2;
+						}
+					}else {
+						return false;
+					}
+				}
+			}
+				
+		}
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+			
+			if (renderTitles == true) {
+				this.font.drawString(this.title.getFormattedText(), titleTextLoc.x, titleTextLoc.y, 4210752);
+				this.font.drawString(this.playerInventory.getDisplayName().getFormattedText(), invTextLoc.x,
+						invTextLoc.y, 4210752);
+			}
+			
+			int x = (this.width - this.xSize) / 2;
+			int y = (this.height - this.ySize) / 2;
+			
+			
+			//Render energy TT if sustained upgrade is not installed.
+			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
+				if (mouseX >= x + energyMeterLoc.x && mouseY >= y + energyMeterLoc.y && mouseX <= x + energyMeterLoc.x + 15 && mouseY <= y + energyMeterLoc.y + 51) {
+
+					if(Screen.hasShiftDown()) {
+						ArrayList<String> str = new ArrayList<>();
+						str.add(Utils.FORMAT.format(machine.amount) + "/" + Utils.FORMAT.format(machine.properties.getCapacity()) + "FE");
+						if(usesfept) {
+							
+							
+							str.add(Utils.FEPT_FORMAT.format(machine.fept) + " FE/tick");
+						}
+						this.renderTooltip(str,
+								mouseX - x, mouseY - y);
+					}else {
+						this.renderTooltip(Utils.format(machine.amount) + "/" + Utils.format(machine.properties.getCapacity()) + "FE",
+								mouseX - x, mouseY - y);
+					}
+					
+				}
+			}
+
+			//Render each button upgrade TT.
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (mouseX >= bb.x.x && mouseX <= bb.x.x + bb.x.sizex && mouseY >= bb.x.y && mouseY <= bb.x.y + bb.x.sizey) {
-					int x = (this.width - this.xSize) / 2;
-					int y = (this.height - this.ySize) / 2;
-					if (bb.y != null) {
-						this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
-					} else {
-						this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
+					
+					if(!(bb.x instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton)bb.x).isEnabledSlot()) {
+						if (bb.y != null) {
+							this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
+						} else {
+							this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
+						}
 					}
-
+					
 					break;
+					
 				}
 					
 			}
+			
+			//Render special filter slot button TT.
+			if (mouseX >= bSwitch.x && mouseX <= bSwitch.x + bSwitch.sizex && mouseY >= bSwitch.y && mouseY <= bSwitch.y + bSwitch.sizey) {
+				
+				
+				
+				switch(tsfm.slotTargets[tsfm.selectedRecipe]) {
+				case 3:
+					this.renderTooltip("Output to Orange Slots", mouseX - x, mouseY - y);
+					break;
+				case 2:
+					this.renderTooltip("Output to Magenta Slots", mouseX - x, mouseY - y);
+					break;
+				case 1:
+					this.renderTooltip("Output to Lime Slots", mouseX - x, mouseY - y);
+					break;
+				default:
+					this.renderTooltip("Output to any Slot", mouseX - x, mouseY - y);
+					break;
+				}
+			}
+			
+			
+			
 		}
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (bb.y != null && bb.y.supplier.get()) {
-					super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, bb.x.sizex, bb.x.sizey);
+				
+				if(!(bb.x instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton) bb.x).isEnabledSlot()) {
+					if (bb.y != null && bb.y.supplier.get()) {
+						//blit each button's pressed texture, if available.
+						super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, bb.x.sizex, bb.x.sizey);
+					}
+				}else {
+					//if recipe slot is not enabled blit over it to hide.
+					super.blit(bb.x.x, bb.x.y, 54, 17, bb.x.sizex, bb.x.sizey);
 				}
+				
 
+			}
+			int x = (this.width - this.xSize) / 2;
+			int y = (this.height - this.ySize) / 2;
+			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) != 0) {
+				
+				//Blit over the energy bar if sustained upgrade is installed.
+				super.blit(x+13, y+16, 178, 10, 18, 54);
+			}
+			
+			
+			//Blit over the button depending on which mode is selected.
+			switch(tsfm.slotTargets[tsfm.selectedRecipe]) {
+			case 3:
+				super.blit(x+154, y+51, 231, 142, 11, 11);
+				break;
+			case 2:
+				super.blit(x+154, y+51, 231, 129, 11, 11);
+				break;
+			case 1:
+				super.blit(x+154, y+51, 231, 116, 11, 11);
+				break;
+			}
+			
+			if (mouseX >= bSwitch.x && mouseX <= bSwitch.x + bSwitch.sizex && mouseY >= bSwitch.y && mouseY <= bSwitch.y + bSwitch.sizey) {
+				
+				
+				//blit overlay for the color slots on the internal inventory.
+				//blit lime
+				for (int row = 0; row < 2; ++row) {
+					for (int col = 0; col < 2; ++col) {
+						
+						super.blit(x+116+(col * 18), y+69+(row*18), 230, 154, 16, 16);
+						
+					}
+				}
+				
+				//blit magenta
+				for (int row = 0; row < 2; ++row) {
+					for (int col = 0; col < 2; ++col) {
+						
+						super.blit(x+152+(col * 18), y+69+(row*18), 230, 170, 16, 16);
+						
+					}
+				}
+				
+				//blit orange
+				for (int row = 0; row < 2; ++row) {
+					for (int col = 0; col < 2; ++col) {
+						
+						super.blit(x+188+(col * 18), y+69+(row*18), 230, 186, 16, 16);
+						
+					}
+				}
+				
+				//blit input-only slots.
+				for (int row = 0; row < 2; ++row) {
+					for (int col = 0; col < 3; ++col) {
+						
+						super.blit(x+61+(col * 18), y+69+(row*18), 214, 202, 16, 16);
+						
+					}
+				}
 			}
 			
 		}
@@ -666,10 +947,10 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		HashPacketImpl.INSTANCE.sendToServer(pd);
 	}
 	
-	private static void sendOutputModeChangeRequest(BlockPos pos, int bNum) {
+	private static void sendOutputModeChangeRequest(BlockPos pos, int bNum, String button) {
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
-		pd.writeString("button", "setoutputmode");
+		pd.writeString("button", button);
 		pd.writeInteger("number", bNum);
 		
 		HashPacketImpl.INSTANCE.sendToServer(pd);
@@ -749,6 +1030,13 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 						te.outputMode[i] = 1;
 					}else {
 						te.outputMode[i] = 0;
+					}
+				}else if(b.equals("settargetslots")) {
+					int i = pd.get("number", Integer.class);
+					if(te.slotTargets[i] == 3) {
+						te.slotTargets[i] = 0;
+					}else {
+						te.slotTargets[i]++;
 					}
 				}
 				
