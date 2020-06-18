@@ -1,15 +1,13 @@
 package me.haydenb.assemblylinemachines.block;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
+import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
+import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Triplet;
-import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
+import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -74,9 +72,9 @@ public class BlockHandGrinder extends Block {
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		
 		if(state.get(BLADE_PROPERTY) == Blades.none) {
-			return Utils.rotateShape(Direction.NORTH, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE_NO_BLADE);
+			return General.rotateShape(Direction.NORTH, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE_NO_BLADE);
 		}else {
-			return Utils.rotateShape(Direction.NORTH, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE);
+			return General.rotateShape(Direction.NORTH, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE);
 		}
 	}
 	
@@ -91,7 +89,7 @@ public class BlockHandGrinder extends Block {
 			if(worldIn.getTileEntity(pos) instanceof TEHandGrinder) {
 				TEHandGrinder tehg = (TEHandGrinder) worldIn.getTileEntity(pos);
 				if(tehg.blade != null) {
-					Utils.spawnItem(tehg.blade, pos, worldIn);
+					General.spawnItem(tehg.blade, pos, worldIn);
 				}
 				worldIn.removeTileEntity(pos);
 			}
@@ -143,14 +141,15 @@ public class BlockHandGrinder extends Block {
 						}else {
 							boolean sendupdates = true;
 							boolean bladeBroke = false;
-							Triplet<ItemStack, Integer, ItemStack> prog = entity.progress.get(player.getUniqueID().toString());
-							if(prog != null && prog.x == held) {
-								prog.y--;
+							if(entity.input.isItemEqual(held)) {
+								entity.value--;
 								bladeBroke = ItemGrindingBlade.damageBlade(entity.blade);
-								if(prog.y == 0) {
+								if(entity.value == 0) {
 									held.shrink(1);
-									ItemHandlerHelper.giveItemToPlayer(player, prog.z);
-									entity.progress.remove(player.getUniqueID().toString());
+									ItemHandlerHelper.giveItemToPlayer(player, entity.output);
+									entity.input = null;
+									entity.value = null;
+									entity.output = null;
 									
 								}
 							}else {
@@ -161,7 +160,9 @@ public class BlockHandGrinder extends Block {
 										if(recipe.getBlade().tier <= igb.blade.tier) {
 											
 											bladeBroke = ItemGrindingBlade.damageBlade(entity.blade);
-											entity.progress.put(player.getUniqueID().toString(), new Triplet<ItemStack, Integer, ItemStack>(held, recipe.getGrinds() - 1, recipe.getRecipeOutput().copy()));
+											entity.input = held.copy();
+											entity.value = recipe.getGrinds() - 1;
+											entity.output = recipe.getRecipeOutput().copy();
 										}else {
 											player.sendStatusMessage(new StringTextComponent("You need a better blade to use this recipe."), true);
 											sendupdates = false;
@@ -195,10 +196,12 @@ public class BlockHandGrinder extends Block {
 		
 	}
 	
-	public static class TEHandGrinder extends ALMTileEntity {
+	public static class TEHandGrinder extends BasicTileEntity {
 
 		private ItemStack blade = null;
-		HashMap<String, Triplet<ItemStack, Integer, ItemStack>> progress = new HashMap<>();
+		private ItemStack input;
+		private Integer value;
+		private ItemStack output;
 		
 		public TEHandGrinder(final TileEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn);

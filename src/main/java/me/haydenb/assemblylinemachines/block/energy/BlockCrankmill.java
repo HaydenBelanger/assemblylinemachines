@@ -1,18 +1,18 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
-import java.text.DecimalFormat;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Pair;
+
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.util.Utils.Localization;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -41,7 +41,7 @@ import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECrankmill> implements ICrankableBlock {
+public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrankmill> implements ICrankableBlock {
 
 	private static final VoxelShape SHAPE_N = Stream.of(Block.makeCuboidShape(7, 7, 2, 9, 9, 6),
 			Block.makeCuboidShape(5, 5, 6, 11, 11, 8), Block.makeCuboidShape(0, 0, 0, 16, 16, 2),
@@ -56,11 +56,9 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
 			}).get();
 
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	
-	private static final DecimalFormat FORMAT = new DecimalFormat("###.#");
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	
 
 	public BlockCrankmill() {
@@ -109,7 +107,7 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 		builder.add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 
-	public static class TECrankmill extends ALMMachineEnergyBased<ContainerCrankmill>
+	public static class TECrankmill extends EnergyMachine<ContainerCrankmill>
 			implements ICrankableMachine, ITickableTileEntity {
 
 		
@@ -195,7 +193,7 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 		}
 
 		public ContainerCrankmill(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TECrankmill.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TECrankmill.class));
 		}
 	}
 
@@ -217,10 +215,10 @@ public class BlockCrankmill extends GUIContainingBasicBlock<BlockCrankmill.TECra
 			int y = (this.height - this.ySize) / 2;
 			
 			if(tsfm.fept == 0) {
-				this.drawCenteredString(this.font, "0" + Localization.PERTICK.getFormattedText(), x+114, y+38, 0xffffff);
+				this.drawCenteredString(this.font, "0/t", x+114, y+38, 0xffffff);
 			}else {
 				super.blit(x+74, y+33, 176, 52, 18, 18);
-				this.drawCenteredString(this.font, "+" + FORMAT.format(tsfm.fept) + Localization.PERTICK.getFormattedText(), x+114, y+38, 0x76f597);
+				this.drawCenteredString(this.font, "+" + Formatting.FEPT_FORMAT.format(tsfm.fept) + "/t", x+114, y+38, 0x76f597);
 			}
 			
 

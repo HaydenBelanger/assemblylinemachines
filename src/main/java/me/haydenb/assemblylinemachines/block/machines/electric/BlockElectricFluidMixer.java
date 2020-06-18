@@ -7,20 +7,21 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMManagedSidedMachineBlock;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -63,7 +64,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectricFluidMixer.TEElectricFluidMixer>{
+public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectricFluidMixer.TEElectricFluidMixer>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.makeCuboidShape(0, 14, 0, 16, 16, 16),
@@ -77,21 +78,21 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 			Block.makeCuboidShape(7, 4, 0, 9, 5, 1)
 			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	private static final Random RAND = new Random();
 	
 	public BlockElectricFluidMixer() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "electric_fluid_mixer", BlockElectricFluidMixer.TEElectricFluidMixer.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(FluidProperty.FLUID, Fluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(FluidProperty.FLUID).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.FLUID).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -131,7 +132,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 		}
 	}
 	
-	public static class TEElectricFluidMixer extends ALMManagedSidedMachineBlock<ContainerElectricFluidMixer> implements ITickableTileEntity{
+	public static class TEElectricFluidMixer extends ManagedSidedMachine<ContainerElectricFluidMixer> implements ITickableTileEntity{
 		
 		
 		private int timer = 0;
@@ -139,7 +140,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 		private float progress = 0;
 		private float cycles = 0;
 		private ItemStack output = null;
-		private Fluids inProgress = Fluids.NONE;
+		private DisplayFluids inProgress = DisplayFluids.NONE;
 		private FluidStack fluid = FluidStack.EMPTY;
 		
 		protected IFluidHandler fluids = new MixerHandler();
@@ -204,7 +205,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 						BathCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
 							if(fluid.getAmount() >= 1000) {
-								Fluids ff = Fluids.getAssocFluids(fluid.getFluid());
+								DisplayFluids ff = DisplayFluids.getAssocFluids(fluid.getFluid());
 								if(ff == recipe.getFluid()) {
 									output = recipe.getRecipeOutput().copy();
 									cycles = ((float) recipe.getStirs() * 3.6F);
@@ -227,16 +228,16 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 									inProgress = ff;
 									
 									sendUpdates = true;
-									if(getBlockState().get(FluidProperty.FLUID) != ff) {
-										world.setBlockState(pos, getBlockState().with(FluidProperty.FLUID, ff));
+									if(getBlockState().get(StateProperties.FLUID) != ff) {
+										world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, ff));
 									}
 								}
 							}
 							
 							
 						}else {
-							if(getBlockState().get(FluidProperty.FLUID) != Fluids.NONE) {
-								world.setBlockState(pos, getBlockState().with(FluidProperty.FLUID, Fluids.NONE));
+							if(getBlockState().get(StateProperties.FLUID) != DisplayFluids.NONE) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, DisplayFluids.NONE));
 								sendUpdates = true;
 							}
 						}
@@ -253,7 +254,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 										contents.get(0).grow(output.getCount());
 									}
 									output = null;
-									inProgress = Fluids.NONE;
+									inProgress = DisplayFluids.NONE;
 									cycles = 0;
 									progress = 0;
 									sendUpdates = true;
@@ -294,7 +295,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 				nTimer = compound.getInt("assemblylinemachines:ntimer");
 			}
 			if(compound.contains("assemblylinemachines:inprogress")) {
-				inProgress = Fluids.valueOf(compound.getString("assemblylinemachines:inprogress"));
+				inProgress = DisplayFluids.valueOf(compound.getString("assemblylinemachines:inprogress"));
 			}
 			cycles = compound.getFloat("assemblylinemachines:cycles");
 			progress = compound.getFloat("assemblylinemachines:progress");
@@ -347,8 +348,8 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				Fluids ff = Fluids.getAssocFluids(stack.getFluid());
-				return ff != Fluids.NONE;
+				DisplayFluids ff = DisplayFluids.getAssocFluids(stack.getFluid());
+				return ff != DisplayFluids.NONE;
 			}
 			
 			@Override
@@ -374,8 +375,8 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 					}
 				}
 				
-				Fluids ff = Fluids.getAssocFluids(resource.getFluid());
-				if(ff == Fluids.NONE) {
+				DisplayFluids ff = DisplayFluids.getAssocFluids(resource.getFluid());
+				if(ff == DisplayFluids.NONE) {
 					return 0;
 				}
 				
@@ -420,16 +421,16 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 		public ContainerElectricFluidMixer(final int windowId, final PlayerInventory playerInventory, final TEElectricFluidMixer tileEntity) {
 			super(Registry.getContainerType("electric_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, 54, 34, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 2, 75, 34, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 3, 149, 21, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 39, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 57, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 54, 34, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 2, 75, 34, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 3, 149, 21, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 39, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 57, tileEntity));
 		}
 		
 		public ContainerElectricFluidMixer(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TEElectricFluidMixer.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEElectricFluidMixer.class));
 		}
 	}
 	
@@ -456,7 +457,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(tsfm.fluid.getFluid().getAttributes().getStillTexture());
 				}
 				
-				if(tsfm.fluid.getFluid() == Fluids.WATER.getAssocFluid()) {
+				if(tsfm.fluid.getFluid() == DisplayFluids.WATER.getAssocFluid()) {
 					RenderSystem.color4f(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
@@ -474,7 +475,7 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 15f);
 			
 			int cover = 52;
-			if(tsfm.inProgress == Fluids.LAVA) {
+			if(tsfm.inProgress == DisplayFluids.LAVA) {
 				cover = 68;
 			}
 			
@@ -494,18 +495,18 @@ public class BlockElectricFluidMixer extends GUIContainingBasicBlock<BlockElectr
 			
 			if (mouseX >= x + 41 && mouseY >= y + 23 && mouseX <= x + 48 && mouseY <= y + 59) {
 				ArrayList<String> str = new ArrayList<>();
-				Fluids ff = Fluids.getAssocFluids(tsfm.fluid.getFluid());
-				if(ff == Fluids.NONE) {
+				DisplayFluids ff = DisplayFluids.getAssocFluids(tsfm.fluid.getFluid());
+				if(ff == DisplayFluids.NONE) {
 					this.renderTooltip("None",
 							mouseX - x, mouseY - y);
 				}else {
 					str.add(ff.getFriendlyName());
 					if(Screen.hasShiftDown()) {
 
-						str.add(Utils.FEPT_FORMAT.format(tsfm.fluid.getAmount()) + " mB");
+						str.add(Formatting.FEPT_FORMAT.format(tsfm.fluid.getAmount()) + " mB");
 						
 					}else {
-						str.add(Utils.FEPT_FORMAT.format((double) tsfm.fluid.getAmount() / 1000D) + " B");
+						str.add(Formatting.FEPT_FORMAT.format((double) tsfm.fluid.getAmount() / 1000D) + " B");
 					}
 					
 					this.renderTooltip(str,

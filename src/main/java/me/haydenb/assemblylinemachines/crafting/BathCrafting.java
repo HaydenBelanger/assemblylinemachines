@@ -6,7 +6,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
+import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,13 +32,13 @@ public class BathCrafting implements IRecipe<IInventory>{
 	private final Ingredient inputa;
 	private final Ingredient inputb;
 	private final ItemStack output;
-	private final Fluids fluid;
+	private final DisplayFluids fluid;
 	private final int stirs;
 	private final ResourceLocation id;
 	private final int color;
 	private final boolean machineReqd;
 	
-	public BathCrafting(ResourceLocation id, Ingredient inputa, Ingredient inputb, ItemStack output, int stirs, Fluids fluid, int color, boolean machineReqd) {
+	public BathCrafting(ResourceLocation id, Ingredient inputa, Ingredient inputb, ItemStack output, int stirs, DisplayFluids fluid, int color, boolean machineReqd) {
 		this.inputa = inputa;
 		this.inputb = inputb;
 		this.output = output;
@@ -156,7 +156,7 @@ public class BathCrafting implements IRecipe<IInventory>{
 		return BATH_RECIPE;
 	}
 	
-	public Fluids getFluid() {
+	public DisplayFluids getFluid() {
 		return fluid;
 	}
 	
@@ -177,8 +177,8 @@ public class BathCrafting implements IRecipe<IInventory>{
 				
 				final ItemStack output = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "output"));
 				final int stirs = JSONUtils.getInt(json, "stirs");
-				final Fluids fluid = Fluids.valueOf(JSONUtils.getString(json, "fluid").toUpperCase());
-				if(fluid == Fluids.NONE) {
+				final DisplayFluids fluid = DisplayFluids.valueOf(JSONUtils.getString(json, "fluid").toUpperCase());
+				if(fluid == DisplayFluids.NONE) {
 					AssemblyLineMachines.LOGGER.error("Error deserializing Bath Crafting Recipe from JSON: Cannot use 'none' as fluid.");
 					return null;
 				}
@@ -207,7 +207,7 @@ public class BathCrafting implements IRecipe<IInventory>{
 			final Ingredient inputb = Ingredient.read(buffer);
 			final ItemStack output = buffer.readItemStack();
 			final int stirs = buffer.readInt();
-			final Fluids fluid = buffer.readEnumValue(Fluids.class);
+			final DisplayFluids fluid = buffer.readEnumValue(DisplayFluids.class);
 			final int color = buffer.readInt();
 			final boolean machineReqd = buffer.readBoolean();
 			

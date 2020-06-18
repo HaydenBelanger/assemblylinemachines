@@ -4,10 +4,10 @@ import java.text.DecimalFormat;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank.FluidTankHandler;
-import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -65,7 +65,7 @@ public class BlockFluidTank extends Block {
 		_capacity = capacity;
 		_tempres = resist;
 
-		this.setDefaultState(this.stateContainer.getBaseState().with(FluidProperty.FLUID, Fluids.NONE));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE));
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class BlockFluidTank extends Block {
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
 
-		builder.add(FluidProperty.FLUID);
+		builder.add(StateProperties.FLUID);
 	}
 
 	@Override
@@ -132,8 +132,8 @@ public class BlockFluidTank extends Block {
 					if (handler != null) {
 						if (player.isSneaking()) {
 							FluidStack f = handler.getFluidInTank(0);
-							Fluids ff = Fluids.getAssocFluids(f.getFluid());
-							if (ff.equals(Fluids.NONE)) {
+							DisplayFluids ff = DisplayFluids.getAssocFluids(f.getFluid());
+							if (ff.equals(DisplayFluids.NONE)) {
 								player.sendStatusMessage(new StringTextComponent("This tank is empty."), true);
 							} else {
 								player.sendStatusMessage(
@@ -172,10 +172,10 @@ public class BlockFluidTank extends Block {
 
 	}
 
-	public static class TEFluidTank extends me.haydenb.assemblylinemachines.util.machines.ALMTileEntity {
+	public static class TEFluidTank extends me.haydenb.assemblylinemachines.helpers.BasicTileEntity {
 
-		private FluidStack fluid = FluidStack.EMPTY;
-		private int capacity = 0;
+		public FluidStack fluid = FluidStack.EMPTY;
+		public int capacity = 0;
 		private TemperatureResistance trs = TemperatureResistance.COLD;
 		
 		FluidTankHandler fluids = new FluidTankHandler(this);
@@ -256,8 +256,8 @@ public class BlockFluidTank extends Block {
 			}
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				Fluids ff = Fluids.getAssocFluids(stack.getFluid());
-				if(ff != Fluids.NONE) {
+				DisplayFluids ff = DisplayFluids.getAssocFluids(stack.getFluid());
+				if(ff != DisplayFluids.NONE) {
 					return true;
 				}
 				return false;
@@ -286,8 +286,8 @@ public class BlockFluidTank extends Block {
 					}
 				}
 				
-				Fluids ff = Fluids.getAssocFluids(resource.getFluid());
-				if(ff == Fluids.NONE) {
+				DisplayFluids ff = DisplayFluids.getAssocFluids(resource.getFluid());
+				if(ff == DisplayFluids.NONE) {
 					sendIfNotNull(player, "This tank cannot store this fluid.");
 					return 0;
 				}
@@ -308,8 +308,8 @@ public class BlockFluidTank extends Block {
 					} else {
 						te.fluid.setAmount(te.fluid.getAmount() + attemptedInsert);
 					}
-					if (attemptedInsert != 0 && te.getBlockState().get(FluidProperty.FLUID) != ff) {
-						te.world.setBlockState(te.pos, te.getBlockState().with(FluidProperty.FLUID, ff));
+					if (attemptedInsert != 0 && te.getBlockState().get(StateProperties.FLUID) != ff) {
+						te.world.setBlockState(te.pos, te.getBlockState().with(StateProperties.FLUID, ff));
 						te.sendUpdates();
 					}
 				}
@@ -338,8 +338,8 @@ public class BlockFluidTank extends Block {
 				if (te.fluid.getAmount() <= 0) {
 					te.fluid = FluidStack.EMPTY;
 
-					if (te.getBlockState().get(FluidProperty.FLUID) != Fluids.NONE) {
-						te.world.setBlockState(te.pos, te.getBlockState().with(FluidProperty.FLUID, Fluids.NONE));
+					if (te.getBlockState().get(StateProperties.FLUID) != DisplayFluids.NONE) {
+						te.world.setBlockState(te.pos, te.getBlockState().with(StateProperties.FLUID, DisplayFluids.NONE));
 					}
 				}
 

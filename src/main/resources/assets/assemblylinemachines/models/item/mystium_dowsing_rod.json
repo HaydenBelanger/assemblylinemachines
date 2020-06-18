@@ -1,0 +1,7 @@
+{
+	"parent": "item/handheld",
+	"textures":{
+		"layer0": "assemblylinemachines:item/mystium_dowsing_rod"
+	}
+	
+}

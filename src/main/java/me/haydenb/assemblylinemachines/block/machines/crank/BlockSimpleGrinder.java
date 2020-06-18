@@ -1,18 +1,20 @@
 package me.haydenb.assemblylinemachines.block.machines.crank;
 
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.StateProperties;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -38,13 +40,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder> implements ICrankableBlock{
+public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> implements ICrankableBlock{
 	
 
 	public BlockSimpleGrinder() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_grinder", TESimpleGrinder.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(Utils.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -55,7 +57,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
 
-		builder.add(Utils.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -68,7 +70,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 		return false;
 	}
 	
-	public static class TESimpleGrinder extends ALMMachineNoExtract<ContainerSimpleGrinder> implements ITickableTileEntity, ICrankableMachine{
+	public static class TESimpleGrinder extends SimpleMachine<ContainerSimpleGrinder> implements ITickableTileEntity, ICrankableMachine{
 		
 		public int timer;
 		public int cranks;
@@ -128,7 +130,7 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 											pendingOutput = false;
 											sendupdate = true;
 											end = true;
-											world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, false));
+											world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
 											break;
 										}
 									}
@@ -153,8 +155,8 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 							}
 						}
 						
-						if(end == false && getBlockState().get(Utils.MACHINE_ACTIVE) == false) {
-							world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, true));
+						if(end == false && getBlockState().get(StateProperties.MACHINE_ACTIVE) == false) {
+							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
 							sendupdate = true;
 						}
 						if(sendupdate) {
@@ -246,13 +248,13 @@ public class BlockSimpleGrinder extends GUIContainingBasicBlock<TESimpleGrinder>
 			super(Registry.getContainerType("simple_grinder"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, INPUT_A_POS.x, INPUT_A_POS.y, tileEntity));
-			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.x, INPUT_B_POS.y));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, INPUT_A_POS.getFirst(), INPUT_A_POS.getSecond(), tileEntity));
+			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.getFirst(), INPUT_B_POS.getSecond()));
 		}
 		
 		
 		public ContainerSimpleGrinder(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TESimpleGrinder.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TESimpleGrinder.class));
 		}
 		
 		

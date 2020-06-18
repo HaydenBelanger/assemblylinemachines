@@ -69,6 +69,11 @@
 	"item.assemblylinemachines.autocrafting_upgrade_recipes": "Autocrafting Table Upgrade: Recipe Capacity",
 	"item.assemblylinemachines.autocrafting_upgrade_sustained": "Autocrafting Table Upgrade: Sustained Operation",
 	"item.assemblylinemachines.ground_charcoal": "Ground Charcoal",
+	"item.assemblylinemachines.oil_bucket": "Oil Bucket",
+	"item.assemblylinemachines.condensed_void_bucket": "Condensed Void Bucket",
+	"item.assemblylinemachines.naphtha_bucket": "Naphtha Bucket",
+	"item.assemblylinemachines.corrupted_shard": "Corrupted Shard",
+	"item.assemblylinemachines.mystium_dowsing_rod": "Mystium Dowsing Rod",
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
@@ -111,43 +116,9 @@
 	"block.assemblylinemachines.alloy_smelter": "Alloy Smelter",
 	"block.assemblylinemachines.autocrafting_table": "Autocrafting Table",
 	
-	"tooltip.assemblylinemachines.gearbox_limiter": "Gearbox will only burn fuel while action is required.",
-	"tooltip.assemblylinemachines.gearbox_efficiency_positive": "Gearbox will use greatly less fuel.",
-	"tooltip.assemblylinemachines.gearbox_efficiency_negative": "Gearbox will run half as quickly",
-	"tooltip.assemblylinemachines.gearbox_compatability": "Gearbox can use any burnable fuel.",
-	"tooltip.assemblylinemachines.pipe_stack": "Item Pipe will take larger stacks.",
-	"tooltip.assemblylinemachines.pipe_filter": "Item Pipe's filter space will grow.",
-	"tooltip.assemblylinemachines.pipe_redstone": "Item Pipe will gain Redstone control.",
-	"tooltip.assemblylinemachines.speed_positive": "Device will operate much quicker.",
-	"tooltip.assemblylinemachines.speed_negative": "Device may use more fuel or power.",
-	"tooltip.assemblylinemachines.ac_sustained_positive": "Autocrafting Table won't use power.",
-	"tooltip.assemblylinemachines.ac_sustained_nega": "No other upgrades will function.",
-	"tooltip.assemblylinemachines.ac_sustained_negb": "Autocrafting Table will run slower.",
-	"tooltip.assemblylinemachines.ac_recipes": "Autocrafting table will gain extra recipes.",
-	"tooltip.assemblylinemachines.machine_cons": "Certain machines have a chance to not use item.",
-	"tooltip.assemblylinemachines.upgrade_canstack": "This upgrade's effect can be stacked.",
-	
-	"gui.assemblylinemachines.autocrafter_title": "Autocrafting",
-	"gui.assemblylinemachines.top_enabled": "Top Face Enabled",
-	"gui.assemblylinemachines.top_disabled": "Top Face Disabled",
-	"gui.assemblylinemachines.left_enabled": "Left Face Enabled",
-	"gui.assemblylinemachines.left_disabled": "Left Face Enabled",
-	"gui.assemblylinemachines.right_enabled": "Right Face Enabled",
-	"gui.assemblylinemachines.right_disabled": "Right Face Disabled",
-	"gui.assemblylinemachines.bottom_enabled": "Bottom Face Enabled",
-	"gui.assemblylinemachines.bottom_disabled": "Bottom Face Disabled",
-	"gui.assemblylinemachines.front_enabled": "Front Face Enabled",
-	"gui.assemblylinemachines.front_disabled": "Front Face Disabled",
-	"gui.assemblylinemachines.back_enabled": "Back Face Enabled",
-	"gui.assemblylinemachines.back_disabled": "Back Face Enabled",
-	"gui.assemblylinemachines.tp_increase": "Increase Throughput",
-	"gui.assemblylinemachines.tp_decrease": "Decrease Throughput",
-	"gui.assemblylinemachines.auto_in": "Auto-Input Enabled",
-	"gui.assemblylinemachines.auto_out": "Auto-Output Enabled",
-	"gui.assemblylinemachines.fe_total_coal": "FE Total",
-	"gui.assemblylinemachines.fe": "FE",
-	"gui.assemblylinemachines.fept": "FE/t",
-	"gui.assemblylinemachines.pt": "/t"
+	"fluid.assemblylinemachines.oil": "Oil",
+	"fluid.assemblylinemachines.condensed_void": "Condensed Void",
+	"fluid.assemblylinemachines:naphtha": "Naphtha"
 	
 	
 }

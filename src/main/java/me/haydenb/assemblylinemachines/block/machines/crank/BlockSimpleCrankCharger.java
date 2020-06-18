@@ -1,10 +1,10 @@
 package me.haydenb.assemblylinemachines.block.machines.crank;
 
+import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock;
-import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -24,7 +24,7 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleCrankCharger extends TEContainingBlock implements ICrankableBlock{
+public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankableBlock{
 
 	public BlockSimpleCrankCharger() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
@@ -43,7 +43,7 @@ public class BlockSimpleCrankCharger extends TEContainingBlock implements ICrank
 		return ActionResultType.PASS;
 	}
 	
-	public static class TESimpleCrankCharger extends ALMTileEntity implements ICrankableMachine{
+	public static class TESimpleCrankCharger extends BasicTileEntity implements ICrankableMachine{
 
 		
 		private IItemHandler handler = null;

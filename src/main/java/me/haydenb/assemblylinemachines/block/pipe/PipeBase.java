@@ -4,7 +4,7 @@ import com.google.common.base.Supplier;
 
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -148,9 +148,9 @@ public class PipeBase<T> extends Block {
 				default:
 					if (pco == PipeConnOptions.CONNECTOR) {
 						rt = VoxelShapes.combineAndSimplify(rt,
-								Utils.rotateShape(Direction.NORTH, d, SHAPE_CONN_CARDINAL), IBooleanFunction.OR);
+								General.rotateShape(Direction.NORTH, d, SHAPE_CONN_CARDINAL), IBooleanFunction.OR);
 					} else {
-						rt = VoxelShapes.combineAndSimplify(rt, Utils.rotateShape(Direction.WEST, d, SHAPE_CARDINAL),
+						rt = VoxelShapes.combineAndSimplify(rt, General.rotateShape(Direction.WEST, d, SHAPE_CARDINAL),
 								IBooleanFunction.OR);
 					}
 

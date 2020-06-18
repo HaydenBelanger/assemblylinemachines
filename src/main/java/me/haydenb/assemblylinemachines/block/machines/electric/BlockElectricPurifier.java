@@ -4,17 +4,19 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMManagedSidedMachineBlock;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.StateProperties;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -42,7 +44,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectricPurifier.TEElectricPurifier>{
+public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPurifier.TEElectricPurifier>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.makeCuboidShape(0, 0, 0, 16, 2, 16),
@@ -56,21 +58,21 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 			Block.makeCuboidShape(2, 2, 2, 14, 7, 16)
 			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	private static final Random RAND = new Random();
 	
 	public BlockElectricPurifier() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "electric_purifier", BlockElectricPurifier.TEElectricPurifier.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(Utils.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(Utils.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -92,7 +94,7 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 		}
 	}
 	
-	public static class TEElectricPurifier extends ALMManagedSidedMachineBlock<ContainerElectricPurifier> implements ITickableTileEntity{
+	public static class TEElectricPurifier extends ManagedSidedMachine<ContainerElectricPurifier> implements ITickableTileEntity{
 		
 		private int timer = 0;
 		private int nTimer = 20;
@@ -153,12 +155,12 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 							}
 							contents.get(3).shrink(1);
 							sendUpdates = true;
-							if(!getBlockState().get(Utils.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, true));
+							if(!getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
 							}
 						}else {
-							if(getBlockState().get(Utils.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, false));
+							if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
 								sendUpdates = true;
 							}
 						}
@@ -259,19 +261,19 @@ public class BlockElectricPurifier extends GUIContainingBasicBlock<BlockElectric
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerElectricPurifier(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TEElectricPurifier.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEElectricPurifier.class));
 		}
 		
 		public ContainerElectricPurifier(final int windowId, final PlayerInventory playerInventory, final TEElectricPurifier tileEntity) {
 			super(Registry.getContainerType("electric_purifier"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, 51, 21, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 2, 51, 47, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 3, 72, 34, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 21, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 39, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 6, 149, 57, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 51, 21, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 2, 51, 47, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 3, 72, 34, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 21, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 39, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 6, 149, 57, tileEntity));
 		}
 		
 	}

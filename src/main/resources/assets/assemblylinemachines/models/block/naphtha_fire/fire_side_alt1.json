@@ -1,0 +1,7 @@
+{
+    "parent": "assemblylinemachines:block/naphtha_fire/fire_side_alt",
+    "textures": {
+        "particle": "assemblylinemachines:block/naphtha_fire/fire_1",
+        "fire": "assemblylinemachines:block/naphtha_fire/fire_1"
+    }
+}

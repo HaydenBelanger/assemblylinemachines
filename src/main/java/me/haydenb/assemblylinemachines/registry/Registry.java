@@ -15,6 +15,7 @@ import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
+import me.haydenb.assemblylinemachines.block.BlockNaphthaFire;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ContainerBasicBatteryCell;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ScreenBasicBatteryCell;
@@ -27,6 +28,12 @@ import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ContainerCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ScreenCrankmill;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
+import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid;
+import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha;
+import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidOil;
+import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockCrank;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.ContainerGearbox;
@@ -77,22 +84,23 @@ import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
-import me.haydenb.assemblylinemachines.item.CrankTool;
-import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
-import me.haydenb.assemblylinemachines.item.ItemGrindingBlade;
-import me.haydenb.assemblylinemachines.item.ItemHammer;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.SpecialNamedItem;
-import me.haydenb.assemblylinemachines.item.ToolStirringStick;
-import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.item.categories.ItemBasicFormattedName;
+import me.haydenb.assemblylinemachines.item.categories.ItemCrankTool;
+import me.haydenb.assemblylinemachines.item.categories.ItemGearboxBasicFuel;
+import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
+import me.haydenb.assemblylinemachines.item.categories.ItemHammer;
+import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick;
+import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
+import me.haydenb.assemblylinemachines.item.items.ItemDowsingRod;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.util.CreativeTab;
-import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.util.Utils.Localization;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SoundType;
@@ -106,14 +114,18 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.FlowingFluid;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ShovelItem;
 import net.minecraft.item.SwordItem;
@@ -125,7 +137,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.ILightReader;
 import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
@@ -137,6 +148,8 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -164,7 +177,9 @@ public class Registry {
 	private static final HashMap<String, TileEntityType<?>> teRegistry = new HashMap<>();
 	private static final HashMap<String, ContainerType<?>> containerRegistry = new HashMap<>();
 	private static final HashMap<ContainerType<?>, Integer> containerIdRegistry = new HashMap<>();
-	public static final CreativeTab creativeTab = new CreativeTab("assemblylinemachines");
+	
+	private static final HashMap<String, Fluid> fluidRegistry = new HashMap<>();
+	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
 	
 	//EVENTS
 	@SubscribeEvent
@@ -206,30 +221,31 @@ public class Registry {
 		createItem("iron_gear");
 		createItem("titanium_gear");
 		
-		createItem("empowered_coal", new ItemGearboxFuel(3200));
-		createItem("gearbox_upgrade_limiter", new ItemUpgrade(false, Localization.get("tooltip", "gearbox_limiter")));
-		createItem("gearbox_upgrade_efficiency", new ItemUpgrade(false, Localization.get("tooltip", "gearbox_efficiency_positive"), Localization.get("tooltip", "gearbox_efficiency_negative")));
-		createItem("gearbox_upgrade_compatability", new ItemUpgrade(false, Localization.get("tooltip", "gearbox_compatability")));
+		createItem("empowered_coal", new ItemGearboxBasicFuel(3200));
+		createItem("gearbox_upgrade_limiter", new ItemUpgrade(false, "Gearbox will only run while needed."));
+		createItem("gearbox_upgrade_efficiency", new ItemUpgrade(false, "Gearbox will use less fuel.", "Gearbox will run slower."));
+		createItem("gearbox_upgrade_compatability", new ItemUpgrade(false, "Gearbox can use any fuel."));
 		
 		
 		
-		createItem("item_pipe_upgrade_stack", new ItemUpgrade(true, Localization.get("tooltip", "pipe_stack")));
-		createItem("item_pipe_upgrade_filter", new ItemUpgrade(true, Localization.get("tooltip", "pipe_filter")));
-		createItem("item_pipe_upgrade_redstone", new ItemUpgrade(false, Localization.get("tooltip", "pipe_redstone")));
+		createItem("item_pipe_upgrade_stack", new ItemUpgrade(true, "Item Pipe can take larger stacks."));
+		createItem("item_pipe_upgrade_filter", new ItemUpgrade(true, "Item Pipe's filter space will grow."));
+		createItem("item_pipe_upgrade_redstone", new ItemUpgrade(false, "Item Pipe will gain Redstone control."));
 		
-		createItem("upgrade_speed", new ItemUpgrade(true, Localization.get("tooltip", "speed_positive"), Localization.get("tooltip", "speed_negative")));
+		createItem("upgrade_speed", new ItemUpgrade(true, "Device will operate much quicker.", "Device may use more fuel, power, or resources."));
 		
-		createItem("autocrafting_upgrade_sustained", new ItemUpgrade(false, new TranslationTextComponent[] {Localization.get("tooltip", "ac_sustained_positive")}, new TranslationTextComponent[] {Localization.get("tooltip", "ac_sustained_nega"), Localization.get("tooltip", "ac_sustained_negb")}));
-		createItem("autocrafting_upgrade_recipes", new ItemUpgrade(true, Localization.get("tooltip", "ac_recipes")));
+		createItem("autocrafting_upgrade_sustained", new ItemUpgrade(false, new String[] {"Autocrafting Table can run without power."}, new String[] {"No other upgrades are accepted.", "Autocrafting Table will run slower."}));
+		createItem("autocrafting_upgrade_recipes", new ItemUpgrade(true, "Autocrafting Table will gain more recipes."));
 		
-		createItem("machine_upgrade_conservation", new ItemUpgrade(true, Localization.get("tooltip", "machine_cons")));
-		createItem("wooden_stirring_stick", new ToolStirringStick(35, TemperatureResistance.COLD));
-		createItem("pure_iron_stirring_stick", new ToolStirringStick(135, TemperatureResistance.HOT));
+		createItem("machine_upgrade_conservation", new ItemUpgrade(true, "Machines may have a chance to not use input."));
+		createItem("wooden_stirring_stick", new ItemStirringStick(35, TemperatureResistance.COLD));
+		createItem("pure_iron_stirring_stick", new ItemStirringStick(135, TemperatureResistance.HOT));
+		createItem("mystium_dowsing_rod", new ItemDowsingRod());
 		
 		createItem("ground_lapis_lazuli");
-		createItem("mystium_blend", new SpecialNamedItem(TextFormatting.LIGHT_PURPLE));
-		createItem("mystium_ingot", new SpecialNamedItem(TextFormatting.LIGHT_PURPLE));
-		
+		createItem("mystium_blend", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
+		createItem("mystium_ingot", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
+		createItem("corrupted_shard", new ItemCorruptedShard());
 		
 		createItem("titanium_sword", new SwordItem(ItemTiers.TITANIUM, 2, -1.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM, 4, -3.5f, new Item.Properties().group(creativeTab)));
@@ -242,12 +258,12 @@ public class Registry {
 		createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
 		createItem("titanium_hammer", new ItemHammer(ItemTiers.TITANIUM, 8, -3.2f, new Item.Properties().group(creativeTab)));
 		
-		createItem("crank_sword", CrankTool.makeCrankTool(ItemTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
-		createItem("crank_axe", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
-		createItem("crank_pickaxe", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
-		createItem("crank_shovel", CrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
-		createItem("crank_hoe", CrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, HoeItem.class));
-		createItem("crank_hammer", CrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
+		createItem("crank_sword", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
+		createItem("crank_axe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
+		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
+		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
+		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, HoeItem.class));
+		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
 		
 		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
 		createItem("steel_sword", new SwordItem(ItemTiers.STEEL, 2, -1.9f, new Item.Properties().group(creativeTab)));
@@ -259,6 +275,8 @@ public class Registry {
 		createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
 		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
 		createItem("steel_hoe", new HoeItem(ItemTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
+		
+		
 		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
@@ -321,9 +339,23 @@ public class Registry {
 		
 		createBlock("autocrafting_table", new BlockAutocraftingTable());
 		
+		createBlockNoTab("naphtha_fire", new BlockNaphthaFire());
+		
+		
+		//FLUIDS
+		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
+		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(), getBucketItem("condensed_void"));
+		createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(), getBucketItem("naphtha"));
+		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
 	
+	@SubscribeEvent
+	public static void registerFluids(RegistryEvent.Register<Fluid> event) {
+		
+		//All Fluids are handled at bottom of registerBlocks, to handle the _block and _bucket versions of fluids.
+		event.getRegistry().registerAll(fluidRegistry.values().toArray(new Fluid[fluidRegistry.size()]));
+	}
 	
 	@SubscribeEvent
 	public static void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
@@ -386,6 +418,9 @@ public class Registry {
 		RenderTypeLookup.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("autocrafting_table"), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(getBlock("naphtha_fire"), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(getFluid("naphtha"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("naphtha_flowing"), RenderType.getTranslucent());
 		
 		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
@@ -447,7 +482,7 @@ public class Registry {
 					}
 					
 					
-					if(state.get(FluidProperty.FLUID) == Fluids.LAVA) {
+					if(state.get(StateProperties.FLUID) == DisplayFluids.LAVA) {
 						return 0xcb3d07;
 					}else {
 						return BiomeColors.getWaterColor(reader, pos);
@@ -514,8 +549,79 @@ public class Registry {
 		createItem(name, new BlockItem(block, new Item.Properties().group(creativeTab)));
 	}
 	
+	private static void createBlockNoTab(String name, Block block) {
+		block.setRegistryName(name);
+		blockRegistry.put(name, block);
+		createItem(name, new BlockItem(block, new Item.Properties()));
+	}
+	
 	public static Block getBlock(String name) {
 		return blockRegistry.get(name);
+	}
+	
+	//FLUIDS
+	
+	/**
+	 * This must be called during Block registry, despite being targeted at fluids. This allows all maps to be populated first.
+	 * Will register x, x_flowing, x_block, x_bucket.
+	 */
+	
+	@SuppressWarnings("unused")
+	private static void createFluid(String name) {
+		createFluid(name, getFluidAttributes(name));
+		
+	}
+	
+	private static void createFluid(String name, FluidAttributes.Builder attributes) {
+		
+		
+		
+		createFluid(name, attributes, getFluidProperties(name, attributes));
+		
+	}
+	
+	private static void createFluid(String name, FluidAttributes.Builder attributes, ForgeFlowingFluid.Properties properties) {
+		
+		
+		
+		createFluid(name, getSourceFluid(properties), getFlowingFluid(properties), getFlowingFluidBlock(name), getBucketItem(name));
+	}
+	
+	private static void createFluid(String name, ForgeFlowingFluid source, ForgeFlowingFluid flowing, FlowingFluidBlock block, BucketItem bucket) {
+		
+		fluidRegistry.put(name, source.setRegistryName(name));
+		fluidRegistry.put(name + "_flowing", flowing.setRegistryName(name + "_flowing"));
+		blockRegistry.put(name + "_block", block.setRegistryName(name + "_block"));
+		itemRegistry.put(name + "_bucket", bucket.setRegistryName(name + "_bucket"));
+	}
+	
+	//FLUID GETTERS
+	public static FluidAttributes.Builder getFluidAttributes(String name){
+		return FluidAttributes.builder(new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name), new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name + "_flowing"));
+	}
+	
+	public static ForgeFlowingFluid.Properties getFluidProperties(String name, FluidAttributes.Builder attributes){
+		return new ForgeFlowingFluid.Properties(() -> fluidRegistry.get(name), () -> fluidRegistry.get(name + "_flowing"), attributes).block(() -> (FlowingFluidBlock) blockRegistry.get(name + "_block")).bucket(() -> itemRegistry.get(name + "_bucket"));
+	}
+	
+	private static ForgeFlowingFluid.Source getSourceFluid(ForgeFlowingFluid.Properties properties){
+		return new ForgeFlowingFluid.Source(properties);
+	}
+	
+	private static ForgeFlowingFluid.Flowing getFlowingFluid(ForgeFlowingFluid.Properties properties){
+		return new ForgeFlowingFluid.Flowing(properties);
+	}
+	
+	private static FlowingFluidBlock getFlowingFluidBlock(String name) {
+		return new FlowingFluidBlock(() -> (FlowingFluid) fluidRegistry.get(name), Block.Properties.create(Material.WATER).hardnessAndResistance(100f).noDrops());
+	}
+	
+	private static BucketItem getBucketItem(String name) {
+		return new BucketItem(() -> fluidRegistry.get(name), new Item.Properties().maxStackSize(1).containerItem(Items.BUCKET).group(creativeTab));
+	}
+	
+	public static Fluid getFluid(String name) {
+		return fluidRegistry.get(name);
 	}
 	
 	//TILE ENTITIES

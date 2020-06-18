@@ -2,18 +2,20 @@ package me.haydenb.assemblylinemachines.block.machines.crank;
 
 import java.util.Random;
 
-import me.haydenb.assemblylinemachines.item.ItemGearboxFuel;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import com.mojang.datafixers.util.Pair;
+
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
+import me.haydenb.assemblylinemachines.item.categories.IGearboxFuel;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.StateProperties;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -42,7 +44,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
 
-public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox> {
+public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> {
 
 	private static final Random RAND = new Random();
 	
@@ -50,13 +52,13 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(1f, 2f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "gearbox", TEGearbox.class);
 		this.setDefaultState(
-				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(Utils.MACHINE_ACTIVE, false));
+				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.MACHINE_ACTIVE, false));
 	}
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
 
-		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(Utils.MACHINE_ACTIVE);
+		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(StateProperties.MACHINE_ACTIVE);
 	}
 
 	@Override
@@ -73,7 +75,7 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		return stateIn;
 	}
 	
-	public static class TEGearbox extends ALMMachineNoExtract<ContainerGearbox> implements ITickableTileEntity{
+	public static class TEGearbox extends SimpleMachine<ContainerGearbox> implements ITickableTileEntity{
 		
 		public int timer = 0;
 		public float maxBurnTime = 0;
@@ -172,8 +174,8 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 								burnTime = ForgeHooks.getBurnTime(contents.get(1));
 								maxBurnTime = burnTime;
 								contents.get(1).shrink(1);
-								if(getBlockState().get(Utils.MACHINE_ACTIVE) == false) {
-									world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, true));
+								if(getBlockState().get(StateProperties.MACHINE_ACTIVE) == false) {
+									world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
 									
 								}
 								sendUpdate = true;
@@ -181,8 +183,8 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 								if(maxBurnTime != 0) {
 									burnTime = 0;
 									maxBurnTime = 0;
-									if(getBlockState().get(Utils.MACHINE_ACTIVE) == true) {
-										world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, false));
+									if(getBlockState().get(StateProperties.MACHINE_ACTIVE) == true) {
+										world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
 										
 									}
 									sendUpdate = true;
@@ -212,7 +214,7 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 						return true;
 					}
 				}else {
-					if(stack.getItem() instanceof ItemGearboxFuel) {
+					if(stack.getItem() instanceof IGearboxFuel) {
 						return true;
 					}
 				}
@@ -224,9 +226,9 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		
 		@Override
 		public NonNullList<ItemStack> getItems() {
-			if(contents.get(1) != ItemStack.EMPTY && contents.get(1).getItem() != Items.AIR && !(contents.get(1).getItem() instanceof ItemGearboxFuel)) {
+			if(contents.get(1) != ItemStack.EMPTY && contents.get(1).getItem() != Items.AIR && !(contents.get(1).getItem() instanceof IGearboxFuel)) {
 				if(Upgrades.match(contents.get(0)) != Upgrades.GB_COMPATABILITY) {
-					Utils.spawnItem(contents.get(1), pos.up(), world);
+					General.spawnItem(contents.get(1), pos.up(), world);
 					contents.set(1, ItemStack.EMPTY);
 					burnTime = 0;
 					sendUpdates();
@@ -246,13 +248,13 @@ public class BlockGearbox extends GUIContainingBasicBlock<BlockGearbox.TEGearbox
 		public ContainerGearbox(final int windowId, final PlayerInventory playerInventory, final TEGearbox tileEntity) {
 			super(Registry.getContainerType("gearbox"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.x, INPUT_POS.y, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.getFirst(), UPGRADE_POS.getSecond(), tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.getFirst(), INPUT_POS.getSecond(), tileEntity));
 		}
 		
 		
 		public ContainerGearbox(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TEGearbox.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEGearbox.class));
 		}
 		
 		

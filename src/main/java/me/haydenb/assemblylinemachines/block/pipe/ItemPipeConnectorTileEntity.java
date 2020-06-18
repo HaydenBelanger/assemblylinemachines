@@ -4,21 +4,23 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeSet;
+
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.*;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.Utils.SimpleButton;
-import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.*;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.SimpleButton;
+import me.haydenb.assemblylinemachines.util.SupplierWrapper;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -44,7 +46,7 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeConnectorContainer>
+public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnectorContainer>
 		implements ITickableTileEntity {
 
 	private boolean inputMode = true;
@@ -415,7 +417,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			}
 
 			for (int row = 0; row < 3; ++row) {
-				this.addSlot(new AbstractALMMachine.SlotWithRestrictions(tileEntity, row + 9, 149, 21 + (row * 18),
+				this.addSlot(new AbstractMachine.SlotWithRestrictions(tileEntity, row + 9, 149, 21 + (row * 18),
 						tileEntity));
 			}
 
@@ -424,13 +426,13 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 		public ItemPipeConnectorContainer(final int windowId, final PlayerInventory playerInventory,
 				final PacketBuffer data) {
 			this(windowId, playerInventory,
-					Utils.getTileEntity(playerInventory, data, ItemPipeConnectorTileEntity.class));
+					General.getTileEntity(playerInventory, data, ItemPipeConnectorTileEntity.class));
 		}
 
 		private static class FilterPipeValidatorSlot extends SlotWithRestrictions {
 
 			public FilterPipeValidatorSlot(IInventory inventoryIn, int index, int xPosition, int yPosition,
-					AbstractALMMachine<?> check) {
+					AbstractMachine<?> check) {
 				super(inventoryIn, index, xPosition, yPosition, check);
 			}
 
@@ -548,7 +550,7 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 				sendPipeUpdatePacket(tsfm.pos, "redstone");
 			}, tsfm), new SupplierWrapper("Enabled on Redstone Signal", "Always Active", () -> tsfm.redstone)));
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				this.addButton(bb.x);
+				this.addButton(bb.getFirst());
 			}
 
 		}
@@ -558,15 +560,15 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 			this.font.drawString(this.title.getFormattedText(), 11, 6, 4210752);
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (!(bb.x instanceof ItemPipeRedstoneButton)
-						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled())
-					if (mouseX >= bb.x.x && mouseX <= bb.x.x + 8 && mouseY >= bb.x.y && mouseY <= bb.x.y + 8) {
+				if (!(bb.getFirst() instanceof ItemPipeRedstoneButton)
+						|| ((ItemPipeRedstoneButton) bb.getFirst()).isRedstoneControlEnabled())
+					if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + 8 && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + 8) {
 						int x = (this.width - this.xSize) / 2;
 						int y = (this.height - this.ySize) / 2;
-						if (bb.y != null) {
-							this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
+						if (bb.getSecond() != null) {
+							this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 						} else {
-							this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
+							this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);
 						}
 
 						break;
@@ -581,10 +583,10 @@ public class ItemPipeConnectorTileEntity extends ALMMachineNoExtract<ItemPipeCon
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (!(bb.x instanceof ItemPipeRedstoneButton)
-						|| ((ItemPipeRedstoneButton) bb.x).isRedstoneControlEnabled()) {
-					if (bb.y != null && bb.y.supplier.get()) {
-						super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, 8, 8);
+				if (!(bb.getFirst() instanceof ItemPipeRedstoneButton)
+						|| ((ItemPipeRedstoneButton) bb.getFirst()).isRedstoneControlEnabled()) {
+					if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
+						super.blit(bb.getFirst().x, bb.getFirst().y, bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
 					}
 				} else {
 					super.blit(x + 43, y + 42, 9, 12, 8, 8);

@@ -6,8 +6,8 @@ import java.util.TreeSet;
 
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
+import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -21,7 +21,7 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class EnergyPipeConnectorTileEntity extends ALMTileEntity implements ITickableTileEntity {
+public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements ITickableTileEntity {
 
 	public boolean outputMode = false;
 	private int timer = 0;

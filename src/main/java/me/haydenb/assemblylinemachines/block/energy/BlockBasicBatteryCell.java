@@ -3,19 +3,21 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Pair;
+
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Localization;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.Utils.SimpleButton;
-import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMManagedSidedMachineBlock;
-import me.haydenb.assemblylinemachines.util.machines.ALMManagedSidedMachineBlock.ManagedDirection;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.SimpleButton;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.SupplierWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -49,7 +51,7 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBatteryCell.TEBasicBatteryCell> {
+public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatteryCell.TEBasicBatteryCell> {
 
 	private static final VoxelShape SHAPE_N = Stream.of(Block.makeCuboidShape(10, 3, 0, 12, 13, 2),
 			Block.makeCuboidShape(4, 3, 0, 6, 13, 2), Block.makeCuboidShape(2, 5, 3, 2, 11, 13),
@@ -69,16 +71,16 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			Block.makeCuboidShape(1, 5, 9, 2, 11, 10), Block.makeCuboidShape(1, 5, 11, 2, 11, 12)).reduce((v1, v2) -> {
 				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
 			}).get();
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 
 	public BlockBasicBatteryCell() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(3f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "basic_battery_cell", null, true,
 				Direction.NORTH, TEBasicBatteryCell.class);
 		this.setDefaultState(
-				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(Utils.BATTERY_PERCENT_STATE, 0));
+				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.BATTERY_PERCENT_STATE, 0));
 	}
 
 	@Override
@@ -104,10 +106,10 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(Utils.BATTERY_PERCENT_STATE);
+		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(StateProperties.BATTERY_PERCENT_STATE);
 	}
 
-	public static class TEBasicBatteryCell extends ALMManagedSidedMachineBlock<ContainerBasicBatteryCell> implements ITickableTileEntity {
+	public static class TEBasicBatteryCell extends ManagedSidedMachine<ContainerBasicBatteryCell> implements ITickableTileEntity {
 
 		private int fept = 200;
 		private boolean autoIn = true;
@@ -299,7 +301,7 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 
 		public ContainerBasicBatteryCell(final int windowId, final PlayerInventory playerInventory,
 				final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TEBasicBatteryCell.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEBasicBatteryCell.class));
 		}
 	}
 
@@ -325,44 +327,44 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			b.put("up", new Pair<>(new SimpleButton(x + 51, y + 28, 177, 83, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "up");
-			}), new SupplierWrapper(Localization.TOP_ENBD.getFormattedText(), Localization.TOP_DSBD.getFormattedText(),
+			}), new SupplierWrapper("Top Face Enabled", "Top Face Disabled",
 					() -> tsfm.getDirectionEnabled(ManagedDirection.TOP))));
 			b.put("down", new Pair<>(new SimpleButton(x + 51, y + 50, 177, 73, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "down");
-			}), new SupplierWrapper(Localization.BOT_ENBD.getFormattedText(), Localization.BOT_DSBD.getFormattedText(),
+			}), new SupplierWrapper("Bottom Face Enabled", "Bottom Face Disabled",
 					() -> tsfm.getDirectionEnabled(ManagedDirection.BOTTOM))));
 			b.put("left", new Pair<>(new SimpleButton(x + 40, y + 39, 177, 103, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "left");
-			}), new SupplierWrapper(Localization.LFT_ENBD.getFormattedText(), Localization.LFT_DSBD.getFormattedText(),
+			}), new SupplierWrapper("Left Face Enabled", "Left Face Disabled",
 					() -> tsfm.getDirectionEnabled(ManagedDirection.LEFT))));
 			b.put("right", new Pair<>(new SimpleButton(x + 62, y + 39, 177, 93, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "right");
-			}), new SupplierWrapper(Localization.RGT_ENBD.getFormattedText(), Localization.RGT_DSBD.getFormattedText(),
+			}), new SupplierWrapper("Right Face Enabled", "Right Face Disabled",
 					() -> tsfm.getDirectionEnabled(ManagedDirection.RIGHT))));
 			b.put("back", new Pair<>(new SimpleButton(x + 51, y + 39, 177, 63, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "back");
-			}), new SupplierWrapper(Localization.BCK_ENBD.getFormattedText(), Localization.BCK_DSBD.getFormattedText(),
+			}), new SupplierWrapper("Back Face Enabled", "Back Face Disabled",
 					() -> tsfm.getDirectionEnabled(ManagedDirection.BACK))));
 			b.put("automode", new Pair<>(new SimpleButton(x + 95, y + 16, 177, 53, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "automode");
-			}), new SupplierWrapper(Localization.AUTO_IN.getFormattedText(), Localization.AUTO_OUT.getFormattedText(),
+			}), new SupplierWrapper("Auto-Input Enabled", "Auto-Output Disabled",
 					() -> tsfm.autoIn)));
-			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, Localization.THP_DCRS.getFormattedText(), (button) -> {
+			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, "Decrease Automatic Throughput", (button) -> {
 				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.hasShiftDown(), Screen.hasControlDown());
 
 			}), null));
-			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, Localization.THP_INCS.getFormattedText(), (button) -> {
+			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, "Increase Automatic Throughput", (button) -> {
 				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.hasShiftDown(), Screen.hasControlDown());
 
 			}), null));
 
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				this.addButton(bb.x);
+				this.addButton(bb.getFirst());
 			}
 		}
 
@@ -373,11 +375,11 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			int y = (this.height - this.ySize) / 2;
 
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (mouseX >= bb.x.x && mouseX <= bb.x.x + 8 && mouseY >= bb.x.y && mouseY <= bb.x.y + 8) {
-					if (bb.y != null) {
-						this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
+				if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + 8 && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + 8) {
+					if (bb.getFirst() != null) {
+						this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 					} else {
-						this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
+						this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);
 					}
 
 					break;
@@ -390,14 +392,14 @@ public class BlockBasicBatteryCell extends GUIContainingBasicBlock<BlockBasicBat
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (bb.y != null && bb.y.supplier.get()) {
-					super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, 8, 8);
+				if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
+					super.blit(bb.getFirst().x, bb.getFirst().y, bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
 				}
 
 			}
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
-			this.drawCenteredString(this.font, Utils.FORMAT.format(tsfm.fept), x + 122, y + 38, 0xffffff);
+			this.drawCenteredString(this.font, Formatting.GENERAL_FORMAT.format(tsfm.fept), x + 122, y + 38, 0xffffff);
 		}
 
 		public static void sendCellUpdatePacket(BlockPos pos, String button) {

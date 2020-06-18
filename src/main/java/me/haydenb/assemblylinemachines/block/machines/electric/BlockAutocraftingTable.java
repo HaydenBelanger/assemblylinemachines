@@ -5,23 +5,26 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.item.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import com.mojang.datafixers.util.Pair;
+
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.SlotWithRestrictions;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Localization;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.Utils.SimpleButton;
-import me.haydenb.assemblylinemachines.util.Utils.SupplierWrapper;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMManagedSidedMachineBlock;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.SlotWithRestrictions;
+import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.SimpleButton;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.SupplierWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -55,6 +58,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -62,7 +66,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocraftingTable.TEAutocraftingTable>{
+public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraftingTable.TEAutocraftingTable>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.makeCuboidShape(0, 0, 0, 16, 3, 16),Block.makeCuboidShape(0, 3, 3, 3, 13, 13),
@@ -80,20 +84,20 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			Block.makeCuboidShape(11, 12, 14, 12, 16, 15),Block.makeCuboidShape(4, 12, 14, 5, 16, 15)
 			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	
 	public BlockAutocraftingTable() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).notSolid().variableOpacity().sound(SoundType.METAL), "autocrafting_table", BlockAutocraftingTable.TEAutocraftingTable.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(Utils.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(Utils.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -137,7 +141,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		
 	}
 	
-	public static class TEAutocraftingTable extends ALMManagedSidedMachineBlock<ContainerAutocraftingTable> implements ITickableTileEntity{
+	public static class TEAutocraftingTable extends ManagedSidedMachine<ContainerAutocraftingTable> implements ITickableTileEntity{
 		
 		private static final Integer[] grnSlots = {17, 18, 26, 27};
 		private static final Integer[] magSlots = {19, 20, 28, 29};
@@ -155,7 +159,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		private int changeModelTimer = 0;
 		
 		public TEAutocraftingTable(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 32, Localization.get("gui", "autocrafter_title"), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000));
+			super(tileEntityTypeIn, 32, (TranslationTextComponent) Blocks.CRAFTING_TABLE.getNameTextComponent(), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000));
 		}
 		
 		public TEAutocraftingTable() {
@@ -328,16 +332,16 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 						
 						fept = (float) cost / (float) nTimer;
 						
-						if(changeModelTimer == 0 && !getBlockState().get(Utils.MACHINE_ACTIVE)) {
-							world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, true));
+						if(changeModelTimer == 0 && !getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
 						}
 						changeModelTimer = 15;
 						sendUpdates();
 					}else {
 						fept = 0;
 						if(changeModelTimer == 0) {
-							if(getBlockState().get(Utils.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, false));
+							if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
 								sendUpdates();
 							}
 							
@@ -501,7 +505,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		}
 		
 		public ContainerAutocraftingTable(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TEAutocraftingTable.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEAutocraftingTable.class));
 		}
 		
 		@Override
@@ -720,7 +724,7 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			});
 			
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				this.addButton(bb.x);
+				this.addButton(bb.getFirst());
 			}
 			
 			this.addButton(bSwitch);
@@ -770,9 +774,9 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			
 			if (renderTitles == true) {
-				this.font.drawString(this.title.getFormattedText(), titleTextLoc.x, titleTextLoc.y, 4210752);
-				this.font.drawString(this.playerInventory.getDisplayName().getFormattedText(), invTextLoc.x,
-						invTextLoc.y, 4210752);
+				this.font.drawString(this.title.getFormattedText(), titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
+				this.font.drawString(this.playerInventory.getDisplayName().getFormattedText(), invTextLoc.getFirst(),
+						invTextLoc.getSecond(), 4210752);
 			}
 			
 			int x = (this.width - this.xSize) / 2;
@@ -781,20 +785,20 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			
 			//Render energy TT if sustained upgrade is not installed.
 			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
-				if (mouseX >= x + energyMeterLoc.x && mouseY >= y + energyMeterLoc.y && mouseX <= x + energyMeterLoc.x + 15 && mouseY <= y + energyMeterLoc.y + 51) {
+				if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
 
 					if(Screen.hasShiftDown()) {
 						ArrayList<String> str = new ArrayList<>();
-						str.add(Utils.FORMAT.format(machine.amount) + "/" + Utils.FORMAT.format(machine.properties.getCapacity()) + "FE");
+						str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.getCapacity()) + "FE");
 						if(usesfept) {
 							
 							
-							str.add(Utils.FEPT_FORMAT.format(machine.fept) + " FE/tick");
+							str.add(Formatting.FEPT_FORMAT.format(machine.fept) + " FE/tick");
 						}
 						this.renderTooltip(str,
 								mouseX - x, mouseY - y);
 					}else {
-						this.renderTooltip(Utils.format(machine.amount) + "/" + Utils.format(machine.properties.getCapacity()) + "FE",
+						this.renderTooltip(Formatting.formatToSuffix(machine.amount) + "/" + Formatting.formatToSuffix(machine.properties.getCapacity()) + "FE",
 								mouseX - x, mouseY - y);
 					}
 					
@@ -803,13 +807,13 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 
 			//Render each button upgrade TT.
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (mouseX >= bb.x.x && mouseX <= bb.x.x + bb.x.sizex && mouseY >= bb.x.y && mouseY <= bb.x.y + bb.x.sizey) {
+				if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + bb.getFirst().sizex && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + bb.getFirst().sizey) {
 					
-					if(!(bb.x instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton)bb.x).isEnabledSlot()) {
-						if (bb.y != null) {
-							this.renderTooltip(bb.y.getTextFromSupplier(), mouseX - x, mouseY - y);
+					if(!(bb.getFirst() instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton)bb.getFirst()).isEnabledSlot()) {
+						if (bb.getSecond() != null) {
+							this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 						} else {
-							this.renderTooltip(bb.x.getMessage(), mouseX - x, mouseY - y);
+							this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);
 						}
 					}
 					
@@ -849,14 +853,14 @@ public class BlockAutocraftingTable extends GUIContainingBasicBlock<BlockAutocra
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				
-				if(!(bb.x instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton) bb.x).isEnabledSlot()) {
-					if (bb.y != null && bb.y.supplier.get()) {
+				if(!(bb.getFirst() instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton) bb.getFirst()).isEnabledSlot()) {
+					if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
 						//blit each button's pressed texture, if available.
-						super.blit(bb.x.x, bb.x.y, bb.x.blitx, bb.x.blity, bb.x.sizex, bb.x.sizey);
+						super.blit(bb.getFirst().x, bb.getFirst().y, bb.getFirst().blitx, bb.getFirst().blity, bb.getFirst().sizex, bb.getFirst().sizey);
 					}
 				}else {
 					//if recipe slot is not enabled blit over it to hide.
-					super.blit(bb.x.x, bb.x.y, 54, 17, bb.x.sizex, bb.x.sizey);
+					super.blit(bb.getFirst().x, bb.getFirst().y, 54, 17, bb.getFirst().sizex, bb.getFirst().sizey);
 				}
 				
 

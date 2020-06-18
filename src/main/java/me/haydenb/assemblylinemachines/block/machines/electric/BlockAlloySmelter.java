@@ -3,16 +3,18 @@ package me.haydenb.assemblylinemachines.block.machines.electric;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
-import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMManagedSidedMachineBlock;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.StateProperties;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -40,7 +42,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockAlloySmelter extends GUIContainingBasicBlock<BlockAlloySmelter.TEAlloySmelter>{
+public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.TEAlloySmelter>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.makeCuboidShape(0, 0, 0, 16, 3, 16),Block.makeCuboidShape(0, 13, 0, 16, 16, 16),
@@ -64,19 +66,19 @@ public class BlockAlloySmelter extends GUIContainingBasicBlock<BlockAlloySmelter
 			Block.makeCuboidShape(13, 10, 5, 15, 11, 8),Block.makeCuboidShape(13, 12, 5, 15, 13, 8)
 			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockAlloySmelter() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "alloy_smelter", BlockAlloySmelter.TEAlloySmelter.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(Utils.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(Utils.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -98,7 +100,7 @@ public class BlockAlloySmelter extends GUIContainingBasicBlock<BlockAlloySmelter
 		}
 	}
 	
-	public static class TEAlloySmelter extends ALMManagedSidedMachineBlock<ContainerAlloySmelter> implements ITickableTileEntity{
+	public static class TEAlloySmelter extends ManagedSidedMachine<ContainerAlloySmelter> implements ITickableTileEntity{
 		
 		private int timer = 0;
 		private int nTimer = 20;
@@ -151,12 +153,12 @@ public class BlockAlloySmelter extends GUIContainingBasicBlock<BlockAlloySmelter
 							contents.get(1).shrink(1);
 							contents.get(2).shrink(1);
 							sendUpdates = true;
-							if(!getBlockState().get(Utils.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, true));
+							if(!getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
 							}
 						}else {
-							if(getBlockState().get(Utils.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(Utils.MACHINE_ACTIVE, false));
+							if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
 								sendUpdates = true;
 							}
 						}
@@ -246,18 +248,18 @@ public class BlockAlloySmelter extends GUIContainingBasicBlock<BlockAlloySmelter
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerAlloySmelter(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TEAlloySmelter.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEAlloySmelter.class));
 		}
 		
 		public ContainerAlloySmelter(final int windowId, final PlayerInventory playerInventory, final TEAlloySmelter tileEntity) {
 			super(Registry.getContainerType("alloy_smelter"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 1, 54, 34, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 2, 75, 34, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 3, 149, 21, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 39, tileEntity));
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 57, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 54, 34, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 2, 75, 34, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 3, 149, 21, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 39, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 57, tileEntity));
 		}
 		
 	}

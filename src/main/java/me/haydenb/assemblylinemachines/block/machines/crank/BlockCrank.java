@@ -3,10 +3,10 @@ package me.haydenb.assemblylinemachines.block.machines.crank;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine;
-import me.haydenb.assemblylinemachines.util.Utils;
+import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -61,7 +61,7 @@ public class BlockCrank extends Block {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 
-		return Utils.rotateShape(Direction.EAST, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE);
+		return General.rotateShape(Direction.EAST, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE);
 	}
 
 	@Override
@@ -79,8 +79,8 @@ public class BlockCrank extends Block {
 						if(chance != -1 && RAND.nextInt(chance) == 0) {
 							world.playSound(null, pos, SoundEvents.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 1f, 1f);
 							world.setBlockState(pos, Blocks.AIR.getDefaultState());
-							Utils.spawnItem(new ItemStack(Items.STICK, 2), pos, world);
-							Utils.spawnItem(new ItemStack(Registry.getItem("steel_ingot")), pos, world);
+							General.spawnItem(new ItemStack(Items.STICK, 2), pos, world);
+							General.spawnItem(new ItemStack(Registry.getItem("steel_ingot")), pos, world);
 						}else {
 							world.playSound(null, pos, SoundEvents.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 0.7f, 1f);
 						}

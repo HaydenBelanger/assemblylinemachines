@@ -1,17 +1,18 @@
 package me.haydenb.assemblylinemachines.block.machines.crank;
 
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.util.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineNoExtract;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -41,19 +42,19 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFluidMixer.TESimpleFluidMixer> implements ICrankableBlock{
+public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFluidMixer.TESimpleFluidMixer> implements ICrankableBlock{
 	
 
 	public BlockSimpleFluidMixer() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_fluid_mixer", BlockSimpleFluidMixer.TESimpleFluidMixer.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(FluidProperty.FLUID, Fluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
 
-		builder.add(FluidProperty.FLUID).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.FLUID).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -85,7 +86,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 		return false;
 	}
 	
-	public static class TESimpleFluidMixer extends ALMMachineNoExtract<ContainerSimpleFluidMixer> implements ITickableTileEntity, ICrankableMachine{
+	public static class TESimpleFluidMixer extends SimpleMachine<ContainerSimpleFluidMixer> implements ITickableTileEntity, ICrankableMachine{
 		
 		public IFluidTank tank;
 		public int timer;
@@ -95,7 +96,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 		public float cycles = 0;
 		public ItemStack isa = null;
 		public ItemStack isb = null;
-		public Fluids f = null;
+		public DisplayFluids f = null;
 		public boolean pendingOutput = false;
 		public int cranks;
 		
@@ -148,7 +149,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 											pendingOutput = false;
 											sendupdate = true;
 											end = true;
-											world.setBlockState(pos, getBlockState().with(FluidProperty.FLUID, Fluids.NONE));
+											world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, DisplayFluids.NONE));
 											break;
 										}
 									}
@@ -168,8 +169,8 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 							
 						}
 						
-						if(getBlockState().get(FluidProperty.FLUID) != f && end == false) {
-							world.setBlockState(pos, getBlockState().with(FluidProperty.FLUID, f));
+						if(getBlockState().get(StateProperties.FLUID) != f && end == false) {
+							world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, f));
 							sendupdate = true;
 						}
 						
@@ -257,7 +258,7 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
 			}
 			if(compound.contains("assemblylinemachines:fluid")) {
-				f = Fluids.valueOf(compound.getString("assemblylinemachines:fluid"));
+				f = DisplayFluids.valueOf(compound.getString("assemblylinemachines:fluid"));
 			}
 		}
 		
@@ -282,12 +283,12 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 		public ContainerSimpleFluidMixer(final int windowId, final PlayerInventory playerInventory, final TESimpleFluidMixer tileEntity) {
 			super(Registry.getContainerType("simple_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new Slot(this.tileEntity, 0, INPUT_A_POS.x, INPUT_A_POS.y));
-			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.x, INPUT_B_POS.y));
+			this.addSlot(new Slot(this.tileEntity, 0, INPUT_A_POS.getFirst(), INPUT_A_POS.getSecond()));
+			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.getFirst(), INPUT_B_POS.getSecond()));
 		}
 		
 		public ContainerSimpleFluidMixer(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TESimpleFluidMixer.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TESimpleFluidMixer.class));
 		}
 		
 	}
@@ -310,9 +311,9 @@ public class BlockSimpleFluidMixer extends GUIContainingBasicBlock<BlockSimpleFl
 			int y = (this.height - this.ySize) / 2;
 			if(tsfm.f != null && tsfm.cycles != 0) {
 				int prog = Math.round((tsfm.progress/tsfm.cycles) * 24f);
-				if(tsfm.f == Fluids.LAVA) {
+				if(tsfm.f == DisplayFluids.LAVA) {
 					super.blit(x+71, y+19 + (24 - prog), 200, (24 - prog), 24, prog);
-				}else if(tsfm.f == Fluids.WATER) {
+				}else if(tsfm.f == DisplayFluids.WATER) {
 					super.blit(x+71, y+19 + (24 - prog), 176, (24 - prog), 24, prog);
 				}
 			}

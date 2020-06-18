@@ -6,16 +6,17 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class HashPacketImpl {
@@ -64,7 +65,7 @@ public class HashPacketImpl {
 		}
 		
 		public <T> T get(String key, Class<T> clazz) {
-			return clazz.cast(map.get(key).y);
+			return clazz.cast(map.get(key).getSecond());
 		}
 		
 		public int getMapSize() {
@@ -121,8 +122,8 @@ public class HashPacketImpl {
 			for(String k : t.getKeySet()) {
 				u.writeString(k);
 				Pair<Integer, Object> v = t.get(k);
-				Integer id = v.x;
-				Object data = v.y;
+				Integer id = v.getFirst();
+				Object data = v.getSecond();
 				u.writeInt(id);
 				
 				if(id == 0) {

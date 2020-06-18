@@ -4,12 +4,12 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.item.ToolStirringStick;
-import me.haydenb.assemblylinemachines.item.ToolStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
+import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick;
+import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.FluidProperty;
-import me.haydenb.assemblylinemachines.util.FluidProperty.Fluids;
-import me.haydenb.assemblylinemachines.util.machines.ALMTileEntity;
+import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -58,13 +58,13 @@ public class BlockFluidBath extends Block {
 	public BlockFluidBath() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.WOOD));
-		this.setDefaultState(this.stateContainer.getBaseState().with(FluidProperty.FLUID, Fluids.NONE).with(STATUS, BathStatus.none));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE).with(STATUS, BathStatus.none));
 	}
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
 
-		builder.add(FluidProperty.FLUID).add(STATUS);
+		builder.add(StateProperties.FLUID).add(STATUS);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class BlockFluidBath extends Block {
 
 					if (player.isSneaking()) {
 
-						if (entity.fluid == Fluids.NONE || state.get(FluidProperty.FLUID) == Fluids.NONE) {
+						if (entity.fluid == DisplayFluids.NONE || state.get(StateProperties.FLUID) == DisplayFluids.NONE) {
 							player.sendStatusMessage(new StringTextComponent("The basin is empty."), true);
 						} else {
 							int maxSludge = 2;
@@ -117,7 +117,7 @@ public class BlockFluidBath extends Block {
 							if(entity.inputb != null) {
 								maxSludge = maxSludge + 2;
 							}
-							entity.fluid = Fluids.NONE;
+							entity.fluid = DisplayFluids.NONE;
 							entity.stirsRemaining = -1;
 							entity.output = null;
 							entity.inputa = null;
@@ -125,7 +125,7 @@ public class BlockFluidBath extends Block {
 							entity.inputb = null;
 							entity.sendUpdates();
 							world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1f, 1f);
-							world.setBlockState(pos, state.with(FluidProperty.FLUID, Fluids.NONE).with(STATUS, BathStatus.none));
+							world.setBlockState(pos, state.with(StateProperties.FLUID, DisplayFluids.NONE).with(STATUS, BathStatus.none));
 							player.sendStatusMessage(new StringTextComponent("Drained basin."), true);
 							
 							ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), RAND.nextInt(maxSludge)));
@@ -133,15 +133,15 @@ public class BlockFluidBath extends Block {
 
 					} else {
 						ItemStack held = player.getHeldItemMainhand();
-						if (entity.fluid == Fluids.NONE || state.get(FluidProperty.FLUID) == Fluids.NONE) {
+						if (entity.fluid == DisplayFluids.NONE || state.get(StateProperties.FLUID) == DisplayFluids.NONE) {
 							if (held.getItem() == Items.LAVA_BUCKET || held.getItem() == Items.WATER_BUCKET) {
-								Fluids f;
+								DisplayFluids f;
 								if (held.getItem() == Items.LAVA_BUCKET) {
-									f = Fluids.LAVA;
+									f = DisplayFluids.LAVA;
 									world.playSound(null, pos, SoundEvents.ITEM_BUCKET_FILL_LAVA, SoundCategory.BLOCKS,
 											1f, 1f);
 								} else {
-									f = Fluids.WATER;
+									f = DisplayFluids.WATER;
 									world.playSound(null, pos, SoundEvents.ITEM_BUCKET_FILL, SoundCategory.BLOCKS, 1f,
 											1f);
 								}
@@ -149,7 +149,7 @@ public class BlockFluidBath extends Block {
 									ItemHandlerHelper.giveItemToPlayer(player, held.getContainerItem());
 									held.shrink(1);
 								}
-								world.setBlockState(pos, state.with(FluidProperty.FLUID, f));
+								world.setBlockState(pos, state.with(StateProperties.FLUID, f));
 								entity.fluid = f;
 								entity.sendUpdates();
 								player.sendStatusMessage(new StringTextComponent("Filled basin."), true);
@@ -197,7 +197,7 @@ public class BlockFluidBath extends Block {
 								if (entity.output != null) {
 									if (entity.stirsRemaining <= 0) {
 										ItemHandlerHelper.giveItemToPlayer(player, entity.output);
-										entity.fluid = Fluids.NONE;
+										entity.fluid = DisplayFluids.NONE;
 										entity.stirsRemaining = -1;
 										entity.fluidColor = 0;
 										entity.output = null;
@@ -206,14 +206,14 @@ public class BlockFluidBath extends Block {
 										entity.sendUpdates();
 										world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS,
 												1f, 1f);
-										world.setBlockState(pos, state.with(FluidProperty.FLUID, Fluids.NONE).with(STATUS, BathStatus.none));
+										world.setBlockState(pos, state.with(StateProperties.FLUID, DisplayFluids.NONE).with(STATUS, BathStatus.none));
 									} else {
 
-										if(!(held.getItem() instanceof ToolStirringStick)) {
+										if(!(held.getItem() instanceof ItemStirringStick)) {
 											player.sendStatusMessage(new StringTextComponent("Use a Stirring Stick to mix."), true);
 										}else {
-											ToolStirringStick tss = (ToolStirringStick) held.getItem();
-											if(entity.fluid == Fluids.LAVA && tss.getStirringResistance() == TemperatureResistance.COLD) {
+											ItemStirringStick tss = (ItemStirringStick) held.getItem();
+											if(entity.fluid == DisplayFluids.LAVA && tss.getStirringResistance() == TemperatureResistance.COLD) {
 												player.sendStatusMessage(new StringTextComponent("You need a metal Stirring Stick to stir Lava."), true);
 											}else {
 												tss.useStirStick(held);
@@ -241,10 +241,10 @@ public class BlockFluidBath extends Block {
 
 	}
 
-	public static class TEFluidBath extends ALMTileEntity implements IInventory {
+	public static class TEFluidBath extends BasicTileEntity implements IInventory {
 
 		private int stirsRemaining = -1;
-		private Fluids fluid = Fluids.NONE;
+		private DisplayFluids fluid = DisplayFluids.NONE;
 		private ItemStack inputa = null;
 		private ItemStack inputb = null;
 		private ItemStack output = null;
@@ -266,7 +266,7 @@ public class BlockFluidBath extends Block {
 				stirsRemaining = compound.getInt("assemblylinemachines:stirs");
 			}
 			if (compound.contains("assemblylinemachines:fluid")) {
-				fluid = Fluids.valueOf(compound.getString("assemblylinemachines:fluid"));
+				fluid = DisplayFluids.valueOf(compound.getString("assemblylinemachines:fluid"));
 			}
 			if(compound.contains("assemblylinemachines:fluidcolor")) {
 				fluidColor = compound.getInt("assemblylinemachines:fluidcolor");

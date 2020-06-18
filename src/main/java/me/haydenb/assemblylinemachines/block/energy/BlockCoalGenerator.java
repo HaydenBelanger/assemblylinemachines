@@ -1,18 +1,18 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Pair;
+
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TEContainingBlock.GUIContainingBasicBlock;
-import me.haydenb.assemblylinemachines.util.Utils;
-import me.haydenb.assemblylinemachines.util.Utils.Localization;
-import me.haydenb.assemblylinemachines.util.Utils.Pair;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.ALMMachineEnergyBased.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine;
-import me.haydenb.assemblylinemachines.util.machines.AbstractALMMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -40,7 +40,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
 
-public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerator.TECoalGenerator>{
+public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator.TECoalGenerator>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.makeCuboidShape(0, 9, 3, 2, 16, 13),
@@ -50,11 +50,9 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 			Block.makeCuboidShape(2, 9, 2, 14, 16, 14)
 			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	
-	private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###");
+	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	
 	public BlockCoalGenerator() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(3f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), 
@@ -88,7 +86,7 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 	}
 	
 	
-	public static class TECoalGenerator extends ALMMachineEnergyBased<ContainerCoalGenerator> implements ITickableTileEntity{
+	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ITickableTileEntity{
 
 		
 		private int initGen = 0;
@@ -187,12 +185,12 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 		public ContainerCoalGenerator(final int windowId, final PlayerInventory playerInventory, final TECoalGenerator tileEntity) {
 			super(Registry.getContainerType("coal_generator"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
 			
-			this.addSlot(new AbstractALMMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.x, UPGRADE_POS.y, tileEntity));
+			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.getFirst(), UPGRADE_POS.getSecond(), tileEntity));
 		}
 		
 		
 		public ContainerCoalGenerator(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, Utils.getTileEntity(playerInventory, data, TECoalGenerator.class));
+			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TECoalGenerator.class));
 		}
 	}
 	
@@ -213,8 +211,8 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 			int y = (this.height - this.ySize) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
 				List<String> tt = getTooltipFromItem(stack);
-				tt.add(1, "§e" + FORMAT.format(ForgeHooks.getBurnTime(stack) * 10) + " " + Localization.FE_TOTAL.getFormattedText());
-				tt.add(1, "§a15 " + Localization.FEPT.getFormattedText());
+				tt.add(1, "§e" + Formatting.GENERAL_FORMAT.format(ForgeHooks.getBurnTime(stack) * 10) + " FE Total");
+				tt.add(1, "§a15 FE/t");
 				this.renderTooltip(tt, mouseX, mouseY);
 				return;
 			}
@@ -234,9 +232,9 @@ public class BlockCoalGenerator extends GUIContainingBasicBlock<BlockCoalGenerat
 			}
 			
 			if(tsfm.remGen == 0) {
-				this.drawCenteredString(this.font, "0" + Localization.PERTICK.getFormattedText(), x+111, y+38, 0xffffff);
+				this.drawCenteredString(this.font, "0/t", x+111, y+38, 0xffffff);
 			}else {
-				this.drawCenteredString(this.font, "+15" + Localization.PERTICK.getFormattedText(), x+111, y+38, 0x76f597);
+				this.drawCenteredString(this.font, "+15/t", x+111, y+38, 0x76f597);
 			}
 			
 			

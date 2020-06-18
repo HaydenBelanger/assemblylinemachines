@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "assemblylinemachines:oil",
+    "assemblylinemachines:oil_flowing",
+	"assemblylinemachines:condensed_void",
+	"assemblylinemachines:condensed_void_flowing"
+  ]
+}
