@@ -8,21 +8,23 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 
 public class ItemDowsingRod extends ItemBasicFormattedName {
 
 	
 	public ItemDowsingRod() {
-		super(TextFormatting.LIGHT_PURPLE);
+		super(TextFormatting.DARK_PURPLE);
 	}
 	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 		
 		
-		if(!context.getWorld().isRemote) {
-			FluidStack fs = FluidLevelManager.getOrCreateFluidStack(context.getPos(), context.getWorld());
+		World world = context.getWorld();
+		if(!world.isRemote) {
+			FluidStack fs = FluidLevelManager.getOrCreateFluidStack(context.getPos(), world);
 			if(fs != FluidStack.EMPTY && fs.getFluid() != Fluids.EMPTY) {
 				context.getPlayer().sendStatusMessage(new StringTextComponent("There is " + Formatting.GENERAL_FORMAT.format(fs.getAmount()) + " mB of " + fs.getDisplayName().getFormattedText() + " in this chunk.").applyTextStyle(TextFormatting.GOLD), true);
 			}else {

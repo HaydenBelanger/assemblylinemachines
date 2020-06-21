@@ -3,11 +3,13 @@ package me.haydenb.assemblylinemachines.registry.plugins.jei;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
+import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.AlloyingRecipeCategory;
 import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.FluidBathRecipeCategory;
+import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.FluidGroundCategory;
 import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.GrinderRecipeCategory;
 import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.PurifierRecipeCategory;
 import mezz.jei.api.IModPlugin;
@@ -25,6 +27,7 @@ public class ALMJEI implements IModPlugin{
 	private FluidBathRecipeCategory bathCategory;
 	private PurifierRecipeCategory purifierCategory;
 	private AlloyingRecipeCategory alloyingCategory;
+	private FluidGroundCategory groundCategory;
 	
 	@Override
 	public ResourceLocation getPluginUid() {
@@ -40,8 +43,9 @@ public class ALMJEI implements IModPlugin{
 			bathCategory = new FluidBathRecipeCategory(guiHelper);
 			purifierCategory = new PurifierRecipeCategory(guiHelper);
 			alloyingCategory = new AlloyingRecipeCategory(guiHelper);
+			groundCategory = new FluidGroundCategory(guiHelper);
 			
-			registration.addRecipeCategories(grinderCategory, bathCategory, purifierCategory, alloyingCategory);
+			registration.addRecipeCategories(grinderCategory, bathCategory, purifierCategory, alloyingCategory, groundCategory);
 		}
 		
 		
@@ -54,6 +58,7 @@ public class ALMJEI implements IModPlugin{
 			registration.addRecipes(JEIHelper.getRecipes(BathCrafting.BATH_RECIPE), bathCategory.getUid());
 			registration.addRecipes(JEIHelper.getRecipes(PurifierCrafting.PURIFIER_RECIPE), purifierCategory.getUid());
 			registration.addRecipes(JEIHelper.getRecipes(AlloyingCrafting.ALLOYING_RECIPE), alloyingCategory.getUid());
+			registration.addRecipes(JEIHelper.getRecipes(FluidInGroundRecipe.FIG_RECIPE), groundCategory.getUid());
 		}
 	}
 

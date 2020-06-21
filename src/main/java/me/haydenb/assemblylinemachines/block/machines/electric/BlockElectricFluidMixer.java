@@ -21,7 +21,7 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
+import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -87,7 +87,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 	public BlockElectricFluidMixer() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "electric_fluid_mixer", BlockElectricFluidMixer.TEElectricFluidMixer.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -140,7 +140,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		private float progress = 0;
 		private float cycles = 0;
 		private ItemStack output = null;
-		private DisplayFluids inProgress = DisplayFluids.NONE;
+		private BathCraftingFluids inProgress = BathCraftingFluids.NONE;
 		private FluidStack fluid = FluidStack.EMPTY;
 		
 		protected IFluidHandler fluids = new MixerHandler();
@@ -205,7 +205,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 						BathCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
 							if(fluid.getAmount() >= 1000) {
-								DisplayFluids ff = DisplayFluids.getAssocFluids(fluid.getFluid());
+								BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(fluid.getFluid());
 								if(ff == recipe.getFluid()) {
 									output = recipe.getRecipeOutput().copy();
 									cycles = ((float) recipe.getStirs() * 3.6F);
@@ -236,8 +236,8 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 							
 							
 						}else {
-							if(getBlockState().get(StateProperties.FLUID) != DisplayFluids.NONE) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, DisplayFluids.NONE));
+							if(getBlockState().get(StateProperties.FLUID) != BathCraftingFluids.NONE) {
+								world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, BathCraftingFluids.NONE));
 								sendUpdates = true;
 							}
 						}
@@ -254,7 +254,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 										contents.get(0).grow(output.getCount());
 									}
 									output = null;
-									inProgress = DisplayFluids.NONE;
+									inProgress = BathCraftingFluids.NONE;
 									cycles = 0;
 									progress = 0;
 									sendUpdates = true;
@@ -295,7 +295,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 				nTimer = compound.getInt("assemblylinemachines:ntimer");
 			}
 			if(compound.contains("assemblylinemachines:inprogress")) {
-				inProgress = DisplayFluids.valueOf(compound.getString("assemblylinemachines:inprogress"));
+				inProgress = BathCraftingFluids.valueOf(compound.getString("assemblylinemachines:inprogress"));
 			}
 			cycles = compound.getFloat("assemblylinemachines:cycles");
 			progress = compound.getFloat("assemblylinemachines:progress");
@@ -348,8 +348,9 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				DisplayFluids ff = DisplayFluids.getAssocFluids(stack.getFluid());
-				return ff != DisplayFluids.NONE;
+				BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(stack.getFluid());
+				
+				return ff != BathCraftingFluids.NONE;
 			}
 			
 			@Override
@@ -375,8 +376,8 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 					}
 				}
 				
-				DisplayFluids ff = DisplayFluids.getAssocFluids(resource.getFluid());
-				if(ff == DisplayFluids.NONE) {
+				BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(resource.getFluid());
+				if(ff == BathCraftingFluids.NONE) {
 					return 0;
 				}
 				
@@ -457,7 +458,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(tsfm.fluid.getFluid().getAttributes().getStillTexture());
 				}
 				
-				if(tsfm.fluid.getFluid() == DisplayFluids.WATER.getAssocFluid()) {
+				if(tsfm.fluid.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
 					RenderSystem.color4f(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
@@ -475,7 +476,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 15f);
 			
 			int cover = 52;
-			if(tsfm.inProgress == DisplayFluids.LAVA) {
+			if(tsfm.inProgress == BathCraftingFluids.LAVA) {
 				cover = 68;
 			}
 			
@@ -495,8 +496,8 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 			
 			if (mouseX >= x + 41 && mouseY >= y + 23 && mouseX <= x + 48 && mouseY <= y + 59) {
 				ArrayList<String> str = new ArrayList<>();
-				DisplayFluids ff = DisplayFluids.getAssocFluids(tsfm.fluid.getFluid());
-				if(ff == DisplayFluids.NONE) {
+				BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(tsfm.fluid.getFluid());
+				if(ff == BathCraftingFluids.NONE) {
 					this.renderTooltip("None",
 							mouseX - x, mouseY - y);
 				}else {

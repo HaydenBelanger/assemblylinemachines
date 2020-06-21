@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "minecraft:water",
+	"chance": 12,
+	"min": 250,
+	"max": 1500,
+	"criteria_set": "OVERWORLD_PREFCOLD"
+}

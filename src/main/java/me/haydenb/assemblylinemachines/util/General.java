@@ -53,4 +53,8 @@ public class General {
 		world.addEntity(ent);
 	}
 	
+	
+	public static interface IPoweredTool{
+		public int getMaxPower();
+	}
 }

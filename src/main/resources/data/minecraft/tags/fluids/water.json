@@ -4,6 +4,10 @@
     "assemblylinemachines:oil",
     "assemblylinemachines:oil_flowing",
 	"assemblylinemachines:condensed_void",
-	"assemblylinemachines:condensed_void_flowing"
+	"assemblylinemachines:condensed_void_flowing",
+	"assemblylinemachines:diesel",
+	"assemblylinemachines:diesel_flowing",
+	"assemblylinemachines:gasoline",
+	"assemblylinemachines:gasoline_flowing"
   ]
 }

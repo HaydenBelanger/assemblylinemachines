@@ -12,7 +12,7 @@ import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
+import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
@@ -48,7 +48,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 	public BlockSimpleFluidMixer() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_fluid_mixer", BlockSimpleFluidMixer.TESimpleFluidMixer.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 		public float cycles = 0;
 		public ItemStack isa = null;
 		public ItemStack isb = null;
-		public DisplayFluids f = null;
+		public BathCraftingFluids f = null;
 		public boolean pendingOutput = false;
 		public int cranks;
 		
@@ -149,7 +149,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 											pendingOutput = false;
 											sendupdate = true;
 											end = true;
-											world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, DisplayFluids.NONE));
+											world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, BathCraftingFluids.NONE));
 											break;
 										}
 									}
@@ -200,7 +200,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 								isb = contents.get(1);
 								check = false;
 								BathCrafting crafting = world.getRecipeManager().getRecipe(BathCrafting.BATH_RECIPE, this, world).orElse(null);
-								if(crafting != null) {
+								if(crafting != null && crafting.getFluid().isElectricMixerOnly() == false) {
 									if(crafting.getFluid().getAssocFluid() == tank.getFluid().getFluid() && tank.drain(1000, FluidAction.SIMULATE).getAmount() == 1000) {
 										tank.drain(1000, FluidAction.EXECUTE);
 										isa.shrink(1);
@@ -258,7 +258,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
 			}
 			if(compound.contains("assemblylinemachines:fluid")) {
-				f = DisplayFluids.valueOf(compound.getString("assemblylinemachines:fluid"));
+				f = BathCraftingFluids.valueOf(compound.getString("assemblylinemachines:fluid"));
 			}
 		}
 		
@@ -311,9 +311,9 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 			int y = (this.height - this.ySize) / 2;
 			if(tsfm.f != null && tsfm.cycles != 0) {
 				int prog = Math.round((tsfm.progress/tsfm.cycles) * 24f);
-				if(tsfm.f == DisplayFluids.LAVA) {
+				if(tsfm.f == BathCraftingFluids.LAVA) {
 					super.blit(x+71, y+19 + (24 - prog), 200, (24 - prog), 24, prog);
-				}else if(tsfm.f == DisplayFluids.WATER) {
+				}else if(tsfm.f == BathCraftingFluids.WATER) {
 					super.blit(x+71, y+19 + (24 - prog), 176, (24 - prog), 24, prog);
 				}
 			}

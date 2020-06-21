@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "assemblylinemachines:oil",
+	"chance": 3,
+	"min": 50,
+	"max": 500,
+	"criteria_set": "OVERWORLD_ANY"
+}

@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "assemblylinemachines:naphtha",
+	"chance": 2,
+	"min": 75,
+	"max": 400,
+	"criteria_set": "NETHER"
+}

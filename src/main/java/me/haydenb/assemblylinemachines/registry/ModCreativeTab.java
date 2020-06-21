@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModCreativeTab extends ItemGroup {
@@ -21,12 +22,11 @@ public class ModCreativeTab extends ItemGroup {
 
 	@Override
 	public ItemStack createIcon() {
-		return new ItemStack(Registry.getItem("titanium_ingot"));
+		return new ItemStack(Registry.getItem("steel_gear"));
 	}
 	
 	@Override
 	public void fill(NonNullList<ItemStack> items) {
-		
 		TreeSet<Item> data = new TreeSet<>(new Comparator<Item>() {
 
 			@Override
@@ -51,4 +51,13 @@ public class ModCreativeTab extends ItemGroup {
 		}
 	}
 	
+	@Override
+	public ResourceLocation getBackgroundImage() {
+		return new ResourceLocation("assemblylinemachines", "textures/gui/creative/page.png");
+	}
+	
+	@Override
+	public ResourceLocation getTabsImage() {
+		return new ResourceLocation("assemblylinemachines", "textures/gui/creative/tabs.png");
+	}
 }

@@ -6,7 +6,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.plugins.jei.JEIHelper;
-import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
+import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -59,7 +59,7 @@ public class FluidBathRecipeCategory implements IRecipeCategory<BathCrafting> {
 	
 	@Override
 	public void draw(BathCrafting recipe, double mouseX, double mouseY) {
-		if(recipe.getFluid() == DisplayFluids.LAVA) {
+		if(recipe.getFluid() == BathCraftingFluids.LAVA) {
 			progbarlava.draw(9, 20);
 		}else {
 			progbarwater.draw(9, 20);

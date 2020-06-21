@@ -1,0 +1,11 @@
+{
+	"replace": false,
+	"values":[
+		"assemblylinemachines:naphtha_fire",
+		"minecraft:torch",
+		"minecraft:fire",
+		"assemblylinemachines:naphtha_block",
+		"minecraft:campfire",
+		"minecraft:lava"
+	]
+}

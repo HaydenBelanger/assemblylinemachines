@@ -34,6 +34,8 @@ import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha;
 import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidOil;
 import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct;
+import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct.FluidOilProductBlock;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockCrank;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.ContainerGearbox;
@@ -73,6 +75,11 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPuri
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.ContainerElectricPurifier;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.ScreenElectricPurifier;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.TEElectricPurifier;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockToolCharger;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockToolCharger.TEToolCharger;
+import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump;
+import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
+import me.haydenb.assemblylinemachines.block.machines.oil.BlockPumpshaft;
 import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
@@ -82,22 +89,26 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
+import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.item.categories.ItemBasicFormattedName;
+import me.haydenb.assemblylinemachines.item.categories.ItemBlockFormattedName;
 import me.haydenb.assemblylinemachines.item.categories.ItemCrankTool;
 import me.haydenb.assemblylinemachines.item.categories.ItemGearboxBasicFuel;
 import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.item.categories.ItemHammer;
+import me.haydenb.assemblylinemachines.item.categories.ItemMystiumTool;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.item.items.ItemDowsingRod;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.rendering.TankTER;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
+import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
@@ -152,6 +163,7 @@ import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
@@ -215,6 +227,7 @@ public class Registry {
 		createItem("iron_plate");
 		createItem("gold_plate");
 		createItem("titanium_plate");
+		createItem("mystium_plate", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
 		
 		createItem("gold_gear");
 		createItem("steel_gear");
@@ -264,6 +277,14 @@ public class Registry {
 		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
 		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, HoeItem.class));
 		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
+		
+		
+		createItem("mystium_sword", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, 3, -1.2f, new Item.Properties().group(creativeTab), 100000, SwordItem.class));
+		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 300000, AxeItem.class));
+		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 600000, PickaxeItem.class));
+		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 300000, ShovelItem.class));
+		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, -999, -0.5f, new Item.Properties().group(creativeTab), 90000, HoeItem.class));
+		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2500000, ItemHammer.class));
 		
 		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
 		createItem("steel_sword", new SwordItem(ItemTiers.STEEL, 2, -1.9f, new Item.Properties().group(creativeTab)));
@@ -339,13 +360,28 @@ public class Registry {
 		
 		createBlock("autocrafting_table", new BlockAutocraftingTable());
 		
-		createBlockNoTab("naphtha_fire", new BlockNaphthaFire());
+		createBlockNoItem("naphtha_fire", new BlockNaphthaFire());
+		createItem("naphtha_fire", new BlockItem(Registry.getBlock("naphtha_fire"), new Item.Properties()));
 		
+		createBlock("pump", new BlockPump());
+		createBlock("pumpshaft", new BlockPumpshaft());
+		
+		createBlockNoItem("mystium_block", Material.IRON, 11f, 80f, 3, ToolType.PICKAXE, SoundType.METAL);
+		createItem("mystium_block", new ItemBlockFormattedName(Registry.getBlock("mystium_block"), TextFormatting.LIGHT_PURPLE));
+		
+		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT));
+		
+		createBlock("tool_charger", new BlockToolCharger());
 		
 		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
 		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(), getBucketItem("condensed_void"));
 		createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(), getBucketItem("naphtha"));
+		
+		createFluid("gasoline", new FluidOilProduct(getFluidProperties("gasoline", getFluidAttributes("gasoline").temperature(200)), true), new FluidOilProduct(getFluidProperties("gasoline", 
+				getFluidAttributes("gasoline").temperature(200)), false), new FluidOilProductBlock(() -> (FlowingFluid)Registry.getFluid("gasoline")), getBucketItem("gasoline"));
+		createFluid("diesel", new FluidOilProduct(getFluidProperties("diesel", getFluidAttributes("diesel").temperature(200)), true), new FluidOilProduct(getFluidProperties("diesel", 
+				getFluidAttributes("diesel").temperature(200)), false), new FluidOilProductBlock(() -> (FlowingFluid)Registry.getFluid("diesel")), getBucketItem("diesel"));
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
@@ -368,7 +404,7 @@ public class Registry {
 		
 		createTileEntity("gearbox", TEGearbox.class);
 		
-		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"));
+		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"), blockRegistry.get("mystium_fluid_tank"));
 		
 		createTileEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
 		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"));
@@ -385,6 +421,8 @@ public class Registry {
 		createTileEntity("alloy_smelter", TEAlloySmelter.class);
 		
 		createTileEntity("autocrafting_table", TEAutocraftingTable.class);
+		createTileEntity("pump", TEPump.class);
+		createTileEntity("tool_charger", TEToolCharger.class);
 		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
@@ -412,16 +450,23 @@ public class Registry {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
 		RenderTypeLookup.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("autocrafting_table"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("naphtha_fire"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getFluid("naphtha"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("naphtha_flowing"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("diesel"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("diesel_flowing"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("gasoline"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("gasoline_flowing"), RenderType.getTranslucent());
 		
+		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEFluidTank>)getTileEntity("fluid_tank"), TankTER::new);
 		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
 		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
@@ -453,6 +498,9 @@ public class Registry {
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(AlloyingCrafting.ALLOYING_RECIPE.toString()), AlloyingCrafting.ALLOYING_RECIPE);
 		event.getRegistry().register(AlloyingCrafting.SERIALIZER.setRegistryName("alloying"));
 		
+		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(FluidInGroundRecipe.FIG_RECIPE.toString()), FluidInGroundRecipe.FIG_RECIPE);
+		event.getRegistry().register(FluidInGroundRecipe.SERIALIZER.setRegistryName("fluid_in_ground"));
+		
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -482,7 +530,7 @@ public class Registry {
 					}
 					
 					
-					if(state.get(StateProperties.FLUID) == DisplayFluids.LAVA) {
+					if(state.get(StateProperties.FLUID) == BathCraftingFluids.LAVA) {
 						return 0xcb3d07;
 					}else {
 						return BiomeColors.getWaterColor(reader, pos);
@@ -491,7 +539,7 @@ public class Registry {
 				
 				return 0;
 			}
-		}, getBlock("fluid_bath"), getBlock("steel_fluid_tank"), getBlock("wooden_fluid_tank"));
+		}, getBlock("fluid_bath"));
 	}
 	
 	@SubscribeEvent
@@ -549,10 +597,20 @@ public class Registry {
 		createItem(name, new BlockItem(block, new Item.Properties().group(creativeTab)));
 	}
 	
-	private static void createBlockNoTab(String name, Block block) {
+	private static void createBlockNoItem(String name, Material material, float hardness, float resistance, int harvestLevel, ToolType toolType, SoundType sound) {
+		Block.Properties properties = Block.Properties.create(material).hardnessAndResistance(hardness, resistance).harvestLevel(harvestLevel).harvestTool(toolType).sound(sound);
+		createBlockNoItem(name, properties);
+		
+	}
+	
+	private static void createBlockNoItem(String name, Block.Properties properties) {
+		Block b = new Block(properties);
+		createBlockNoItem(name, b);
+	}
+	
+	private static void createBlockNoItem(String name, Block block) {
 		block.setRegistryName(name);
 		blockRegistry.put(name, block);
-		createItem(name, new BlockItem(block, new Item.Properties()));
 	}
 	
 	public static Block getBlock(String name) {
@@ -629,6 +687,7 @@ public class Registry {
 		return teRegistry.get(name);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static <T extends TileEntity> void createTileEntity(String name, Class<T> clazz, Block... blocks){
 		teRegistry.put(name, TileEntityType.Builder.create(() -> {
 			T inst;

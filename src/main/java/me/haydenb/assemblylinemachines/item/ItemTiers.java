@@ -21,7 +21,8 @@ public enum ItemTiers implements IItemTier, IArmorMaterial {
 	
 	TITANIUM(6f, 7f, 20, 3, 2200, 153, new int[] {8, 11, 10, 7}, "titanium", 1.7f, ()->{return Ingredient.fromItems(Registry.getItem("titanium_ingot"));}),
 	STEEL(8f, 15f, 0, 3, 1100, 98, new int[] {11, 15, 12, 9}, "steel", 2.4f, ()->{return Ingredient.fromItems(Registry.getItem("steel_ingot"));}),
-	CRANK(10f, 22f, 35, 3, 50, 0, new int[] {0, 0, 0, 0}, "", 0f,  ()->{return Ingredient.fromTag(ItemTags.getCollection().get(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));});
+	CRANK(10f, 22f, 35, 3, 50, 0, new int[] {0, 0, 0, 0}, "", 0f,  ()->{return Ingredient.fromTag(ItemTags.getCollection().get(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
+	MYSTIUM(14f, 24f, 60, 3, 125, 0, new int[] {0, 0, 0, 0}, "", 0f,  ()->{return Ingredient.fromItems(Registry.getItem("mystium_ingot"));});
 	
 	private static final int[] ARMOR_DURABILITY_OFFSET = new int[] {4, 8, 7, 5};
 	private float attack;

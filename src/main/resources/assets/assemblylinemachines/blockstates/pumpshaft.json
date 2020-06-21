@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "active=false": { "model": "assemblylinemachines:block/pump/shaft" },
+		"active=true": { "model": "assemblylinemachines:block/pump/shaft_active" }
+    }
+}

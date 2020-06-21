@@ -18,7 +18,8 @@ public class JEIHelper {
 	
 	public static <C extends IInventory, T extends IRecipe<C>> List<T> getRecipes(IRecipeType<T> recipe){
 		
-		ClientWorld world = Minecraft.getInstance().world;
+		Minecraft mc = Minecraft.getInstance();
+		ClientWorld world = mc.world;
 		RecipeManager rm = world.getRecipeManager();
 		return rm.getRecipes(recipe, null, world);
 	}

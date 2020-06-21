@@ -6,8 +6,7 @@ import java.util.stream.Stream;
 import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank.FluidTankHandler;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.DisplayFluids;
+import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -17,7 +16,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
@@ -45,42 +43,28 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BlockFluidTank extends Block {
 
-	private static final VoxelShape SHAPE = Stream.of(Block.makeCuboidShape(0, 0, 0, 16, 1, 16),
-			Block.makeCuboidShape(0, 1, 15, 1, 15, 16), Block.makeCuboidShape(15, 1, 15, 16, 15, 16),
-			Block.makeCuboidShape(0, 1, 0, 1, 15, 1), Block.makeCuboidShape(15, 1, 0, 16, 15, 1),
-			Block.makeCuboidShape(0, 15, 0, 16, 16, 16), Block.makeCuboidShape(1, 1, 0, 15, 15, 1),
-			Block.makeCuboidShape(1, 1, 15, 15, 15, 16), Block.makeCuboidShape(1, 1, 1, 15, 15, 15),
-			Block.makeCuboidShape(0, 1, 1, 1, 15, 15), Block.makeCuboidShape(15, 1, 1, 16, 15, 15)).reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
-			}).get();
-
 	private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###");
 
+	private static final VoxelShape SHAPE = Stream.of(
+			Block.makeCuboidShape(0, 0, 0, 16, 1, 16),
+			Block.makeCuboidShape(0, 1, 15, 1, 15, 16),
+			Block.makeCuboidShape(15, 1, 15, 16, 15, 16),
+			Block.makeCuboidShape(0, 1, 0, 1, 15, 1),
+			Block.makeCuboidShape(15, 1, 0, 16, 15, 1),
+			Block.makeCuboidShape(0, 15, 0, 16, 16, 16),
+			Block.makeCuboidShape(1, 1, 0, 15, 15, 1),
+			Block.makeCuboidShape(1, 1, 15, 15, 15, 16),
+			Block.makeCuboidShape(0, 1, 1, 1, 15, 15),
+			Block.makeCuboidShape(15, 1, 1, 16, 15, 15)
+			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
 	private final int _capacity;
 	private final TemperatureResistance _tempres;
 
 	public BlockFluidTank(int capacity, TemperatureResistance resist) {
 		super(Block.Properties.create(Material.GLASS).notSolid().hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.GLASS));
+				.harvestTool(ToolType.PICKAXE).sound(SoundType.GLASS).variableOpacity());
 		_capacity = capacity;
 		_tempres = resist;
-
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, DisplayFluids.NONE));
-	}
-
-	@Override
-	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		return false;
-	}
-
-	@Override
-	public boolean isVariableOpacity() {
-		return true;
-	}
-
-	@Override
-	public boolean isTransparent(BlockState state) {
-		return true;
 	}
 
 	@Override
@@ -91,25 +75,23 @@ public class BlockFluidTank extends Block {
 			}
 		}
 	}
-
+	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-
-		builder.add(StateProperties.FLUID);
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return SHAPE;
 	}
-
+	
+	@Override
+	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return false;
+	}
+	
 	@Override
 	public boolean hasTileEntity(BlockState state) {
 		if (state.getBlock() == this) {
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-
-		return SHAPE;
 	}
 
 	@Override
@@ -132,13 +114,12 @@ public class BlockFluidTank extends Block {
 					if (handler != null) {
 						if (player.isSneaking()) {
 							FluidStack f = handler.getFluidInTank(0);
-							DisplayFluids ff = DisplayFluids.getAssocFluids(f.getFluid());
-							if (ff.equals(DisplayFluids.NONE)) {
+							if (f.isEmpty() || f.getAmount() == 0) {
 								player.sendStatusMessage(new StringTextComponent("This tank is empty."), true);
 							} else {
 								player.sendStatusMessage(
 										new StringTextComponent(FORMAT.format(f.getAmount()) + "/"
-												+ FORMAT.format(handler.getTankCapacity(0)) + " mB " + ff.getFriendlyName()),
+												+ FORMAT.format(handler.getTankCapacity(0)) + " mB " + f.getFluid().getAttributes().getDisplayName(f).getFormattedText()),
 										true);
 							}
 						} else {
@@ -154,7 +135,8 @@ public class BlockFluidTank extends Block {
 								
 								
 							}else {
-								if(handler.fill(FluidUtil.getFluidContained(is).orElse(FluidStack.EMPTY), FluidAction.SIMULATE, player) == 1000) {
+								
+								if(FluidUtil.getFluidContained(is).isPresent() && handler.fill(FluidUtil.getFluidContained(is).orElse(FluidStack.EMPTY), FluidAction.SIMULATE, player) == 1000) {
 									FluidActionResult far = FluidUtil.tryEmptyContainer(is, handler, 1000, player, true);
 									if(far.isSuccess()) {
 										is.shrink(1);
@@ -256,8 +238,8 @@ public class BlockFluidTank extends Block {
 			}
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				DisplayFluids ff = DisplayFluids.getAssocFluids(stack.getFluid());
-				if(ff != DisplayFluids.NONE) {
+				BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(stack.getFluid());
+				if(ff != BathCraftingFluids.NONE) {
 					return true;
 				}
 				return false;
@@ -286,12 +268,6 @@ public class BlockFluidTank extends Block {
 					}
 				}
 				
-				DisplayFluids ff = DisplayFluids.getAssocFluids(resource.getFluid());
-				if(ff == DisplayFluids.NONE) {
-					sendIfNotNull(player, "This tank cannot store this fluid.");
-					return 0;
-				}
-				
 				if (resource.getFluid().getAttributes().getTemperature() >= 800 && te.trs == TemperatureResistance.COLD) {
 					sendIfNotNull(player, "This fluid is too hot for this tank");
 					return 0;
@@ -307,10 +283,6 @@ public class BlockFluidTank extends Block {
 						te.fluid = resource;
 					} else {
 						te.fluid.setAmount(te.fluid.getAmount() + attemptedInsert);
-					}
-					if (attemptedInsert != 0 && te.getBlockState().get(StateProperties.FLUID) != ff) {
-						te.world.setBlockState(te.pos, te.getBlockState().with(StateProperties.FLUID, ff));
-						te.sendUpdates();
 					}
 				}
 				
@@ -338,9 +310,6 @@ public class BlockFluidTank extends Block {
 				if (te.fluid.getAmount() <= 0) {
 					te.fluid = FluidStack.EMPTY;
 
-					if (te.getBlockState().get(StateProperties.FLUID) != DisplayFluids.NONE) {
-						te.world.setBlockState(te.pos, te.getBlockState().with(StateProperties.FLUID, DisplayFluids.NONE));
-					}
 				}
 
 				te.sendUpdates();

@@ -74,8 +74,17 @@
 	"item.assemblylinemachines.naphtha_bucket": "Naphtha Bucket",
 	"item.assemblylinemachines.corrupted_shard": "Corrupted Shard",
 	"item.assemblylinemachines.mystium_dowsing_rod": "Mystium Dowsing Rod",
+	"item.assemblylinemachines.mystium_pickaxe": "Mystium Pickaxe",
+	"item.assemblylinemachines.mystium_axe": "Mystium Axe",
+	"item.assemblylinemachines.mystium_sword": "Mystium Sword",
+	"item.assemblylinemachines.mystium_shovel": "Mystium Shovel",
+	"item.assemblylinemachines.mystium_hoe": "Mystium Hoe",
+	"item.assemblylinemachines.mystium_hammer": "Mystium Hammer",
+	"item.assemblylinemachines.mystium_plate": "Mystium Plate",
+	"item.assemblylinemachines.diesel_bucket": "Diesel Bucket",
+	"item.assemblylinemachines.gasoline_bucket": "Gasoline Bucket",
 	
-	"itemGroup.assemblylinemachines": "Assembly Line Machines",
+	"itemGroup.assemblylinemachines": "  Assembly Line Machines",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.titanium_block": "Titanium Block",
@@ -115,10 +124,18 @@
 	"block.assemblylinemachines.electric_grinder": "Electric Grinder",
 	"block.assemblylinemachines.alloy_smelter": "Alloy Smelter",
 	"block.assemblylinemachines.autocrafting_table": "Autocrafting Table",
+	"block.assemblylinemachines.naphtha_fire": "Naphtha Fire",
+	"block.assemblylinemachines.pump": "Pump",
+	"block.assemblylinemachines.pumpshaft": "Pumpshaft",
+	"block.assemblylinemachines.mystium_block": "Mystium Block",
+	"block.assemblylinemachines.mystium_fluid_tank": "Mystium Fluid Tank",
+	"block.assemblylinemachines.tool_charger": "Tool Charger",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",
-	"fluid.assemblylinemachines:naphtha": "Naphtha"
+	"fluid.assemblylinemachines.naphtha": "Naphtha",
+	"fluid.assemblylinemachines.diesel": "Diesel",
+	"fluid.assemblylinemachines.gasoline": "Gasoline"
 	
 	
 }

@@ -142,11 +142,12 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 					return null;
 				}
 				final boolean machineReqd;
-				if(JSONUtils.hasField(json, "machine_required")) {
+				if(JSONUtils.hasField(json, "machine_required") && JSONUtils.getBoolean(json, "machine_required")) {
 					machineReqd = true;
 				}else {
 					machineReqd = false;
 				}
+				
 				return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Grinder Crafting Recipe from JSON: " + e.getMessage());

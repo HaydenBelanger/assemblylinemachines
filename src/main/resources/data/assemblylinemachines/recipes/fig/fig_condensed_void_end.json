@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "assemblylinemachines:condensed_void",
+	"chance": 2,
+	"min": 40,
+	"max": 150,
+	"criteria_set": "END"
+}

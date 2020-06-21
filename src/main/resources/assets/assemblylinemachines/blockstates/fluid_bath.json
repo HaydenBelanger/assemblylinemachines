@@ -1,14 +1,36 @@
 {
-	"variants":{
-		"fluid=none,status=none": {"model": "assemblylinemachines:block/bath/fluid_bath_empty"},
-		"fluid=none,status=fail": {"model": "assemblylinemachines:block/bath/fluid_bath_empty"},
-		"fluid=none,status=success": {"model": "assemblylinemachines:block/bath/fluid_bath_empty"},
-		"fluid=water,status=none": {"model": "assemblylinemachines:block/bath/fluid_bath_water"},
-		"fluid=water,status=fail": {"model": "assemblylinemachines:block/bath/fluid_bath_sludge"},
-		"fluid=water,status=success": {"model": "assemblylinemachines:block/bath/fluid_bath_water"},
-		"fluid=lava,status=none": {"model": "assemblylinemachines:block/bath/fluid_bath_lava"},
-		"fluid=lava,status=fail": {"model": "assemblylinemachines:block/bath/fluid_bath_sludge"},
-		"fluid=lava,status=success": {"model": "assemblylinemachines:block/bath/fluid_bath_lava_tinted"}
-	}
+	
+	
+	
+	"multipart":[
+		
+		{   "when": { "fluid": "none", "status": "none" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_empty"}
+        },
+        {   "when": { "fluid": "none", "status": "fail" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_empty"}
+        },
+		{   "when": { "fluid": "none", "status": "success" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_empty"}
+        },
+		{   "when": { "fluid": "water", "status": "none" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_water"}
+        },
+        {   "when": { "fluid": "water", "status": "fail" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_sludge"}
+        },
+		{   "when": { "fluid": "water", "status": "success" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_water"}
+        },
+		{   "when": { "fluid": "lava", "status": "none" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_lava"}
+        },
+        {   "when": { "fluid": "lava", "status": "fail" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_sludge"}
+        },
+		{   "when": { "fluid": "lava", "status": "success" },
+            "apply": { "model": "assemblylinemachines:block/bath/fluid_bath_lava_tinted"}
+        }
+	]
 	
 }

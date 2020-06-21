@@ -141,7 +141,7 @@ public class BlockHandGrinder extends Block {
 						}else {
 							boolean sendupdates = true;
 							boolean bladeBroke = false;
-							if(entity.input.isItemEqual(held)) {
+							if(entity.input != null && entity.input.isItemEqual(held)) {
 								entity.value--;
 								bladeBroke = ItemGrindingBlade.damageBlade(entity.blade);
 								if(entity.value == 0) {

@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sbs",
+		"sgs",
+		"lgl"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"b":{
+			"item": "minecraft:bucket"
+		},
+		"l":{
+			"tag": "forge:gems/lapis"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:electric_fluid_mixer"
+	}
+}

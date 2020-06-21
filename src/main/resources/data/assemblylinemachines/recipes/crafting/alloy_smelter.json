@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sps",
+		"pgp",
+		"igi"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"p":{
+			"item": "assemblylinemachines:pure_gold_blade"
+		},
+		"i":{
+			"tag": "forge:storage_blocks/iron"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:electric_grinder"
+	}
+}

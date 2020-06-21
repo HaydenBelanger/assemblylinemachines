@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "minecraft:lava",
+	"chance": 16,
+	"min": 750,
+	"max": 3250,
+	"criteria_set": "NETHER"
+}

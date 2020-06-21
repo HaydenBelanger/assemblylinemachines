@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"gsg",
+		"sms",
+		"imi"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"m":{
+			"item": "minecraft:magma_block"
+		},
+		"i":{
+			"tag": "forge:storage_blocks/iron"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:alloy_smelter"
+	}
+}

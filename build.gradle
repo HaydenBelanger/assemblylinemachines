@@ -17,7 +17,7 @@ version = '1.15.2-0.1.0'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.11' // Need this here so eclipse task generates correctly.
 
 task sourcesJar(type: Jar, dependsOn: classes) {
 	classifier = 'sources'
