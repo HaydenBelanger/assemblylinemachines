@@ -246,7 +246,7 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerGearbox(final int windowId, final PlayerInventory playerInventory, final TEGearbox tileEntity) {
-			super(Registry.getContainerType("gearbox"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("gearbox"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.getFirst(), UPGRADE_POS.getSecond(), tileEntity));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.getFirst(), INPUT_POS.getSecond(), tileEntity));

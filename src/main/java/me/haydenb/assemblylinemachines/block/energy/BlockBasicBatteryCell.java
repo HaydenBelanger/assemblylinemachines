@@ -296,7 +296,7 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 		public ContainerBasicBatteryCell(final int windowId, final PlayerInventory playerInventory,
 				final TEBasicBatteryCell tileEntity) {
 			super(Registry.getContainerType("basic_battery_cell"), windowId, tileEntity, playerInventory,
-					PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+					PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 		}
 
 		public ContainerBasicBatteryCell(final int windowId, final PlayerInventory playerInventory,
@@ -376,7 +376,7 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + 8 && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + 8) {
-					if (bb.getFirst() != null) {
+					if (bb.getSecond() != null) {
 						this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 					} else {
 						this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);

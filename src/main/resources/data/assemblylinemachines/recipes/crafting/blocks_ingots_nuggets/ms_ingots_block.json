@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xxx",
+		"xxx",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:mystium_ingot"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mystium_block"
+	}
+}

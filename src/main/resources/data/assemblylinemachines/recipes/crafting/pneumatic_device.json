@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"c  ",
+		"ssp",
+		"c  "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_rod"
+		},
+		"c":{
+			"item": "assemblylinemachines:chromium_plate"
+		},
+		"p":{
+			"item": "minecraft:sticky_piston"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:pneumatic_device"
+	}
+}

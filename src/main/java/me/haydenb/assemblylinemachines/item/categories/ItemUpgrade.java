@@ -69,7 +69,7 @@ public class ItemUpgrade extends Item {
 		
 		UNIVERSAL_SPEED(Registry.getItem("upgrade_speed")),
 		
-		MACHINE_CONSERVATION(Registry.getItem("machine_upgrade_conservation")),
+		MACHINE_CONSERVATION(Registry.getItem("machine_upgrade_conservation")), MACHINE_EXTRA(Registry.getItem("machine_upgrade_extra")),
 		
 		AC_SUSTAINED(Registry.getItem("autocrafting_upgrade_sustained")), AC_RECIPES(Registry.getItem("autocrafting_upgrade_recipes")),
 		

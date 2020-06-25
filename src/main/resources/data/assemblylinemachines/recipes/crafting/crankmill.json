@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"igi",
+		"iqi",
 		"iqi",
 		"iri"
 	],
@@ -10,13 +10,10 @@
 			"item": "assemblylinemachines:iron_plate"
 		},
 		"q":{
-			"item": "assemblylinemachines:black_granite"
-		},
-		"g":{
-			"tag": "assemblylinemachines:crafting/gears/precious"
+			"item": "assemblylinemachines:energy_pipe"
 		},
 		"r":{
-			"item": "minecraft:redstone_block"
+			"item": "assemblylinemachines:crank_shaft"
 		}
 	},
 	"result":{

@@ -1,0 +1,12 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:mystium_block"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:mystium_ingot",
+		"count": 9
+	}
+}

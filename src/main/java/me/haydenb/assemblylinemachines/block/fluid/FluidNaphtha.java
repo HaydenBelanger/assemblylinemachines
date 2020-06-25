@@ -14,6 +14,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
@@ -56,7 +57,7 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 			
 			BlockPos cor = iter.next();
 			
-			if(world.getBlockState(cor).getBlock() == Blocks.AIR && (world.isBlockPresent(cor.down()) || isSurroundingBlockFlammable(world, cor))) {
+			if(world.getBlockState(cor).getBlock() == Blocks.AIR && (world.isBlockPresent(cor.down()) || isSurroundingBlockFlammable(world, cor)) && !world.getBlockState(cor.down()).getBlock().getTags().contains(new ResourceLocation("assemblylinemachines", "world/naphtha_fireproof"))) {
 				
 				world.setBlockState(cor, ForgeEventFactory.fireFluidPlaceBlockEvent(world, cor, pos, Registry.getBlock("naphtha_fire").getDefaultState()));
 				

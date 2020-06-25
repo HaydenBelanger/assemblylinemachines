@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:energized_gold_ingot"
+		},
+		{
+			"tag": "assemblylinemachines:crafting/hammers"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:energized_gold_plate",
+		"count": 4
+	}
+}

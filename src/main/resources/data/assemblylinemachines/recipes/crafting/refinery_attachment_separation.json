@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"tst",
+		"psp"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		},
+		"p":{
+			"item": "assemblylinemachines:fluid_pipe"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:refinery_attachment_separation"
+	}
+}

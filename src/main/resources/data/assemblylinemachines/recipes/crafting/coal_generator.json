@@ -1,25 +1,25 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"gfg",
-		"iqi",
-		"rrr"
+		"geg",
+		"ici",
+		"fgf"
 	],
 	"key":{
 		"i":{
 			"item": "assemblylinemachines:iron_plate"
 		},
-		"q":{
-			"item": "assemblylinemachines:black_granite"
+		"e":{
+			"item": "assemblylinemachines:energy_pipe"
 		},
 		"f":{
-			"item": "minecraft:blast_furnace"
+			"item": "minecraft:furnace"
 		},
 		"g":{
 			"tag": "assemblylinemachines:crafting/gears/precious"
 		},
-		"r":{
-			"tag": "forge:dusts/redstone"
+		"c":{
+			"item": "assemblylinemachines:convection_component"
 		}
 	},
 	"result":{

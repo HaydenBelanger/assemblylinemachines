@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"cxc",
+		"cxc",
+		"sts"
+	],
+	"key":{
+		"t":{
+			"item": "assemblylinemachines:fluid_regulator"
+		},
+		"x":{
+			"item": "assemblylinemachines:pneumatic_device"
+		},
+		"s":{
+			"item": "assemblylinemachines:mystium_plate"
+		},
+		"c":{
+			"item": "assemblylinemachines:chromium_plate"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:pumpshaft"
+	}
+}

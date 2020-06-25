@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -92,39 +92,34 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 							return;
 						}
 						int max = 1000;
-						for(int i = 0; i < output.getTanks(); i++) {
-							FluidStack origStack = output.getFluidInTank(i);
-							if(origStack != FluidStack.EMPTY) {
-								FluidStack copyStack = origStack.copy();
-								if(copyStack.getAmount() > max) {
-									copyStack.setAmount(max);
-								}
-								
-								int origSize = copyStack.getAmount();
-								int extracted = 0;
-								double waitTime = 0;
-								
-								for(FluidPipeConnectorTileEntity tpc : targets.descendingSet()) {
-									if(tpc != null) {
-										extracted =+ tpc.attemptAcceptFluid(copyStack);
-										
-										double thisdist = pos.distanceSq(tpc.pos);
-										
-										if(thisdist > waitTime) {
-											waitTime = thisdist;
-										}
-										
-										if(extracted == origSize || extracted >= max) {
-											break;
-										}
+						FluidStack sim = output.drain(max, FluidAction.SIMULATE);
+						if(sim.getAmount() < max) {
+							max = sim.getAmount();
+						}
+						
+						if(!sim.isEmpty()) {
+							int extracted = 0;
+							double waitTime = 0;
+							
+							for(FluidPipeConnectorTileEntity tpc : targets.descendingSet()) {
+								if(tpc != null) {
+									extracted =+ tpc.attemptAcceptFluid(sim);
+									
+									double thisdist = pos.distanceSq(tpc.pos);
+									
+									if(thisdist > waitTime) {
+										waitTime = thisdist;
+									}
+									
+									if(extracted != 0) {
+										break;
 									}
 								}
-								
-								if(extracted != 0) {
-									pendingCooldown = waitTime / 10;
-									output.drain(extracted, FluidAction.EXECUTE);
-									break;
-								}
+							}
+							
+							if(extracted != 0) {
+								pendingCooldown = waitTime / 10;
+								output.drain(extracted, FluidAction.EXECUTE);
 							}
 						}
 						
@@ -153,7 +148,7 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 					checked.add(targPos);
 					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
 						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
-						if (t.type == Type.FLUID) {
+						if (t.type.getMainType() == MainType.FLUID) {
 							pathToNearestFluid(world, targPos, checked, initial, targets);
 						}
 

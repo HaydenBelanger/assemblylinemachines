@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ici",
+		"iri",
+		"iii"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"r":{
+			"item": "minecraft:redstone_block"
+		},
+		"c":{
+			"item": "minecraft:coal_block"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:basic_battery"
+	}
+}

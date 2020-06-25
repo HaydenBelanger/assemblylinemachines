@@ -2,6 +2,7 @@ package me.haydenb.assemblylinemachines.block.pipe;
 
 import com.google.common.base.Supplier;
 
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
@@ -266,18 +267,37 @@ public class PipeBase<T> extends Block {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if(type == Type.ITEM) {
+		if(type.getMainType() == MainType.ITEM) {
 			return Registry.getTileEntity("pipe_connector_item").create();
-		}else if(type == Type.FLUID) {
+		}else if(type.getMainType() == MainType.FLUID) {
 			return Registry.getTileEntity("pipe_connector_fluid").create();
-		}else {
+		}else if(type.getMainType() == MainType.POWER){
+			
 			return Registry.getTileEntity("pipe_connector_energy").create();
+		}else {
+			throw new IllegalArgumentException("Invalid MainType found. No associated Tile Entity available.");
 		}
 		
 	}
 
 	public static enum Type {
-		POWER, FLUID, ITEM;
+		BASIC_POWER(MainType.POWER), ADVANCED_POWER(MainType.POWER), FLUID(MainType.FLUID), ITEM(MainType.ITEM);
+		
+		
+		private MainType category;
+		Type(MainType category){
+			this.category = category;
+		}
+		
+		
+		
+		public static enum MainType{
+			POWER, FLUID, ITEM;
+		}
+		
+		public MainType getMainType() {
+			return category;
+		}
 	}
 
 }

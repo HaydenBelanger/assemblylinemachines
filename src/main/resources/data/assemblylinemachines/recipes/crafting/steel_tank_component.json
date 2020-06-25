@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"rgr",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"r":{
+			"item": "assemblylinemachines:steel_rod"
+		},
+		"g":{
+			"item": "minecraft:glass_pane"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:steel_tank_component"
+	}
+}

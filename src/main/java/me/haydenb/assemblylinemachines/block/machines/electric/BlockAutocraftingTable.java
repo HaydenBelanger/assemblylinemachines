@@ -36,7 +36,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
@@ -459,7 +458,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 		private final AutocrafterInvWrapper wrapper = new AutocrafterInvWrapper(this, tileEntity);
 		
 		public ContainerAutocraftingTable(final int windowId, final PlayerInventory playerInventory, final TEAutocraftingTable tileEntity) {
-			super(Registry.getContainerType("autocrafting_table"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("autocrafting_table"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 14);
 			
 			//Output slot
 			this.addSlot(new SlotWithRestrictions(tileEntity, 0, 158, 30, tileEntity, true));
@@ -570,31 +569,6 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 				return super.slotClick(slot, dragType, clickTypeIn, player);
 			}
 			
-		}
-		
-		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-			ItemStack itemstack = ItemStack.EMPTY;
-			Slot slot = this.inventorySlots.get(index);
-			if (slot != null && slot.getHasStack()) {
-				ItemStack itemstack1 = slot.getStack();
-				itemstack = itemstack1.copy();
-				if (index < 36) {
-					if (!this.mergeItemStack(itemstack1, 36 + 14, this.inventorySlots.size(), false)) {
-						return ItemStack.EMPTY;
-					}
-				} else if (!this.mergeItemStack(itemstack1, 0, 36, false)) {
-					return ItemStack.EMPTY;
-				}
-
-				if (itemstack1.isEmpty()) {
-					slot.putStack(ItemStack.EMPTY);
-				} else {
-					slot.onSlotChanged();
-				}
-			}
-
-			return itemstack;
 		}
 		
 		private void checkRecipe() {

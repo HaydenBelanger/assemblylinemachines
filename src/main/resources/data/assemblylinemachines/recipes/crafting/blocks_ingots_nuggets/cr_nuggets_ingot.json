@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xxx",
+		"xxx",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:chromium_nugget"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:chromium_ingot"
+	}
+}

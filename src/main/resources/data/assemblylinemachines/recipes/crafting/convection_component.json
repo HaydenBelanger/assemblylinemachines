@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"iri",
+		"rgr",
+		"iri"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:gold_plate"
+		},
+		"r":{
+			"item": "minecraft:redstone"
+		},
+		"g":{
+			"item": "assemblylinemachines:steel_gear"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:convection_component"
+	}
+}

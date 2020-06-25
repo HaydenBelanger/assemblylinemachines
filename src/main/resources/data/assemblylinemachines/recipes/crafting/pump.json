@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"csc",
+		"sts",
+		"sxs"
+	],
+	"key":{
+		"t":{
+			"item": "assemblylinemachines:steel_tank_component"
+		},
+		"x":{
+			"item": "assemblylinemachines:pneumatic_device"
+		},
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"c":{
+			"item": "assemblylinemachines:chromium_plate"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:pump"
+	}
+}

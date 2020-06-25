@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -28,6 +29,8 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 	private double pendingCooldown = 0;
 
 	private IEnergyStorage output = null;
+	
+	private Integer transferRate = null;
 
 	private final TreeSet<EnergyPipeConnectorTileEntity> targets = new TreeSet<>(
 			new Comparator<EnergyPipeConnectorTileEntity>() {
@@ -77,6 +80,17 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 		if (!world.isRemote) {
 			if (outputMode == true) {
 				if (timer++ == 2) {
+					if(transferRate == null) {
+						
+						PipeBase<?> pb = (PipeBase<?>) getBlockState().getBlock();
+						if(pb.type == Type.ADVANCED_POWER) {
+							transferRate = 2000;
+						}else if(pb.type == Type.BASIC_POWER) {
+							transferRate = 400;
+						}else {
+							transferRate = 0;
+						}
+					}
 					timer = 0;
 					if (pendingCooldown-- <= 0) {
 						pendingCooldown = 0;
@@ -87,7 +101,7 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 						if (output == null && connectToOutput() == false) {
 							return;
 						}
-						int max = output.extractEnergy(400, true);
+						int max = output.extractEnergy(transferRate, true);
 						if (max != 0) {
 							int extracted = 0;
 							double waitTime = 0;
@@ -139,7 +153,7 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 					checked.add(targPos);
 					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
 						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
-						if (t.type == Type.POWER) {
+						if (t.type.getMainType() == MainType.POWER) {
 							pathToNearestEnergy(world, targPos, checked, initial, targets);
 						}
 

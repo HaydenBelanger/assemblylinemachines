@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"gbg",
+		"sas",
+		"scs"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		},
+		"b":{
+			"item": "assemblylinemachines:convection_component"
+		},
+		"a":{
+			"item": "assemblylinemachines:adv_energy_pipe"
+		},
+		"c":{
+			"item": "assemblylinemachines:conduction_component"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:tool_charger"
+	}
+}

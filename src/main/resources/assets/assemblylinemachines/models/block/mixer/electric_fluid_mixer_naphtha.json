@@ -3,7 +3,7 @@
 	"textures": {
 		"2": "assemblylinemachines:block/machine_basic_side",
 		"3": "assemblylinemachines:block/machine_basic_top",
-		"5": "assemblylinemachines:block/mixerfronts/electric_fluid_mixer_condensed_void",
+		"5": "assemblylinemachines:block/mixerfronts/electric_fluid_mixer_naphtha",
 		"6": "assemblylinemachines:block/electric_furnace_inset_active",
 		"particle": "assemblylinemachines:block/machine_basic_top"
 	},

@@ -265,7 +265,7 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		}
 		
 		public ContainerElectricPurifier(final int windowId, final PlayerInventory playerInventory, final TEElectricPurifier tileEntity) {
-			super(Registry.getContainerType("electric_purifier"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("electric_purifier"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 51, 21, tileEntity));

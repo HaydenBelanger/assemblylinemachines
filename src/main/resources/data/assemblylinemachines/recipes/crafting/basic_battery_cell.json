@@ -1,22 +1,28 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"srs",
-		"rpr",
-		"drd"
+		"pap",
+		"sbs",
+		"dcd"
 	],
 	"key":{
-		"s":{
-			"item": "assemblylinemachines:iron_plate"
+		"a":{
+			"item": "assemblylinemachines:conduction_component"
+		},
+		"c":{
+			"item": "assemblylinemachines:convection_component"
 		},
 		"d":{
 			"tag": "forge:gems/diamond"
 		},
-		"r":{
-			"tag": "forge:dusts/redstone"
+		"b":{
+			"item": "assemblylinemachines:basic_battery"
 		},
 		"p":{
 			"tag": "assemblylinemachines:crafting/gears/precious"
+		},
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
 		}
 	},
 	"result":{

@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"iri",
+		"rsr",
+		"iri"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"r":{
+			"item": "minecraft:redstone"
+		},
+		"s":{
+			"item": "assemblylinemachines:steel_gear"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:conduction_component"
+	}
+}

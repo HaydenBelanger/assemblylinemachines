@@ -228,12 +228,12 @@ public class BlockPump extends BlockTileEntity {
 				return energyHandler.cast();
 			}
 
-			return LazyOptional.empty();
+			return super.getCapability(cap, side);
 		}
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			return LazyOptional.empty();
+			return super.getCapability(cap);
 		}
 
 		@Override

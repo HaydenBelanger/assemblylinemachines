@@ -245,7 +245,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerSimpleGrinder(final int windowId, final PlayerInventory playerInventory, final TESimpleGrinder tileEntity) {
-			super(Registry.getContainerType("simple_grinder"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("simple_grinder"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 			
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, INPUT_A_POS.getFirst(), INPUT_A_POS.getSecond(), tileEntity));

@@ -7,6 +7,8 @@
 	"#forge:ingots/titanium",
 	"#forge:ingots/steel",
 	"#forge:ingots/pure_steel",
-	"#forge:ingots/mystium"
+	"#forge:ingots/mystium",
+	"#forge:ingots/chromium",
+	"#forge:ingots/energized_gold"
   ]
 }

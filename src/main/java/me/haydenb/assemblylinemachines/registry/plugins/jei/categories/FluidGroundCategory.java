@@ -95,7 +95,6 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 	public void setIngredients(FluidInGroundRecipe recipe, IIngredients ingredients) {
 		ingredients.setInputIngredients(Arrays.asList(new Ingredient[] {Ingredient.fromItems(Registry.getItem("pump"), Registry.getItem("pumpshaft"))}));
 		ingredients.setOutput(VanillaTypes.FLUID, new FluidStack(recipe.getFluid(), 1000));
-		ingredients.setOutput(VanillaTypes.ITEM, new ItemStack(recipe.getFluid().getFilledBucket(), 1));
 		
 	}
 
@@ -104,7 +103,7 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 		IGuiItemStackGroup gui = recipeLayout.getItemStacks();
 		
 		IGuiFluidStackGroup fgui = recipeLayout.getFluidStacks();
-		gui.init(0, true, 57, 12);
+		gui.init(0, false, 57, 12);
 		fgui.init(0, false, new IIngredientRenderer<FluidStack>() {
 			
 			@Override

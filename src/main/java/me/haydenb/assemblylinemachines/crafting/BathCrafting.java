@@ -141,10 +141,18 @@ public class BathCrafting implements IRecipe<IInventory>{
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(inputa);
 		nnl.add(inputb);
+		
+		
 		Item mixerHandler = Registry.getItem("simple_fluid_mixer");
 		Item electricMixer = Registry.getItem("electric_fluid_mixer");
 		if(this.machineReqd) {
-			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer));
+			
+			if(fluid.isElectricMixerOnly()) {
+				nnl.add(Ingredient.fromItems(electricMixer));
+			}else {
+				nnl.add(Ingredient.fromItems(mixerHandler, electricMixer));
+			}
+			
 		}else {
 			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer, Registry.getItem("fluid_bath")));
 		}

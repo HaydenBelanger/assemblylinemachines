@@ -252,7 +252,7 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 		}
 		
 		public ContainerAlloySmelter(final int windowId, final PlayerInventory playerInventory, final TEAlloySmelter tileEntity) {
-			super(Registry.getContainerType("alloy_smelter"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("alloy_smelter"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 54, 34, tileEntity));

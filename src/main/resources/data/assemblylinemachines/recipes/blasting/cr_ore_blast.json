@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:chromium_ore"
+	},
+	"result": "assemblylinemachines:chromium_ingot",
+	"experience": 1,
+	"cookingtime": 100
+}

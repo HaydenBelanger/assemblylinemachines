@@ -61,7 +61,7 @@ public abstract class BlockTileEntity extends Block{
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
+			Hand hand, BlockRayTraceResult hit) {
 		
 		if(player.getActiveHand() == Hand.MAIN_HAND) {
 			if(!worldIn.isRemote) {
@@ -71,7 +71,7 @@ public abstract class BlockTileEntity extends Block{
 			}
 		}
 		
-		return ActionResultType.PASS;
+		return ActionResultType.CONSUME;
 	}
 	
 	@Override

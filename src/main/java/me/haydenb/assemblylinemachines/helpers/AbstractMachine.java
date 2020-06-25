@@ -210,12 +210,27 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 
 		protected final IWorldPosCallable canInteract;
 		public final T tileEntity;
+		private final int mergeMinOffset;
+		private final int mergeMaxOffset;
 
 		protected ContainerALMBase(ContainerType<?> type, int id, T te, PlayerInventory pInv,
-				Pair<Integer, Integer> pmain, Pair<Integer, Integer> phot) {
+				Pair<Integer, Integer> pmain, Pair<Integer, Integer> phot, int mergeMinOffset) {
 			super(type, id);
 			this.canInteract = IWorldPosCallable.of(te.getWorld(), te.getPos());
 			this.tileEntity = te;
+			this.mergeMinOffset = mergeMinOffset;
+			this.mergeMaxOffset = 0;
+			bindPlayerInventory(pInv, pmain.getFirst(), pmain.getSecond(), phot.getSecond(), phot.getFirst());
+
+		}
+		
+		protected ContainerALMBase(ContainerType<?> type, int id, T te, PlayerInventory pInv,
+				Pair<Integer, Integer> pmain, Pair<Integer, Integer> phot, int mergeMinOffset, int mergeMaxOffset) {
+			super(type, id);
+			this.canInteract = IWorldPosCallable.of(te.getWorld(), te.getPos());
+			this.tileEntity = te;
+			this.mergeMinOffset = mergeMinOffset;
+			this.mergeMaxOffset = mergeMaxOffset;
 			bindPlayerInventory(pInv, pmain.getFirst(), pmain.getSecond(), phot.getSecond(), phot.getFirst());
 
 		}
@@ -248,7 +263,8 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 				ItemStack itemstack1 = slot.getStack();
 				itemstack = itemstack1.copy();
 				if (index < 36) {
-					if (!this.mergeItemStack(itemstack1, 36, this.inventorySlots.size(), false)) {
+					
+					if (!this.mergeItemStack(itemstack1, 36 + mergeMinOffset, this.inventorySlots.size() - mergeMaxOffset, false)) {
 						return ItemStack.EMPTY;
 					}
 				} else if (!this.mergeItemStack(itemstack1, 0, 36, false)) {

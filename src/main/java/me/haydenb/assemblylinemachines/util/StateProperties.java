@@ -23,29 +23,32 @@ public class StateProperties {
 	public static final EnumProperty<BathCraftingFluids> FLUID = EnumProperty.create("fluid", BathCraftingFluids.class);
 	
 	public static enum BathCraftingFluids implements IStringSerializable {
-		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153)), 
-		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121));
+		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52), new Pair<>(87, 197)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68), new Pair<>(87, 213)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153), new Pair<>(102, 229)), 
+		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), new Pair<>(102, 213)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), new Pair<>(102, 197));
 
 		private Supplier<Fluid> f;
 		private Fluid fx;
 		private boolean electricMixerOnly;
 		private Pair<Integer, Integer> simpleBlitPiece;
 		private Pair<Integer, Integer> electricBlitPiece;
+		private Pair<Integer, Integer> jeiBlitPiece;
 		
-		BathCraftingFluids(Supplier<Fluid> f, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece){
+		BathCraftingFluids(Supplier<Fluid> f, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
 			this.f = f;
 			this.fx = null;
 			this.electricMixerOnly = electricMixerOnly;
 			this.simpleBlitPiece = simpleBlitPiece;
 			this.electricBlitPiece = electricBlitPiece;
+			this.jeiBlitPiece = jeiBlitPiece;
 		}
 		
-		BathCraftingFluids(Fluid fx, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece){
+		BathCraftingFluids(Fluid fx, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
 			this.fx = fx;
 			this.f = null;
 			this.electricMixerOnly = electricMixerOnly;
 			this.simpleBlitPiece = simpleBlitPiece;
 			this.electricBlitPiece = electricBlitPiece;
+			this.jeiBlitPiece = jeiBlitPiece;
 		}
 		
 		BathCraftingFluids(){
@@ -110,6 +113,10 @@ public class StateProperties {
 
 		public Pair<Integer, Integer> getElectricBlitPiece() {
 			return electricBlitPiece;
+		}
+
+		public Pair<Integer, Integer> getJeiBlitPiece() {
+			return jeiBlitPiece;
 		}
 	}
 }

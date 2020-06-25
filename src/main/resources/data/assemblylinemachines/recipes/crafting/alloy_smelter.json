@@ -1,25 +1,29 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"sps",
-		"pgp",
-		"igi"
+		"sss",
+		"gmg",
+		"ftf"
 	],
 	"key":{
 		"s":{
 			"item": "assemblylinemachines:steel_plate"
 		},
-		"p":{
-			"item": "assemblylinemachines:pure_gold_blade"
+		"f":{
+			"item": "minecraft:blast_furnace"
 		},
-		"i":{
-			"tag": "forge:storage_blocks/iron"
+		"t":{
+			"item": "assemblylinemachines:temperature_regulator"
 		},
 		"g":{
 			"tag": "assemblylinemachines:crafting/gears/industrial"
+		},
+		"m":{
+			"item": "assemblylinemachines:conduction_component"
 		}
+		
 	},
 	"result":{
-		"item": "assemblylinemachines:electric_grinder"
+		"item": "assemblylinemachines:alloy_smelter"
 	}
 }

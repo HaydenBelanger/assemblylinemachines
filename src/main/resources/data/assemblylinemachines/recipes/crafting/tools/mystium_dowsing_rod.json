@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" xb",
+		" xx",
+		"s  "
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:mystium_ingot"
+		},
+		"b":{
+			"item": "minecraft:blaze_powder"
+		},
+		"s":{
+			"item": "assemblylinemachines:steel_rod"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mystium_dowsing_rod"
+	}
+}

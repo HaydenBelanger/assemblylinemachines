@@ -19,7 +19,7 @@
 			"tag": "assemblylinemachines:crafting/gears/industrial"
 		},
 		"q":{
-			"item": "assemblylinemachines:black_granite"
+			"item": "assemblylinemachines:conduction_component"
 		}
 	},
 	"result":{

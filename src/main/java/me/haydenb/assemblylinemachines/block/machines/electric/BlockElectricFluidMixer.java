@@ -108,9 +108,13 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 			IFluidHandler handler = ((TEElectricFluidMixer) world.getTileEntity(pos)).fluids;
 			FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
 			if(far.isSuccess()) {
-				stack.shrink(1);
+				if(stack.getCount() == 1) {
+					player.inventory.removeStackFromSlot(player.inventory.currentItem);
+				}else {
+					stack.shrink(1);
+				}
 				ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-				return ActionResultType.CONSUME;
+				return ActionResultType.PASS;
 			}
 			
 			
@@ -420,7 +424,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerElectricFluidMixer(final int windowId, final PlayerInventory playerInventory, final TEElectricFluidMixer tileEntity) {
-			super(Registry.getContainerType("electric_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("electric_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 54, 34, tileEntity));
@@ -475,13 +479,11 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 			
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 15f);
 			
-			int cover = 52;
-			if(tsfm.inProgress == BathCraftingFluids.LAVA) {
-				cover = 68;
+			
+			if(tsfm.inProgress != null && tsfm.inProgress.getElectricBlitPiece() != null) {
+				super.blit(x+95, y+34, tsfm.inProgress.getElectricBlitPiece().getFirst(), tsfm.inProgress.getElectricBlitPiece().getSecond(), prog, 16);
 			}
 			
-			
-			super.blit(x+95, y+34, 176, cover, prog, 16);
 			
 			
 			

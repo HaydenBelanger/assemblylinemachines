@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"imi",
+		"sss"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"i":{
+			"item": "assemblylinemachines:energy_pipe"
+		},
+		"m":{
+			"item": "assemblylinemachines:mystium_plate"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:adv_energy_pipe",
+		"count": 4
+	}
+}

@@ -176,7 +176,12 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 				return super.getCapability(cap, side);
 			}
 			
-			return LazyOptional.empty();
+			return super.getCapability(cap, side);
+		}
+		
+		@Override
+		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
+			return super.getCapability(cap);
 		}
 
 	}
@@ -189,7 +194,7 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 		public ContainerCrankmill(final int windowId, final PlayerInventory playerInventory,
 				final TECrankmill tileEntity) {
 			super(Registry.getContainerType("crankmill"), windowId, tileEntity, playerInventory, PLAYER_INV_POS,
-					PLAYER_HOTBAR_POS);
+					PLAYER_HOTBAR_POS, 0);
 		}
 
 		public ContainerCrankmill(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {

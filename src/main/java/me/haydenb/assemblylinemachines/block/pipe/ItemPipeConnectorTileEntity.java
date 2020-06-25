@@ -8,10 +8,10 @@ import java.util.TreeSet;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
-import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.*;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
@@ -26,7 +26,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -301,7 +300,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 					checked.add(targPos);
 					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
 						PipeBase<?> t = (PipeBase<?>) world.getBlockState(targPos).getBlock();
-						if (t.type == Type.ITEM) {
+						if (t.type.getMainType() == MainType.ITEM) {
 							pathToNearestItem(world, targPos, checked, initial, targets);
 						}
 
@@ -408,7 +407,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		public ItemPipeConnectorContainer(final int windowId, final PlayerInventory playerInventory,
 				final ItemPipeConnectorTileEntity tileEntity) {
 			super(Registry.getContainerType("pipe_connector_item"), windowId, tileEntity, playerInventory,
-					PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+					PLAYER_INV_POS, PLAYER_HOTBAR_POS, 9);
 			for (int row = 0; row < 3; ++row) {
 				for (int col = 0; col < 3; ++col) {
 					this.addSlot(new FilterPipeValidatorSlot(tileEntity, (row * 3) + col, 55 + (18 * col),
@@ -459,31 +458,6 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 				return super.slotClick(slot, dragType, clickTypeIn, player);
 			}
 			
-		}
-		
-		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-			ItemStack itemstack = ItemStack.EMPTY;
-			Slot slot = this.inventorySlots.get(index);
-			if (slot != null && slot.getHasStack()) {
-				ItemStack itemstack1 = slot.getStack();
-				itemstack = itemstack1.copy();
-				if (index < 36) {
-					if (!this.mergeItemStack(itemstack1, 36 + 9, this.inventorySlots.size(), false)) {
-						return ItemStack.EMPTY;
-					}
-				} else if (!this.mergeItemStack(itemstack1, 0, 36, false)) {
-					return ItemStack.EMPTY;
-				}
-
-				if (itemstack1.isEmpty()) {
-					slot.putStack(ItemStack.EMPTY);
-				} else {
-					slot.onSlotChanged();
-				}
-			}
-
-			return itemstack;
 		}
 
 	}

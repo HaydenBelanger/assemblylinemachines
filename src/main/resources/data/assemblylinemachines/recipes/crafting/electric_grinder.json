@@ -1,8 +1,8 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"gsg",
-		"sms",
+		"bsb",
+		"svs",
 		"imi"
 	],
 	"key":{
@@ -10,16 +10,19 @@
 			"item": "assemblylinemachines:steel_plate"
 		},
 		"m":{
-			"item": "minecraft:magma_block"
+			"item": "assemblylinemachines:simple_grinder"
+		},
+		"v":{
+			"item": "assemblylinemachines:conduction_component"
 		},
 		"i":{
-			"tag": "forge:storage_blocks/iron"
+			"tag": "forge:ingots/iron"
 		},
-		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+		"b":{
+			"item": "assemblylinemachines:titanium_blade"
 		}
 	},
 	"result":{
-		"item": "assemblylinemachines:alloy_smelter"
+		"item": "assemblylinemachines:electric_grinder"
 	}
 }

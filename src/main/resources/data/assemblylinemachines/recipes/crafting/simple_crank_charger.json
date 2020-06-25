@@ -2,18 +2,18 @@
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
 		"iei",
-		"igi",
-		"igi"
+		"isi",
+		"isi"
 	],
 	"key":{
 		"i":{
 			"item": "assemblylinemachines:iron_plate"
 		},
 		"e":{
-			"item": "assemblylinemachines:empowered_coal"
+			"item": "minecraft:chest"
 		},
-		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+		"s":{
+			"item": "assemblylinemachines:crank_shaft"
 		}
 	},
 	"result":{

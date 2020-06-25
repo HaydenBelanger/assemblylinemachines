@@ -1,0 +1,19 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_separation",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:oil",
+		"amount": 1000,
+		"upgrade_preserve_chance": 0.15
+	},
+	"proc_time": 12,
+	"output_fluid_a":{
+		"fluid": "assemblylinemachines:gasoline",
+		"amount": 500
+	},
+	"output_fluid_b":{
+		"fluid": "assemblylinemachines:diesel",
+		"amount": 200,
+		"upgrade_multiply_chance": 0.50
+	}
+}

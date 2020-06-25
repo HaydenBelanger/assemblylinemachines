@@ -1,0 +1,12 @@
+{
+    "variants": {
+        "facing=north,active=false": { "model": "assemblylinemachines:block/refinery/refinery" },
+        "facing=south,active=false": { "model": "assemblylinemachines:block/refinery/refinery", "y": 180 },
+        "facing=west,active=false":  { "model": "assemblylinemachines:block/refinery/refinery", "y": 270 },
+        "facing=east,active=false":  { "model": "assemblylinemachines:block/refinery/refinery", "y": 90 },
+		"facing=north,active=true": { "model": "assemblylinemachines:block/refinery/refinery_active" },
+        "facing=south,active=true": { "model": "assemblylinemachines:block/refinery/refinery_active", "y": 180 },
+        "facing=west,active=true":  { "model": "assemblylinemachines:block/refinery/refinery_active", "y": 270 },
+        "facing=east,active=true":  { "model": "assemblylinemachines:block/refinery/refinery_active", "y": 90 }
+    }
+}

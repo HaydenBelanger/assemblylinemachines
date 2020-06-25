@@ -1,0 +1,12 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:chromium_ingot"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:chromium_nugget",
+		"count": 9
+	}
+}

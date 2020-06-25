@@ -11,6 +11,7 @@ import net.minecraft.block.FireBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IBlockReader;
@@ -42,7 +43,7 @@ public class BlockNaphthaFire extends FireBlock {
 					BlockPos posx = iter.next();
 					if (rand.nextInt(10) < 2) {
 						if(world.getBlockState(posx).getBlock() == Blocks.AIR) {
-							if(world.isBlockPresent(posx.down())) {
+							if(world.isBlockPresent(posx.down()) && !world.getBlockState(posx.down()).getBlock().getTags().contains(new ResourceLocation("assemblylinemachines", "world/naphtha_fireproof"))) {
 								int nAge = age + 1 + rand.nextInt(3);
 								if(nAge > 15) nAge = 15;
 								world.setBlockState(posx, ForgeEventFactory.fireFluidPlaceBlockEvent(world, pos, posx, Registry.getBlock("naphtha_fire").getDefaultState().with(AGE, nAge)));

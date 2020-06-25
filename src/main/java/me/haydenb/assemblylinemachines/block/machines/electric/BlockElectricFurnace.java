@@ -329,7 +329,7 @@ public class BlockElectricFurnace extends BlockScreenTileEntity<BlockElectricFur
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerElectricFurnace(final int windowId, final PlayerInventory playerInventory, final TEElectricFurnace tileEntity) {
-			super(Registry.getContainerType("electric_furnace"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("electric_furnace"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 75, 34, tileEntity));

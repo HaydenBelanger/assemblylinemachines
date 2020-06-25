@@ -249,7 +249,7 @@ public class BlockElectricGrinder extends BlockScreenTileEntity<BlockElectricGri
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerElectricGrinder(final int windowId, final PlayerInventory playerInventory, final TEElectricGrinder tileEntity) {
-			super(Registry.getContainerType("electric_grinder"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("electric_grinder"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 72, 34, tileEntity));

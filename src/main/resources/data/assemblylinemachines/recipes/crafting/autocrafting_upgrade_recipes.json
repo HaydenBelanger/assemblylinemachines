@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sps",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"p":{
+			"item": "assemblylinemachines:compressed_crafting_table"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:autocrafting_upgrade_recipes"
+	}
+}

@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"rrr",
+		"gwg",
+		"rrr"
+	],
+	"key":{
+		"r":{
+			"item": "assemblylinemachines:mystium_plate"
+		},
+		"g":{
+			"tag": "forge:glass_panes"
+		},
+		"w":{
+			"item": "assemblylinemachines:steel_fluid_tank"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mystium_fluid_tank"
+	}
+}

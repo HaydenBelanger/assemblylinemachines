@@ -1,22 +1,25 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"sbs",
-		"sgs",
+		"bsb",
+		"sts",
 		"lgl"
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "assemblylinemachines:crafting/gears/industrial"
 		},
 		"b":{
-			"item": "minecraft:bucket"
+			"item": "assemblylinemachines:steel_tank_component"
 		},
 		"l":{
 			"tag": "forge:gems/lapis"
 		},
+		"t":{
+			"item": "assemblylinemachines:conduction_component"
+		},
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+			"item": "assemblylinemachines:simple_fluid_mixer"
 		}
 	},
 	"result":{

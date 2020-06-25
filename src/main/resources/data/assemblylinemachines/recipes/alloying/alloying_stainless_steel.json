@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:storage_blocks/chromium"
+	},
+	"part_b":{
+		"item": "assemblylinemachines:steel_plate"
+	},
+	"output":{
+		"item": "assemblylinemachines:stainless_steel_plate"
+	},
+	"time": 1000
+}

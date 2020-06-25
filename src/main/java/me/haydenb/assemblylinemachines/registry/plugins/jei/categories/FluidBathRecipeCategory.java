@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.registry.plugins.jei.categories;
 
+import java.util.HashMap;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -23,13 +24,15 @@ public class FluidBathRecipeCategory implements IRecipeCategory<BathCrafting> {
 
 	private final IDrawable background;
 	private final IDrawable icon;
-	private final IDrawableAnimated progbarlava;
-	private final IDrawableAnimated progbarwater;
+	private final IGuiHelper helper;
+	
+	private HashMap<BathCraftingFluids, IDrawableAnimated> bars = new HashMap<>();
+	
 	public FluidBathRecipeCategory(IGuiHelper helper) {
-		background = helper.createDrawable(JEIHelper.getGUIPath("gui_set_a"), 0, 68, 43, 85);
+		background = helper.createDrawable(JEIHelper.getGUIPath("gui_set_a"), 0, 197, 87, 41);
 		icon = helper.createDrawableIngredient(new ItemStack(Registry.getBlock("fluid_bath")));
-		progbarlava = helper.drawableBuilder(JEIHelper.getGUIPath("gui_set_a"), 67, 68, 24, 24).buildAnimated(200, StartDirection.BOTTOM, false);
-		progbarwater = helper.drawableBuilder(JEIHelper.getGUIPath("gui_set_a"), 43, 68, 24, 24).buildAnimated(200, StartDirection.BOTTOM, false);
+		this.helper = helper;
+		
 	}
 	
 	@Override
@@ -59,11 +62,14 @@ public class FluidBathRecipeCategory implements IRecipeCategory<BathCrafting> {
 	
 	@Override
 	public void draw(BathCrafting recipe, double mouseX, double mouseY) {
-		if(recipe.getFluid() == BathCraftingFluids.LAVA) {
-			progbarlava.draw(9, 20);
-		}else {
-			progbarwater.draw(9, 20);
+		IDrawableAnimated anim = bars.get(recipe.getFluid());
+		if(anim == null) {
+			anim = helper.drawableBuilder(JEIHelper.getGUIPath("gui_set_a"), recipe.getFluid().getJeiBlitPiece().getFirst(), recipe.getFluid().getJeiBlitPiece().getSecond(), 15, 16).buildAnimated(200, StartDirection.LEFT, false);
+			
+			bars.put(recipe.getFluid(), anim);
 		}
+		anim.draw(42, 5);
+		
 	}
 
 	@Override
@@ -76,10 +82,10 @@ public class FluidBathRecipeCategory implements IRecipeCategory<BathCrafting> {
 	@Override
 	public void setRecipe(IRecipeLayout recipeLayout, BathCrafting recipe, IIngredients ingredients) {
 		IGuiItemStackGroup gui = recipeLayout.getItemStacks();
-		gui.init(0, true, 0, 48);
-		gui.init(1, true, 25, 48);
-		gui.init(2, false, 0, 67);
-		gui.init(3, false, 12, 0);
+		gui.init(0, true, 0, 4);
+		gui.init(1, true, 21, 4);
+		gui.init(2, false, 41, 23);
+		gui.init(3, false, 65, 4);
 		
 		int i = 0;
 		for(List<ItemStack> it : ingredients.getInputs(VanillaTypes.ITEM)) {

@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sps",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"p":{
+			"tag": "forge:gems/emerald"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:machine_upgrade_extra"
+	}
+}

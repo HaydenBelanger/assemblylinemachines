@@ -27,6 +27,8 @@ import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -89,9 +91,10 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ITickableTileEntity{
 
 		
-		private int initGen = 0;
-		private int remGen = 0;
+		private int genper = 0;
+		private int timeremaining = 0;
 		private int timer = 0;
+		private boolean naphthaActive = false;
 		
 		public TECoalGenerator(final TileEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn, 1, (TranslationTextComponent) Registry.getBlock("coal_generator").getNameTextComponent(), Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000));
@@ -106,19 +109,17 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		public void read(CompoundNBT compound) {
 			super.read(compound);
 			
-			if(compound.contains("assemblylinemachines:initgen")) {
-				initGen = compound.getInt("assemblylinemachines:initgen");
-			}
-			if(compound.contains("assemblylinemachines:remgen")) {
-				remGen = compound.getInt("assemblylinemachines:remgen");
-			}
+			genper = compound.getInt("assemblylinemachines:initgen");
+			timeremaining = compound.getInt("assemblylinemachines:remgen");
+			naphthaActive = compound.getBoolean("assemblylinemachines:naphtha");
 		}
 		
 		@Override
 		public CompoundNBT write(CompoundNBT compound) {
 			
-			compound.putInt("assemblylinemachines:initgen", initGen);
-			compound.putInt("assemblylinemachines:remgen", remGen);
+			compound.putInt("assemblylinemachines:initgen", genper);
+			compound.putInt("assemblylinemachines:remgen", timeremaining);
+			compound.putBoolean("assemblylinemachines:naphtha", naphthaActive);
 			return super.write(compound);
 		}
 		@Override
@@ -135,33 +136,43 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 				timer = 0;
 				if(amount < properties.getCapacity()) {
 					boolean sendUpdates = false;
-					if(remGen <= 0) {
+					if(timeremaining <= 0) {
 						
 						if(contents.get(0) != ItemStack.EMPTY) {
 							
 							
+							if(world.getBlockState(pos.up()).getBlock() == Registry.getBlock("naphtha_turbine") && world.getBlockState(pos.offset(Direction.UP, 2)).getBlock() == Registry.getBlock("naphtha_fire")) {
+								world.removeBlock(pos.offset(Direction.UP, 2), false);
+								world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.25f, 1f);
+								naphthaActive = true;
+							}else {
+								naphthaActive = false;
+							}
 							int burnTime = ForgeHooks.getBurnTime(contents.get(0));
 							if(burnTime != 0) {
 								contents.get(0).shrink(1);
-								initGen = burnTime * 10;
-								remGen = burnTime * 10;
+								genper = Math.round((float)(burnTime * 3f) / 90f);
+								if(naphthaActive) {
+									timeremaining = 60 * 4;
+								}else {
+									timeremaining = 60;
+								}
+								
 								sendUpdates = true;
 								
 							}
 						}
 					}
 					
-					if(remGen != 0) {
+					if(timeremaining > 0) {
 						
-						int max = 30;
-						if(remGen < 30) {
-							max = remGen;
-						}
-						
-						remGen -= max;
-						amount += max;
+						timeremaining--;
+						amount += genper;
 						if(amount > properties.getCapacity()) {
 							amount = properties.getCapacity();
+						}
+						if(timeremaining == 0) {
+							genper = 0;
 						}
 						sendUpdates = true;
 					}
@@ -183,7 +194,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerCoalGenerator(final int windowId, final PlayerInventory playerInventory, final TECoalGenerator tileEntity) {
-			super(Registry.getContainerType("coal_generator"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("coal_generator"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.getFirst(), UPGRADE_POS.getSecond(), tileEntity));
 		}
@@ -211,8 +222,14 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			int y = (this.height - this.ySize) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
 				List<String> tt = getTooltipFromItem(stack);
-				tt.add(1, "§e" + Formatting.GENERAL_FORMAT.format(ForgeHooks.getBurnTime(stack) * 10) + " FE Total");
-				tt.add(1, "§a15 FE/t");
+				int burnTime = ForgeHooks.getBurnTime(stack);
+				if(tsfm.naphthaActive) {
+					tt.add(1, "§eApprox. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * 240f) + " FE Total");
+				}else {
+					tt.add(1, "§eApprox. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * 60f) + " FE Total");
+				}
+				
+				tt.add(1, "§a" + Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t");
 				this.renderTooltip(tt, mouseX, mouseY);
 				return;
 			}
@@ -226,15 +243,26 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			
-			if(tsfm.initGen != 0) {
-				int prog2 = Math.round(((float) tsfm.remGen / (float)tsfm.initGen) * 12F);
-				super.blit(x+77, y+19 + (12 - prog2), 176, 52 + (12 - prog2), 13, prog2);
+			if(tsfm.timeremaining != 0) {
+				int prog2;
+				if(tsfm.naphthaActive) {
+					prog2 = Math.round(((float) tsfm.timeremaining / 240f) * 12F);
+					super.blit(x+77, y+19 + (12 - prog2), 189, 52 + (12 - prog2), 13, prog2);
+				}else {
+					prog2 = Math.round(((float) tsfm.timeremaining / 60f) * 12F);
+					super.blit(x+77, y+19 + (12 - prog2), 176, 52 + (12 - prog2), 13, prog2);
+				}
+				
 			}
 			
-			if(tsfm.remGen == 0) {
+			if(tsfm.naphthaActive) {
+				super.blit(x+75, y+52, 176, 64, 16, 16);
+			}
+			
+			if(tsfm.genper == 0) {
 				this.drawCenteredString(this.font, "0/t", x+111, y+38, 0xffffff);
 			}else {
-				this.drawCenteredString(this.font, "+15/t", x+111, y+38, 0x76f597);
+				this.drawCenteredString(this.font, "+" + Math.round((float)tsfm.genper / 2f) + "/t", x+111, y+38, 0x76f597);
 			}
 			
 			

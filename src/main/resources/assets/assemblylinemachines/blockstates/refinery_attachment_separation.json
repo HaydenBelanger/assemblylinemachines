@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "assemblylinemachines:block/refinery/refinery_attachment_separation" },
+        "facing=south": { "model": "assemblylinemachines:block/refinery/refinery_attachment_separation", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/refinery/refinery_attachment_separation", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/refinery/refinery_attachment_separation", "y": 90 }
+    }
+}

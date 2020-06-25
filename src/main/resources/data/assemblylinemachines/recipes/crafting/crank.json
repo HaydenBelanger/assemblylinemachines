@@ -2,7 +2,7 @@
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
 		"m  ",
-		"mss",
+		"oss",
 		"m  "
 	],
 	"key":{
@@ -11,6 +11,9 @@
 		},
 		"m":{
 			"item": "assemblylinemachines:steel_ingot"
+		},
+		"o":{
+			"item": "assemblylinemachines:crank_shaft"
 		}
 		
 	},

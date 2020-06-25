@@ -1,17 +1,9 @@
 package me.haydenb.assemblylinemachines.registry.plugins.jei;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
-import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
-import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
+import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.AlloyingRecipeCategory;
-import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.FluidBathRecipeCategory;
-import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.FluidGroundCategory;
-import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.GrinderRecipeCategory;
-import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.PurifierRecipeCategory;
+import me.haydenb.assemblylinemachines.registry.plugins.jei.categories.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -28,6 +20,7 @@ public class ALMJEI implements IModPlugin{
 	private PurifierRecipeCategory purifierCategory;
 	private AlloyingRecipeCategory alloyingCategory;
 	private FluidGroundCategory groundCategory;
+	private RefineryRecipeCategory refineryCategory;
 	
 	@Override
 	public ResourceLocation getPluginUid() {
@@ -44,8 +37,9 @@ public class ALMJEI implements IModPlugin{
 			purifierCategory = new PurifierRecipeCategory(guiHelper);
 			alloyingCategory = new AlloyingRecipeCategory(guiHelper);
 			groundCategory = new FluidGroundCategory(guiHelper);
+			refineryCategory = new RefineryRecipeCategory(guiHelper);
 			
-			registration.addRecipeCategories(grinderCategory, bathCategory, purifierCategory, alloyingCategory, groundCategory);
+			registration.addRecipeCategories(grinderCategory, bathCategory, purifierCategory, alloyingCategory, groundCategory, refineryCategory);
 		}
 		
 		
@@ -59,6 +53,7 @@ public class ALMJEI implements IModPlugin{
 			registration.addRecipes(JEIHelper.getRecipes(PurifierCrafting.PURIFIER_RECIPE), purifierCategory.getUid());
 			registration.addRecipes(JEIHelper.getRecipes(AlloyingCrafting.ALLOYING_RECIPE), alloyingCategory.getUid());
 			registration.addRecipes(JEIHelper.getRecipes(FluidInGroundRecipe.FIG_RECIPE), groundCategory.getUid());
+			registration.addRecipes(JEIHelper.getRecipes(RefiningCrafting.REFINING_RECIPE), refineryCategory.getUid());
 		}
 	}
 

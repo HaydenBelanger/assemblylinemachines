@@ -29,15 +29,15 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.IFluidTank;
+import net.minecraftforge.common.util.NonNullConsumer;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -63,20 +63,6 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn,
-			BlockPos currentPos, BlockPos facingPos) {
-		if(facing == Direction.DOWN) {
-			TileEntity te = worldIn.getTileEntity(currentPos);
-			if(te != null && te instanceof TESimpleFluidMixer) {
-				TESimpleFluidMixer tsfm = (TESimpleFluidMixer) te;
-				tsfm.tankUpdated();
-			}
-		}
-		
-		return stateIn;
-	}
-	
-	@Override
 	public boolean validSide(BlockState state, Direction dir) {
 		return true;
 	}
@@ -88,7 +74,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 	
 	public static class TESimpleFluidMixer extends SimpleMachine<ContainerSimpleFluidMixer> implements ITickableTileEntity, ICrankableMachine{
 		
-		public IFluidTank tank;
+		public IFluidHandler handler;
 		public int timer;
 		public ItemStack output = null;
 		public boolean check;
@@ -179,18 +165,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 						}
 						
 					}else {
-						boolean pass = true;
-						if(tank == null) {
-							
-							TileEntity te = world.getTileEntity(pos.down());
-							if(te != null && te instanceof IFluidTank) {
-								tank = (IFluidTank) te;
-							}else {
-								pass = false;
-							}
-						}
-						
-						if(pass) {
+						if(handler != null || connectToOutput() == true) {
 							if(contents.get(0) != isa || contents.get(1) != isb) {
 								
 								check = true;
@@ -199,10 +174,12 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 								isa = contents.get(0);
 								isb = contents.get(1);
 								check = false;
+								
+								System.out.println("CHECK");
 								BathCrafting crafting = world.getRecipeManager().getRecipe(BathCrafting.BATH_RECIPE, this, world).orElse(null);
 								if(crafting != null && crafting.getFluid().isElectricMixerOnly() == false) {
-									if(crafting.getFluid().getAssocFluid() == tank.getFluid().getFluid() && tank.drain(1000, FluidAction.SIMULATE).getAmount() == 1000) {
-										tank.drain(1000, FluidAction.EXECUTE);
+									if(crafting.getFluid().getAssocFluid() == handler.getFluidInTank(0).getFluid() && handler.drain(1000, FluidAction.SIMULATE).getAmount() == 1000) {
+										handler.drain(1000, FluidAction.EXECUTE);
 										isa.shrink(1);
 										isb.shrink(1);
 										isa = null;
@@ -224,6 +201,32 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 				
 			}
 			
+		}
+		
+		private boolean connectToOutput() {
+
+			TileEntity te = world.getTileEntity(pos.down());
+			if (te != null) {
+				LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.UP);
+				IFluidHandler output = cap.orElse(null);
+				if (output != null) {
+					TESimpleFluidMixer ipcte = this;
+					cap.addListener(new NonNullConsumer<LazyOptional<IFluidHandler>>() {
+
+						@Override
+						public void accept(LazyOptional<IFluidHandler> t) {
+							if (ipcte != null) {
+								ipcte.handler = null;
+							}
+						}
+					});
+
+					this.handler = output;
+					return true;
+				}
+			}
+
+			return false;
 		}
 		
 		@Override
@@ -261,15 +264,6 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 				f = BathCraftingFluids.valueOf(compound.getString("assemblylinemachines:fluid"));
 			}
 		}
-		
-		public void tankUpdated() {
-			
-			TileEntity tankTe = world.getTileEntity(pos.down());
-			if(tankTe == null || !(tankTe instanceof IFluidTank)) {
-				tank = null;
-				
-			}
-		}
 
 	}
 	
@@ -281,7 +275,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerSimpleFluidMixer(final int windowId, final PlayerInventory playerInventory, final TESimpleFluidMixer tileEntity) {
-			super(Registry.getContainerType("simple_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS);
+			super(Registry.getContainerType("simple_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 			
 			this.addSlot(new Slot(this.tileEntity, 0, INPUT_A_POS.getFirst(), INPUT_A_POS.getSecond()));
 			this.addSlot(new Slot(this.tileEntity, 1, INPUT_B_POS.getFirst(), INPUT_B_POS.getSecond()));
@@ -311,11 +305,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 			int y = (this.height - this.ySize) / 2;
 			if(tsfm.f != null && tsfm.cycles != 0) {
 				int prog = Math.round((tsfm.progress/tsfm.cycles) * 24f);
-				if(tsfm.f == BathCraftingFluids.LAVA) {
-					super.blit(x+71, y+19 + (24 - prog), 200, (24 - prog), 24, prog);
-				}else if(tsfm.f == BathCraftingFluids.WATER) {
-					super.blit(x+71, y+19 + (24 - prog), 176, (24 - prog), 24, prog);
-				}
+				super.blit(x+71, y+19 + (24 - prog), tsfm.f.getSimpleBlitPiece().getFirst(), tsfm.f.getSimpleBlitPiece().getSecond() + (24 - prog), 24, prog);
 			}
 		}
 	}

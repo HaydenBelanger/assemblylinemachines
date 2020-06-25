@@ -1,0 +1,32 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"cmc",
+		"fpf",
+		"tat"
+	],
+	"key":{
+		"m":{
+			"item": "assemblylinemachines:mystium_plate"
+		},
+		"c":{
+			"item": "assemblylinemachines:chromium_plate"
+		},
+		"p":{
+			"item": "assemblylinemachines:pneumatic_device"
+		},
+		"f":{
+			"item": "assemblylinemachines:fluid_regulator"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		},
+		"a":{
+			"item": "assemblylinemachines:empowered_conduction_component"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:refinery"
+	}
+}

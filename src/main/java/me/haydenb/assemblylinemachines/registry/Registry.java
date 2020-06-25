@@ -1,121 +1,56 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.BlockBlackGranite;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath;
+import me.haydenb.assemblylinemachines.block.*;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.BathStatus;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
-import me.haydenb.assemblylinemachines.block.BlockFluidTank;
 import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
-import me.haydenb.assemblylinemachines.block.BlockNaphthaFire;
-import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell;
-import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ContainerBasicBatteryCell;
-import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.ScreenBasicBatteryCell;
-import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.TEBasicBatteryCell;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.ContainerCoalGenerator;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.ScreenCoalGenerator;
-import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.TECoalGenerator;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ContainerCrankmill;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.ScreenCrankmill;
-import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.TECrankmill;
-import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid;
+import me.haydenb.assemblylinemachines.block.energy.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
+import me.haydenb.assemblylinemachines.block.fluid.*;
 import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha;
 import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidOil;
 import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct;
 import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct.FluidOilProductBlock;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockCrank;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.ContainerGearbox;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.ScreenGearbox;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.TEGearbox;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleCrankCharger;
+import me.haydenb.assemblylinemachines.block.machines.crank.*;
+import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.*;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleCrankCharger.TESimpleCrankCharger;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer.ContainerSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer.ScreenSimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer.TESimpleFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.ContainerSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.ScreenSimpleGrinder;
-import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.TESimpleGrinder;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.ContainerAlloySmelter;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.ScreenAlloySmelter;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.TEAlloySmelter;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.ContainerAutocraftingTable;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.ScreenAutocraftingTable;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.TEAutocraftingTable;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.ContainerElectricFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.ScreenElectricFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.ContainerElectricFurnace;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.ScreenElectricFurnace;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.TEElectricFurnace;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.ContainerElectricGrinder;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.ScreenElectricGrinder;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.TEElectricGrinder;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.ContainerElectricPurifier;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.ScreenElectricPurifier;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.TEElectricPurifier;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockToolCharger;
+import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer.*;
+import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockToolCharger.TEToolCharger;
-import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump;
+import me.haydenb.assemblylinemachines.block.machines.oil.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
-import me.haydenb.assemblylinemachines.block.machines.oil.BlockPumpshaft;
-import me.haydenb.assemblylinemachines.block.pipe.EnergyPipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.pipe.FluidPipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
+import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.*;
+import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefineryAddon.BlockSeparationAddon;
+import me.haydenb.assemblylinemachines.block.pipe.*;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorScreen;
-import me.haydenb.assemblylinemachines.block.pipe.PipeBase;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
-import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
-import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
-import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
+import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
-import me.haydenb.assemblylinemachines.item.categories.ItemBasicFormattedName;
-import me.haydenb.assemblylinemachines.item.categories.ItemBlockFormattedName;
-import me.haydenb.assemblylinemachines.item.categories.ItemCrankTool;
-import me.haydenb.assemblylinemachines.item.categories.ItemGearboxBasicFuel;
-import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
-import me.haydenb.assemblylinemachines.item.categories.ItemHammer;
-import me.haydenb.assemblylinemachines.item.categories.ItemMystiumTool;
-import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick;
+import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
-import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.item.items.ItemDowsingRod;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.rendering.TankTER;
 import me.haydenb.assemblylinemachines.util.StateProperties;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.RotatedPillarBlock;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.StairsBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
@@ -130,16 +65,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.HoeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.ShovelItem;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -235,6 +161,8 @@ public class Registry {
 		createItem("titanium_gear");
 		
 		createItem("empowered_coal", new ItemGearboxBasicFuel(3200));
+		createItem("empowered_fuel", new ItemGearboxBasicFuel(6400));
+		
 		createItem("gearbox_upgrade_limiter", new ItemUpgrade(false, "Gearbox will only run while needed."));
 		createItem("gearbox_upgrade_efficiency", new ItemUpgrade(false, "Gearbox will use less fuel.", "Gearbox will run slower."));
 		createItem("gearbox_upgrade_compatability", new ItemUpgrade(false, "Gearbox can use any fuel."));
@@ -251,6 +179,8 @@ public class Registry {
 		createItem("autocrafting_upgrade_recipes", new ItemUpgrade(true, "Autocrafting Table will gain more recipes."));
 		
 		createItem("machine_upgrade_conservation", new ItemUpgrade(true, "Machines may have a chance to not use input."));
+		createItem("machine_upgrade_extra", new ItemUpgrade(true, "Machines may have a chance to provide additional output."));
+		
 		createItem("wooden_stirring_stick", new ItemStirringStick(35, TemperatureResistance.COLD));
 		createItem("pure_iron_stirring_stick", new ItemStirringStick(135, TemperatureResistance.HOT));
 		createItem("mystium_dowsing_rod", new ItemDowsingRod());
@@ -297,6 +227,24 @@ public class Registry {
 		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
 		createItem("steel_hoe", new HoeItem(ItemTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
 		
+		createItem("crank_shaft");
+		createItem("convection_component");
+		createItem("conduction_component");
+		createItem("empowered_conduction_component");
+		createItem("basic_battery");
+		createItem("temperature_regulator");
+		createItem("fluid_regulator");
+		createItem("stainless_steel_tank_component");
+		createItem("steel_tank_component");
+		createItem("pneumatic_device");
+		
+		createItem("chromium_ingot");
+		createItem("chromium_nugget");
+		createItem("chromium_plate");
+		
+		createItem("stainless_steel_plate");
+		createItem("energized_gold_ingot");
+		createItem("energized_gold_plate");
 		
 		
 		for(String i : itemRegistry.keySet()) {
@@ -323,7 +271,7 @@ public class Registry {
 		
 		createBlock("item_pipe", new PipeBase<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Type.ITEM));
 		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.FLUID));
-		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.POWER));
+		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.BASIC_POWER));
 		
 		
 		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT));
@@ -352,6 +300,9 @@ public class Registry {
 		createBlock("coal_generator", new BlockCoalGenerator());
 		createBlock("crankmill", new BlockCrankmill());
 		
+		createBlock("chromium_ore", Material.ROCK, 3f, 15f, 3, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("chromium_block", Material.IRON, 5f, 20f, 3, ToolType.PICKAXE, SoundType.METAL);
+		
 		createBlock("electric_furnace", new BlockElectricFurnace());
 		createBlock("electric_purifier", new BlockElectricPurifier());
 		createBlock("electric_grinder", new BlockElectricGrinder());
@@ -372,6 +323,15 @@ public class Registry {
 		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT));
 		
 		createBlock("tool_charger", new BlockToolCharger());
+		
+		createBlock("adv_energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.ADVANCED_POWER));
+		createBlock("smoldering_stone", Material.ROCK, 30f, 300f, 3, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("naphtha_turbine", new BlockNaphthaTurbine());
+		
+		createBlock("compressed_crafting_table", Material.WOOD, 2f, 10f, 0, ToolType.AXE, SoundType.WOOD);
+		
+		createBlock("refinery", new BlockRefinery());
+		createBlock("refinery_attachment_separation", new BlockSeparationAddon());
 		
 		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
@@ -408,7 +368,7 @@ public class Registry {
 		
 		createTileEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
 		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"));
-		createTileEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"));
+		createTileEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"), blockRegistry.get("adv_energy_pipe"));
 		
 		createTileEntity("basic_battery_cell", TEBasicBatteryCell.class);
 		createTileEntity("coal_generator", TECoalGenerator.class);
@@ -423,6 +383,7 @@ public class Registry {
 		createTileEntity("autocrafting_table", TEAutocraftingTable.class);
 		createTileEntity("pump", TEPump.class);
 		createTileEntity("tool_charger", TEToolCharger.class);
+		createTileEntity("refinery", TERefinery.class);
 		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
@@ -445,6 +406,7 @@ public class Registry {
 		createContainer("alloy_smelter", 1062, ContainerAlloySmelter.class);
 		
 		createContainer("autocrafting_table", 1061, ContainerAutocraftingTable.class);
+		createContainer("refinery", 1063, ContainerRefinery.class);
 		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
@@ -482,6 +444,7 @@ public class Registry {
 		registerScreen("electric_fluid_mixer", ContainerElectricFluidMixer.class, ScreenElectricFluidMixer.class);
 		registerScreen("autocrafting_table", ContainerAutocraftingTable.class, ScreenAutocraftingTable.class);
 		registerScreen("alloy_smelter", ContainerAlloySmelter.class, ScreenAlloySmelter.class);
+		registerScreen("refinery", ContainerRefinery.class, ScreenRefinery.class);
 	}
 	
 	@SubscribeEvent
@@ -500,6 +463,9 @@ public class Registry {
 		
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(FluidInGroundRecipe.FIG_RECIPE.toString()), FluidInGroundRecipe.FIG_RECIPE);
 		event.getRegistry().register(FluidInGroundRecipe.SERIALIZER.setRegistryName("fluid_in_ground"));
+		
+		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(RefiningCrafting.REFINING_RECIPE.toString()), RefiningCrafting.REFINING_RECIPE);
+		event.getRegistry().register(RefiningCrafting.SERIALIZER.setRegistryName("refining"));
 		
 	}
 	

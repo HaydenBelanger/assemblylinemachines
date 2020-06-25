@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sps",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:stainless_steel_plate"
+		},
+		"p":{
+			"item": "assemblylinemachines:energized_gold_plate"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:autocrafting_upgrade_sustained"
+	}
+}
