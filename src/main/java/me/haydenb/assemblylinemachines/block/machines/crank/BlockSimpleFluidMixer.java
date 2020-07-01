@@ -87,7 +87,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 		public int cranks;
 		
 		public TESimpleFluidMixer(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, (TranslationTextComponent) Registry.getBlock("simple_fluid_mixer").getNameTextComponent(), Registry.getContainerId("simple_fluid_mixer"), ContainerSimpleFluidMixer.class);
+			super(tileEntityTypeIn, 2, new TranslationTextComponent(Registry.getBlock("simple_fluid_mixer").getTranslationKey()), Registry.getContainerId("simple_fluid_mixer"), ContainerSimpleFluidMixer.class);
 		}
 		
 		public TESimpleFluidMixer() {

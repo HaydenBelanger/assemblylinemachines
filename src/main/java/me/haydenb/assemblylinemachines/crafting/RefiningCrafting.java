@@ -73,6 +73,11 @@ public class RefiningCrafting implements IRecipe<IInventory>{
 	public IRecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
+	
+	@Override
+	public boolean isDynamic() {
+		return true;
+	}
 
 	@Override
 	public IRecipeType<?> getType() {

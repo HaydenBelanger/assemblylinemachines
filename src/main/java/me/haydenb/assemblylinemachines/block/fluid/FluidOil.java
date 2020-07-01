@@ -9,7 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.state.StateContainer.Builder;
@@ -34,7 +34,7 @@ public class FluidOil extends ForgeFlowingFluid {
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Fluid, IFluidState> builder) {
+	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
 		super.fillStateContainer(builder);
 		
 		if(!source) {
@@ -42,12 +42,12 @@ public class FluidOil extends ForgeFlowingFluid {
 		}
 	}
 	@Override
-	public boolean isSource(IFluidState state) {
+	public boolean isSource(FluidState state) {
 		return source;
 	}
 
 	@Override
-	public int getLevel(IFluidState state) {
+	public int getLevel(FluidState state) {
 		if(!source) {
 			return state.get(LEVEL_1_8);
 		}else {

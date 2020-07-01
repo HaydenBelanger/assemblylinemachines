@@ -99,7 +99,7 @@ public class BlockElectricGrinder extends BlockScreenTileEntity<BlockElectricGri
 		private ItemStack output = null;
 		
 		public TEElectricGrinder(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 5, (TranslationTextComponent) Registry.getBlock("electric_grinder").getNameTextComponent(), Registry.getContainerId("electric_grinder"), ContainerElectricGrinder.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 5, new TranslationTextComponent(Registry.getBlock("electric_grinder").getTranslationKey()), Registry.getContainerId("electric_grinder"), ContainerElectricGrinder.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricGrinder() {

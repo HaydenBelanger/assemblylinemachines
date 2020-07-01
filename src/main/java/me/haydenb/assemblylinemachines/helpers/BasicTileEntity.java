@@ -25,7 +25,8 @@ public class BasicTileEntity extends TileEntity {
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		
+		handleUpdateTag(world.getBlockState(pos), pkt.getNbtCompound());
 	}
 	
 	

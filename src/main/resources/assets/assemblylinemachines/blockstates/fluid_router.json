@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "facing=north": { "model": "assemblylinemachines:block/fluid_router" },
+        "facing=south": { "model": "assemblylinemachines:block/fluid_router", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/fluid_router", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/fluid_router", "y": 90 }
+
+    }
+}

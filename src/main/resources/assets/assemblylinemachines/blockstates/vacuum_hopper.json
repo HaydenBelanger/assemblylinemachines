@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "facing=down": { "model": "assemblylinemachines:block/vacuum_hopper" },
+        "facing=north": { "model": "assemblylinemachines:block/vacuum_hopper_side", "y": 270},
+        "facing=south": { "model": "assemblylinemachines:block/vacuum_hopper_side", "y": 90 },
+        "facing=west": { "model": "assemblylinemachines:block/vacuum_hopper_side", "y": 180 },
+        "facing=east": { "model": "assemblylinemachines:block/vacuum_hopper_side"}
+    }
+}

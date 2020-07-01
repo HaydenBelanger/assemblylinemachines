@@ -17,7 +17,6 @@ public class ItemHammer extends SwordItem {
 	public ItemStack getContainerItem(ItemStack itemStack) {
 		
 		if(itemStack.getDamage() >= itemStack.getMaxDamage()) {
-			System.out.println("Deleting...");
 			return ItemStack.EMPTY;
 		}
 		
@@ -43,11 +42,27 @@ public class ItemHammer extends SwordItem {
 					return stack;
 				}
 			}
+		}else if(stack.getItem() == Registry.getItem("mystium_hammer")) {
+			if(stack.hasTag()) {
+				CompoundNBT compound = stack.getTag();
+				
+				int fe = compound.getInt("assemblylinemachines:fe");
+				
+				if(fe >= 200) {
+					compound.putInt("assemblylinemachines:fe", fe - 200);
+					stack.setTag(compound);
+					return stack;
+				}
+			}
 		}
 		stack.setDamage(itemStack.getDamage() + 1);
 		
 		return stack;
 	}
 	
+	@Override
+	public boolean hasContainerItem() {
+		return true;
+	}
 }
 

@@ -14,7 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.state.StateContainer.Builder;
@@ -37,7 +37,7 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Fluid, IFluidState> builder) {
+	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
 		super.fillStateContainer(builder);
 
 		if (!source) {
@@ -46,12 +46,12 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 	}
 
 	@Override
-	public boolean isSource(IFluidState state) {
+	public boolean isSource(FluidState state) {
 		return source;
 	}
 
 	@Override
-	public int getLevel(IFluidState state) {
+	public int getLevel(FluidState state) {
 		if (!source) {
 			return state.get(LEVEL_1_8);
 		} else {
@@ -65,7 +65,7 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	protected void randomTick(World world, BlockPos pos, IFluidState state, Random random) {
+	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
 		
 		if(source) {
 			Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.add(-3, -1, -3).north().west(), pos.add(3, 1, 3)).iterator();
@@ -84,7 +84,7 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 		}
 	}
 	
-	private float breakAndBreakConnected(World world, IFluidState origState, BlockPos posx) {
+	private float breakAndBreakConnected(World world, FluidState origState, BlockPos posx) {
 		world.setBlockState(posx, Blocks.AIR.getDefaultState());
 		
 		Iterator<BlockPos> iter = BlockPos.getAllInBox(posx.down().north().west(), posx.up().south().east()).iterator();
@@ -93,7 +93,7 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 		while(iter.hasNext()) {
 			BlockPos posq = iter.next();
 			
-			IFluidState fs = world.getFluidState(posq);
+			FluidState fs = world.getFluidState(posq);
 			if(fs.getFluid() == origState.getFluid()) {
 				pow = pow + breakAndBreakConnected(world, origState, posq);
 			}

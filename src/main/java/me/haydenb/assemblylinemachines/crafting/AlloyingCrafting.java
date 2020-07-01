@@ -7,15 +7,9 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
+import net.minecraft.item.crafting.*;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -105,6 +99,11 @@ public class AlloyingCrafting implements IRecipe<IInventory>{
 		nnl.add(Ingredient.fromItems(Registry.getItem("alloy_smelter")));
 		
 		return nnl;
+	}
+	
+	@Override
+	public boolean isDynamic() {
+		return true;
 	}
 	
 	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<AlloyingCrafting>{

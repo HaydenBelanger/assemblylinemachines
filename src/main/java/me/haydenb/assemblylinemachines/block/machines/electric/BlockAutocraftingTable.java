@@ -1,8 +1,6 @@
 package me.haydenb.assemblylinemachines.block.machines.electric;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
@@ -17,45 +15,26 @@ import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.SimpleButton;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.SupplierWrapper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import me.haydenb.assemblylinemachines.util.*;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.inventory.*;
 import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.RecipeItemHelper;
+import net.minecraft.item.crafting.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -158,7 +137,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 		private int changeModelTimer = 0;
 		
 		public TEAutocraftingTable(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 32, (TranslationTextComponent) Blocks.CRAFTING_TABLE.getNameTextComponent(), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000));
+			super(tileEntityTypeIn, 32, new TranslationTextComponent(Blocks.CRAFTING_TABLE.getTranslationKey()), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000));
 		}
 		
 		public TEAutocraftingTable() {
@@ -217,6 +196,8 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 						ICraftingRecipe recipe = validRecipes.get(nX);
 						int tCost = 0;
 						boolean validRecipe = true;
+						
+						ArrayList<Integer> containerItemSlots = new ArrayList<>();
 						HashMap<ItemStack, Integer> shrinkStacks = new HashMap<>();
 						for(Ingredient ing : recipe.getIngredients()) {
 							if(ing.getMatchingStacks().length != 0) {
@@ -225,19 +206,30 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 								for(int i = 14; i < 32; i++) {
 									ItemStack st = this.getStackInSlot(i);
 									if(ing.test(st)) {
-										if(shrinkStacks.containsKey(st)) {
+										
+										if(st.hasContainerItem()) {
 											
-											if(shrinkStacks.get(st) < st.getCount()) {
-												shrinkStacks.put(st, shrinkStacks.get(st) + 1);
+											if(!containerItemSlots.contains(i)) {
+												containerItemSlots.add(i);
 												foundMatch = true;
 												break;
 											}
 										}else {
-											shrinkStacks.put(st, 1);
-											foundMatch = true;
-											break;
-											
+											if(shrinkStacks.containsKey(st)) {
+												
+												if(shrinkStacks.get(st) < st.getCount()) {
+													shrinkStacks.put(st, shrinkStacks.get(st) + 1);
+													foundMatch = true;
+													break;
+												}
+											}else {
+												shrinkStacks.put(st, 1);
+												foundMatch = true;
+												break;
+												
+											}
 										}
+										
 										
 									}
 								}
@@ -266,12 +258,20 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 									for(ItemStack i : shrinkStacks.keySet()) {
 										i.shrink(shrinkStacks.get(i));
 									}
+									for(Integer i : containerItemSlots) {
+										
+										setInventorySlotContents(i, getStackInSlot(i).getContainerItem());
+									}
 									cost += tCost;
 									devicePerformed = true;
 									setInventorySlotContents(0, output);
 								}else if(ItemHandlerHelper.canItemStacksStack(output, getStackInSlot(0)) && getStackInSlot(0).getCount() + output.getCount() <= getStackInSlot(0).getMaxStackSize()) {
 									for(ItemStack i : shrinkStacks.keySet()) {
 										i.shrink(shrinkStacks.get(i));
+									}
+									for(Integer i : containerItemSlots) {
+										
+										setInventorySlotContents(i, getStackInSlot(i).getContainerItem());
 									}
 									cost += tCost;
 									devicePerformed = true;
@@ -296,7 +296,13 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 								for(int x : vals) {
 									if(getStackInSlot(x).isEmpty()) {
 										for(ItemStack i : shrinkStacks.keySet()) {
+												
 											i.shrink(shrinkStacks.get(i));
+											
+										}
+										for(Integer i : containerItemSlots) {
+											
+											setInventorySlotContents(i, getStackInSlot(i).getContainerItem());
 										}
 										cost += tCost;
 										devicePerformed = true;
@@ -305,6 +311,10 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 									}else if(ItemHandlerHelper.canItemStacksStack(output, getStackInSlot(x)) && getStackInSlot(x).getCount() + output.getCount() <= getStackInSlot(x).getMaxStackSize()) {
 										for(ItemStack i : shrinkStacks.keySet()) {
 											i.shrink(shrinkStacks.get(i));
+										}
+										for(Integer i : containerItemSlots) {
+											
+											setInventorySlotContents(i, getStackInSlot(i).getContainerItem());
 										}
 										cost += tCost;
 										devicePerformed = true;
@@ -667,8 +677,8 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 		protected void init() {
 			super.init();
 			
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = this.guiLeft;
+			int y = this.guiTop;
 			
 			
 			for (int row = 0; row < 5; ++row) {
@@ -717,10 +727,8 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 			}
 			
 			@Override
-			protected boolean isValidClickButton(int p_isValidClickButton_1_) {
-				
+			protected boolean func_230987_a_(int p_230987_1_) {
 				return isEnabledSlot();
-				
 			}
 			
 			
@@ -747,12 +755,6 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			
-			if (renderTitles == true) {
-				this.font.drawString(this.title.getFormattedText(), titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
-				this.font.drawString(this.playerInventory.getDisplayName().getFormattedText(), invTextLoc.getFirst(),
-						invTextLoc.getSecond(), 4210752);
-			}
-			
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			
@@ -761,7 +763,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
 				if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
 
-					if(Screen.hasShiftDown()) {
+					if(Screen.func_231173_s_()) {
 						ArrayList<String> str = new ArrayList<>();
 						str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.getCapacity()) + "FE");
 						if(usesfept) {
@@ -781,7 +783,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 
 			//Render each button upgrade TT.
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + bb.getFirst().sizex && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + bb.getFirst().sizey) {
+				if (mouseX >= bb.getFirst().getX() && mouseX <= bb.getFirst().getX() + bb.getFirst().sizex && mouseY >= bb.getFirst().getY() && mouseY <= bb.getFirst().getY() + bb.getFirst().sizey) {
 					
 					if(!(bb.getFirst() instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton)bb.getFirst()).isEnabledSlot()) {
 						if (bb.getSecond() != null) {
@@ -798,7 +800,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 			}
 			
 			//Render special filter slot button TT.
-			if (mouseX >= bSwitch.x && mouseX <= bSwitch.x + bSwitch.sizex && mouseY >= bSwitch.y && mouseY <= bSwitch.y + bSwitch.sizey) {
+			if (mouseX >= bSwitch.getX() && mouseX <= bSwitch.getX() + bSwitch.sizex && mouseY >= bSwitch.getY() && mouseY <= bSwitch.getY() + bSwitch.sizey) {
 				
 				
 				
@@ -830,11 +832,11 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 				if(!(bb.getFirst() instanceof AutocraftingSlotButton) || ((AutocraftingSlotButton) bb.getFirst()).isEnabledSlot()) {
 					if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
 						//blit each button's pressed texture, if available.
-						super.blit(bb.getFirst().x, bb.getFirst().y, bb.getFirst().blitx, bb.getFirst().blity, bb.getFirst().sizex, bb.getFirst().sizey);
+						super.blit(bb.getFirst().getX(), bb.getFirst().getY(), bb.getFirst().blitx, bb.getFirst().blity, bb.getFirst().sizex, bb.getFirst().sizey);
 					}
 				}else {
 					//if recipe slot is not enabled blit over it to hide.
-					super.blit(bb.getFirst().x, bb.getFirst().y, 54, 17, bb.getFirst().sizex, bb.getFirst().sizey);
+					super.blit(bb.getFirst().getX(), bb.getFirst().getY(), 54, 17, bb.getFirst().sizex, bb.getFirst().sizey);
 				}
 				
 
@@ -861,7 +863,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 				break;
 			}
 			
-			if (mouseX >= bSwitch.x && mouseX <= bSwitch.x + bSwitch.sizex && mouseY >= bSwitch.y && mouseY <= bSwitch.y + bSwitch.sizey) {
+			if (mouseX >= bSwitch.getX() && mouseX <= bSwitch.getX() + bSwitch.sizex && mouseY >= bSwitch.getY() && mouseY <= bSwitch.getY() + bSwitch.sizey) {
 				
 				
 				//blit overlay for the color slots on the internal inventory.

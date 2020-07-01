@@ -2,6 +2,8 @@ package me.haydenb.assemblylinemachines.registry.plugins.jei.categories;
 
 import java.util.List;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -56,8 +58,8 @@ public class GrinderRecipeCategory implements IRecipeCategory<GrinderCrafting> {
 	}
 	
 	@Override
-	public void draw(GrinderCrafting recipe, double mouseX, double mouseY) {
-		progbar.draw(21, 22);
+	public void draw(GrinderCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
+		progbar.draw(mx, 21, 22);
 	}
 
 	@Override

@@ -76,6 +76,11 @@ public class FluidInGroundRecipe implements IRecipe<IInventory>{
 		return FIG_RECIPE;
 	}
 	
+	@Override
+	public boolean isDynamic() {
+		return true;
+	}
+	
 	public int getChance() {
 		return odds;
 	}

@@ -12,13 +12,12 @@ import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome.TempCategory;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FluidLevelManager {
@@ -29,7 +28,7 @@ public class FluidLevelManager {
 
 	public static void readData(ChunkPos pos, IWorld world, CompoundNBT nbt) {
 
-		ChunkCoords cc = new ChunkCoords(world.getDimension().getType().getId(), pos.x, pos.z);
+		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), pos.x, pos.z);
 
 		if (nbt.contains("assemblylinemachines:chunkfluid")) {
 
@@ -38,7 +37,7 @@ public class FluidLevelManager {
 	}
 
 	public static void writeData(IChunk chunk, IWorld world, CompoundNBT nbt) {
-		ChunkCoords cc = new ChunkCoords(world.getDimension().getType().getId(), chunk.getPos().x, chunk.getPos().z);
+		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), chunk.getPos().x, chunk.getPos().z);
 		if (CHUNK_FLUIDS.containsKey(cc)) {
 
 			CompoundNBT sub = new CompoundNBT();
@@ -49,26 +48,26 @@ public class FluidLevelManager {
 	}
 
 	public static void clearData(IWorld world, ChunkPos pos) {
-		int dimid = world.getDimension().getType().getId();
+		int dimid = world.func_230315_m_().func_241513_m_();
 		CHUNK_FLUIDS.remove(new ChunkCoords(dimid, pos.x, pos.z));
 	}
 
 	public static FluidStack getOrCreateFluidStack(BlockPos pos, World world) {
 
 		ChunkPos chunkpos = world.getChunk(pos).getPos();
-		ChunkCoords cc = new ChunkCoords(world.getDimension().getType().getId(), chunkpos.x, chunkpos.z);
+		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), chunkpos.x, chunkpos.z);
 		FluidStack fs = CHUNK_FLUIDS.get(cc);
 		if (fs == null) {
 
 			List<FluidInGroundRecipe> recipes = world.getRecipeManager().getRecipes(FluidInGroundRecipe.FIG_RECIPE, null, world);
 			TempCategory tc = world.getBiome(pos).getTempCategory();
-			DimensionType dt = world.getDimension().getType();
+			RegistryKey<DimensionType> dk = world.func_234922_V_();
 			for (FluidInGroundRecipe recipe : recipes) {
 
 				int chance = recipe.getChance();
 				boolean half = false;
 
-				if (dt == DimensionType.OVERWORLD) {
+				if (dk.equals(DimensionType.field_235999_c_)) {
 
 					if (recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ANY && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYCOLD
 							&& recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYHOT && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_PREFCOLD
@@ -84,11 +83,11 @@ public class FluidLevelManager {
 						chance = Math.round((float) chance / 2f);
 						half = true;
 					}
-				}else if(dt == DimensionType.THE_NETHER) {
+				}else if(dk.equals(DimensionType.field_236000_d_)) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.NETHER) {
 						chance = -1;
 					}
-				}else if(dt == DimensionType.THE_END) {
+				}else if(dk.equals(DimensionType.field_236001_e_)) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.END) {
 						chance = -1;
 					}
@@ -147,7 +146,7 @@ public class FluidLevelManager {
 		}
 
 		ChunkPos chunkpos = world.getChunk(pos).getPos();
-		ChunkCoords cc = new ChunkCoords(world.getDimension().getType().getId(), chunkpos.x, chunkpos.z);
+		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), chunkpos.x, chunkpos.z);
 
 		Fluid f = fs.getFluid();
 		if (fs.getAmount() <= amt) {

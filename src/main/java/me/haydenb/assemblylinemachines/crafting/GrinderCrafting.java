@@ -84,6 +84,11 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
+	public boolean isDynamic() {
+		return true;
+	}
+	
+	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(input);
@@ -137,7 +142,7 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 				final int grinds = JSONUtils.getInt(json, "grinds");
 				final Blades tier = Blades.valueOf(JSONUtils.getString(json, "bladetype"));
 				
-				if(tier == Blades.none) {
+				if(tier == Blades.NONE) {
 					AssemblyLineMachines.LOGGER.error("Error deserializing Grinder Crafting Recipe from JSON: Cannot use 'none' as bladetype.");
 					return null;
 				}

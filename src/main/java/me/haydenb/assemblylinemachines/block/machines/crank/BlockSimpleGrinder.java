@@ -84,7 +84,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		
 		
 		public TESimpleGrinder(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, (TranslationTextComponent) Registry.getBlock("simple_grinder").getNameTextComponent(), Registry.getContainerId("simple_grinder"), ContainerSimpleGrinder.class);
+			super(tileEntityTypeIn, 2, new TranslationTextComponent(Registry.getBlock("simple_grinder").getTranslationKey()), Registry.getContainerId("simple_grinder"), ContainerSimpleGrinder.class);
 		}
 		
 		public TESimpleGrinder() {

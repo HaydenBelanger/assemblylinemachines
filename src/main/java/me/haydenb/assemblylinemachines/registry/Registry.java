@@ -7,13 +7,16 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.*;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.BathStatus;
 import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
-import me.haydenb.assemblylinemachines.block.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.BlockFluidRouter.*;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
+import me.haydenb.assemblylinemachines.block.BlockInteractor.*;
+import me.haydenb.assemblylinemachines.block.BlockVacuumHopper.TEVacuumHopper;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.FluidGeneratorTypes;
 import me.haydenb.assemblylinemachines.block.fluid.*;
 import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
@@ -35,17 +38,20 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockToolCharger.
 import me.haydenb.assemblylinemachines.block.machines.oil.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.*;
-import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefineryAddon.BlockSeparationAddon;
+import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefineryAddon.*;
 import me.haydenb.assemblylinemachines.block.pipe.*;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorScreen;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
+import me.haydenb.assemblylinemachines.block.storage.BlockBottomlessStorageUnit;
+import me.haydenb.assemblylinemachines.block.storage.BlockBottomlessStorageUnit.*;
+import me.haydenb.assemblylinemachines.block.storage.BlockFluidTank;
+import me.haydenb.assemblylinemachines.block.storage.BlockFluidTank.TEFluidTank;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
-import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
-import me.haydenb.assemblylinemachines.item.items.ItemDowsingRod;
+import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.rendering.TankTER;
 import me.haydenb.assemblylinemachines.util.StateProperties;
@@ -74,7 +80,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.ILightReader;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -126,9 +132,9 @@ public class Registry {
 		createItem("titanium_ingot");
 		createItem("titanium_nugget");
 		createItem("titanium_blade_piece");
-		createItem("titanium_blade", new ItemGrindingBlade(Blades.titanium));
+		createItem("titanium_blade", new ItemGrindingBlade(Blades.TITANIUM));
 		createItem("pure_gold_blade_piece");
-		createItem("pure_gold_blade", new ItemGrindingBlade(Blades.puregold));
+		createItem("pure_gold_blade", new ItemGrindingBlade(Blades.PUREGOLD));
 		
 		createItem("ground_iron");
 		createItem("ground_gold");
@@ -180,6 +186,7 @@ public class Registry {
 		
 		createItem("machine_upgrade_conservation", new ItemUpgrade(true, "Machines may have a chance to not use input."));
 		createItem("machine_upgrade_extra", new ItemUpgrade(true, "Machines may have a chance to provide additional output."));
+		createItem("machine_upgrade_gas", new ItemUpgrade(false, "Some machines gain the ability to process gas.", "Greatly increases power consumption."));
 		
 		createItem("wooden_stirring_stick", new ItemStirringStick(35, TemperatureResistance.COLD));
 		createItem("pure_iron_stirring_stick", new ItemStirringStick(135, TemperatureResistance.HOT));
@@ -194,7 +201,8 @@ public class Registry {
 		createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM, 4, -3.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_pickaxe", new PickaxeItem(ItemTiers.TITANIUM, 0, -1.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_shovel", new ShovelItem(ItemTiers.TITANIUM, 0, -1.3f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_hoe", new HoeItem(ItemTiers.TITANIUM, -0.5f, new Item.Properties().group(creativeTab)));
+		
+		createItem("titanium_hoe", new ItemPublicHoe(ItemTiers.TITANIUM, 0, -0.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_helmet", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
 		createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
 		createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
@@ -205,7 +213,7 @@ public class Registry {
 		createItem("crank_axe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
 		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
 		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
-		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, HoeItem.class));
+		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, ItemPublicHoe.class));
 		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
 		
 		
@@ -213,7 +221,7 @@ public class Registry {
 		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 300000, AxeItem.class));
 		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 600000, PickaxeItem.class));
 		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 300000, ShovelItem.class));
-		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, -999, -0.5f, new Item.Properties().group(creativeTab), 90000, HoeItem.class));
+		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, -999, -0.5f, new Item.Properties().group(creativeTab), 90000, ItemPublicHoe.class));
 		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2500000, ItemHammer.class));
 		
 		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
@@ -225,7 +233,7 @@ public class Registry {
 		createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
 		createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
 		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
-		createItem("steel_hoe", new HoeItem(ItemTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_hoe", new ItemPublicHoe(ItemTiers.STEEL, 0, -0.5f, new Item.Properties().group(creativeTab)));
 		
 		createItem("crank_shaft");
 		createItem("convection_component");
@@ -246,6 +254,13 @@ public class Registry {
 		createItem("energized_gold_ingot");
 		createItem("energized_gold_plate");
 		
+		createItem("plastic_sheet");
+		createItem("rubber_sheet");
+		createItem("rubber_ball");
+		createItem("plastic_ball");
+		
+		createItem("lock_remover", new ItemLockRemover());
+		createItem("key", new ItemKey());
 		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
@@ -332,6 +347,19 @@ public class Registry {
 		
 		createBlock("refinery", new BlockRefinery());
 		createBlock("refinery_attachment_separation", new BlockSeparationAddon());
+		createBlock("refinery_attachment_addition", new BlockAdditionAddon());
+		createBlock("refinery_attachment_halogen", new BlockHalogenAddon());
+		createBlock("refinery_attachment_cracking", new BlockCrackingAddon());
+		
+		createBlock("fluid_router", new BlockFluidRouter());
+		createBlock("interactor", new BlockInteractor());
+		createBlock("vacuum_hopper", new BlockVacuumHopper());
+		
+		createBlockNoItem("bottomless_storage_unit", new BlockBottomlessStorageUnit());
+		createItem("bottomless_storage_unit", new BlockItemBottomlessStorageUnit(getBlock("bottomless_storage_unit")));
+		
+		createBlock("combustion_generator", new BlockFluidGenerator(FluidGeneratorTypes.COMBUSTION));
+		createBlock("geothermal_generator", new BlockFluidGenerator(FluidGeneratorTypes.GEOTHERMAL));
 		
 		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
@@ -342,6 +370,10 @@ public class Registry {
 				getFluidAttributes("gasoline").temperature(200)), false), new FluidOilProductBlock(() -> (FlowingFluid)Registry.getFluid("gasoline")), getBucketItem("gasoline"));
 		createFluid("diesel", new FluidOilProduct(getFluidProperties("diesel", getFluidAttributes("diesel").temperature(200)), true), new FluidOilProduct(getFluidProperties("diesel", 
 				getFluidAttributes("diesel").temperature(200)), false), new FluidOilProductBlock(() -> (FlowingFluid)Registry.getFluid("diesel")), getBucketItem("diesel"));
+		createGaseousFluid("ethane", 600);
+		createGaseousFluid("propane", 600);
+		createGaseousFluid("ethylene", 600);
+		createGaseousFluid("propylene", 600);
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
@@ -384,6 +416,10 @@ public class Registry {
 		createTileEntity("pump", TEPump.class);
 		createTileEntity("tool_charger", TEToolCharger.class);
 		createTileEntity("refinery", TERefinery.class);
+		createTileEntity("fluid_router", TEFluidRouter.class);
+		createTileEntity("interactor", TEInteractor.class);
+		createTileEntity("vacuum_hopper", TEVacuumHopper.class);
+		createTileEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
 		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
@@ -407,6 +443,9 @@ public class Registry {
 		
 		createContainer("autocrafting_table", 1061, ContainerAutocraftingTable.class);
 		createContainer("refinery", 1063, ContainerRefinery.class);
+		createContainer("fluid_router", 1064, ContainerFluidRouter.class);
+		createContainer("interactor", 1065, ContainerInteractor.class);
+		createContainer("bottomless_storage_unit", 1066, ContainerBottomlessStorageUnit.class);
 		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
@@ -445,6 +484,9 @@ public class Registry {
 		registerScreen("autocrafting_table", ContainerAutocraftingTable.class, ScreenAutocraftingTable.class);
 		registerScreen("alloy_smelter", ContainerAlloySmelter.class, ScreenAlloySmelter.class);
 		registerScreen("refinery", ContainerRefinery.class, ScreenRefinery.class);
+		registerScreen("fluid_router", ContainerFluidRouter.class, ScreenFluidRouter.class);
+		registerScreen("interactor", ContainerInteractor.class, ScreenInteractor.class);
+		registerScreen("bottomless_storage_unit", ContainerBottomlessStorageUnit.class, ScreenBottomlessStorageUnit.class);
 	}
 	
 	@SubscribeEvent
@@ -475,14 +517,13 @@ public class Registry {
 		
 		
 		event.getBlockColors().register(new IBlockColor() {
-			
+
 			@Override
-			public int getColor(BlockState state, ILightReader reader, BlockPos pos, int tint) {
+			public int getColor(BlockState state, IBlockDisplayReader reader, BlockPos pos, int tint) {
 				if(reader != null && pos != null) {
 					
-					
-					if(state.has(BlockFluidBath.STATUS)) {
-						if(state.get(BlockFluidBath.STATUS) == BathStatus.success) {
+					if(state.func_235901_b_(BlockFluidBath.STATUS)) {
+						if(state.get(BlockFluidBath.STATUS) == BathStatus.SUCCESS) {
 							
 							TileEntity te = reader.getTileEntity(pos);
 							if(te != null && te instanceof TEFluidBath) {
@@ -529,7 +570,6 @@ public class Registry {
 		Item.Properties properties = new Item.Properties().group(creativeTab);
 		createItem(name, properties);
 	}
-	
 	private static void createItem(String name, Item.Properties properties) {
 		Item i = new Item(properties);
 		createItem(name, i);
@@ -617,6 +657,20 @@ public class Registry {
 		fluidRegistry.put(name + "_flowing", flowing.setRegistryName(name + "_flowing"));
 		blockRegistry.put(name + "_block", block.setRegistryName(name + "_block"));
 		itemRegistry.put(name + "_bucket", bucket.setRegistryName(name + "_bucket"));
+	}
+	
+	
+	private static void createGaseousFluid(String name, int temp) {
+		ForgeFlowingFluid.Properties props = new ForgeFlowingFluid.Properties(() -> fluidRegistry.get(name), () -> fluidRegistry.get(name + "_flowing"), FluidAttributes.builder(new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name),
+				new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name)).gaseous().temperature(temp));
+		GaseousFluid fl = new GaseousFluid(true, props);
+		GaseousFluid gfl = new GaseousFluid(false, props);
+		createFluidOnly(name, fl, gfl);
+	}
+	
+	private static void createFluidOnly(String name, ForgeFlowingFluid source, ForgeFlowingFluid flowing) {
+		fluidRegistry.put(name, source.setRegistryName(name));
+		fluidRegistry.put(name + "_flowing", flowing.setRegistryName(name + "_flowing"));
 	}
 	
 	//FLUID GETTERS

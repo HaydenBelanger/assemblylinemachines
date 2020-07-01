@@ -46,12 +46,12 @@ public class BlockHandGrinder extends Block {
 	private static final EnumProperty<Blades> BLADE_PROPERTY = EnumProperty.create("blade_type", Blades.class);
 	public BlockHandGrinder() {
 		super(Block.Properties.create(Material.ROCK).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE));
-		this.setDefaultState(this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(BLADE_PROPERTY, Blades.none));
+		this.setDefaultState(this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(BLADE_PROPERTY, Blades.NONE));
 	}
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite()).with(BLADE_PROPERTY, Blades.none);
+		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite()).with(BLADE_PROPERTY, Blades.NONE);
 	}
 	
 	@Override
@@ -71,7 +71,7 @@ public class BlockHandGrinder extends Block {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		
-		if(state.get(BLADE_PROPERTY) == Blades.none) {
+		if(state.get(BLADE_PROPERTY) == Blades.NONE) {
 			return General.rotateShape(Direction.NORTH, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE_NO_BLADE);
 		}else {
 			return General.rotateShape(Direction.NORTH, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE);
@@ -175,7 +175,7 @@ public class BlockHandGrinder extends Block {
 							}
 							
 							if(entity.blade == null || entity.blade == ItemStack.EMPTY || bladeBroke) {
-								world.setBlockState(pos, state.with(BLADE_PROPERTY, Blades.none));
+								world.setBlockState(pos, state.with(BLADE_PROPERTY, Blades.NONE));
 								player.sendStatusMessage(new StringTextComponent("The blade broke!"), true);
 								entity.blade = ItemStack.EMPTY;
 							}
@@ -212,8 +212,8 @@ public class BlockHandGrinder extends Block {
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
+			super.func_230337_a_(p_230337_1_, compound);
 			
 			if(compound.contains("assemblylinemachines:blade")) {
 				blade = ItemStack.read(compound.getCompound("assemblylinemachines:blade"));
@@ -238,7 +238,7 @@ public class BlockHandGrinder extends Block {
 	}
 	
 	public static enum Blades implements IStringSerializable{
-		titanium(0, 110, "Titanium", "titanium_blade"), puregold(1, 170, "Pure Gold", "pure_gold_blade"), none(-999, -999, null, null);
+		TITANIUM(0, 110, "Titanium", "titanium_blade"), PUREGOLD(1, 170, "Pure Gold", "pure_gold_blade"), NONE(-999, -999, null, null);
 
 		public int tier;
 		public int uses;
@@ -252,11 +252,6 @@ public class BlockHandGrinder extends Block {
 			this.iconItemName = iconItemName;
 		}
 		
-		@Override
-		public String getName() {
-			return this.toString();
-		}
-		
 		public static Ingredient getAllBladesAtMinTier(int minTier) {
 			List<Item> items = new ArrayList<>();
 			for(Blades b : values()) {
@@ -266,6 +261,11 @@ public class BlockHandGrinder extends Block {
 			}
 			
 			return Ingredient.fromItems(items.toArray(new Item[items.size()]));
+		}
+
+		@Override
+		public String func_176610_l() {
+			return toString().toLowerCase();
 		}
 	}
 	

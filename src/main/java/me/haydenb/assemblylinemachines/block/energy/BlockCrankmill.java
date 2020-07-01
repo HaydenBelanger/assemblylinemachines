@@ -116,7 +116,7 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 		private int timer = 0;
 		
 		public TECrankmill(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 0, (TranslationTextComponent) Registry.getBlock("crankmill").getNameTextComponent(), Registry.getContainerId("crankmill"), ContainerCrankmill.class,
+			super(tileEntityTypeIn, 0, new TranslationTextComponent(Registry.getBlock("crankmill").getTranslationKey()), Registry.getContainerId("crankmill"), ContainerCrankmill.class,
 					new EnergyProperties(false, true, 12000));
 		}
 

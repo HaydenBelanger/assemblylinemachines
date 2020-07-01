@@ -13,6 +13,7 @@ import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -96,7 +97,7 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		return parent.getAttributeModifiers(equipmentSlot);
 	}
 	
@@ -130,12 +131,12 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 			CompoundNBT compound = stack.getTag();
 			
 			if(compound.contains("assemblylinemachines:cranks")) {
-				tooltip.add(new StringTextComponent("Cranks: " + compound.getInt("assemblylinemachines:cranks") + "/" + getMaxCranks()).applyTextStyle(TextFormatting.DARK_GREEN));
+				tooltip.add(new StringTextComponent("Cranks: " + compound.getInt("assemblylinemachines:cranks") + "/" + getMaxCranks()).func_230532_e_().func_240699_a_(TextFormatting.DARK_GREEN));
 				return;
 			}
 		}
 		
-		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).applyTextStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).func_230532_e_().func_240699_a_(TextFormatting.DARK_GREEN));
 	}
 	/**
 	 * Returns a CrankTool version of A.

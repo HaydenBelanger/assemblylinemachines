@@ -1,12 +1,8 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.*;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -25,25 +21,27 @@ public class ModCreativeTab extends ItemGroup {
 		return new ItemStack(Registry.getItem("steel_gear"));
 	}
 	
+	
 	@Override
 	public void fill(NonNullList<ItemStack> items) {
-		TreeSet<Item> data = new TreeSet<>(new Comparator<Item>() {
+		
+		
+		ArrayList<Item> data = new ArrayList<>(ForgeRegistries.ITEMS.getValues());
+		data.sort(new Comparator<Item>() {
 
 			@Override
 			public int compare(Item i1, Item i2) {
+				
 				if(i1 instanceof BlockItem && !(i2 instanceof BlockItem)) {
 					return -1;
-				}else if(i2 instanceof BlockItem && !(i2 instanceof BlockItem)) {
+				}else if(i2 instanceof BlockItem && !(i1 instanceof BlockItem)) {
 					return 1;
 				}else {
-					
 					return i1.getName().getUnformattedComponentText().compareTo(i2.getName().getUnformattedComponentText());
 					
 				}
 			}
 		});
-		
-		data.addAll(ForgeRegistries.ITEMS.getValues());
 		
 		for(Item i : data) {
 			

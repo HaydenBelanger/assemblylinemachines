@@ -4,17 +4,12 @@ import java.util.Iterator;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
@@ -22,7 +17,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -45,7 +40,7 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Fluid, IFluidState> builder) {
+	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
 		super.fillStateContainer(builder);
 
 		if (!source) {
@@ -54,10 +49,9 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 	}
 
 	@Override
-	public boolean isSource(IFluidState state) {
+	public boolean isSource(FluidState state) {
 		return source;
 	}
-	
 
 	@Override
 	protected int getLevelDecreasePerBlock(IWorldReader worldIn) {
@@ -65,7 +59,7 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	protected void randomTick(World world, BlockPos pos, IFluidState state, Random random) {
+	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
 		Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.up().north().east(), pos.down().south().west()).iterator();
 		while(iter.hasNext()) {
 			BlockPos cor = iter.next();
@@ -97,7 +91,7 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 	}
 
 	@Override
-	public int getLevel(IFluidState state) {
+	public int getLevel(FluidState state) {
 		if (!source) {
 			return state.get(LEVEL_1_8);
 		} else {
@@ -141,7 +135,7 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 				player.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100));
 				player.addPotionEffect(new EffectInstance(Effects.WITHER, 40, 6));
 				
-				entity.setMotionMultiplier(state, new Vec3d(0.02D, 0.02D, 0.02D));
+				entity.setMotionMultiplier(state, new Vector3d(0.02D, 0.02D, 0.02D));
 			}
 			super.onEntityCollision(state, worldIn, pos, entity);
 		}

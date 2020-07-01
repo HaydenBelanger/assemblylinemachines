@@ -2,9 +2,7 @@ package me.haydenb.assemblylinemachines.packets;
 
 import java.util.HashMap;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import com.mojang.datafixers.util.Pair;
 
@@ -60,6 +58,14 @@ public class HashPacketImpl {
 			map.put(key, new Pair<>(5, value));
 		}
 		
+		public void writeResourceLocation(String key, ResourceLocation value) {
+			map.put(key, new Pair<>(6, value));
+		}
+		
+		public void writeDouble(String key, Double value) {
+			map.put(key, new Pair<>(7, value));
+		}
+		
 		public Pair<Integer, Object> get(String key) {
 			return map.get(key);
 		}
@@ -104,6 +110,10 @@ public class HashPacketImpl {
 					pd.writeBlockPos(key, t.readBlockPos());
 				}else if(id == 5) {
 					pd.writeItemStack(key, t.readItemStack());
+				}else if(id == 6) {
+					pd.writeResourceLocation(key, t.readResourceLocation());
+				}else if(id == 7) {
+					pd.writeDouble(key, t.readDouble());
 				}
 			}
 			return pd;
@@ -138,6 +148,10 @@ public class HashPacketImpl {
 					u.writeBlockPos((BlockPos) data);
 				}else if(id == 5) {
 					u.writeItemStack((ItemStack) data);
+				}else if(id == 6) {
+					u.writeResourceLocation((ResourceLocation) data);
+				}else if(id == 7) {
+					u.writeDouble((Double) data);
 				}
 				
 			}
@@ -157,7 +171,14 @@ public class HashPacketImpl {
 					
 					BiConsumer<PacketData, World> x = PacketTargetMethods.PACKET_TARGETS.get(t.title);
 					if(x != null) {
-						x.accept(t, u.get().getSender().world);
+						if(u.get().getSender() != null) {
+							x.accept(t, u.get().getSender().world);
+						}else {
+							x.accept(t, null);
+						}
+						
+					}else {
+						AssemblyLineMachines.LOGGER.warn("Received packet with no method target: " + t.title + ". Look out for injection possibilities.");
 					}
 					
 					

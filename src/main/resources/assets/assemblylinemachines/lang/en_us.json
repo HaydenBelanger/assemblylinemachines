@@ -101,6 +101,14 @@
 	"item.assemblylinemachines.energized_gold_ingot": "Energized Gold Ingot",
 	"item.assemblylinemachines.energized_gold_plate": "Energized Gold Plate",
 	"item.assemblylinemachines.machine_upgrade_extra": "Machine Upgrade: Additional Output",
+	"item.assemblylinemachines.machine_upgrade_gas": "Machine Upgrade: Gas Processing",
+	"item.assemblylinemachines.plastic_ball": "Plastic Ball",
+	"item.assemblylinemachines.plastic_sheet": "Plastic Sheet",
+	"item.assemblylinemachines.rubber_ball": "Rubber Ball",
+	"item.assemblylinemachines.rubber_sheet": "Rubber Sheet",
+	"item.assemblylinemachines.key": "Key",
+	"item.assemblylinemachines.key_configured": "Cut Key",
+	"item.assemblylinemachines.lock_remover": "Lock Remover",
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
@@ -156,12 +164,25 @@
 	"block.assemblylinemachines.chromium_block": "Chromium Block",
 	"block.assemblylinemachines.chromium_ore": "Chromium Ore",
 	"block.assemblylinemachines.compressed_crafting_table": "Compressed Crafting Table",
+	"block.assemblylinemachines.refinery_attachment_addition": "Refinery Addition Attachment",
+	"block.assemblylinemachines.refinery_attachment_halogen": "Refinery Halogen Reactor Attachment",
+	"block.assemblylinemachines.refinery_attachment_cracking": "Refinery Cracking Chamber Attachment",
+	"block.assemblylinemachines.bottomless_storage_unit": "Bottomless Storage Unit",
+	"block.assemblylinemachines.interactor": "Interactor",
+	"block.assemblylinemachines.vacuum_hopper": "Vacuum Hopper",
+	"block.assemblylinemachines.geothermal_generator": "Geothermal Generator",
+	"block.assemblylinemachines.combustion_generator": "Combustion Generator",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",
 	"fluid.assemblylinemachines.naphtha": "Naphtha",
 	"fluid.assemblylinemachines.diesel": "Diesel",
-	"fluid.assemblylinemachines.gasoline": "Gasoline"
+	"fluid.assemblylinemachines.gasoline": "Gasoline",
+	"fluid.assemblylinemachines.ethane": "Ethane",
+	"fluid.assemblylinemachines.propane": "Propane",
+	"fluid.assemblylinemachines.ethylene": "Ethylene",
+	"fluid.assemblylinemachines.propylene": "Propylene",
 	
-	
+	"death.attack.interactor": "%1$s was killed by %2$s's Interactor",
+	"death.attack.interactor.item": "%1$s was killed by %2$s's Interactor using %3$s"
 }

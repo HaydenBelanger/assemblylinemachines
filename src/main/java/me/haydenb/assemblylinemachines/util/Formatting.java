@@ -9,7 +9,7 @@ public class Formatting {
 
 	private static final NavigableMap<Long, String> SUFFIX = new TreeMap<>();
 	
-	public static final DecimalFormat GENERAL_FORMAT = new DecimalFormat("###,###,###,###,###");
+	public static final DecimalFormat GENERAL_FORMAT = new DecimalFormat("###,###,###,###,###,###,###");
 	public static final DecimalFormat FEPT_FORMAT = new DecimalFormat("###,##0.#");
 	
 	

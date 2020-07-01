@@ -93,7 +93,9 @@ public class PipeBase<T> extends Block {
 
 							TileEntity te = world.getTileEntity(pos);
 							if(te instanceof ItemPipeConnectorTileEntity) {
-								NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
+								try {
+									NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
+								}catch(NullPointerException e) {}
 								return ActionResultType.CONSUME;
 							}else if(te instanceof FluidPipeConnectorTileEntity) {
 								FluidPipeConnectorTileEntity fpcte = (FluidPipeConnectorTileEntity) te;

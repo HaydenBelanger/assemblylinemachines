@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "facing=north": { "model": "assemblylinemachines:block/bottomless_storage_unit" },
+        "facing=south": { "model": "assemblylinemachines:block/bottomless_storage_unit", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/bottomless_storage_unit", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/bottomless_storage_unit", "y": 90 }
+
+    }
+}

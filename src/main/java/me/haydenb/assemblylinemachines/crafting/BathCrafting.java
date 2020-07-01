@@ -105,6 +105,11 @@ public class BathCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
+	public boolean isDynamic() {
+		return true;
+	}
+	
+	@Override
 	public ItemStack getCraftingResult(IInventory inv) {
 		return this.output.copy();
 	}

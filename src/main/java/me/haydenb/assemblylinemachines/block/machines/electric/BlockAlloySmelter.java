@@ -109,7 +109,7 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 		private ItemStack output = null;
 		
 		public TEAlloySmelter(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 6, (TranslationTextComponent) Registry.getBlock("alloy_smelter").getNameTextComponent(), Registry.getContainerId("alloy_smelter"), ContainerAlloySmelter.class, new EnergyProperties(true, false, 40000));
+			super(tileEntityTypeIn, 6, new TranslationTextComponent(Registry.getBlock("alloy_smelter").getTranslationKey()), Registry.getContainerId("alloy_smelter"), ContainerAlloySmelter.class, new EnergyProperties(true, false, 40000));
 		}
 		
 		public TEAlloySmelter() {

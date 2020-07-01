@@ -83,7 +83,7 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 		public int nTimer = 40;
 		public ICrankableMachine mch;
 		public TEGearbox(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, (TranslationTextComponent) Registry.getBlock("gearbox").getNameTextComponent(), Registry.getContainerId("gearbox"), ContainerGearbox.class);
+			super(tileEntityTypeIn, 2, new TranslationTextComponent(Registry.getBlock("gearbox").getTranslationKey()), Registry.getContainerId("gearbox"), ContainerGearbox.class);
 		}
 		
 		public TEGearbox() {

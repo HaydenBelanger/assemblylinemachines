@@ -1,8 +1,8 @@
 package me.haydenb.assemblylinemachines.registry.plugins.jei.categories;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
@@ -22,8 +22,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe> {
@@ -73,7 +72,7 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 	}
 	
 	@Override
-	public void draw(FluidInGroundRecipe recipe, double mouseX, double mouseY) {
+	public void draw(FluidInGroundRecipe recipe, MatrixStack mx, double mouseX, double mouseY) {
 		
 		IDrawable draw;
 		if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD || recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD) {
@@ -88,7 +87,7 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 			draw = progbardirt;
 		}
 		
-		draw.draw(49, 57);
+		draw.draw(mx, 49, 57);
 	}
 
 	@Override
@@ -107,35 +106,35 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 		fgui.init(0, false, new IIngredientRenderer<FluidStack>() {
 			
 			@Override
-			public void render(int xPosition, int yPosition, FluidStack ingredient) {
+			public void render(MatrixStack mx, int xPosition, int yPosition, FluidStack ingredient) {
 				
-				helper.createDrawableIngredient(ingredient).draw(xPosition, yPosition);
+				helper.createDrawableIngredient(ingredient).draw(mx, xPosition, yPosition);
 			}
 			
 			@Override
-			public List<String> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
+			public List<ITextComponent> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
 				
-				ArrayList<String> arr = new ArrayList<>();
+				ArrayList<ITextComponent> arr = new ArrayList<>();
 				
-				arr.add(ingredient.getDisplayName().getFormattedText());
+				arr.add(ingredient.getDisplayName().func_230532_e_());
 				if(recipe.getCriteria() == FluidInGroundCriteria.END) {
-					arr.add(new StringTextComponent("Found in The End.").applyTextStyle(TextFormatting.DARK_PURPLE).getFormattedText());
+					arr.add(new StringTextComponent("Found in The End.").func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE));
 				}else if(recipe.getCriteria() == FluidInGroundCriteria.NETHER) {
-					arr.add(new StringTextComponent("Found in The Nether.").applyTextStyle(TextFormatting.DARK_RED).getFormattedText());
+					arr.add(new StringTextComponent("Found in The Nether.").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
 				}else {
-					arr.add(new StringTextComponent("Found in The Overworld.").applyTextStyle(TextFormatting.DARK_GREEN).getFormattedText());
+					arr.add(new StringTextComponent("Found in The Overworld.").func_230532_e_().func_240699_a_(TextFormatting.DARK_GREEN));
 					if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD) {
-						arr.add(new StringTextComponent("Only in very cold biomes.").applyTextStyle(TextFormatting.BLUE).getFormattedText());
+						arr.add(new StringTextComponent("Only in very cold biomes.").func_230532_e_().func_240699_a_(TextFormatting.BLUE));
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD) {
-						arr.add(new StringTextComponent("Favors very cold biomes.").applyTextStyle(TextFormatting.BLUE).getFormattedText());
+						arr.add(new StringTextComponent("Favors very cold biomes.").func_230532_e_().func_240699_a_(TextFormatting.BLUE));
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT) {
-						arr.add(new StringTextComponent("Favors very hot biomes.").applyTextStyle(TextFormatting.RED).getFormattedText());
+						arr.add(new StringTextComponent("Favors very hot biomes.").func_230532_e_().func_240699_a_(TextFormatting.RED));
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYHOT) {
-						arr.add(new StringTextComponent("Only in very hot biomes.").applyTextStyle(TextFormatting.RED).getFormattedText());
+						arr.add(new StringTextComponent("Only in very hot biomes.").func_230532_e_().func_240699_a_(TextFormatting.RED));
 					}
 				}
 				
-				arr.add(new StringTextComponent(recipe.getChance() + "% chance to generate.").applyTextStyle(TextFormatting.YELLOW).getFormattedText());
+				arr.add(new StringTextComponent(recipe.getChance() + "% chance to generate.").func_230532_e_().func_240699_a_(TextFormatting.YELLOW));
 				
 				return arr;
 			}

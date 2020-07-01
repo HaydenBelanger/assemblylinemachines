@@ -1,12 +1,10 @@
 package me.haydenb.assemblylinemachines.block.machines.electric;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
@@ -18,14 +16,9 @@ import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -44,10 +37,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -57,9 +47,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidActionResult;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.*;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -114,7 +102,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 					stack.shrink(1);
 				}
 				ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-				return ActionResultType.PASS;
+				return ActionResultType.CONSUME;
 			}
 			
 			
@@ -152,7 +140,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		protected LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> fluids);
 		
 		public TEElectricFluidMixer(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 6, (TranslationTextComponent) Registry.getBlock("electric_fluid_mixer").getNameTextComponent(), Registry.getContainerId("electric_fluid_mixer"), ContainerElectricFluidMixer.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 6, new TranslationTextComponent(Registry.getBlock("electric_fluid_mixer").getTranslationKey()), Registry.getContainerId("electric_fluid_mixer"), ContainerElectricFluidMixer.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricFluidMixer() {
@@ -460,13 +448,14 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 				TextureAtlasSprite tas = spriteMap.get(tsfm.fluid.getFluid());
 				if(tas == null) {
 					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(tsfm.fluid.getFluid().getAttributes().getStillTexture());
+					spriteMap.put(tsfm.fluid.getFluid(), tas);
 				}
 				
 				if(tsfm.fluid.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
-					RenderSystem.color4f(0.2470f, 0.4627f, 0.8941f, 1f);
+					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
-				minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 				
 				super.blit(x+41, y+23, 37, 37, 37, tas);
 			}
@@ -504,7 +493,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 							mouseX - x, mouseY - y);
 				}else {
 					str.add(ff.getFriendlyName());
-					if(Screen.hasShiftDown()) {
+					if(Screen.func_231173_s_()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(tsfm.fluid.getAmount()) + " mB");
 						

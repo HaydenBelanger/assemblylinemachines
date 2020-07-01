@@ -9,9 +9,7 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.*;
 import net.minecraft.util.IStringSerializable;
 
 @SuppressWarnings("deprecation")
@@ -60,7 +58,7 @@ public class StateProperties {
 		}
 		
 		@Override
-		public String getName() {
+		public String func_176610_l() {
 			return toString().toLowerCase();
 		}
 		

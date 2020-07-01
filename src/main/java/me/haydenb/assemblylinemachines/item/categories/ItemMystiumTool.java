@@ -18,6 +18,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -182,7 +183,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		return parent.getAttributeModifiers(equipmentSlot);
 	}
 
@@ -194,7 +195,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).applyTextStyle(TextFormatting.DARK_PURPLE);
+		return super.getDisplayName(stack).func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -332,10 +333,10 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				if (nbt.contains("assemblylinemachines:secondarystyle")) {
 					nbt.remove("assemblylinemachines:secondarystyle");
-					player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").applyTextStyle(TextFormatting.RED), true);
+					player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
 				} else {
 					nbt.putBoolean("assemblylinemachines:secondarystyle", true);
-					player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").applyTextStyle(TextFormatting.AQUA), true);
+					player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.AQUA), true);
 				}
 
 				stack.setTag(nbt);
@@ -354,18 +355,18 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			if (compound.contains("assemblylinemachines:fe")) {
 				tooltip.add(new StringTextComponent(
 						Formatting.GENERAL_FORMAT.format(compound.getInt("assemblylinemachines:fe")) + "/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE")
-								.applyTextStyle(TextFormatting.DARK_PURPLE));
+						.func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE));
 			} else {
-				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").applyTextStyle(TextFormatting.DARK_RED));
+				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
 			}
 
 			if (compound.contains("assemblylinemachines:secondarystyle")) {
-				tooltip.add(new StringTextComponent("Secondary Ability Enabled").applyTextStyle(TextFormatting.AQUA));
+				tooltip.add(new StringTextComponent("Secondary Ability Enabled").func_230532_e_().func_240699_a_(TextFormatting.AQUA));
 			}
 			return;
 		}
 
-		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").applyTextStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
 
 	}
 

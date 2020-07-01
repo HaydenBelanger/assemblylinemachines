@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:propylene",
+		"amount": 1000
+	},
+	"input_item":{
+		"tag": "forge:dusts/charcoal"
+	},
+	"proc_time": 18,
+	"output_item":{
+		"item": "assemblylinemachines:rubber_ball",
+		"upgrade_multiply_chance": 0.25
+	}
+}

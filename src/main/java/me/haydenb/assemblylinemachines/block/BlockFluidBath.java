@@ -56,9 +56,9 @@ public class BlockFluidBath extends Block {
 	private static final Random RAND = new Random();
 
 	public BlockFluidBath() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.WOOD));
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.none));
+		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(4f, 15f).harvestLevel(0).
+				harvestTool(ToolType.PICKAXE).sound(SoundType.WOOD));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.NONE));
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class BlockFluidBath extends Block {
 							entity.inputb = null;
 							entity.sendUpdates();
 							world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1f, 1f);
-							world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.none));
+							world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.NONE));
 							player.sendStatusMessage(new StringTextComponent("Drained basin."), true);
 							
 							ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), RAND.nextInt(maxSludge)));
@@ -183,13 +183,13 @@ public class BlockFluidBath extends Block {
 										entity.stirsRemaining = crafting.getStirs();
 										entity.fluidColor = crafting.getColor();
 										entity.sendUpdates();
-										world.setBlockState(pos, world.getBlockState(pos).with(STATUS, BathStatus.success), 3);
+										world.setBlockState(pos, world.getBlockState(pos).with(STATUS, BathStatus.SUCCESS), 3);
 										
 										
 										
 									}else {
 										entity.sendUpdates();
-										world.setBlockState(pos, state.with(STATUS, BathStatus.fail));
+										world.setBlockState(pos, state.with(STATUS, BathStatus.FAIL));
 									}
 								}
 
@@ -206,7 +206,7 @@ public class BlockFluidBath extends Block {
 										entity.sendUpdates();
 										world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS,
 												1f, 1f);
-										world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.none));
+										world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.NONE));
 									} else {
 
 										if(!(held.getItem() instanceof ItemStirringStick)) {
@@ -257,11 +257,11 @@ public class BlockFluidBath extends Block {
 		public TEFluidBath() {
 			this(Registry.getTileEntity("fluid_bath"));
 		}
-
+		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
-
+		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
+			super.func_230337_a_(p_230337_1_, compound);
+			
 			if (compound.contains("assemblylinemachines:stirs")) {
 				stirsRemaining = compound.getInt("assemblylinemachines:stirs");
 			}
@@ -372,11 +372,11 @@ public class BlockFluidBath extends Block {
 	}
 	
 	public static enum BathStatus implements IStringSerializable {
-		none, fail, success;
+		NONE, FAIL, SUCCESS;
 
 		@Override
-		public String getName() {
-			return this.toString();
+		public String func_176610_l() {
+			return toString().toLowerCase();
 		}
 		
 		

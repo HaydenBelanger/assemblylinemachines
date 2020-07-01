@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:naphtha",
+		"amount": 250
+	},
+	"input_item":{
+		"tag": "forge:cobblestone"
+	},
+	"proc_time": 15,
+	"output_item":{
+		"item": "assemblylinemachines:smoldering_stone",
+		"count": 2
+	}
+}

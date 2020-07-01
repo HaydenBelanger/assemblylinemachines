@@ -1,0 +1,18 @@
+ {
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xyy",
+		"  y"
+	],
+	"key":{
+		"x":{
+			"tag": "forge:ingots/gold"
+		},
+		"y":{
+			"tag": "forge:nuggets/gold"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:key"
+	}
+}

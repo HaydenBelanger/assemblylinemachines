@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
@@ -13,10 +14,7 @@ import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBase
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
@@ -26,16 +24,10 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.math.shapes.*;
+import net.minecraft.util.text.*;
 import net.minecraft.world.IBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -97,7 +89,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		private boolean naphthaActive = false;
 		
 		public TECoalGenerator(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 1, (TranslationTextComponent) Registry.getBlock("coal_generator").getNameTextComponent(), Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000));
+			super(tileEntityTypeIn, 1, new TranslationTextComponent(Registry.getBlock("coal_generator").getTranslationKey()), Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000));
 		}
 		
 		public TECoalGenerator() {
@@ -216,25 +208,27 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			tsfm = screenContainer.tileEntity;
 		}
 		
+		
 		@Override
-		protected void renderTooltip(ItemStack stack, int mouseX, int mouseY) {
+		protected void func_230457_a_(MatrixStack mx, ItemStack stack, int mouseX, int mouseY) {
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
-				List<String> tt = getTooltipFromItem(stack);
-				int burnTime = ForgeHooks.getBurnTime(stack);
-				if(tsfm.naphthaActive) {
-					tt.add(1, "§eApprox. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * 240f) + " FE Total");
-				}else {
-					tt.add(1, "§eApprox. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * 60f) + " FE Total");
-				}
+				List<ITextComponent> tt = func_231151_a_(stack);
 				
-				tt.add(1, "§a" + Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t");
-				this.renderTooltip(tt, mouseX, mouseY);
+				int burnTime = ForgeHooks.getBurnTime(stack);
+				float mul;
+				if(tsfm.naphthaActive) {
+					mul = 240f;
+				}else {
+					mul = 60f;
+				}
+				tt.add(1, new StringTextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").func_230532_e_().func_240699_a_(TextFormatting.YELLOW));
+				tt.add(1, new StringTextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+				super.func_238654_b_(mx, tt, mouseX, mouseY);
 				return;
 			}
-			
-			super.renderTooltip(stack, mouseX, mouseY);
+			super.func_230457_a_(mx, stack, mouseX, mouseY);
 		}
 		
 		@Override

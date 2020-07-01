@@ -4,14 +4,9 @@ import java.util.Iterator;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.*;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -37,7 +32,7 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Fluid, IFluidState> builder) {
+	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
 		super.fillStateContainer(builder);
 
 		if (!source) {
@@ -46,12 +41,12 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 	}
 
 	@Override
-	public boolean isSource(IFluidState state) {
+	public boolean isSource(FluidState state) {
 		return source;
 	}
 
 	@Override
-	protected void randomTick(World world, BlockPos pos, IFluidState state, Random random) {
+	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
 		Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.up().north().east(), pos.down().south().west()).iterator();
 		while(iter.hasNext()) {
 			
@@ -65,16 +60,16 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 				
 		}
 		
-		super.randomTick(world, pos, state, random);
+		//super.randomTick(world, pos, state, random);
 	}
-
+	
 	@Override
 	protected boolean ticksRandomly() {
 		return true;
 	}
 
 	@Override
-	public int getLevel(IFluidState state) {
+	public int getLevel(FluidState state) {
 		if (!source) {
 			return state.get(LEVEL_1_8);
 		} else {
@@ -107,13 +102,9 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 
 		public FluidNaphthaBlock() {
 			super(() -> (FlowingFluid) Registry.getFluid("naphtha"),
-					Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).noDrops());
+					Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).func_235838_a_((state) -> 11).noDrops());
 		}
 		
-		@Override
-		public int getLightValue(BlockState state) {
-			return 11;
-		}
 	}
 
 }

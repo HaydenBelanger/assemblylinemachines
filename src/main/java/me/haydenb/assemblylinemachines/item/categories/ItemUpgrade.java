@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 public class ItemUpgrade extends Item {
 
 	
-	private static final ITextComponent CAN_STACK = new StringTextComponent("This upgrade's effect can be stacked.").applyTextStyle(TextFormatting.DARK_GRAY);
+	private static final ITextComponent CAN_STACK = new StringTextComponent("This upgrade's effect can be stacked.").func_230532_e_().func_240699_a_(TextFormatting.DARK_GRAY);
 	
 	final String[] positives;
 	final String[] negatives;
@@ -49,12 +49,12 @@ public class ItemUpgrade extends Item {
 			tooltip.add(CAN_STACK);
 		}
 		for(String s : positives) {
-			tooltip.add(new StringTextComponent(s).applyTextStyle(TextFormatting.GREEN));
+			tooltip.add(new StringTextComponent(s).func_230532_e_().func_240699_a_(TextFormatting.GREEN));
 		}
 		
 		if(negatives != null) {
 			for(String s : negatives) {
-				tooltip.add(new StringTextComponent(s).applyTextStyle(TextFormatting.DARK_RED));
+				tooltip.add(new StringTextComponent(s).func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
 			}
 			super.addInformation(stack, worldIn, tooltip, flagIn);
 		}
@@ -70,6 +70,7 @@ public class ItemUpgrade extends Item {
 		UNIVERSAL_SPEED(Registry.getItem("upgrade_speed")),
 		
 		MACHINE_CONSERVATION(Registry.getItem("machine_upgrade_conservation")), MACHINE_EXTRA(Registry.getItem("machine_upgrade_extra")),
+		MACHINE_GAS(Registry.getItem("machine_upgrade_gas")),
 		
 		AC_SUSTAINED(Registry.getItem("autocrafting_upgrade_sustained")), AC_RECIPES(Registry.getItem("autocrafting_upgrade_recipes")),
 		

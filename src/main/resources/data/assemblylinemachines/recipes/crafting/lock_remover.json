@@ -1,0 +1,19 @@
+ {
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" y ",
+		"yry",
+		" y "
+	],
+	"key":{
+		"r":{
+			"tag": "forge:dusts/redstone"
+		},
+		"y":{
+			"tag": "forge:nuggets/gold"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:lock_remover"
+	}
+}

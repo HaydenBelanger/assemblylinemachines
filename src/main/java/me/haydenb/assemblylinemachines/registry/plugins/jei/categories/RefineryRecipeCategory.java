@@ -1,6 +1,9 @@
 package me.haydenb.assemblylinemachines.registry.plugins.jei.categories;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
@@ -23,8 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraftforge.fluids.FluidStack;
 
 public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting> {
@@ -66,11 +68,11 @@ public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting>
 	}
 	
 	@Override
-	public void draw(RefiningCrafting recipe, double mouseX, double mouseY) {
-		progbar.draw(35, 19);
-		progbar.draw(44, 19);
-		progbar.draw(55, 19);
-		progbar.draw(64, 19);
+	public void draw(RefiningCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
+		progbar.draw(mx, 35, 19);
+		progbar.draw(mx, 44, 19);
+		progbar.draw(mx, 55, 19);
+		progbar.draw(mx, 64, 19);
 	}
 
 	@Override
@@ -171,16 +173,16 @@ public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting>
 	private class RefineryFluidIngredientRenderer implements IIngredientRenderer<FluidStack>{
 
 		@Override
-		public void render(int xPosition, int yPosition, FluidStack ingredient) {
-			helper.createDrawableIngredient(new FluidStack(ingredient.getFluid(), 1000)).draw(xPosition, yPosition);
+		public void render(MatrixStack mx, int xPosition, int yPosition, FluidStack ingredient) {
+			helper.createDrawableIngredient(new FluidStack(ingredient.getFluid(), 1000)).draw(mx, xPosition, yPosition);
 			
 		}
 
 		@Override
-		public List<String> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
-			List<String> tooltip = new ArrayList<>();
-			tooltip.add(ingredient.getDisplayName().getFormattedText());
-			tooltip.add(new StringTextComponent(Formatting.GENERAL_FORMAT.format(ingredient.getAmount()) + " mB").applyTextStyle(TextFormatting.AQUA).getFormattedText());
+		public List<ITextComponent> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
+			List<ITextComponent> tooltip = new ArrayList<>();
+			tooltip.add(ingredient.getDisplayName().func_230532_e_());
+			tooltip.add(new StringTextComponent(Formatting.GENERAL_FORMAT.format(ingredient.getAmount()) + " mB").func_230532_e_().func_240699_a_(TextFormatting.AQUA));
 			
 			
 			return tooltip;

@@ -89,6 +89,11 @@ public class PurifierCrafting implements IRecipe<IInventory>{
 		return PURIFIER_RECIPE;
 	}
 	
+	@Override
+	public boolean isDynamic() {
+		return true;
+	}
+	
 	public int getTime() {
 		return time;
 	}

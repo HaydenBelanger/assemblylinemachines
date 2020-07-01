@@ -1,13 +1,13 @@
 {
 	"parent": "block/cube",
 	"textures": {
-		"0": "assemblylinemachines:block/refinery/attachments/separation/attachment_legs",
-		"1": "assemblylinemachines:block/refinery/attachments/separation/attachment_legs_top",
-		"2": "assemblylinemachines:block/refinery/attachments/separation/attachment_bottom_pipe",
+		"0": "assemblylinemachines:block/refinery/attachments/attachment_legs",
+		"1": "assemblylinemachines:block/refinery/attachments/attachment_legs_top",
+		"2": "assemblylinemachines:block/refinery/attachments/attachment_bottom_pipe",
 		"3": "assemblylinemachines:block/refinery/attachments/separation/attachment_tank",
 		"4": "assemblylinemachines:block/refinery/attachments/separation/attachment_tank_top",
 		"5": "assemblylinemachines:block/refinery/attachments/separation/attachment_tank_pipe",
-		"6": "assemblylinemachines:block/refinery/attachments/separation/attachment_tank_support1",
+		"6": "assemblylinemachines:block/refinery/attachments/attachment_tank_support1",
 		"7": "assemblylinemachines:block/refinery/attachments/separation/attachment_tank_support2",
 		"8": "assemblylinemachines:block/refinery/attachments/separation/attachment_top_pipe",
 		"particle": "assemblylinemachines:block/machine_advanced_top"

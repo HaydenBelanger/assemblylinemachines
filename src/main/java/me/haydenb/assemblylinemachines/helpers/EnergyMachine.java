@@ -192,7 +192,7 @@ public abstract class EnergyMachine<A extends Container> extends SimpleMachine<A
 			int y = (this.height - this.ySize) / 2;
 			if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
 
-				if(Screen.hasShiftDown()) {
+				if(Screen.func_231173_s_()) {
 					ArrayList<String> str = new ArrayList<>();
 					str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.capacity) + "FE");
 					if(usesfept) {

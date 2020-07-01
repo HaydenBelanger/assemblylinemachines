@@ -1,0 +1,86 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/fluidrouter/router_input",
+		"1": "assemblylinemachines:block/fluidrouter/router_output_a",
+		"2": "assemblylinemachines:block/fluidrouter/router_output_b",
+		"4": "assemblylinemachines:block/fluidrouter/router_front",
+		"5": "assemblylinemachines:block/fluidrouter/router_fluid_pipe",
+		"6": "assemblylinemachines:block/machine_advanced_top",
+		"particle": "assemblylinemachines:block/machine_advanced_top"
+	},
+	"elements": [
+		{
+			"name": "Bottom",
+			"from": [0, 0, 0],
+			"to": [16, 3, 16],
+			"faces": {
+				"north": {"uv": [0, 13, 16, 16], "texture": "#4"},
+				"east": {"uv": [0, 13, 16, 16], "texture": "#2"},
+				"south": {"uv": [0, 13, 16, 16], "texture": "#4"},
+				"west": {"uv": [0, 13, 16, 16], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#6"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#6"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [0, 13, 0],
+			"to": [16, 16, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 3], "texture": "#4"},
+				"east": {"uv": [0, 0, 16, 3], "texture": "#2"},
+				"south": {"uv": [0, 0, 16, 3], "texture": "#4"},
+				"west": {"uv": [0, 0, 16, 3], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#6"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#6"}
+			}
+		},
+		{
+			"name": "Side1",
+			"from": [0, 3, 0],
+			"to": [3, 13, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 11, 8]},
+			"faces": {
+				"north": {"uv": [13, 3, 16, 13], "texture": "#4"},
+				"east": {"uv": [0, 3, 16, 13], "texture": "#6"},
+				"south": {"uv": [0, 3, 3, 13], "texture": "#4"},
+				"west": {"uv": [0, 3, 16, 13], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Side2",
+			"from": [13, 3, 0],
+			"to": [16, 13, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [21, 11, 8]},
+			"faces": {
+				"north": {"uv": [0, 3, 3, 13], "texture": "#4"},
+				"east": {"uv": [0, 3, 16, 13], "texture": "#2"},
+				"south": {"uv": [13, 3, 16, 13], "texture": "#4"},
+				"west": {"uv": [0, 3, 16, 13], "texture": "#6"}
+			}
+		},
+		{
+			"name": "Back",
+			"from": [3, 3, 8],
+			"to": [13, 13, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 11, 23]},
+			"faces": {
+				"north": {"uv": [3, 3, 13, 13], "texture": "#6"},
+				"south": {"uv": [3, 3, 13, 13], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Pipe",
+			"from": [3, 4, 4],
+			"to": [13, 12, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 12, 15]},
+			"faces": {
+				"north": {"uv": [3, 4, 13, 12], "texture": "#5"},
+				"up": {"uv": [3, 4, 13, 8], "texture": "#5"},
+				"down": {"uv": [3, 8, 13, 12], "texture": "#5"}
+			}
+		}
+	]
+}

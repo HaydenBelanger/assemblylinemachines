@@ -93,7 +93,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 
 
 	public ItemPipeConnectorTileEntity(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn, 12, (TranslationTextComponent) Registry.getBlock("item_pipe").getNameTextComponent(), Registry.getContainerId("pipe_connector_item"),
+		super(tileEntityTypeIn, 12, new TranslationTextComponent(Registry.getBlock("item_pipe").getTranslationKey()), Registry.getContainerId("pipe_connector_item"),
 				ItemPipeConnectorContainer.class);
 	}
 
@@ -473,6 +473,8 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 				ITextComponent titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73),
 					"pipe_connector_item", false);
+			this.renderTitleText = false;
+			this.renderInventoryText = false;
 			tsfm = screenContainer.tileEntity;
 			container = screenContainer;
 			b = new HashMap<>();
@@ -481,9 +483,8 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		@Override
 		protected void init() {
 			super.init();
-			this.renderTitles = false;
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = this.guiLeft;
+			int y = this.guiTop;
 			b.put("input", new Pair<>(new SimpleButton(x + 32, y + 20, 177, 1, null, (button) -> {
 
 				sendPipeUpdatePacket(tsfm.pos, "input");
@@ -532,11 +533,10 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-			this.font.drawString(this.title.getFormattedText(), 11, 6, 4210752);
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (!(bb.getFirst() instanceof ItemPipeRedstoneButton)
 						|| ((ItemPipeRedstoneButton) bb.getFirst()).isRedstoneControlEnabled())
-					if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + 8 && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + 8) {
+					if (mouseX >= bb.getFirst().getX() && mouseX <= bb.getFirst().getX() + 8 && mouseY >= bb.getFirst().getY() && mouseY <= bb.getFirst().getY() + 8) {
 						int x = (this.width - this.xSize) / 2;
 						int y = (this.height - this.ySize) / 2;
 						if (bb.getSecond() != null) {
@@ -560,7 +560,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 				if (!(bb.getFirst() instanceof ItemPipeRedstoneButton)
 						|| ((ItemPipeRedstoneButton) bb.getFirst()).isRedstoneControlEnabled()) {
 					if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
-						super.blit(bb.getFirst().x, bb.getFirst().y, bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
+						super.blit(bb.getFirst().getX(), bb.getFirst().getY(), bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
 					}
 				} else {
 					super.blit(x + 43, y + 42, 9, 12, 8, 8);
@@ -598,9 +598,9 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 				ItemPipeConnectorTileEntity ipcte) {
 			this(widthIn, heightIn, 0, 0, text, onPress, ipcte);
 		}
-
+		
 		@Override
-		protected boolean isValidClickButton(int p_isValidClickButton_1_) {
+		protected boolean func_230987_a_(int p_230987_1_) {
 			return isRedstoneControlEnabled();
 		}
 

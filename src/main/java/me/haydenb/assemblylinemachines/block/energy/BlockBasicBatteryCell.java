@@ -13,15 +13,8 @@ import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine.ManagedDirect
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.SimpleButton;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.SupplierWrapper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import me.haydenb.assemblylinemachines.util.*;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -29,15 +22,10 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -83,6 +71,7 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.BATTERY_PERCENT_STATE, 0));
 	}
 
+	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING,
@@ -115,7 +104,7 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 		private boolean autoIn = true;
 		private int timer = 0;
 		public TEBasicBatteryCell(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 0, (TranslationTextComponent) Registry.getBlock("basic_battery_cell").getNameTextComponent(), Registry.getContainerId("basic_battery_cell"),
+			super(tileEntityTypeIn, 0, new TranslationTextComponent(Registry.getBlock("basic_battery_cell").getTranslationKey()), Registry.getContainerId("basic_battery_cell"),
 					ContainerBasicBatteryCell.class, new EnergyProperties(true, true, 2500000));
 		}
 
@@ -281,7 +270,7 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 					}
 					
 					tebbc.sendUpdates();
-					tebbc.getWorld().notifyNeighbors(pos, tebbc.getBlockState().getBlock());
+					tebbc.getWorld().notifyNeighborsOfStateChange(pos, tebbc.getBlockState().getBlock());
 				}
 			}
 		}
@@ -319,12 +308,15 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 			b = new HashMap<>();
 		}
 
+		
 		@Override
 		protected void init() {
 			super.init();
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
-			b.put("up", new Pair<>(new SimpleButton(x + 51, y + 28, 177, 83, null, (button) -> {
+			
+			int x = this.guiLeft;
+			int y = this.guiTop;
+			
+			b.put("up", new Pair<>(new SimpleButton(x+51, y+28, 177, 83, null, (button) -> {
 
 				sendCellUpdatePacket(tsfm.getPos(), "up");
 			}), new SupplierWrapper("Top Face Enabled", "Top Face Disabled",
@@ -355,14 +347,15 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 			}), new SupplierWrapper("Auto-Input Enabled", "Auto-Output Disabled",
 					() -> tsfm.autoIn)));
 			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, "Decrease Automatic Throughput", (button) -> {
-				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.hasShiftDown(), Screen.hasControlDown());
+				Screen.func_231172_r_();
+				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.func_231173_s_(), Screen.func_231172_r_());
 
 			}), null));
 			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, "Increase Automatic Throughput", (button) -> {
-				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.hasShiftDown(), Screen.hasControlDown());
+				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.func_231173_s_(), Screen.func_231172_r_());
 
 			}), null));
-
+			
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				this.addButton(bb.getFirst());
 			}
@@ -375,11 +368,11 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 			int y = (this.height - this.ySize) / 2;
 
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (mouseX >= bb.getFirst().x && mouseX <= bb.getFirst().x + 8 && mouseY >= bb.getFirst().y && mouseY <= bb.getFirst().y + 8) {
+				if (mouseX >= bb.getFirst().getX() && mouseX <= bb.getFirst().getX() + 8 && mouseY >= bb.getFirst().getY() && mouseY <= bb.getFirst().getY() + 8) {
 					if (bb.getSecond() != null) {
 						this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 					} else {
-						this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);
+						this.renderTooltip(bb.getFirst().func_230458_i_().getString(), mouseX - x, mouseY - y);
 					}
 
 					break;
@@ -393,7 +386,7 @@ public class BlockBasicBatteryCell extends BlockScreenTileEntity<BlockBasicBatte
 			
 			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
 				if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
-					super.blit(bb.getFirst().x, bb.getFirst().y, bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
+					super.blit(bb.getFirst().getX(), bb.getFirst().getY(), bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
 				}
 
 			}

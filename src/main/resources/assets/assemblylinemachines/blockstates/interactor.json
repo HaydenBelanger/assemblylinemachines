@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "assemblylinemachines:block/interactor" },
+        "facing=south": { "model": "assemblylinemachines:block/interactor", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/interactor", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/interactor", "y": 90 }
+    }
+}

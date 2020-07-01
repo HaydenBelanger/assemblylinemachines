@@ -7,6 +7,6 @@
 		"item": "assemblylinemachines:ground_lapis_lazuli"
 	},
 	"grinds": 2,
-	"bladetype": "puregold",
+	"bladetype": "PUREGOLD",
 	"machine_required": true
 }

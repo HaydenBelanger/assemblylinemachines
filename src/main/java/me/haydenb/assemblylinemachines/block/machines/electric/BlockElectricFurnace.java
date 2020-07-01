@@ -117,7 +117,7 @@ public class BlockElectricFurnace extends BlockScreenTileEntity<BlockElectricFur
 		private EFIInventoryWrapper wrapper = new EFIInventoryWrapper(this);
 		
 		public TEElectricFurnace(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 5, (TranslationTextComponent) Registry.getBlock("electric_furnace").getNameTextComponent(), Registry.getContainerId("electric_furnace"), ContainerElectricFurnace.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 5, new TranslationTextComponent(Registry.getBlock("electric_furnace").getTranslationKey()), Registry.getContainerId("electric_furnace"), ContainerElectricFurnace.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricFurnace() {

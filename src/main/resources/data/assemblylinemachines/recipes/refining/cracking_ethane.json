@@ -1,0 +1,14 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_cracking",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:ethane",
+		"amount": 1000
+	},
+	"proc_time": 25,
+	"output_fluid_a":{
+		"fluid": "assemblylinemachines:ethylene",
+		"amount": 500,
+		"upgrade_multiply_chance": 0.25
+	}
+}

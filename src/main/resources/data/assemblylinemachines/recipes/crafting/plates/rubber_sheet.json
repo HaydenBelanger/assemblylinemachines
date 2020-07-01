@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:rubber_ball"
+		},
+		{
+			"tag": "assemblylinemachines:crafting/hammers"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:rubber_sheet",
+		"count": 4
+	}
+}

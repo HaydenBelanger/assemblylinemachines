@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:naphtha",
+		"amount": 250
+	},
+	"input_item":{
+		"item": "assemblylinemachines:empowered_coal"
+	},
+	"proc_time": 18,
+	"output_item":{
+		"item": "assemblylinemachines:empowered_fuel"
+	}
+}

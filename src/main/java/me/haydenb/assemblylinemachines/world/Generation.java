@@ -15,5 +15,6 @@ public class Generation {
 	public static void completeLoad(FMLLoadCompleteEvent e) {
 		Ore.generateOverworldOre(Registry.getBlock("titanium_ore").getDefaultState(), 3, 2, 8, 8);
 		Ore.generateNetherOre(Registry.getBlock("black_granite").getDefaultState().with(BlockBlackGranite.NATURAL_GRANITE, true), 2, 1, 255, 25);
+		Ore.generateEndOre(Registry.getBlock("chromium_ore").getDefaultState(), 4, 1, 255, 10);
 	}
 }

@@ -8,6 +8,6 @@
 		"count": 8
 	},
 	"grinds": 10,
-	"bladetype": "puregold",
+	"bladetype": "PUREGOLD",
 	"machine_required": true
 }

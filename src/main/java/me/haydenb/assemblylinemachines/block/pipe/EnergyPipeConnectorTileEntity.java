@@ -55,11 +55,11 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 	public EnergyPipeConnectorTileEntity() {
 		this(Registry.getTileEntity("pipe_connector_energy"));
 	}
-
+	
 	@Override
-	public void read(CompoundNBT compound) {
-		super.read(compound);
-
+	public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
+		super.func_230337_a_(p_230337_1_, compound);
+		
 		if (compound.contains("assemblylinemachines:output")) {
 			outputMode = compound.getBoolean("assemblylinemachines:output");
 		}

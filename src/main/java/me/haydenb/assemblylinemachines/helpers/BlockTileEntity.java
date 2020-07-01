@@ -77,7 +77,7 @@ public abstract class BlockTileEntity extends Block{
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		if(shape != null) {
-			if(shouldRotate == true && state.has(HorizontalBlock.HORIZONTAL_FACING)) {
+			if(shouldRotate == true && state.func_235901_b_(HorizontalBlock.HORIZONTAL_FACING)) {
 				return General.rotateShape(dir, state.get(HorizontalBlock.HORIZONTAL_FACING), shape);
 			}else {
 				return shape;
@@ -106,7 +106,11 @@ public abstract class BlockTileEntity extends Block{
 				PlayerEntity player) {
 			TileEntity te = world.getTileEntity(pos);
 			if(clazz.isInstance(te)) {
-				NetworkHooks.openGui((ServerPlayerEntity) player, clazz.cast(te), buf -> buf.writeBlockPos(pos));
+				
+				try {
+					NetworkHooks.openGui((ServerPlayerEntity) player, clazz.cast(te), buf -> buf.writeBlockPos(pos));
+				}catch(NullPointerException e) {}
+				
 			}
 			return ActionResultType.CONSUME;
 			

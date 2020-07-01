@@ -104,7 +104,7 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		
 		
 		public TEElectricPurifier(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 7, (TranslationTextComponent) Registry.getBlock("electric_purifier").getNameTextComponent(), Registry.getContainerId("electric_purifier"), ContainerElectricPurifier.class, new EnergyProperties(true, false, 20000));
+			super(tileEntityTypeIn, 7, new TranslationTextComponent(Registry.getBlock("electric_purifier").getTranslationKey()), Registry.getContainerId("electric_purifier"), ContainerElectricPurifier.class, new EnergyProperties(true, false, 20000));
 		}
 		
 		public TEElectricPurifier() {

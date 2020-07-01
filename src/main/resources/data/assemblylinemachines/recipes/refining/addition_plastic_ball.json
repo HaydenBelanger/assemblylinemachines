@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_cracking",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:ethylene",
+		"amount": 1000
+	},
+	"input_item":{
+		"tag": "forge:dusts/charcoal"
+	},
+	"proc_time": 18,
+	"output_item":{
+		"item": "assemblylinemachines:plastic_ball",
+		"upgrade_multiply_chance": 0.25
+	}
+}

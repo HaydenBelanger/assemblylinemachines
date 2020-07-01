@@ -1,0 +1,19 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_halogen",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:oil",
+		"amount": 1000
+	},
+	"proc_time": 22,
+	"output_fluid_a":{
+		"fluid": "assemblylinemachines:propane",
+		"amount": 250,
+		"upgrade_multiply_chance": 0.25
+	},
+	"output_fluid_b":{
+		"fluid": "assemblylinemachines:ethane",
+		"amount": 500,
+		"upgrade_multiply_chance": 0.25
+	}
+}
