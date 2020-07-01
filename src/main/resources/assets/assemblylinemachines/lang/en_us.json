@@ -109,6 +109,7 @@
 	"item.assemblylinemachines.key": "Key",
 	"item.assemblylinemachines.key_configured": "Cut Key",
 	"item.assemblylinemachines.lock_remover": "Lock Remover",
+	"item.assemblylinemachines.generator_upgrade_coolant": "Generator Upgrade: Active Cooling",
 	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	

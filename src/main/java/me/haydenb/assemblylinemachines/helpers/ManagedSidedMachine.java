@@ -57,18 +57,7 @@ public class ManagedSidedMachine<A extends Container> extends AbstractSidedMachi
 			return null;
 		}
 
-		switch(mdir) {
-		case LEFT:
-			return dir.rotateY();
-		case RIGHT:
-			return dir.rotateYCCW();
-		case BACK:
-			return dir.getOpposite();
-		case FRONT:
-			return dir;
-		default:
-			return mdir.rel;
-		}
+		return mdir.getDirection(dir);
 	}
 
 	public boolean getDirectionEnabled(ManagedDirection mdir) {
@@ -114,6 +103,21 @@ public class ManagedSidedMachine<A extends Container> extends AbstractSidedMachi
 
 		ManagedDirection(Direction rel){
 			this.rel = rel;
+		}
+		
+		public Direction getDirection(Direction facing) {
+			switch(this){
+			case FRONT:
+				return facing;
+			case BACK:
+				return facing.getOpposite();
+			case LEFT:
+				return facing.rotateYCCW();
+			case RIGHT:
+				return facing.rotateY();
+			default:
+				return rel;
+			}
 		}
 	}
 

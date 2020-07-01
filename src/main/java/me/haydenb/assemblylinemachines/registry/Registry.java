@@ -16,7 +16,7 @@ import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
-import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.FluidGeneratorTypes;
+import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.*;
 import me.haydenb.assemblylinemachines.block.fluid.*;
 import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
@@ -262,6 +262,8 @@ public class Registry {
 		createItem("lock_remover", new ItemLockRemover());
 		createItem("key", new ItemKey());
 		
+		createItem("generator_upgrade_coolant", new ItemUpgrade(false, "Generators will give more power per unit of fuel.", "Requires a secondary coolant supply."));
+		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
 		}
@@ -420,6 +422,7 @@ public class Registry {
 		createTileEntity("interactor", TEInteractor.class);
 		createTileEntity("vacuum_hopper", TEVacuumHopper.class);
 		createTileEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
+		createTileEntity("fluid_generator", TEFluidGenerator.class, blockRegistry.get("geothermal_generator"), blockRegistry.get("combustion_generator"));
 		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
@@ -446,6 +449,7 @@ public class Registry {
 		createContainer("fluid_router", 1064, ContainerFluidRouter.class);
 		createContainer("interactor", 1065, ContainerInteractor.class);
 		createContainer("bottomless_storage_unit", 1066, ContainerBottomlessStorageUnit.class);
+		createContainer("fluid_generator", 1067, ContainerFluidGenerator.class);
 		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
@@ -459,6 +463,7 @@ public class Registry {
 		RenderTypeLookup.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("autocrafting_table"), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(getBlock("geothermal_generator"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("naphtha_fire"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getFluid("naphtha"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("naphtha_flowing"), RenderType.getTranslucent());
@@ -487,6 +492,7 @@ public class Registry {
 		registerScreen("fluid_router", ContainerFluidRouter.class, ScreenFluidRouter.class);
 		registerScreen("interactor", ContainerInteractor.class, ScreenInteractor.class);
 		registerScreen("bottomless_storage_unit", ContainerBottomlessStorageUnit.class, ScreenBottomlessStorageUnit.class);
+		registerScreen("fluid_generator", ContainerFluidGenerator.class, ScreenFluidGenerator.class);
 	}
 	
 	@SubscribeEvent

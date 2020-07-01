@@ -74,6 +74,8 @@ public class ItemUpgrade extends Item {
 		
 		AC_SUSTAINED(Registry.getItem("autocrafting_upgrade_sustained")), AC_RECIPES(Registry.getItem("autocrafting_upgrade_recipes")),
 		
+		GENERATOR_COOLANT(Registry.getItem("generator_upgrade_coolant")),
+		
 		NONE(null);
 		
 		public final Item i;

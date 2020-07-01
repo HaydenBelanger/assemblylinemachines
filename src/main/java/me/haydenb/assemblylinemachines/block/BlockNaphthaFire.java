@@ -3,11 +3,9 @@ package me.haydenb.assemblylinemachines.block;
 import java.util.Iterator;
 import java.util.Random;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -17,20 +15,16 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.ForgeEventFactory;
 
 public class BlockNaphthaFire extends AbstractFireBlock {
-
-
-	private static final BooleanProperty FINAL_SPREAD = BooleanProperty.create("final_spread");
 	public BlockNaphthaFire() {
 		super(Block.Properties.create(Material.FIRE, MaterialColor.TNT).doesNotBlockMovement().tickRandomly()
 				.hardnessAndResistance(0f).func_235838_a_((state) -> 15).sound(SoundType.CLOTH).noDrops(), 4f);
-		this.setDefaultState(this.stateContainer.getBaseState().with(FireBlock.AGE, 0).with(FINAL_SPREAD, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(FireBlock.AGE, 0));
 	}
 
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(FireBlock.AGE, FINAL_SPREAD);
-		super.fillStateContainer(builder);
+		builder.add(FireBlock.AGE);
 	}
 
 	@Override
@@ -42,21 +36,25 @@ public class BlockNaphthaFire extends AbstractFireBlock {
 			}
 
 			int age = state.get(FireBlock.AGE);
-			if(state.get(FINAL_SPREAD) == false && age < 15) {
+			if(age < 15) {
 
 				Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.up().north().east(), pos.down().south().west()).iterator();
 
 
 				while(iter.hasNext()) {
 					BlockPos posx = iter.next();
-					if (rand.nextInt(10) < 2) {
+					if (rand.nextInt(5) == 0) {
 						if(world.getBlockState(posx).getBlock() == Blocks.AIR) {
+							int nAge = age + 2 + rand.nextInt(6);
+							int xAge = age + 1 + rand.nextInt(4);
+							if(nAge > 15) nAge = 15;
+							if(xAge > 15) xAge = 15;
 							if(world.isBlockPresent(posx.down()) && !world.getBlockState(posx.down()).getBlock().getTags().contains(new ResourceLocation("assemblylinemachines", "world/naphtha_fireproof"))) {
-								int nAge = age + 1 + rand.nextInt(4);
-								if(nAge > 15) nAge = 15;
-								world.setBlockState(posx, ForgeEventFactory.fireFluidPlaceBlockEvent(world, pos, posx, Registry.getBlock("naphtha_fire").getDefaultState().with(FireBlock.AGE, nAge)));
-								if(rand.nextInt(6) == 0) {
-									world.setBlockState(pos, state.with(FINAL_SPREAD, true));
+								world.setBlockState(posx, ForgeEventFactory.fireFluidPlaceBlockEvent(world, posx, pos, state.with(FireBlock.AGE, nAge)));
+								
+								world.setBlockState(pos, state.with(FireBlock.AGE, xAge));
+								
+								if(xAge == 15) {
 									break;
 								}
 							}
@@ -73,7 +71,7 @@ public class BlockNaphthaFire extends AbstractFireBlock {
 	
 	@Override
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return this.isValidPosition(stateIn, worldIn, currentPos) ? this.getDefaultState() : Blocks.AIR.getDefaultState();
+		return this.isValidPosition(stateIn, worldIn, currentPos) ? stateIn : Blocks.AIR.getDefaultState();
 	}
 
 

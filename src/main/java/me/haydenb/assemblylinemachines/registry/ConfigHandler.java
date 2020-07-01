@@ -59,8 +59,8 @@ public class ConfigHandler {
 			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
 			
 			Predicate<Object> fluidTestPredicate = (object) -> true;
-			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 32000), Pair.of("assemblylinemachines:naphtha", 128000)), fluidTestPredicate);
-			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:gasoline", 192000), Pair.of("assemblylinemachines:diesel", 480000)), fluidTestPredicate);
+			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 115000), Pair.of("assemblylinemachines:naphtha", 350000)), fluidTestPredicate);
+			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:gasoline", 600000), Pair.of("assemblylinemachines:diesel", 1050000)), fluidTestPredicate);
 			coolantFluidsRaw = builder.comment("What fluids should be valid for use as coolant in various Generators? Value is multiplier on burn time.").defineList("coolantFluids", getFluidDefaultConfig(Pair.of("minecraft:water", 2), Pair.of("assemblylinemachines:condensed_void", 4)), fluidTestPredicate);
 			
 			builder.pop();
