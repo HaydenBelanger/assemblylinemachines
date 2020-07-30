@@ -283,7 +283,7 @@ public class PipeBase<T> extends Block {
 	}
 
 	public static enum Type {
-		BASIC_POWER(MainType.POWER), ADVANCED_POWER(MainType.POWER), FLUID(MainType.FLUID), ITEM(MainType.ITEM);
+		BASIC_POWER(MainType.POWER), ADVANCED_POWER(MainType.POWER), BASIC_FLUID(MainType.FLUID), ADVANCED_FLUID(MainType.FLUID), ITEM(MainType.ITEM);
 		
 		
 		private MainType category;

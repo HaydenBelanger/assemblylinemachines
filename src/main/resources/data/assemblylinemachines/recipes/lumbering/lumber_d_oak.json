@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:lumber",
+	"input":{
+		"tag": "minecraft:dark_oak_logs"
+	},
+	"output":{
+		"item": "minecraft:dark_oak_planks",
+		"count": 6
+	},
+	"secondaryoutput":{
+		"item": "assemblylinemachines:sawdust"
+	},
+	"opbchance": 0.25,
+	"time": 10
+}

@@ -294,7 +294,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 		
 		public ScreenSimpleFluidMixer(ContainerSimpleFluidMixer screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "simple_fluid_mixer", true);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "simple_fluid_mixer", true);
 			tsfm = screenContainer.tileEntity;
 		}
 		

@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:diamond"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:silk_touch",
+	"cost": 225
+}

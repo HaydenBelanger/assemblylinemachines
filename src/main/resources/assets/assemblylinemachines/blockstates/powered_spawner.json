@@ -1,0 +1,8 @@
+{
+	"variants":{
+		"": {
+			"model": "assemblylinemachines:block/powered_spawner"
+		}
+	}
+	
+}

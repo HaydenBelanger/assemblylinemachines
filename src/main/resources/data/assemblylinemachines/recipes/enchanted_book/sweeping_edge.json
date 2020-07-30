@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "assemblylinemachines:ground_lapis_lazuli"
+	},
+	"amount": 2,
+	"enchantment": "minecraft:sweeping",
+	"cost": 100
+}

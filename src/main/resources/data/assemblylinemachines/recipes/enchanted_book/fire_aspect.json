@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:magma_block"
+	},
+	"amount": 4,
+	"enchantment": "minecraft:fire_aspect",
+	"cost": 125
+}

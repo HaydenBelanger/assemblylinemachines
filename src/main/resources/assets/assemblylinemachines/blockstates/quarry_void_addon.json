@@ -1,0 +1,42 @@
+{
+    "multipart": [
+
+		{   "when": { "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/quarry/upgrades/quarry_void_addon_cardinal", "y": 90}
+        },
+        {   "when": { "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/quarry/upgrades/quarry_void_addon_cardinal", "y": 180}
+        },
+        {   "when": { "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/quarry/upgrades/quarry_void_addon_cardinal", "y": 270}
+        },
+        {   "when": { "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/quarry/upgrades/quarry_void_addon_cardinal"}
+        },
+        {   "when": { "facing": "down" },
+            "apply": { "model": "assemblylinemachines:block/quarry/upgrades/quarry_void_addon_vertical"}
+        },
+        {   "when": { "facing": "up" },
+            "apply": { "model": "assemblylinemachines:block/quarry/upgrades/quarry_void_addon_vertical", "x": 180}
+        },
+
+        {   "when": { "north": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal", "y": 90}
+        },
+        {   "when": { "east": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal", "y": 180}
+        },
+        {   "when": { "south": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal", "y": 270}
+        },
+        {   "when": { "west": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal"}
+        },
+        {   "when": { "down": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_vertical"}
+        },
+        {   "when": { "up": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_vertical", "x": 180}
+        }
+    ]
+}

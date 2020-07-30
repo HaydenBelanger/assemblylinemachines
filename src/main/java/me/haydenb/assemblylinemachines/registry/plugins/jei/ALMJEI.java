@@ -21,6 +21,8 @@ public class ALMJEI implements IModPlugin{
 	private AlloyingRecipeCategory alloyingCategory;
 	private FluidGroundCategory groundCategory;
 	private RefineryRecipeCategory refineryCategory;
+	private EnchantmentBookRecipeCategory enchantmentCategory;
+	private LumberRecipeCategory lumberCategory;
 	
 	@Override
 	public ResourceLocation getPluginUid() {
@@ -38,8 +40,11 @@ public class ALMJEI implements IModPlugin{
 			alloyingCategory = new AlloyingRecipeCategory(guiHelper);
 			groundCategory = new FluidGroundCategory(guiHelper);
 			refineryCategory = new RefineryRecipeCategory(guiHelper);
+			enchantmentCategory = new EnchantmentBookRecipeCategory(guiHelper);
+			lumberCategory = new LumberRecipeCategory(guiHelper);
 			
-			registration.addRecipeCategories(grinderCategory, bathCategory, purifierCategory, alloyingCategory, groundCategory, refineryCategory);
+			registration.addRecipeCategories(grinderCategory, bathCategory, purifierCategory, 
+					alloyingCategory, groundCategory, refineryCategory, enchantmentCategory, lumberCategory);
 		}
 		
 		
@@ -54,6 +59,8 @@ public class ALMJEI implements IModPlugin{
 			registration.addRecipes(JEIHelper.getRecipes(AlloyingCrafting.ALLOYING_RECIPE), alloyingCategory.getUid());
 			registration.addRecipes(JEIHelper.getRecipes(FluidInGroundRecipe.FIG_RECIPE), groundCategory.getUid());
 			registration.addRecipes(JEIHelper.getRecipes(RefiningCrafting.REFINING_RECIPE), refineryCategory.getUid());
+			registration.addRecipes(JEIHelper.getRecipes(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE), enchantmentCategory.getUid());
+			registration.addRecipes(JEIHelper.getRecipes(LumberCrafting.LUMBER_RECIPE), lumberCategory.getUid());
 		}
 	}
 

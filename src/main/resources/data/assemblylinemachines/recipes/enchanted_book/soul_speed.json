@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:soul_torch"
+	},
+	"amount": 8,
+	"enchantment": "minecraft:soul_speed",
+	"cost": 150
+}

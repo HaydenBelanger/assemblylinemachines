@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:redstone"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:efficiency",
+	"cost": 75
+}

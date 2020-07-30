@@ -12,6 +12,7 @@ import com.google.common.collect.Multimap;
 import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -35,10 +36,12 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 
 	private final A parent;
 	private final int maxCranks;
+	private final ItemStack item;
 	public ItemCrankTool(float damage, float speed, ToolType tt, Item.Properties builder, int maxCranks, A parent) {
 		super(parent.getTier(), builder);
 		this.parent = parent;
 		this.maxCranks = maxCranks;
+		this.item = new ItemStack(parent);
 	}
 
 
@@ -72,6 +75,12 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 	@Override
 	public boolean canHarvestBlock(BlockState blockIn) {
 		return parent.canHarvestBlock(blockIn);
+	}
+	
+	@Override
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+		
+		return parent.canApplyAtEnchantingTable(item, enchantment);
 	}
 	
 	@Override

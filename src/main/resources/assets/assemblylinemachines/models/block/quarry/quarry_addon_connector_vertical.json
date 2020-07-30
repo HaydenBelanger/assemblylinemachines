@@ -1,0 +1,78 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/quarry/quarry_connector_1",
+		"1": "assemblylinemachines:block/quarry/quarry_connector_2",
+		"particle": "assemblylinemachines:block/quarry/quarry_connector_1"
+	},
+	"elements": [
+		{
+			"name": "Connector1",
+			"from": [3, 0, 3],
+			"to": [6, 2, 6],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 22, 11]},
+			"faces": {
+				"north": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"east": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"south": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"west": {"uv": [3, 0, 6, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Connector2",
+			"from": [10, 0, 3],
+			"to": [13, 2, 6],
+			"rotation": {"angle": 0, "axis": "y", "origin": [18, 22, 11]},
+			"faces": {
+				"north": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"east": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"south": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"west": {"uv": [3, 0, 6, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Connector3",
+			"from": [10, 0, 10],
+			"to": [13, 2, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [18, 22, 18]},
+			"faces": {
+				"north": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"east": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"south": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"west": {"uv": [3, 0, 6, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Connector4",
+			"from": [3, 0, 10],
+			"to": [6, 2, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 22, 18]},
+			"faces": {
+				"north": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"east": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"south": {"uv": [3, 0, 6, 2], "texture": "#0"},
+				"west": {"uv": [3, 0, 6, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Connector5",
+			"from": [7, 0, 7],
+			"to": [9, 2, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14, 22, 15]},
+			"faces": {
+				"north": {"uv": [7, 0, 9, 2], "texture": "#1"},
+				"east": {"uv": [7, 0, 9, 2], "texture": "#1"},
+				"south": {"uv": [7, 0, 9, 2], "texture": "#1"},
+				"west": {"uv": [7, 0, 9, 2], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0, 1, 2, 3, 4]
+		}
+	]
+}

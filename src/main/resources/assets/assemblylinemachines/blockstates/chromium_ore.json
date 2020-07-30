@@ -1,8 +1,14 @@
 {
 	"variants":{
-		"": {
-			"model": "assemblylinemachines:block/chromium_ore"
-		}
+		"": [{
+			"model": "assemblylinemachines:block/ores/chromium_ore"
+		},
+		{
+			"model": "assemblylinemachines:block/ores/chromium_ore_1"
+		},
+		{
+			"model": "assemblylinemachines:block/ores/chromium_ore_2"
+		}]
 	}
 	
 }

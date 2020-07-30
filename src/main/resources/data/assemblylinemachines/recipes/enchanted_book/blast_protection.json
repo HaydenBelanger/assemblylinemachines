@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:gunpowder"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:blast_protection",
+	"cost": 100
+}

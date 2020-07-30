@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:nether_wart"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:protection",
+	"cost": 100
+}

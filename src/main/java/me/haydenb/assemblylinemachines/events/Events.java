@@ -1,19 +1,24 @@
 package me.haydenb.assemblylinemachines.events;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon;
 import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
 import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.item.items.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
+import me.haydenb.assemblylinemachines.util.General;
+import net.minecraft.block.*;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.ChunkDataEvent;
-import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
@@ -21,6 +26,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 public class Events {
 	
 	private static final Direction[] dirs = new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+	
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
 		if(!event.getWorld().isRemote()) {
@@ -61,8 +67,58 @@ public class Events {
 					event.setCanceled(true);
 				}
 			}
+			
+			else if(event.getState().getBlock() instanceof BlockQuarryAddon) {
+				boolean b = false;
+				for(Direction d : Direction.values()) {
+					BlockState state = event.getWorld().getBlockState(event.getPos().offset(d));
+					Block block = state.getBlock();
+					if(block == Registry.getBlock("quarry")) {
+						b = true;
+						event.getWorld().setBlockState(event.getPos(), event.getState().with(BlockStateProperties.FACING, d).with(BlockQuarryAddon.getAddonProperty(d), true), 2);
+						break;
+					}
+				}
+				if(b == false) {
+					event.setCanceled(true);
+				}
+			}
 		}
 		
+	}
+	
+	@SubscribeEvent
+	public static void kill(LivingDeathEvent event) {
+		if(event.getSource().getTrueSource() instanceof ServerPlayerEntity) {
+			
+			ServerPlayerEntity spe = (ServerPlayerEntity) event.getSource().getTrueSource();
+			
+			ItemStack stack = spe.getHeldItemMainhand();
+			
+			if (stack.getItem() == Registry.getItem("mystium_sword") && General.RAND.nextInt(10) == 0 && ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null 
+					&& stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
+				ItemStack inert = null;
+				for(int i = 0; i < spe.inventory.getSizeInventory(); i++) {
+					ItemStack sis = spe.inventory.getStackInSlot(i);
+					if(sis.getItem() == Registry.getItem("mob_crystal") && !sis.hasTag()) {
+						inert = sis;
+						break;
+					}
+				}
+				if(spe.isCreative() || inert != null) {
+					ItemStack crystal = new ItemStack(Registry.getItem("mob_crystal"), 1);
+					CompoundNBT tag = new CompoundNBT();
+					tag.putString("assemblylinemachines:mob", event.getEntity().getType().getRegistryName().toString());
+					crystal.setTag(tag);
+					event.getEntity().entityDropItem(crystal);
+					stack.damageItem(20, spe, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+					if(!spe.isCreative() && inert != null) {
+						inert.shrink(1);
+					}
+				}
+				
+			}
+		}
 	}
 	
 	@SubscribeEvent

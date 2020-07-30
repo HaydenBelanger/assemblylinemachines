@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:bamboo"
+	},
+	"amount": 6,
+	"enchantment": "minecraft:luck_of_the_sea",
+	"cost": 125
+}

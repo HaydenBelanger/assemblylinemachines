@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:ghast_tear"
+	},
+	"amount": 1,
+	"enchantment": "minecraft:piercing",
+	"cost": 100
+}

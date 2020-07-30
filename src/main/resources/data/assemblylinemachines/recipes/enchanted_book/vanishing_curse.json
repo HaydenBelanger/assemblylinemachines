@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:glass_pane"
+	},
+	"amount": 1,
+	"enchantment": "minecraft:vanishing_curse",
+	"cost": 50
+}

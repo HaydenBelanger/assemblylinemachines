@@ -1,0 +1,162 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/xphopper/vacuum_hopper_side3",
+		"1": "assemblylinemachines:block/xphopper/vacuum_hopper_side2",
+		"2": "assemblylinemachines:block/xphopper/vacuum_hopper_side1",
+		"3": "assemblylinemachines:block/xphopper/vacuum_hopper_front",
+		"4": "assemblylinemachines:block/xphopper/vacuum_hopper_back3",
+		"5": "assemblylinemachines:block/xphopper/vacuum_hopper_back2",
+		"6": "assemblylinemachines:block/xphopper/vacuum_hopper_back1",
+		"particle": "assemblylinemachines:block/machine_advanced_top"
+	},
+	"elements": [
+		{
+			"name": "Side1",
+			"from": [12, 5, 5],
+			"to": [16, 11, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 13, 13]},
+			"faces": {
+				"north": {"uv": [5, 12, 11, 16], "rotation": 90, "texture": "#0"},
+				"east": {"uv": [5, 5, 11, 11], "rotation": 270, "texture": "#4"},
+				"south": {"uv": [5, 12, 11, 16], "rotation": 270, "texture": "#0"},
+				"up": {"uv": [5, 12, 11, 16], "rotation": 270, "texture": "#0"},
+				"down": {"uv": [5, 12, 11, 16], "rotation": 270, "texture": "#0"}
+			}
+		},
+		{
+			"name": "Side2",
+			"from": [8, 4, 4],
+			"to": [12, 12, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [4, 13, 13]},
+			"faces": {
+				"north": {"uv": [4, 8, 12, 12], "rotation": 90, "texture": "#1"},
+				"east": {"uv": [4, 4, 12, 12], "rotation": 270, "texture": "#5"},
+				"south": {"uv": [4, 8, 12, 12], "rotation": 270, "texture": "#1"},
+				"up": {"uv": [4, 8, 12, 12], "rotation": 270, "texture": "#1"},
+				"down": {"uv": [4, 8, 12, 12], "rotation": 270, "texture": "#1"}
+			}
+		},
+		{
+			"name": "Side3",
+			"from": [4, 3, 3],
+			"to": [8, 13, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 13, 13]},
+			"faces": {
+				"north": {"uv": [3, 4, 13, 8], "rotation": 90, "texture": "#2"},
+				"east": {"uv": [3, 3, 13, 13], "rotation": 270, "texture": "#6"},
+				"south": {"uv": [3, 4, 13, 8], "rotation": 270, "texture": "#2"},
+				"west": {"uv": [3, 3, 13, 13], "rotation": 270, "texture": "#3"},
+				"up": {"uv": [3, 4, 13, 8], "rotation": 270, "texture": "#2"},
+				"down": {"uv": [3, 4, 13, 8], "rotation": 270, "texture": "#2"}
+			}
+		},
+		{
+			"name": "Gem1",
+			"from": [3, 2, 7],
+			"to": [6, 3, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 10, 15]},
+			"faces": {
+				"north": {"uv": [7, 3, 8, 6], "rotation": 90, "texture": "#2"},
+				"east": {"uv": [13, 7, 14, 9], "rotation": 270, "texture": "#3"},
+				"south": {"uv": [8, 3, 9, 6], "rotation": 270, "texture": "#2"},
+				"west": {"uv": [2, 7, 3, 9], "rotation": 270, "texture": "#3"},
+				"down": {"uv": [7, 3, 9, 6], "rotation": 270, "texture": "#2"}
+			}
+		},
+		{
+			"name": "Gem2",
+			"from": [3, 13, 7],
+			"to": [6, 14, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 21, 15]},
+			"faces": {
+				"north": {"uv": [8, 3, 9, 6], "rotation": 90, "texture": "#2"},
+				"east": {"uv": [2, 7, 3, 9], "rotation": 270, "texture": "#3"},
+				"south": {"uv": [7, 3, 8, 6], "rotation": 270, "texture": "#2"},
+				"west": {"uv": [2, 7, 3, 9], "rotation": 90, "texture": "#3"},
+				"up": {"uv": [7, 3, 9, 6], "rotation": 270, "texture": "#2"}
+			}
+		},
+		{
+			"name": "Gem2",
+			"from": [3, 3, 7],
+			"to": [4, 4, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 11, 15]},
+			"faces": {
+				"north": {"uv": [8, 2, 9, 3], "rotation": 90, "texture": "#3"},
+				"south": {"uv": [2, 8, 3, 9], "rotation": 270, "texture": "#3"},
+				"west": {"uv": [2, 7, 3, 9], "rotation": 270, "texture": "#3"},
+				"up": {"uv": [7, 2, 9, 3], "rotation": 270, "texture": "#3"}
+			}
+		},
+		{
+			"name": "Gem3",
+			"from": [3, 12, 7],
+			"to": [4, 13, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 20, 15]},
+			"faces": {
+				"north": {"uv": [7, 2, 8, 3], "rotation": 90, "texture": "#3"},
+				"south": {"uv": [2, 7, 3, 8], "rotation": 270, "texture": "#3"},
+				"west": {"uv": [13, 7, 14, 9], "rotation": 270, "texture": "#3"},
+				"down": {"uv": [7, 2, 9, 3], "rotation": 270, "texture": "#3"}
+			}
+		},
+		{
+			"name": "Gem4",
+			"from": [3, 7, 13],
+			"to": [6, 9, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 15, 21]},
+			"faces": {
+				"east": {"uv": [7, 13, 9, 14], "rotation": 270, "texture": "#3"},
+				"south": {"uv": [7, 3, 9, 6], "rotation": 270, "texture": "#2"},
+				"west": {"uv": [7, 13, 9, 14], "rotation": 270, "texture": "#3"},
+				"up": {"uv": [8, 3, 9, 6], "rotation": 270, "texture": "#2"},
+				"down": {"uv": [7, 3, 8, 6], "rotation": 270, "texture": "#2"}
+			}
+		},
+		{
+			"name": "Gem5",
+			"from": [3, 7, 12],
+			"to": [4, 9, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 15, 20]},
+			"faces": {
+				"north": {"uv": [7, 2, 9, 3], "rotation": 90, "texture": "#3"},
+				"west": {"uv": [7, 13, 9, 14], "rotation": 270, "texture": "#3"},
+				"up": {"uv": [7, 2, 8, 3], "rotation": 270, "texture": "#3"},
+				"down": {"uv": [2, 7, 3, 8], "rotation": 270, "texture": "#3"}
+			}
+		},
+		{
+			"name": "Gem6",
+			"from": [3, 7, 2],
+			"to": [6, 9, 3],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 15, 10]},
+			"faces": {
+				"north": {"uv": [7, 3, 9, 6], "rotation": 90, "texture": "#2"},
+				"east": {"uv": [7, 2, 9, 3], "rotation": 270, "texture": "#3"},
+				"west": {"uv": [7, 2, 9, 3], "rotation": 270, "texture": "#3"},
+				"up": {"uv": [7, 3, 8, 6], "rotation": 270, "texture": "#2"},
+				"down": {"uv": [8, 3, 9, 6], "rotation": 270, "texture": "#2"}
+			}
+		},
+		{
+			"name": "Gem7",
+			"from": [3, 7, 3],
+			"to": [4, 9, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-3, 15, 11]},
+			"faces": {
+				"south": {"uv": [7, 2, 9, 3], "rotation": 270, "texture": "#3"},
+				"west": {"uv": [7, 2, 9, 3], "rotation": 270, "texture": "#3"},
+				"up": {"uv": [8, 2, 9, 3], "rotation": 270, "texture": "#3"},
+				"down": {"uv": [7, 2, 8, 3], "rotation": 270, "texture": "#3"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		}
+	]
+}

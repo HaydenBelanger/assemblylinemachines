@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:popped_chorus_fruit"
+	},
+	"amount": 6,
+	"enchantment": "minecraft:protection",
+	"cost": 100
+}

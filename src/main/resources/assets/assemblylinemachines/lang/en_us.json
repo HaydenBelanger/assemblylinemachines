@@ -110,8 +110,14 @@
 	"item.assemblylinemachines.key_configured": "Cut Key",
 	"item.assemblylinemachines.lock_remover": "Lock Remover",
 	"item.assemblylinemachines.generator_upgrade_coolant": "Generator Upgrade: Active Cooling",
-	
-	"itemGroup.assemblylinemachines": "Assembly Line Machines",
+	"item.assemblylinemachines.liquid_experience_bucket": "Liquid Experience Bucket",
+	"item.assemblylinemachines.mob_crystal": "Inert Mob Crystal",
+	"item.assemblylinemachines.mob_crystal_tuned": "Activated Mob Crystal (%1$s)",
+	"item.assemblylinemachines.polished_rock": "Polished Rock",
+	"item.assemblylinemachines.crimson_sawdust": "Crimson Sawdust",
+	"item.assemblylinemachines.warped_sawdust": "Warped Sawdust",
+	"item.assemblylinemachines.sawdust": "Sawdust",
+	"item.assemblylinemachines.experience_mill_upgrade_level": "Experience Mill Upgrade: Level Increase",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.titanium_block": "Titanium Block",
@@ -173,6 +179,18 @@
 	"block.assemblylinemachines.vacuum_hopper": "Vacuum Hopper",
 	"block.assemblylinemachines.geothermal_generator": "Geothermal Generator",
 	"block.assemblylinemachines.combustion_generator": "Combustion Generator",
+	"block.assemblylinemachines.experience_hopper": "Experience Hopper",
+	"block.assemblylinemachines.experience_mill": "Experience Mill",
+	"block.assemblylinemachines.advanced_battery_cell": "Advanced Battery Cell",
+	"block.assemblylinemachines.advanced_fluid_pipe": "Advanced Fluid Pipe",
+	"block.assemblylinemachines.mystium_farmland": "Mystium Farmland",
+	"block.assemblylinemachines.fluid_router": "Fluid Router",
+	"block.assemblylinemachines.lumber_mill": "Lumber Mill",
+	"block.assemblylinemachines.powered_spawner": "Powered Spawner",
+	"block.assemblylinemachines.quarry": "Quarry",
+	"block.assemblylinemachines.quarry_fortune_addon": "Quarry Addon: Fortune",
+	"block.assemblylinemachines.quarry_void_addon": "Quarry Addon: Void",
+	"block.assemblylinemachines.quarry_speed_addon": "Quarry Addon: Speed",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",
@@ -183,6 +201,9 @@
 	"fluid.assemblylinemachines.propane": "Propane",
 	"fluid.assemblylinemachines.ethylene": "Ethylene",
 	"fluid.assemblylinemachines.propylene": "Propylene",
+	"fluid.assemblylinemachines.liquid_experience": "Liquid Experience",
+	
+	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
 	"death.attack.interactor": "%1$s was killed by %2$s's Interactor",
 	"death.attack.interactor.item": "%1$s was killed by %2$s's Interactor using %3$s"

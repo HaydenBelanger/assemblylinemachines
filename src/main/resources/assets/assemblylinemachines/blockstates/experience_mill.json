@@ -1,0 +1,23 @@
+{
+    "variants": {
+        "facing=north,display=0": { "model": "assemblylinemachines:block/exp_mill/experience_mill" },
+        "facing=south,display=0": { "model": "assemblylinemachines:block/exp_mill/experience_mill", "y": 180 },
+        "facing=west,display=0":  { "model": "assemblylinemachines:block/exp_mill/experience_mill", "y": 270 },
+        "facing=east,display=0":  { "model": "assemblylinemachines:block/exp_mill/experience_mill", "y": 90 },
+
+		"facing=north,display=1": { "model": "assemblylinemachines:block/exp_mill/experience_mill_enchant" },
+        "facing=south,display=1": { "model": "assemblylinemachines:block/exp_mill/experience_mill_enchant", "y": 180 },
+        "facing=west,display=1":  { "model": "assemblylinemachines:block/exp_mill/experience_mill_enchant", "y": 270 },
+        "facing=east,display=1":  { "model": "assemblylinemachines:block/exp_mill/experience_mill_enchant", "y": 90 },
+
+		"facing=north,display=2": { "model": "assemblylinemachines:block/exp_mill/experience_mill_books" },
+        "facing=south,display=2": { "model": "assemblylinemachines:block/exp_mill/experience_mill_books", "y": 180 },
+        "facing=west,display=2":  { "model": "assemblylinemachines:block/exp_mill/experience_mill_books", "y": 270 },
+        "facing=east,display=2":  { "model": "assemblylinemachines:block/exp_mill/experience_mill_books", "y": 90 },
+
+		"facing=north,display=3": { "model": "assemblylinemachines:block/exp_mill/experience_mill_anvil" },
+        "facing=south,display=3": { "model": "assemblylinemachines:block/exp_mill/experience_mill_anvil", "y": 180 },
+        "facing=west,display=3":  { "model": "assemblylinemachines:block/exp_mill/experience_mill_anvil", "y": 270 },
+        "facing=east,display=3":  { "model": "assemblylinemachines:block/exp_mill/experience_mill_anvil", "y": 90 }
+    }
+}

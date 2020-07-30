@@ -269,7 +269,7 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 		
 		public ScreenGearbox(ContainerGearbox screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "gearbox", true);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "gearbox", true);
 			tsfm = screenContainer.tileEntity;
 		}
 		

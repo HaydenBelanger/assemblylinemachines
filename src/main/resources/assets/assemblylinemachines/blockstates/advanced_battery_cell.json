@@ -1,0 +1,90 @@
+{
+	
+	"multipart":[
+		{   "when": { "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/base"}
+        },
+        {   "when": { "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/base", "y": 90}
+        },
+		{   "when": { "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/base", "y": 180}
+        },
+		{   "when": { "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/base", "y": 270}
+        },
+
+
+
+
+		{   "when": { "fullness": 0, "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/0"}
+        },
+        {   "when": { "fullness": 1 , "facing": "north"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/25"}
+        },
+		{   "when": { "fullness": 2 , "facing": "north"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/50"}
+        },
+		{   "when": { "fullness": 3, "facing": "north"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/75"}
+        },
+		{   "when": { "fullness": 4, "facing": "north"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/100"}
+        },
+
+
+
+		{   "when": { "fullness": 0, "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/0", "y": 90}
+        },
+        {   "when": { "fullness": 1 , "facing": "east"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/25", "y": 90}
+        },
+		{   "when": { "fullness": 2 , "facing": "east"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/50", "y": 90}
+        },
+		{   "when": { "fullness": 3, "facing": "east"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/75", "y": 90}
+        },
+		{   "when": { "fullness": 4, "facing": "east"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/100", "y": 90}
+        },
+
+
+
+		{   "when": { "fullness": 0, "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/0", "y": 180}
+        },
+        {   "when": { "fullness": 1 , "facing": "south"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/25", "y": 180}
+        },
+		{   "when": { "fullness": 2 , "facing": "south"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/50", "y": 180}
+        },
+		{   "when": { "fullness": 3, "facing": "south"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/75", "y": 180}
+        },
+		{   "when": { "fullness": 4, "facing": "south"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/100", "y": 180}
+        },
+
+
+
+		{   "when": { "fullness": 0, "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/0", "y": 270}
+        },
+        {   "when": { "fullness": 1 , "facing": "west"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/25", "y": 270}
+        },
+		{   "when": { "fullness": 2 , "facing": "west"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/50", "y": 270}
+        },
+		{   "when": { "fullness": 3, "facing": "west"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/75", "y": 270}
+        },
+		{   "when": { "fullness": 4, "facing": "west"},
+            "apply": { "model": "assemblylinemachines:block/battery_cell/advanced/100", "y": 270}
+        }
+	]
+}

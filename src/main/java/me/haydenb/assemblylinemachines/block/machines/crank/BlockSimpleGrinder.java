@@ -268,7 +268,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		
 		public ScreenSimpleGrinder(ContainerSimpleGrinder screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "simple_grinder", true);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "simple_grinder", true);
 			tsfm = screenContainer.tileEntity;
 		}
 		

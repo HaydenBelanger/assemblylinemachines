@@ -282,14 +282,12 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 	public static class ScreenElectricPurifier extends ScreenALMEnergyBased<ContainerElectricPurifier>{
 		TEElectricPurifier tsfm;
 		
-		private static final int[] ANIM_PAIRS = {52, 84, 116};
-		
 		private int f = 0;
 		private int t = 0;
 		
 		public ScreenElectricPurifier(ContainerElectricPurifier screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "electric_purifier", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "electric_purifier", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 		}
 		
@@ -308,7 +306,7 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 				}
 			}
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 43f);
-			super.blit(x+70, y+26, 176, ANIM_PAIRS[f], prog, 32);
+			super.blit(x+70, y+26, 176, 52 + (32 * f), prog, 32);
 			
 		}
 		

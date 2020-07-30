@@ -152,7 +152,7 @@ public abstract class AbstractSidedMachine<A extends Container> extends EnergyMa
 		
 		@Override
 		public boolean canReceive() {
-			if(sided.canExtractFromSide(0, side)) {
+			if(sided.canInsertToSide(-1, side)) {
 				return sided.properties.getIn();
 			}
 			return false;
@@ -160,7 +160,7 @@ public abstract class AbstractSidedMachine<A extends Container> extends EnergyMa
 		
 		@Override
 		public boolean canExtract() {
-			if(sided.canInsertToSide(-1, side)) {
+			if(sided.canExtractFromSide(0, side)) {
 				return sided.properties.getOut();
 			}
 			return false;

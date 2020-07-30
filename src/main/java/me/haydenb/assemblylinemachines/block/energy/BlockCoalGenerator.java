@@ -204,7 +204,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		
 		public ScreenCoalGenerator(ContainerCoalGenerator screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "coal_generator", false, new Pair<>(14, 17), screenContainer.tileEntity, false);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "coal_generator", false, new Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
 		

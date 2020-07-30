@@ -1,0 +1,64 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"3": "assemblylinemachines:block/exp_mill/experience_mill_siden_active_enchant",
+		"4": "assemblylinemachines:block/exp_mill/experience_mill_sidee_active_enchant",
+		"5": "assemblylinemachines:block/machine_advanced_top",
+		"6": "assemblylinemachines:block/exp_mill/experience_mill_center_pole",
+		"7": "assemblylinemachines:block/exp_mill/experience_mill_plate_bottom",
+		"8": "assemblylinemachines:block/exp_mill/experience_mill_sides_active_enchant",
+		"9": "assemblylinemachines:block/exp_mill/experience_mill_sidew_active_enchant",
+		"10": "assemblylinemachines:block/exp_mill/experience_mill_plate_display_active_enchant",
+		"11": "assemblylinemachines:block/exp_mill/experience_mill_plate_side_active_enchant",
+		"12": "assemblylinemachines:block/exp_mill/experience_mill_top_active_enchant",
+		"particle": "assemblylinemachines:block/machine_advanced_top"
+	},
+	"elements": [
+		{
+			"name": "Base",
+			"from": [0, 0, 0],
+			"to": [16, 7, 16],
+			"faces": {
+				"north": {"uv": [0, 9, 16, 16], "texture": "#3"},
+				"east": {"uv": [0, 9, 16, 16], "texture": "#9"},
+				"south": {"uv": [0, 9, 16, 16], "texture": "#8"},
+				"west": {"uv": [0, 9, 16, 16], "texture": "#4"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#12"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#5"}
+			}
+		},
+		{
+			"name": "Stand",
+			"from": [6, 7, 6],
+			"to": [10, 10, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 15, 8]},
+			"faces": {
+				"north": {"uv": [6, 6, 10, 9], "texture": "#6"},
+				"east": {"uv": [6, 6, 10, 9], "texture": "#6"},
+				"south": {"uv": [6, 6, 10, 9], "texture": "#6"},
+				"west": {"uv": [6, 6, 10, 9], "texture": "#6"}
+			}
+		},
+		{
+			"name": "Plate",
+			"from": [3, 10, 3],
+			"to": [13, 13, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 18, 8]},
+			"faces": {
+				"north": {"uv": [3, 3, 13, 6], "texture": "#11"},
+				"east": {"uv": [3, 3, 13, 6], "texture": "#11"},
+				"south": {"uv": [3, 3, 13, 6], "texture": "#11"},
+				"west": {"uv": [3, 3, 13, 6], "texture": "#11"},
+				"up": {"uv": [3, 3, 13, 13], "rotation": 180, "texture": "#10"},
+				"down": {"uv": [3, 3, 13, 13], "texture": "#7"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0, 1, 2]
+		}
+	]
+}

@@ -202,7 +202,7 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 			ItemStackHelper.loadAllItems(compound, contents);
 		}
 
-		if (compound.contains("assemblylinemachines:lock:slmakeruuidLeast") && compound.contains("assemblylinemachines:lock:slmakeruuidMost")
+		if (compound.contains("assemblylinemachines:lock:slmakeruuid")
 				&& compound.contains("assemblylinemachines:lock:slcode")) {
 			secureLockMaker = compound.getUniqueId("assemblylinemachines:lock:slmakeruuid");
 			secureLock = compound.getString("assemblylinemachines:lock:slcode");

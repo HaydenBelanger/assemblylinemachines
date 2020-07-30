@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:fermented_spider_eye"
+	},
+	"amount": 1,
+	"enchantment": "minecraft:bane_of_arthropods",
+	"cost": 100
+}

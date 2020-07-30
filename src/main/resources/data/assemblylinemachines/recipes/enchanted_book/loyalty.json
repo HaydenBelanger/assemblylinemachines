@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:glistering_melon_slice"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:loyalty",
+	"cost": 150
+}

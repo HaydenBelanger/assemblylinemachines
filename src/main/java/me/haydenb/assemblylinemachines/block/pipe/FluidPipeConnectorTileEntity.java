@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
 
+import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
@@ -31,6 +32,7 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 	private double pendingCooldown = 0;
 	
 	private IFluidHandler output = null;
+	private Integer transferRate = null;
 	
 	private final TreeSet<FluidPipeConnectorTileEntity> targets = new TreeSet<>(
 			new Comparator<FluidPipeConnectorTileEntity>() {
@@ -82,6 +84,17 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 			if(outputMode == true) {
 				if(timer++ == 40) {
 					timer = 0;
+					if(transferRate == null) {
+						
+						PipeBase<?> pb = (PipeBase<?>) getBlockState().getBlock();
+						if(pb.type == Type.ADVANCED_FLUID) {
+							transferRate = 5000;
+						}else if(pb.type == Type.BASIC_FLUID) {
+							transferRate = 1000;
+						}else {
+							transferRate = 0;
+						}
+					}
 					if(pendingCooldown-- <= 0) {
 						pendingCooldown = 0;
 						
@@ -91,7 +104,7 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 						if(output == null && connectToOutput() == false) {
 							return;
 						}
-						int max = 1000;
+						int max = transferRate;
 						FluidStack sim = output.drain(max, FluidAction.SIMULATE);
 						if(sim.getAmount() < max) {
 							max = sim.getAmount();

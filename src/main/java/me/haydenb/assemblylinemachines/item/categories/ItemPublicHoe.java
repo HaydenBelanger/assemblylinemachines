@@ -15,10 +15,10 @@ import net.minecraft.world.World;
 public class ItemPublicHoe extends ToolItem{
 
 	private static final Set<Block> field_234683_c_ = ImmutableSet.of(Blocks.NETHER_WART_BLOCK, Blocks.field_235374_mn_, Blocks.HAY_BLOCK, Blocks.DRIED_KELP_BLOCK, Blocks.field_235396_nb_, Blocks.field_235383_mw_, Blocks.SPONGE, Blocks.WET_SPONGE, Blocks.JUNGLE_LEAVES, Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.ACACIA_LEAVES, Blocks.BIRCH_LEAVES);
-	   protected static final Map<Block, BlockState> HOE_LOOKUP = Maps.newHashMap(ImmutableMap.of(Blocks.GRASS_BLOCK, Blocks.FARMLAND.getDefaultState(), Blocks.GRASS_PATH, Blocks.FARMLAND.getDefaultState(), Blocks.DIRT, Blocks.FARMLAND.getDefaultState(), Blocks.COARSE_DIRT, Blocks.DIRT.getDefaultState()));
+	   public static final Map<Block, BlockState> HOE_LOOKUP = Maps.newHashMap(ImmutableMap.of(Blocks.GRASS_BLOCK, Blocks.FARMLAND.getDefaultState(), Blocks.GRASS_PATH, Blocks.FARMLAND.getDefaultState(), Blocks.DIRT, Blocks.FARMLAND.getDefaultState(), Blocks.COARSE_DIRT, Blocks.DIRT.getDefaultState()));
 
-	   public ItemPublicHoe(IItemTier p_i231595_1_, int p_i231595_2_, float p_i231595_3_, Item.Properties p_i231595_4_) {
-	      super((float)p_i231595_2_, p_i231595_3_, p_i231595_1_, field_234683_c_, p_i231595_4_);
+	   public ItemPublicHoe(IItemTier tier, float speed, Item.Properties properties) {
+	      super(0f - tier.getAttackDamage(), speed, tier, field_234683_c_, properties);
 	   }
 
 	   /**
@@ -49,4 +49,7 @@ public class ItemPublicHoe extends ToolItem{
 
 	      return ActionResultType.PASS;
 	   }
+	   
+	   
+	   
 }

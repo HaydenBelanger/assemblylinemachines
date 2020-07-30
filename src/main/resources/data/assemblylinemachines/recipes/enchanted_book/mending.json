@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:slime_ball"
+	},
+	"amount": 10,
+	"enchantment": "minecraft:mending",
+	"cost": 175
+}

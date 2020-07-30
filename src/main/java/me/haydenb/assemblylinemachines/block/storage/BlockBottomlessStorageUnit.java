@@ -321,7 +321,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		
 
 		public ScreenBottomlessStorageUnit(ContainerBottomlessStorageUnit screenContainer, PlayerInventory inv, ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "bottomless_storage_unit", false);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "bottomless_storage_unit", false);
 			renderTitleText = false;
 			renderInventoryText = false;
 			tsfm = screenContainer.tileEntity;

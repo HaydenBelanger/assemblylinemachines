@@ -8,6 +8,8 @@
 	"assemblylinemachines:diesel",
 	"assemblylinemachines:diesel_flowing",
 	"assemblylinemachines:gasoline",
-	"assemblylinemachines:gasoline_flowing"
+	"assemblylinemachines:gasoline_flowing",
+	"assemblylinemachines:liquid_experience",
+	"assemblylinemachines:liquid_experience_flowing"
   ]
 }

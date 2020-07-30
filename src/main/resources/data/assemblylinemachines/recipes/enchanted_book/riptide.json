@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:chain"
+	},
+	"amount": 4,
+	"enchantment": "minecraft:riptide",
+	"cost": 100
+}

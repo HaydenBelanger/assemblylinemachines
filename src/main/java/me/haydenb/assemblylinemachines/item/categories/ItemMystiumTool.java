@@ -17,25 +17,17 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.TieredItem;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
@@ -47,12 +39,14 @@ import net.minecraftforge.energy.IEnergyStorage;
 public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements IPoweredTool {
 
 	private final A parent;
+	private final ItemStack item;
 	private final int maxPower;
 
 	public ItemMystiumTool(float damage, float speed, ToolType tt, Item.Properties builder, int maxPower, A parent) {
 		super(parent.getTier(), builder);
 		this.parent = parent;
 		this.maxPower = maxPower;
+		this.item = new ItemStack(parent);
 	}
 
 	@Override
@@ -89,15 +83,35 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	@Override
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+
+		return parent.canApplyAtEnchantingTable(item, enchantment);
+	}
+
+	@Override
 	public boolean canPlayerBreakBlockWhileHolding(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
 		return parent.canPlayerBreakBlockWhileHolding(state, worldIn, pos, player);
 	}
 
 	@Override
 	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+
+		if (stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
+
+			Item item = stack.getItem();
+
+			if (item == Registry.getItem("mystium_sword")) {
+
+				stack.damageItem(2, attacker, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+				return false;
+
+			}
+		}
+
 		return parent.hitEntity(stack, target, attacker);
 	}
-	
+
+
 	@Override
 	public boolean onBlockDestroyed(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity player) {
 
@@ -131,13 +145,13 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 			} else if (item == Registry.getItem("mystium_axe")) {
 
-				
+
 				BlockState bs = world.getBlockState(pos);
 				if(bs.getMaterial() == Material.WOOD) {
 					stack.damageItem(breakAndBreakConnected(world, bs, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
 				}
 				return true;
-				
+
 			} else if (item == Registry.getItem("mystium_shovel")) {
 				Direction d = Direction.getFacingDirections(player)[0];
 
@@ -163,24 +177,24 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 	private int breakAndBreakConnected(World world, BlockState origState, int ctx, BlockPos posx, LivingEntity player) {
 		world.destroyBlock(posx, true, player);
-		
+
 		int cost = 2;
 		if(ctx <= 20) {
 			Iterator<BlockPos> iter = BlockPos.getAllInBox(posx.down().north().west(), posx.up().south().east()).iterator();
-			
+
 			while(iter.hasNext()) {
 				BlockPos posq = iter.next();
-				
+
 				BlockState bs = world.getBlockState(posq);
 				if(bs.getBlock() == origState.getBlock()) {
 					cost = cost + breakAndBreakConnected(world, origState, ctx++, posq, player);
 				}
 			}
 		}
-		
+
 		return cost;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
@@ -190,9 +204,46 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 
+		ItemStack stack = context.getItem();
+		if (stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
+
+			Item item = stack.getItem();
+
+
+			if(item == Registry.getItem("mystium_hoe")) {
+
+				BlockPos blockpos = context.getPos();
+				World world = context.getWorld();
+				int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
+				if (hook != 0) return hook > 0 ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+				if (context.getFace() != Direction.DOWN && world.isAirBlock(blockpos.up())) {
+					BlockState blockstate = ItemPublicHoe.HOE_LOOKUP.get(world.getBlockState(blockpos).getBlock());
+					if (blockstate != null) {
+						
+						blockstate = Registry.getBlock("mystium_farmland").getDefaultState();
+						PlayerEntity playerentity = context.getPlayer();
+						world.playSound(playerentity, blockpos, SoundEvents.ITEM_HOE_TILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
+						if (!world.isRemote) {
+							world.setBlockState(blockpos, blockstate, 11);
+							if (playerentity != null) {
+								context.getItem().damageItem(15, playerentity, (p_220043_1_) -> {
+									p_220043_1_.sendBreakAnimation(context.getHand());
+								});
+							}
+						}
+
+						return ActionResultType.func_233537_a_(world.isRemote);
+					}
+				}
+
+				return ActionResultType.PASS;
+
+			}
+		}
+
 		return parent.onItemUse(context);
 	}
-	
+
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
 		return super.getDisplayName(stack).func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE);
@@ -215,11 +266,11 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	public int getMaxPower() {
 		return maxPower;
 	}
-	
+
 	private int getCurrentPower(ItemStack stack) {
-		
+
 		if(stack.hasTag()) {
-			
+
 			if(stack.getTag().contains("assemblylinemachines:fe")) {
 				return stack.getTag().getInt("assemblylinemachines:fe");
 			}else {
@@ -229,9 +280,9 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			return 0;
 		}
 	}
-	
+
 	private void setCurrentPower(ItemStack stack, int amt) {
-		
+
 		CompoundNBT nbt;
 		if(stack.hasTag()) {
 			nbt = stack.getTag();
@@ -246,16 +297,16 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			}else {
 				nbt.putInt("assemblylinemachines:fe", amt);
 			}
-			
+
 		}
-		
+
 		stack.setTag(nbt);
 	}
-	
+
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
 		return new ICapabilityProvider() {
-			
+
 			protected IEnergyStorage energy = new IEnergyStorage() {
 
 				@Override
@@ -298,7 +349,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				}
 			};
 			protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
-			
+
 			@Override
 			public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 				return this.getCapability(cap);
@@ -321,27 +372,24 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		if (!world.isRemote) {
 
 			ItemStack stack = player.getHeldItemMainhand();
-			Item item = stack.getItem();
 
-			if (item == Registry.getItem("mystium_pickaxe") || item == Registry.getItem("mystium_axe") || item == Registry.getItem("mystium_shovel")) {
-				CompoundNBT nbt;
-				if (stack.hasTag()) {
-					nbt = stack.getTag();
-				} else {
-					nbt = new CompoundNBT();
-				}
-
-				if (nbt.contains("assemblylinemachines:secondarystyle")) {
-					nbt.remove("assemblylinemachines:secondarystyle");
-					player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
-				} else {
-					nbt.putBoolean("assemblylinemachines:secondarystyle", true);
-					player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.AQUA), true);
-				}
-
-				stack.setTag(nbt);
-				return new ActionResult<ItemStack>(ActionResultType.CONSUME, stack);
+			CompoundNBT nbt;
+			if (stack.hasTag()) {
+				nbt = stack.getTag();
+			} else {
+				nbt = new CompoundNBT();
 			}
+
+			if (nbt.contains("assemblylinemachines:secondarystyle")) {
+				nbt.remove("assemblylinemachines:secondarystyle");
+				player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
+			} else {
+				nbt.putBoolean("assemblylinemachines:secondarystyle", true);
+				player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.AQUA), true);
+			}
+
+			stack.setTag(nbt);
+			return new ActionResult<ItemStack>(ActionResultType.CONSUME, stack);
 		}
 		return super.onItemRightClick(world, player, hand);
 	}

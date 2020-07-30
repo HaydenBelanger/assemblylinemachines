@@ -478,7 +478,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		
 		public ScreenFluidGenerator(ContainerFluidGenerator screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new com.mojang.datafixers.util.Pair<>(175, 165), new com.mojang.datafixers.util.Pair<>(11, 6), new com.mojang.datafixers.util.Pair<>(11, 73), "", false, new com.mojang.datafixers.util.Pair<>(14, 17), screenContainer.tileEntity, false);
+			super(screenContainer, inv, titleIn, new com.mojang.datafixers.util.Pair<>(176, 166), new com.mojang.datafixers.util.Pair<>(11, 6), new com.mojang.datafixers.util.Pair<>(11, 73), "", false, new com.mojang.datafixers.util.Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
 		

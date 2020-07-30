@@ -89,9 +89,9 @@ public abstract class BlockTileEntity extends Block{
 	
 	public static class BlockScreenTileEntity<T extends AbstractMachine<?>> extends BlockTileEntity{
 
-		private final Class<T> clazz;
+		private final Class<? extends T> clazz;
 		public BlockScreenTileEntity(Properties properties, String teName, VoxelShape shape, boolean shouldRotate,
-				Direction defaultDirection, Class<T> clazz) {
+				Direction defaultDirection, Class<? extends T> clazz) {
 			super(properties, teName, shape, shouldRotate, defaultDirection);
 			this.clazz = clazz;
 		}

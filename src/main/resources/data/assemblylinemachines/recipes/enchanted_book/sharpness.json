@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:quartz"
+	},
+	"amount": 2,
+	"enchantment": "minecraft:sharpness",
+	"cost": 75
+}

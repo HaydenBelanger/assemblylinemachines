@@ -10,10 +10,8 @@ import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.block.BlockFluidRouter.*;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
-import me.haydenb.assemblylinemachines.block.BlockInteractor.*;
-import me.haydenb.assemblylinemachines.block.BlockVacuumHopper.TEVacuumHopper;
 import me.haydenb.assemblylinemachines.block.energy.*;
-import me.haydenb.assemblylinemachines.block.energy.BlockBasicBatteryCell.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.*;
@@ -34,7 +32,17 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFlui
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurnace.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockLumberMill.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarry.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon.BlockFortuneVoidQuarryAddon;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon.BlockSpeedQuarryAddon;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockToolCharger.TEToolCharger;
+import me.haydenb.assemblylinemachines.block.machines.mob.*;
+import me.haydenb.assemblylinemachines.block.machines.mob.BlockExperienceHopper.TEExperienceHopper;
+import me.haydenb.assemblylinemachines.block.machines.mob.BlockExperienceMill.*;
+import me.haydenb.assemblylinemachines.block.machines.mob.BlockInteractor.*;
+import me.haydenb.assemblylinemachines.block.machines.mob.BlockPoweredSpawner.*;
+import me.haydenb.assemblylinemachines.block.machines.mob.BlockVacuumHopper.TEVacuumHopper;
 import me.haydenb.assemblylinemachines.block.machines.oil.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.*;
@@ -53,6 +61,7 @@ import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.rendering.PoweredSpawnerTER;
 import me.haydenb.assemblylinemachines.rendering.TankTER;
 import me.haydenb.assemblylinemachines.util.StateProperties;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
@@ -65,6 +74,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
@@ -104,6 +115,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 public class Registry {
@@ -188,6 +200,8 @@ public class Registry {
 		createItem("machine_upgrade_extra", new ItemUpgrade(true, "Machines may have a chance to provide additional output."));
 		createItem("machine_upgrade_gas", new ItemUpgrade(false, "Some machines gain the ability to process gas.", "Greatly increases power consumption."));
 		
+		createItem("experience_mill_upgrade_level", new ItemUpgrade(true, "Experience Mill will perform a higher level enchantment."));
+		
 		createItem("wooden_stirring_stick", new ItemStirringStick(35, TemperatureResistance.COLD));
 		createItem("pure_iron_stirring_stick", new ItemStirringStick(135, TemperatureResistance.HOT));
 		createItem("mystium_dowsing_rod", new ItemDowsingRod());
@@ -202,7 +216,7 @@ public class Registry {
 		createItem("titanium_pickaxe", new PickaxeItem(ItemTiers.TITANIUM, 0, -1.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_shovel", new ShovelItem(ItemTiers.TITANIUM, 0, -1.3f, new Item.Properties().group(creativeTab)));
 		
-		createItem("titanium_hoe", new ItemPublicHoe(ItemTiers.TITANIUM, 0, -0.5f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_hoe", new ItemPublicHoe(ItemTiers.TITANIUM, -0.5f, new Item.Properties().group(creativeTab)));
 		createItem("titanium_helmet", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
 		createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
 		createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
@@ -233,7 +247,7 @@ public class Registry {
 		createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
 		createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
 		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
-		createItem("steel_hoe", new ItemPublicHoe(ItemTiers.STEEL, 0, -0.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_hoe", new ItemPublicHoe(ItemTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
 		
 		createItem("crank_shaft");
 		createItem("convection_component");
@@ -264,6 +278,15 @@ public class Registry {
 		
 		createItem("generator_upgrade_coolant", new ItemUpgrade(false, "Generators will give more power per unit of fuel.", "Requires a secondary coolant supply."));
 		
+		createItem("polished_rock");
+		createItem("mob_crystal", new ItemMobCrystal());
+		
+		createItem("sawdust");
+		createItem("warped_sawdust");
+		createItem("crimson_sawdust");
+		
+		
+		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
 		}
@@ -287,7 +310,8 @@ public class Registry {
 		createBlock("simple_grinder", new BlockSimpleGrinder());
 		
 		createBlock("item_pipe", new PipeBase<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Type.ITEM));
-		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.FLUID));
+		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.BASIC_FLUID));
+		createBlock("advanced_fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.ADVANCED_FLUID));
 		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.BASIC_POWER));
 		
 		
@@ -313,7 +337,8 @@ public class Registry {
 		createBlock("silt_gold", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_titanium", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		
-		createBlock("basic_battery_cell", new BlockBasicBatteryCell());
+		createBlock("basic_battery_cell", new BlockBatteryCell(BatteryCellTiers.BASIC));
+		createBlock("advanced_battery_cell", new BlockBatteryCell(BatteryCellTiers.ADVANCED));
 		createBlock("coal_generator", new BlockCoalGenerator());
 		createBlock("crankmill", new BlockCrankmill());
 		
@@ -358,10 +383,24 @@ public class Registry {
 		createBlock("vacuum_hopper", new BlockVacuumHopper());
 		
 		createBlockNoItem("bottomless_storage_unit", new BlockBottomlessStorageUnit());
-		createItem("bottomless_storage_unit", new BlockItemBottomlessStorageUnit(getBlock("bottomless_storage_unit")));
+		createItem("bottomless_storage_unit", new BlockItemBottomlessStorageUnit(Registry.getBlock("bottomless_storage_unit")));
 		
 		createBlock("combustion_generator", new BlockFluidGenerator(FluidGeneratorTypes.COMBUSTION));
 		createBlock("geothermal_generator", new BlockFluidGenerator(FluidGeneratorTypes.GEOTHERMAL));
+		
+		createBlock("experience_hopper", new BlockExperienceHopper());
+		createBlock("powered_spawner", new BlockPoweredSpawner());
+		createBlock("experience_mill", new BlockExperienceMill());
+		
+		createBlock("quarry", new BlockQuarry());
+		createBlock("quarry_speed_addon", new BlockSpeedQuarryAddon());
+		createBlock("quarry_fortune_addon", new BlockFortuneVoidQuarryAddon());
+		createBlock("quarry_void_addon", new BlockFortuneVoidQuarryAddon());
+		
+		createBlockNoItem("mystium_farmland", new BlockMystiumFarmland());
+		
+		createBlock("lumber_mill", new BlockLumberMill());
+		
 		
 		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
@@ -376,6 +415,7 @@ public class Registry {
 		createGaseousFluid("propane", 600);
 		createGaseousFluid("ethylene", 600);
 		createGaseousFluid("propylene", 600);
+		createFluid("liquid_experience");
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
@@ -401,10 +441,12 @@ public class Registry {
 		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"), blockRegistry.get("mystium_fluid_tank"));
 		
 		createTileEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
-		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"));
+		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"), blockRegistry.get("advanced_fluid_pipe"));
 		createTileEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"), blockRegistry.get("adv_energy_pipe"));
 		
 		createTileEntity("basic_battery_cell", TEBasicBatteryCell.class);
+		createTileEntity("advanced_battery_cell", TEAdvancedBatteryCell.class);
+		
 		createTileEntity("coal_generator", TECoalGenerator.class);
 		createTileEntity("crankmill", TECrankmill.class);
 		
@@ -423,6 +465,12 @@ public class Registry {
 		createTileEntity("vacuum_hopper", TEVacuumHopper.class);
 		createTileEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
 		createTileEntity("fluid_generator", TEFluidGenerator.class, blockRegistry.get("geothermal_generator"), blockRegistry.get("combustion_generator"));
+		createTileEntity("experience_hopper", TEExperienceHopper.class);
+		
+		createTileEntity("powered_spawner", TEPoweredSpawner.class);
+		createTileEntity("experience_mill", TEExperienceMill.class);
+		createTileEntity("quarry", TEQuarry.class);
+		createTileEntity("lumber_mill", TELumberMill.class);
 		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
@@ -436,7 +484,7 @@ public class Registry {
 		
 		createContainer("coal_generator", 1054, ContainerCoalGenerator.class);
 		createContainer("crankmill", 1055, ContainerCrankmill.class);
-		createContainer("basic_battery_cell", 1056, ContainerBasicBatteryCell.class);
+		createContainer("battery_cell", 1056, ContainerBatteryCell.class);
 		
 		createContainer("electric_furnace", 1057, ContainerElectricFurnace.class);
 		createContainer("electric_purifier", 1058, ContainerElectricPurifier.class);
@@ -450,6 +498,12 @@ public class Registry {
 		createContainer("interactor", 1065, ContainerInteractor.class);
 		createContainer("bottomless_storage_unit", 1066, ContainerBottomlessStorageUnit.class);
 		createContainer("fluid_generator", 1067, ContainerFluidGenerator.class);
+		
+		createContainer("powered_spawner", 1068, ContainerPoweredSpawner.class);
+		createContainer("experience_mill", 1069, ContainerExperienceMill.class);
+		createContainer("quarry", 1070, ContainerQuarry.class);
+		createContainer("lumber_mill", 1071, ContainerLumberMill.class);
+		
 		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
@@ -465,14 +519,20 @@ public class Registry {
 		RenderTypeLookup.setRenderLayer(getBlock("autocrafting_table"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("geothermal_generator"), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(getBlock("naphtha_fire"), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(getBlock("powered_spawner"), RenderType.getCutout());
+		
 		RenderTypeLookup.setRenderLayer(getFluid("naphtha"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("naphtha_flowing"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("diesel"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("diesel_flowing"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("gasoline"), RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(getFluid("gasoline_flowing"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("liquid_experience"), RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(getFluid("liquid_experience_flowing"), RenderType.getTranslucent());
 		
 		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEFluidTank>)getTileEntity("fluid_tank"), TankTER::new);
+		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEPoweredSpawner>)getTileEntity("powered_spawner"), PoweredSpawnerTER::new);
+		
 		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
 		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
@@ -480,7 +540,7 @@ public class Registry {
 		
 		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
 		registerScreen("crankmill", ContainerCrankmill.class, ScreenCrankmill.class);
-		registerScreen("basic_battery_cell", ContainerBasicBatteryCell.class, ScreenBasicBatteryCell.class);
+		registerScreen("battery_cell", ContainerBatteryCell.class, ScreenBatteryCell.class);
 		registerScreen("electric_furnace", ContainerElectricFurnace.class, ScreenElectricFurnace.class);
 		registerScreen("electric_purifier", ContainerElectricPurifier.class, ScreenElectricPurifier.class);
 		
@@ -493,6 +553,12 @@ public class Registry {
 		registerScreen("interactor", ContainerInteractor.class, ScreenInteractor.class);
 		registerScreen("bottomless_storage_unit", ContainerBottomlessStorageUnit.class, ScreenBottomlessStorageUnit.class);
 		registerScreen("fluid_generator", ContainerFluidGenerator.class, ScreenFluidGenerator.class);
+		
+		registerScreen("experience_mill", ContainerExperienceMill.class, ScreenExperienceMill.class);
+		registerScreen("powered_spawner", ContainerPoweredSpawner.class, ScreenPoweredSpawner.class);
+		registerScreen("quarry", ContainerQuarry.class, ScreenQuarry.class);
+		
+		registerScreen("lumber_mill", ContainerLumberMill.class, ScreenLumberMill.class);
 	}
 	
 	@SubscribeEvent
@@ -514,6 +580,12 @@ public class Registry {
 		
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(RefiningCrafting.REFINING_RECIPE.toString()), RefiningCrafting.REFINING_RECIPE);
 		event.getRegistry().register(RefiningCrafting.SERIALIZER.setRegistryName("refining"));
+		
+		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE.toString()), EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE);
+		event.getRegistry().register(EnchantmentBookCrafting.SERIALIZER.setRegistryName("enchantment_book"));
+		
+		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(LumberCrafting.LUMBER_RECIPE.toString()), LumberCrafting.LUMBER_RECIPE);
+		event.getRegistry().register(LumberCrafting.SERIALIZER.setRegistryName("lumber"));
 		
 	}
 	
@@ -553,6 +625,29 @@ public class Registry {
 				return 0;
 			}
 		}, getBlock("fluid_bath"));
+		
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@SubscribeEvent
+	public static void registerItemColorHandlers(ColorHandlerEvent.Item event) {
+		event.getItemColors().register(new IItemColor() {
+			
+			@Override
+			public int getColor(ItemStack stack, int index) {
+				
+				if(stack.hasTag()) {
+					EntityType<?> entity = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(stack.getTag().getString("assemblylinemachines:mob")));
+					if(entity != null) {
+						Integer x = ItemMobCrystal.MOB_COLORS.get(entity);
+						if(x != null) {
+							return x;
+						}
+					}
+				}
+				return 0x7d7d7d;
+			}
+		}, getItem("mob_crystal"));
 	}
 	
 	@SubscribeEvent
@@ -636,7 +731,6 @@ public class Registry {
 	 * Will register x, x_flowing, x_block, x_bucket.
 	 */
 	
-	@SuppressWarnings("unused")
 	private static void createFluid(String name) {
 		createFluid(name, getFluidAttributes(name));
 		

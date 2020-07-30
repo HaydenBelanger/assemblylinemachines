@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:lapis_lazuli"
+	},
+	"amount": 15,
+	"enchantment": "minecraft:looting",
+	"cost": 125
+}

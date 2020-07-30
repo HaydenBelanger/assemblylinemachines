@@ -46,6 +46,7 @@ public class MathHelper {
 	@OnlyIn(Dist.CLIENT)
 	public static void renderScaledText(FontRenderer fr, int xpos, int ypos, float scale, String text) {
 		
-		renderScaledText(fr, xpos, ypos, scale, text);
+		renderScaledText(fr, xpos, ypos, scale, text, false, 0xffffff);
 	}
+	
 }

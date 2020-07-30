@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"item": "minecraft:netherite_scrap"
+	},
+	"part_b":{
+		"item": "assemblylinemachines:polished_rock"
+	},
+	"output":{
+		"item": "assemblylinemachines:mob_crystal"
+	},
+	"time": 400
+}

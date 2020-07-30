@@ -76,6 +76,8 @@ public class ItemUpgrade extends Item {
 		
 		GENERATOR_COOLANT(Registry.getItem("generator_upgrade_coolant")),
 		
+		EXP_MILL_LEVEL(Registry.getItem("experience_mill_upgrade_level")),
+		
 		NONE(null);
 		
 		public final Item i;

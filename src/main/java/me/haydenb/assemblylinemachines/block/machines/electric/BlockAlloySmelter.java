@@ -11,14 +11,12 @@ import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
 import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
@@ -73,6 +71,8 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 	public BlockAlloySmelter() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "alloy_smelter", BlockAlloySmelter.TEAlloySmelter.class);
+		
+		
 		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
@@ -202,6 +202,17 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 		}
 		
 		@Override
+		public boolean isAllowedInSlot(int slot, ItemStack stack) {
+			if(slot > 2) {
+				if(stack.getItem() instanceof ItemUpgrade) {
+					return true;
+				}
+				return false;
+			}
+			return super.isAllowedInSlot(slot, stack);
+		}
+		
+		@Override
 		public void read(CompoundNBT compound) {
 			super.read(compound);
 			if(compound.contains("assemblylinemachines:output")) {
@@ -270,7 +281,7 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 		
 		public ScreenAlloySmelter(ContainerAlloySmelter screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "alloy_smelter", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "alloy_smelter", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 		}
 		

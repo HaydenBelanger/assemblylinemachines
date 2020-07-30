@@ -32,7 +32,8 @@ public class BlockNaphthaFire extends AbstractFireBlock {
 		if (world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
 			if (!world.isAreaLoaded(pos, 2)) return;
 			if (!state.isValidPosition(world, pos)) {
-				world.removeBlock(pos, false);
+				world.setBlockState(pos, Blocks.AIR.getDefaultState());
+				return;
 			}
 
 			int age = state.get(FireBlock.AGE);

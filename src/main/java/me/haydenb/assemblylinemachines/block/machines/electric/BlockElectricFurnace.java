@@ -350,7 +350,7 @@ public class BlockElectricFurnace extends BlockScreenTileEntity<BlockElectricFur
 		
 		public ScreenElectricFurnace(ContainerElectricFurnace screenContainer, PlayerInventory inv,
 				ITextComponent titleIn) {
-			super(screenContainer, inv, titleIn, new Pair<>(175, 165), new Pair<>(11, 6), new Pair<>(11, 73), "electric_furnace", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "electric_furnace", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 		}
 		

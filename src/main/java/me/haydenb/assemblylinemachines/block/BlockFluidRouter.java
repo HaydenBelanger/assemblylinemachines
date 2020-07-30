@@ -349,11 +349,12 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 		}
 		
 		@Override
-		protected void func_231160_c_() {
-			super.func_231160_c_();
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
-
+		protected void init() {
+			super.init();
+			
+			int x = guiLeft;
+			int y = guiTop;
+			
 			this.addButton(new SimpleButton(x + 84, y + 15, 0, 0, 8, 57, "", (button) -> {
 				
 				

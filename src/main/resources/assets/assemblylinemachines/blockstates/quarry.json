@@ -1,0 +1,49 @@
+{
+    "multipart": [
+
+		{   "when": { "facing": "east", "active": false},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry", "y": 90}
+        },
+        {   "when": { "facing": "south", "active": false},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry", "y": 180}
+        },
+        {   "when": { "facing": "west", "active": false},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry", "y": 270}
+        },
+        {   "when": { "facing": "north", "active": false},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry"}
+        },
+
+		{   "when": { "facing": "east", "active": true},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_active", "y": 90}
+        },
+        {   "when": { "facing": "south", "active": true},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_active", "y": 180}
+        },
+        {   "when": { "facing": "west", "active": true},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_active", "y": 270}
+        },
+        {   "when": { "facing": "north", "active": true},
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_active"}
+        },
+
+        {   "when": { "north": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal", "y": 90}
+        },
+        {   "when": { "east": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal", "y": 180}
+        },
+        {   "when": { "south": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal", "y": 270}
+        },
+        {   "when": { "west": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_cardinal"}
+        },
+        {   "when": { "down": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_vertical"}
+        },
+        {   "when": { "up": true },
+            "apply": { "model": "assemblylinemachines:block/quarry/quarry_addon_connector_vertical", "x": 180}
+        }
+    ]
+}

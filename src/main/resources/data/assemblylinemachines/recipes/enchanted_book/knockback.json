@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:piston"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:knockback",
+	"cost": 100
+}

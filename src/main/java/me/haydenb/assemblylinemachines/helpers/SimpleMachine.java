@@ -14,11 +14,18 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 public abstract class SimpleMachine<A extends Container> extends AbstractMachine<A>{
 
 	
-	protected NoExtractItemHandler items = new NoExtractItemHandler(this);
-	protected LazyOptional<NoExtractItemHandler> itemHandler = LazyOptional.of(() -> items);
+	protected final SimpleInventoryHandlerWrapper items;
+	protected final LazyOptional<SimpleInventoryHandlerWrapper> itemHandler;
+	public SimpleMachine(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name, int containerId,
+			Class<A> clazz, boolean supp) {
+		super(tileEntityTypeIn, slotCount, name, containerId, clazz);
+		items = new SimpleInventoryHandlerWrapper(this, supp);
+		itemHandler = LazyOptional.of(() -> items);
+	}
+	
 	public SimpleMachine(TileEntityType<?> tileEntityTypeIn, int slotCount, TranslationTextComponent name, int containerId,
 			Class<A> clazz) {
-		super(tileEntityTypeIn, slotCount, name, containerId, clazz);
+		this(tileEntityTypeIn, slotCount, name, containerId, clazz, false);
 	}
 	
 	@Override
@@ -43,16 +50,24 @@ public abstract class SimpleMachine<A extends Container> extends AbstractMachine
 		return this.getCapability(cap);
 	}
 	
-	private static class NoExtractItemHandler extends InvWrapper {
+	private static class SimpleInventoryHandlerWrapper extends InvWrapper {
 		
 		
-		NoExtractItemHandler(IInventory inv){
+		private final boolean supp;
+		SimpleInventoryHandlerWrapper(IInventory inv, boolean supportsExtract){
 			super(inv);
+			this.supp = supportsExtract;
 		}
 		
 		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-			return ItemStack.EMPTY;
+			
+			if(supp == false || slot != 0) {
+				return ItemStack.EMPTY;
+			}else {
+				return super.extractItem(slot, amount, simulate);
+			}
+			
 		}
 	}
 

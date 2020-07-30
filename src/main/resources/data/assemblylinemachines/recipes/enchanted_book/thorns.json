@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:cactus"
+	},
+	"amount": 6,
+	"enchantment": "minecraft:thorns",
+	"cost": 150
+}

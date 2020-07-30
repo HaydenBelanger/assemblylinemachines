@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:lumber",
+	"input":{
+		"tag": "minecraft:warped_stems"
+	},
+	"output":{
+		"item": "minecraft:warped_planks",
+		"count": 6
+	},
+	"secondaryoutput":{
+		"item": "assemblylinemachines:warped_sawdust"
+	},
+	"opbchance": 0.10,
+	"time": 10
+}
