@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"wsw",
+		"ada",
+		"wsw"
+	],
+	"key":{
+		"w":{
+			"item": "assemblylinemachines:wooden_board"
+		},
+		"s":{
+			"item": "assemblylinemachines:sludge"
+		},
+		"d":{
+			"item": "minecraft:dirt"
+		},
+		"a":{
+			"item": "assemblylinemachines:sawdust"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:fertilizer",
+		"count": 8
+	}
+}

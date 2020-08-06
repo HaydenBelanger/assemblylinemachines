@@ -1,0 +1,31 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sqs",
+		"abc",
+		"szs"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"a":{
+			"item": "minecraft:bookshelf"
+		},
+		"b":{
+			"item": "minecraft:enchanting_table"
+		},
+		"c":{
+			"item": "minecraft:anvil"
+		},
+		"q":{
+			"item": "minecraft:enchanted_book"
+		},
+		"z":{
+			"item": "assemblylinemachines:steel_tank_component"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:experience_mill"
+	}
+}

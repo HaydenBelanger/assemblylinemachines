@@ -5,11 +5,6 @@ import java.util.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.*;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath.BathStatus;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
-import me.haydenb.assemblylinemachines.block.BlockFluidRouter.*;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.TEHandGrinder;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
@@ -33,6 +28,7 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFurn
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricGrinder.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockLumberMill.*;
+import me.haydenb.assemblylinemachines.block.machines.electric.BlockMetalShaper.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarry.*;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon.BlockFortuneVoidQuarryAddon;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon.BlockSpeedQuarryAddon;
@@ -47,22 +43,28 @@ import me.haydenb.assemblylinemachines.block.machines.oil.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefineryAddon.*;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.BathStatus;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.TEHandGrinder;
 import me.haydenb.assemblylinemachines.block.pipe.*;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorContainer;
 import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.ItemPipeConnectorScreen;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
-import me.haydenb.assemblylinemachines.block.storage.BlockBottomlessStorageUnit;
-import me.haydenb.assemblylinemachines.block.storage.BlockBottomlessStorageUnit.*;
-import me.haydenb.assemblylinemachines.block.storage.BlockFluidTank;
-import me.haydenb.assemblylinemachines.block.storage.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.utility.*;
+import me.haydenb.assemblylinemachines.block.utility.BlockBottomlessStorageUnit.*;
+import me.haydenb.assemblylinemachines.block.utility.BlockFluidRouter.*;
+import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.*;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.rendering.PoweredSpawnerTER;
-import me.haydenb.assemblylinemachines.rendering.TankTER;
+import me.haydenb.assemblylinemachines.rendering.*;
 import me.haydenb.assemblylinemachines.util.StateProperties;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.*;
@@ -285,7 +287,22 @@ public class Registry {
 		createItem("warped_sawdust");
 		createItem("crimson_sawdust");
 		
+		createItem("miniature_black_hole", new ItemBasicFormattedName(TextFormatting.AQUA));
+		createItem("singularity", new ItemBasicFormattedName(TextFormatting.DARK_AQUA));
+		createItem("empowered_convection_component");
 		
+		createItem("fertilizer", new ItemFertilizer(1));
+		createItem("enhanced_fertilizer", new ItemFertilizer(3));
+		createItem("ultimate_fertilizer", new ItemFertilizer(5));
+		createItem("enhanced_battery");
+		createItem("microprocessor");
+		createItem("energy_harness");
+		
+		createItem("ground_chromium");
+		
+		createItem("attuned_titanium_ingot", new ItemBasicFormattedName(TextFormatting.BLUE));
+		createItem("attuned_titanium_plate", new ItemBasicFormattedName(TextFormatting.BLUE));
+		createItem("purifier_upgrade_enhanced", new ItemUpgrade(false, "Purifier can process more recipes.", "Increases power consumption."));
 		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
@@ -401,6 +418,8 @@ public class Registry {
 		
 		createBlock("lumber_mill", new BlockLumberMill());
 		
+		createBlock("quantum_link", new BlockQuantumLink());
+		createBlock("metal_shaper", new BlockMetalShaper());
 		
 		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
@@ -472,6 +491,10 @@ public class Registry {
 		createTileEntity("quarry", TEQuarry.class);
 		createTileEntity("lumber_mill", TELumberMill.class);
 		
+		createTileEntity("quantum_link", TEQuantumLink.class);
+		
+		createTileEntity("metal_shaper", TEMetalShaper.class);
+		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
 	
@@ -504,6 +527,9 @@ public class Registry {
 		createContainer("quarry", 1070, ContainerQuarry.class);
 		createContainer("lumber_mill", 1071, ContainerLumberMill.class);
 		
+		createContainer("quantum_link", 1072, ContainerQuantumLink.class);
+		
+		createContainer("metal_shaper", 1073, ContainerMetalShaper.class);
 		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
@@ -532,6 +558,7 @@ public class Registry {
 		
 		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEFluidTank>)getTileEntity("fluid_tank"), TankTER::new);
 		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEPoweredSpawner>)getTileEntity("powered_spawner"), PoweredSpawnerTER::new);
+		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEQuantumLink>)getTileEntity("quantum_link"), QuantumLinkTER::new);
 		
 		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
@@ -559,6 +586,10 @@ public class Registry {
 		registerScreen("quarry", ContainerQuarry.class, ScreenQuarry.class);
 		
 		registerScreen("lumber_mill", ContainerLumberMill.class, ScreenLumberMill.class);
+		
+		registerScreen("quantum_link", ContainerQuantumLink.class, ScreenQuantumLink.class);
+		
+		registerScreen("metal_shaper", ContainerMetalShaper.class, ScreenMetalShaper.class);
 	}
 	
 	@SubscribeEvent
@@ -586,6 +617,9 @@ public class Registry {
 		
 		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(LumberCrafting.LUMBER_RECIPE.toString()), LumberCrafting.LUMBER_RECIPE);
 		event.getRegistry().register(LumberCrafting.SERIALIZER.setRegistryName("lumber"));
+		
+		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(MetalCrafting.METAL_RECIPE.toString()), MetalCrafting.METAL_RECIPE);
+		event.getRegistry().register(MetalCrafting.SERIALIZER.setRegistryName("metal"));
 		
 	}
 	
@@ -649,6 +683,7 @@ public class Registry {
 			}
 		}, getItem("mob_crystal"));
 	}
+	
 	
 	@SubscribeEvent
 	public static void configEvent(ModConfigEvent event) {

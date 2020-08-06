@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "minecraft:glass_bottle"
+	},
+	"input_b":{
+		"item": "minecraft:enchanted_book"
+	},
+	"output":{
+		"item": "minecraft:experience_bottle"
+	},
+	"stirs": 3,
+	"fluid": "water",
+	"mix_color": "0",
+	"machine_required": true
+}

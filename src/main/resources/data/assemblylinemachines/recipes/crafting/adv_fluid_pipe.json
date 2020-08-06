@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"imi",
+		"sss"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"i":{
+			"item": "assemblylinemachines:fluid_pipe"
+		},
+		"m":{
+			"item": "assemblylinemachines:mystium_plate"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:advanced_fluid_pipe",
+		"count": 2
+	}
+}

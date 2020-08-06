@@ -98,7 +98,7 @@ public class ItemKey extends Item {
 		
 		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:lockcode")) {
 			String s = stack.getTag().getString("assemblylinemachines:boundtranskey");
-			if(s.isBlank()) {
+			if(s.trim().equals("")) {
 				tooltip.add(1, new StringTextComponent("This Key is cut to a machine.").func_230532_e_().func_240699_a_(TextFormatting.DARK_GRAY));
 			}else {
 				tooltip.add(1, new StringTextComponent("This Key is cut to " + new TranslationTextComponent(s).getString() + ".").func_230532_e_().func_240699_a_(TextFormatting.DARK_GRAY));

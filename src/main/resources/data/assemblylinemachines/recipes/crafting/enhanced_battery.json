@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ici",
+		"brb",
+		"imi"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"r":{
+			"item": "minecraft:redstone_block"
+		},
+		"b":{
+			"item": "assemblylinemachines:basic_battery"
+		},
+		"c":{
+			"item": "assemblylinemachines:rubber_sheet"
+		},
+		"m":{
+			"item": "assemblylinemachines:mystium_blend"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:enhanced_battery"
+	}
+}

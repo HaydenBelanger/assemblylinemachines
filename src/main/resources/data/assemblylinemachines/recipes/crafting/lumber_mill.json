@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"bsb",
+		"svs",
+		"imi"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"m":{
+			"item": "assemblylinemachines:steel_axe"
+		},
+		"v":{
+			"item": "assemblylinemachines:conduction_component"
+		},
+		"i":{
+			"tag": "forge:ingots/iron"
+		},
+		"b":{
+			"item": "assemblylinemachines:wooden_board"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:lumber_mill"
+	}
+}

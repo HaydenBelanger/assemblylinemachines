@@ -95,15 +95,13 @@ public class BlockVacuumHopper extends HopperBlock {
 					List<ItemEntity> el = world.getEntitiesWithinAABB(ItemEntity.class, bb);
 					for (ItemEntity entity : el) {
 
-						if (entity.getAge() > 30) {
-							double x = entity.getPosX();
-							double y = entity.getPosY();
-							double z = entity.getPosZ();
-							if (captureItem(this, entity)) {
-								markDirty();
-								spawnTeleparticles(x, y, z, world.getChunkAt(entity.func_233580_cy_()));
-								break;
-							}
+						double x = entity.getPosX();
+						double y = entity.getPosY();
+						double z = entity.getPosZ();
+						if (captureItem(this, entity)) {
+							markDirty();
+							spawnTeleparticles(x, y, z, world.getChunkAt(entity.func_233580_cy_()));
+							break;
 						}
 
 					}
@@ -188,13 +186,10 @@ public class BlockVacuumHopper extends HopperBlock {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	private static final RedstoneParticleData ENDER_PARTICLE = new RedstoneParticleData(0.8f, 0.223f, 0.792f, 1f);
-
-	@OnlyIn(Dist.CLIENT)
 	public static void spawnTeleparticles(PacketData pd) {
 		Minecraft mc = Minecraft.getInstance();
 		for (int i = 0; i < 4; i++) {
-			mc.player.getEntityWorld().addParticle(ENDER_PARTICLE, true, pd.get("x", Double.class), pd.get("y", Double.class) + 0.1, pd.get("z", Double.class), 0, 0, 0);
+			mc.player.getEntityWorld().addParticle(new RedstoneParticleData(0.8f, 0.223f, 0.792f, 1f), true, pd.get("x", Double.class), pd.get("y", Double.class) + 0.1, pd.get("z", Double.class), 0, 0, 0);
 		}
 	}
 

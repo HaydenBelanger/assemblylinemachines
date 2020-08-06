@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:enhanced_fertilizer"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:warped_sawdust"
+	},
+	"output":{
+		"item": "assemblylinemachines:ultimate_fertilizer"
+	},
+	"stirs": 10,
+	"fluid": "condensed_void",
+	"mix_color": "0",
+	"machine_required": true
+}

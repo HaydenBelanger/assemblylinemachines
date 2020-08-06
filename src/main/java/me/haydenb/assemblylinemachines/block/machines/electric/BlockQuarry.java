@@ -460,7 +460,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 				for(SimpleButton b : buttons) {
 					
 					if(mouseX >= b.getX() && mouseX <= b.getX() + 8 && mouseY >= b.getY() && mouseY <= b.getY() + 8) {
-						if(!b.getMessage().isBlank()) {
+						if(!b.getMessage().trim().equals("")) {
 							this.renderTooltip(b.getMessage(), mouseX - x, mouseY - y);
 						}else {
 							if(tsfm.right == true) {

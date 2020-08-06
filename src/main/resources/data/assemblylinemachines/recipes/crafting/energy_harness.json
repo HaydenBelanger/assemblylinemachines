@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"pep",
+		"aba",
+		"pep"
+	],
+	"key":{
+		"p":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"e":{
+			"item": "assemblylinemachines:energized_gold_plate"
+		},
+		"a":{
+			"item": "assemblylinemachines:attuned_titanium_plate"
+		},
+		"b":{
+			"item": "assemblylinemachines:enhanced_battery"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:energy_harness"
+	}
+}

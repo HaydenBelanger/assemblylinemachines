@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:metal",
+	"input":{
+		"tag": "forge:ingots/pure_steel"
+	},
+	"output":{
+		"item": "assemblylinemachines:steel_plate",
+		"count": 8
+	},
+	"time": 10
+}

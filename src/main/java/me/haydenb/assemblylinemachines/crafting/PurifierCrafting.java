@@ -7,15 +7,10 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPuri
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.*;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -74,6 +69,15 @@ public class PurifierCrafting implements IRecipe<IInventory>{
 		return output;
 	}
 
+	
+	public boolean requiresUpgrade() {
+		if((parta.test(new ItemStack(Items.SAND)) && partb.test(new ItemStack(Items.GRAVEL))) || (parta.test(new ItemStack(Items.GRAVEL)) && partb.test(new ItemStack(Items.SAND)))) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public ResourceLocation getId() {
 		return id;

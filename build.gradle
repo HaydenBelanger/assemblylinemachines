@@ -17,7 +17,8 @@ version = '1.16.1-0.1.0'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '11' // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = '11'
+compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
 	classifier = 'sources'
@@ -116,11 +117,11 @@ dependencies {
             url = "https://modmaven.k-4u.nl"
         }
     }
-    minecraft 'net.minecraftforge:forge:1.16.1-32.0.31'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.98'
 
 	//JEI
-    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.2:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.2")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6")
 
 }
 

@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"tpm",
+		"tft",
+		"sps"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		},
+		"p":{
+			"item": "assemblylinemachines:fluid_pipe"
+		},
+		"f":{
+			"item": "assemblylinemachines:fluid_regulator"
+		},
+		"m":{
+			"item": "assemblylinemachines:mystium_plate"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:refinery_attachment_halogen"
+	}
+}

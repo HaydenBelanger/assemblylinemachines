@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:purifier",
+	"part_a":{
+		"item": "assemblylinemachines:mystium_blend"
+	},
+	"part_b":{
+		"item": "minecraft:ender_pearl"
+	},
+	"tobepurified":{
+		"tag": "forge:ingots/pure_titanium"
+	},
+	"output":{
+		"item": "assemblylinemachines:attuned_titanium_ingot"
+	},
+	"time": 600
+}

@@ -1,6 +1,6 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

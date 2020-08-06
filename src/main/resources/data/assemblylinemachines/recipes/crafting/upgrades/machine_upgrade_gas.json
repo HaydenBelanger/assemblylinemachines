@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sps",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"p":{
+			"item": "assemblylinemachines:steel_tank_component"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:machine_upgrade_gas"
+	}
+}

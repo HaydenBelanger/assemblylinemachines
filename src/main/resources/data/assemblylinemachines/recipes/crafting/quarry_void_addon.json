@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"s s",
+		" g ",
+		"s s"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"g":{
+			"item": "assemblylinemachines:singularity"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:quarry_void_addon"
+	}
+}

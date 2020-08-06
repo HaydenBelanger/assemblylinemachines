@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"iri",
+		"rgr",
+		"iri"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:convection_component"
+		},
+		"r":{
+			"item": "assemblylinemachines:energized_gold_ingot"
+		},
+		"g":{
+			"item": "minecraft:redstone_block"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:empowered_convection_component"
+	}
+}

@@ -1,0 +1,31 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sbs",
+		"pqo",
+		"scs"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"b":{
+			"item": "assemblylinemachines:enhanced_battery"
+		},
+		"c":{
+			"item": "assemblylinemachines:pneumatic_device"
+		},
+		"o":{
+			"item": "assemblylinemachines:mystium_pickaxe"
+		},
+		"p":{
+			"item": "assemblylinemachines:crank_pickaxe"
+		},
+		"q":{
+			"item": "assemblylinemachines:microprocessor"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:quarry"
+	}
+}

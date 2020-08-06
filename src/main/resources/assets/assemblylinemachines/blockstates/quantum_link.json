@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "assemblylinemachines:block/quantum_link" }
+    }
+}

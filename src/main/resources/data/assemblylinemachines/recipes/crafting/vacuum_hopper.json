@@ -1,0 +1,22 @@
+ {
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sbs",
+		"sqs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"q":{
+			"item": "assemblylinemachines:singularity"
+		},
+		"b":{
+			"item": "minecraft:ender_eye"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:vacuum_hopper"
+	}
+}

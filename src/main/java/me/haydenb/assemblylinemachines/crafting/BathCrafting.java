@@ -3,8 +3,8 @@ package me.haydenb.assemblylinemachines.crafting;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.inventory.IInventory;

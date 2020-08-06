@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ses",
+		"scs",
+		"sts"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"e":{
+			"item": "assemblylinemachines:temperature_regulator"
+		},
+		"c":{
+			"item": "assemblylinemachines:empowered_convection_component"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:geothermal_generator"
+	}
+}

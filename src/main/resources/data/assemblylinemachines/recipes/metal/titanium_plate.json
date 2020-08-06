@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:metal",
+	"input":{
+		"tag": "forge:ingots/pure_titanium"
+	},
+	"output":{
+		"item": "assemblylinemachines:titanium_plate",
+		"count": 5
+	},
+	"time": 10
+}

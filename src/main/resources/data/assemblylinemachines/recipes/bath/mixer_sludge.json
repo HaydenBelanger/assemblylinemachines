@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "assemblylinemachines:crafting/organics"
+	},
+	"input_b":{
+		"tag": "assemblylinemachines:crafting/organics"
+	},
+	"output":{
+		"item": "assemblylinemachines:sludge",
+		"count": 2
+	},
+	"stirs": 5,
+	"fluid": "water",
+	"mix_color": "0",
+	"machine_required": true
+}

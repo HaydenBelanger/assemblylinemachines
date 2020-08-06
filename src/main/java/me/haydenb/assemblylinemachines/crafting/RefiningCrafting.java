@@ -218,6 +218,8 @@ public class RefiningCrafting implements IRecipe<IInventory>{
 			buffer.writeFloat(recipe.fluidOutputA.getSecond());
 			buffer.writeFluidStack(recipe.fluidOutputB.getFirst());
 			buffer.writeFloat(recipe.fluidOutputB.getSecond());
+			buffer.writeItemStack(recipe.itemOutput.getFirst());
+			buffer.writeFloat(recipe.itemOutput.getSecond());
 		}
 		
 	}

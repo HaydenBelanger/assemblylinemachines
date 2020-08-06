@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:metal",
+	"input":{
+		"tag": "forge:ingots/energized_gold"
+	},
+	"output":{
+		"item": "assemblylinemachines:energized_gold_plate",
+		"count": 4
+	},
+	"time": 10
+}

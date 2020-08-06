@@ -1,0 +1,10 @@
+{
+	"type": "assemblylinemachines:metal",
+	"input":{
+		"item": "assemblylinemachines:attuned_titanium_ingot"
+	},
+	"output":{
+		"item": "assemblylinemachines:attuned_titanium_plate"
+	},
+	"time": 10
+}

@@ -363,7 +363,7 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 
 	// SCREEN DYNAMIC
 	public static class ScreenALMBase<T extends Container> extends ContainerScreen<T> {
-		private final ResourceLocation bg;
+		protected final ResourceLocation bg;
 		protected final Pair<Integer, Integer> titleTextLoc;
 		protected final Pair<Integer, Integer> invTextLoc;
 		protected int width;
@@ -426,6 +426,7 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 			super.func_231160_c_();
 			this.init();
 		}
+		
 		// BELOW ARE UTILITY METHODS TO WRAP OLD MAPPINGS
 		protected void blit(int a, int b, int c, int d, int e, int f) {
 			super.func_238474_b_(mx, a, b, c, d, e, f);

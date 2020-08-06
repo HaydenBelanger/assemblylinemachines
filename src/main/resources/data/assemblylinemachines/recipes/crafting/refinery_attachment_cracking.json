@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"scs",
+		"tft",
+		"sps"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		},
+		"p":{
+			"item": "assemblylinemachines:fluid_pipe"
+		},
+		"f":{
+			"item": "assemblylinemachines:fluid_regulator"
+		},
+		"c":{
+			"item": "assemblylinemachines:coal_generator"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:refinery_attachment_cracking"
+	}
+}

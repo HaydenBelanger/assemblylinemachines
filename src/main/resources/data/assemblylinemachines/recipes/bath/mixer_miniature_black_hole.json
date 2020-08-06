@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:singularity"
+	},
+	"input_b":{
+		"item": "minecraft:nether_star"
+	},
+	"output":{
+		"item": "assemblylinemachines:miniature_black_hole"
+	},
+	"stirs": 15,
+	"fluid": "condensed_void",
+	"mix_color": "0",
+	"machine_required": true
+}

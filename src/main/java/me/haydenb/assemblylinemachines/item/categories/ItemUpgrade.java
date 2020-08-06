@@ -78,6 +78,8 @@ public class ItemUpgrade extends Item {
 		
 		EXP_MILL_LEVEL(Registry.getItem("experience_mill_upgrade_level")),
 		
+		PURIFIER_EXPANDED(Registry.getItem("purifier_upgrade_enhanced")),
+		
 		NONE(null);
 		
 		public final Item i;

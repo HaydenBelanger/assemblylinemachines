@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:fertilizer"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:crimson_sawdust"
+	},
+	"output":{
+		"item": "assemblylinemachines:enhanced_fertilizer"
+	},
+	"stirs": 7,
+	"fluid": "lava",
+	"mix_color": "0",
+	"machine_required": true
+}

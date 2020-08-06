@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"ftf",
+		"sps"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"f":{
+			"item": "assemblylinemachines:fluid_regulator"
+		},
+		"p":{
+			"item": "assemblylinemachines:advanced_fluid_pipe"
+		},
+		"t":{
+			"item": "assemblylinemachines:steel_tank_component"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:fluid_router"
+	}
+}

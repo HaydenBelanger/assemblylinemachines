@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sbs",
+		"bqb",
+		"scs"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"b":{
+			"item": "minecraft:iron_bars"
+		},
+		"q":{
+			"item": "assemblylinemachines:basic_battery"
+		},
+		"c":{
+			"item": "assemblylinemachines:empowered_conduction_component"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:powered_spawner"
+	}
+}

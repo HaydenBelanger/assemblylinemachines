@@ -1,0 +1,31 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sbs",
+		"adc",
+		"sps"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"a":{
+			"item": "assemblylinemachines:steel_shovel"
+		},
+		"b":{
+			"item": "assemblylinemachines:steel_sword"
+		},
+		"c":{
+			"item": "assemblylinemachines:steel_pickaxe"
+		},
+		"d":{
+			"item": "assemblylinemachines:conduction_component"
+		},
+		"p":{
+			"item": "minecraft:piston"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:interactor"
+	}
+}

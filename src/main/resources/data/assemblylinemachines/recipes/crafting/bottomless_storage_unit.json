@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ses",
+		"sqs",
+		"sss"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"e":{
+			"item": "minecraft:ender_chest"
+		},
+		"q":{
+			"item": "assemblylinemachines:singularity"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:bottomless_storage_unit"
+	}
+}

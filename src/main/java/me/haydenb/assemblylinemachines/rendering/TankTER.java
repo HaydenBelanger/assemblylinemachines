@@ -5,7 +5,7 @@ import java.awt.Color;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
-import me.haydenb.assemblylinemachines.block.storage.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;

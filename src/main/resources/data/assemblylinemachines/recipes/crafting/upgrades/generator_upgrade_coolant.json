@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sxs",
+		"ptp",
+		"sys"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:stainless_steel_plate"
+		},
+		"p":{
+			"item": "minecraft:packed_ice"
+		},
+		"x":{
+			"item": "assemblylinemachines:temperature_regulator"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		},
+		"y":{
+			"item": "assemblylinemachines:fluid_regulator"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:generator_upgrade_coolant"
+	}
+}

@@ -1,0 +1,22 @@
+ {
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sbs",
+		"sqs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:iron_plate"
+		},
+		"q":{
+			"item": "assemblylinemachines:singularity"
+		},
+		"b":{
+			"item": "minecraft:experience_bottle"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:experience_hopper"
+	}
+}

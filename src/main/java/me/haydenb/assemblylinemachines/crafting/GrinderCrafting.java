@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.crafting;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.BlockHandGrinder.Blades;
+import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;

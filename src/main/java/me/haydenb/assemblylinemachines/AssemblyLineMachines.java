@@ -21,8 +21,10 @@ public final class AssemblyLineMachines{
 	
 	public AssemblyLineMachines() {
 		
+		
 		ModLoadingContext mlc = ModLoadingContext.get();
 		mlc.registerConfig(ModConfig.Type.COMMON, ConfigHolder.COMMON_SPEC);
+		
 		
 		HashPacketImpl.INSTANCE.registerMessage(HashPacketImpl.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
 	}

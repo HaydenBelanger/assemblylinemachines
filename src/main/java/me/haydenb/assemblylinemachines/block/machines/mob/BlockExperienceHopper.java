@@ -220,15 +220,12 @@ public class BlockExperienceHopper extends BlockTileEntity {
 			return false;
 		}
 	}
-	
-	@OnlyIn(Dist.CLIENT)
-	private static final RedstoneParticleData XP_PARTICLE = new RedstoneParticleData(0.643f, 0.960f, 0.258f, 1f);
 
 	@OnlyIn(Dist.CLIENT)
 	public static void spawnTeleparticles(PacketData pd) {
 		Minecraft mc = Minecraft.getInstance();
 		for (int i = 0; i < 4; i++) {
-			mc.player.getEntityWorld().addParticle(XP_PARTICLE, true, pd.get("x", Double.class), pd.get("y", Double.class) + 0.1, pd.get("z", Double.class), 0, 0, 0);
+			mc.player.getEntityWorld().addParticle(new RedstoneParticleData(0.643f, 0.960f, 0.258f, 1f), true, pd.get("x", Double.class), pd.get("y", Double.class) + 0.1, pd.get("z", Double.class), 0, 0, 0);
 		}
 	}
 

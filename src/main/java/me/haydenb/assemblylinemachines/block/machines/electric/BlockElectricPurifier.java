@@ -16,26 +16,21 @@ import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -63,16 +58,17 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	private static final Random RAND = new Random();
+	private static final EnumProperty<PurifierStates> PURIFIER_STATES = EnumProperty.create("active", PurifierStates.class);
 	
 	public BlockElectricPurifier() {
 		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
 				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "electric_purifier", BlockElectricPurifier.TEElectricPurifier.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(PURIFIER_STATES, PurifierStates.FALSE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(PURIFIER_STATES).add(HorizontalBlock.HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -94,6 +90,16 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		}
 	}
 	
+	public static enum PurifierStates implements IStringSerializable{
+		FALSE, TRUE, ENHANCEDFALSE, ENHANCEDTRUE;
+
+		@Override
+		public String func_176610_l() {
+			return toString().toLowerCase();
+		}
+		
+		
+	}
 	public static class TEElectricPurifier extends ManagedSidedMachine<ContainerElectricPurifier> implements ITickableTileEntity{
 		
 		private int timer = 0;
@@ -142,26 +148,50 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 						Optional<PurifierCrafting> rOpt = world.getRecipeManager().getRecipe(PurifierCrafting.PURIFIER_RECIPE, this, world);
 						PurifierCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
-							output = recipe.getRecipeOutput().copy();
-							cycles = ((float) recipe.getTime() / 10F);
 							
-							int conserve = getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
+							boolean reqUpgrade = recipe.requiresUpgrade();
 							
-							if(RAND.nextInt(10) * conserve < 10) {
-								contents.get(1).shrink(1);
-							}
-							if(RAND.nextInt(10) * conserve < 10) {
-								contents.get(2).shrink(1);
-							}
-							contents.get(3).shrink(1);
-							sendUpdates = true;
-							if(!getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
-							}
-						}else {
-							if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+							if(reqUpgrade == false || getUpgradeAmount(Upgrades.PURIFIER_EXPANDED) != 0) {
+								output = recipe.getRecipeOutput().copy();
+								cycles = ((float) recipe.getTime() / 10F);
+								
+								int conserve;
+								
+								if(reqUpgrade) {
+									conserve = 0;
+									cost = Math.round((float) cost * 2.2f);
+								}else {
+									conserve = getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
+								}
+								
+								if(RAND.nextInt(10) * conserve < 10) {
+									contents.get(1).shrink(1);
+								}
+								if(RAND.nextInt(10) * conserve < 10) {
+									contents.get(2).shrink(1);
+								}
+								contents.get(3).shrink(1);
 								sendUpdates = true;
+								
+								
+								if(reqUpgrade) {
+									if(getBlockState().get(PURIFIER_STATES) != PurifierStates.ENHANCEDTRUE) {
+										world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.ENHANCEDTRUE));
+									}
+								}else {
+									if(getBlockState().get(PURIFIER_STATES) != PurifierStates.TRUE) {
+										world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.TRUE));
+									}
+								}
+								
+							}
+							
+						}else {
+							
+							if(getBlockState().get(PURIFIER_STATES) == PurifierStates.ENHANCEDTRUE) {
+								world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.ENHANCEDFALSE));
+							}else if(getBlockState().get(PURIFIER_STATES) == PurifierStates.TRUE) {
+								world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.FALSE));
 							}
 						}
 						

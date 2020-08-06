@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ere",
+		"rxr",
+		"ere"
+	],
+	"key":{
+		"r":{
+			"item": "minecraft:redstone"
+		},
+		"e":{
+			"item": "assemblylinemachines:energized_gold_plate"
+		},
+		"x":{
+			"item": "assemblylinemachines:energy_harness"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:microprocessor"
+	}
+}

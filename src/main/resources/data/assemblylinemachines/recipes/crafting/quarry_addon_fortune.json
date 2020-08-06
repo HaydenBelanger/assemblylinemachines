@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"srs",
+		"dgd",
+		"srs"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"r":{
+			"item": "assemblylinemachines:rubber_sheet"
+		},
+		"g":{
+			"item": "minecraft:gold_block"
+		},
+		"d":{
+			"item": "minecraft:diamond"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:quarry_fortune_addon"
+	}
+}

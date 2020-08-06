@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" e ",
+		"scs",
+		"sts"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"e":{
+			"item": "assemblylinemachines:adv_energy_pipe"
+		},
+		"c":{
+			"item": "assemblylinemachines:empowered_convection_component"
+		},
+		"t":{
+			"item": "assemblylinemachines:stainless_steel_tank_component"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:combustion_generator"
+	}
+}
