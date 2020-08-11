@@ -27,7 +27,8 @@ public class ItemPublicHoe extends ToolItem{
 	   public ActionResultType onItemUse(ItemUseContext context) {
 	      World world = context.getWorld();
 	      BlockPos blockpos = context.getPos();
-	      int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
+	      @SuppressWarnings("deprecation")
+		int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
 	      if (hook != 0) return hook > 0 ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	      if (context.getFace() != Direction.DOWN && world.isAirBlock(blockpos.up())) {
 	         BlockState blockstate = HOE_LOOKUP.get(world.getBlockState(blockpos).getBlock());

@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:metal",
+	"input":{
+		"item": "assemblylinemachines:plastic_ball"
+	},
+	"output":{
+		"item": "assemblylinemachines:plastic_sheet",
+		"count": 3
+	},
+	"time": 6
+}

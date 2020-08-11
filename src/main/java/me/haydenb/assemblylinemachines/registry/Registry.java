@@ -56,10 +56,12 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.utility.*;
 import me.haydenb.assemblylinemachines.block.utility.BlockBottomlessStorageUnit.*;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidRouter.*;
+import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.BlockItemFluidTank;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank;
 import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.*;
 import me.haydenb.assemblylinemachines.crafting.*;
-import me.haydenb.assemblylinemachines.item.ItemTiers;
+import me.haydenb.assemblylinemachines.item.ItemTiers.ArmorTiers;
+import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.items.*;
@@ -149,6 +151,8 @@ public class Registry {
 		createItem("titanium_blade", new ItemGrindingBlade(Blades.TITANIUM));
 		createItem("pure_gold_blade_piece");
 		createItem("pure_gold_blade", new ItemGrindingBlade(Blades.PUREGOLD));
+		createItem("steel_blade_piece");
+		createItem("steel_blade", new ItemGrindingBlade(Blades.STEEL));
 		
 		createItem("ground_iron");
 		createItem("ground_gold");
@@ -213,43 +217,42 @@ public class Registry {
 		createItem("mystium_ingot", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
 		createItem("corrupted_shard", new ItemCorruptedShard());
 		
-		createItem("titanium_sword", new SwordItem(ItemTiers.TITANIUM, 2, -1.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM, 4, -3.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_pickaxe", new PickaxeItem(ItemTiers.TITANIUM, 0, -1.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_shovel", new ShovelItem(ItemTiers.TITANIUM, 0, -1.3f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_sword", new SwordItem(ToolTiers.TITANIUM, 2, -1.5f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_axe", new AxeItem(ToolTiers.TITANIUM, 4, -3.5f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_pickaxe", new PickaxeItem(ToolTiers.TITANIUM, 0, -1.5f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_shovel", new ShovelItem(ToolTiers.TITANIUM, 0, -1.3f, new Item.Properties().group(creativeTab)));
 		
-		createItem("titanium_hoe", new ItemPublicHoe(ItemTiers.TITANIUM, -0.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_helmet", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
-		createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
-		createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
-		createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
-		createItem("titanium_hammer", new ItemHammer(ItemTiers.TITANIUM, 8, -3.2f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_hoe", new ItemPublicHoe(ToolTiers.TITANIUM, -0.5f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_helmet", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
+		createItem("titanium_chestplate", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
+		createItem("titanium_leggings", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
+		createItem("titanium_boots", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
+		createItem("titanium_hammer", new ItemHammer(ToolTiers.TITANIUM, 8, -3.2f, new Item.Properties().group(creativeTab)));
 		
-		createItem("crank_sword", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
-		createItem("crank_axe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
-		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
-		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
-		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, ItemPublicHoe.class));
-		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ItemTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
+		createItem("crank_sword", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
+		createItem("crank_axe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
+		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
+		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
+		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, ItemPublicHoe.class));
+		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
 		
+		createItem("mystium_sword", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, null, 3, -1.2f, new Item.Properties().group(creativeTab), 250000, SwordItem.class));
+		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 250000, AxeItem.class));
+		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 250000, PickaxeItem.class));
+		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 250000, ShovelItem.class));
+		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, null, -999, -0.5f, new Item.Properties().group(creativeTab), 250000, ItemPublicHoe.class));
+		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, null, 11, -3.5f, new Item.Properties().group(creativeTab), 250000, ItemHammer.class));
 		
-		createItem("mystium_sword", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, 3, -1.2f, new Item.Properties().group(creativeTab), 100000, SwordItem.class));
-		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 300000, AxeItem.class));
-		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 600000, PickaxeItem.class));
-		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 300000, ShovelItem.class));
-		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, -999, -0.5f, new Item.Properties().group(creativeTab), 90000, ItemPublicHoe.class));
-		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ItemTiers.MYSTIUM, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2500000, ItemHammer.class));
-		
-		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
-		createItem("steel_sword", new SwordItem(ItemTiers.STEEL, 2, -1.9f, new Item.Properties().group(creativeTab)));
-		createItem("steel_axe", new AxeItem(ItemTiers.STEEL, 4, -3.9f, new Item.Properties().group(creativeTab)));
-		createItem("steel_pickaxe", new PickaxeItem(ItemTiers.STEEL, 0, -1.9f, new Item.Properties().group(creativeTab)));
-		createItem("steel_shovel", new ShovelItem(ItemTiers.STEEL, 0, -1.7f, new Item.Properties().group(creativeTab)));
-		createItem("steel_helmet", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
-		createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
-		createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
-		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
-		createItem("steel_hoe", new ItemPublicHoe(ItemTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_hammer", new ItemHammer(ToolTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_sword", new SwordItem(ToolTiers.STEEL, 2, -1.9f, new Item.Properties().group(creativeTab)));
+		createItem("steel_axe", new AxeItem(ToolTiers.STEEL, 4, -3.9f, new Item.Properties().group(creativeTab)));
+		createItem("steel_pickaxe", new PickaxeItem(ToolTiers.STEEL, 0, -1.9f, new Item.Properties().group(creativeTab)));
+		createItem("steel_shovel", new ShovelItem(ToolTiers.STEEL, 0, -1.7f, new Item.Properties().group(creativeTab)));
+		createItem("steel_helmet", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
+		createItem("steel_chestplate", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
+		createItem("steel_leggings", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
+		createItem("steel_boots", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
+		createItem("steel_hoe", new ItemPublicHoe(ToolTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
 		
 		createItem("crank_shaft");
 		createItem("convection_component");
@@ -304,6 +307,8 @@ public class Registry {
 		createItem("attuned_titanium_plate", new ItemBasicFormattedName(TextFormatting.BLUE));
 		createItem("purifier_upgrade_enhanced", new ItemUpgrade(false, "Purifier can process more recipes.", "Increases power consumption."));
 		
+		createItem("nether_star_shard", new ItemBasicFormattedName(TextFormatting.GOLD));
+		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
 		}
@@ -313,8 +318,8 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
 		
-		createBlock("titanium_ore", Material.ROCK, 3f, 15f, 3, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("titanium_block", Material.IRON, 5f, 20f, 3, ToolType.PICKAXE, SoundType.METAL);
+		createBlock("titanium_ore", Material.ROCK, 3f, 15f, 4, ToolType.PICKAXE, SoundType.STONE);
+		createBlock("titanium_block", Material.IRON, 5f, 20f, 4, ToolType.PICKAXE, SoundType.METAL);
 		
 		createBlock("hand_grinder", new BlockHandGrinder());
 		createBlock("fluid_bath", new BlockFluidBath());
@@ -332,8 +337,10 @@ public class Registry {
 		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.BASIC_POWER));
 		
 		
-		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT));
-		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD));
+		createBlockNoItem("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT));
+		createItem("steel_fluid_tank", new BlockItemFluidTank(Registry.getBlock("steel_fluid_tank")));
+		createBlockNoItem("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD));
+		createItem("wooden_fluid_tank", new BlockItemFluidTank(Registry.getBlock("wooden_fluid_tank")));
 		
 		createBlock("silt", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
 		createBlock("silt_brick", Material.ROCK, 4f, 12f, 0, ToolType.PICKAXE, SoundType.STONE);
@@ -371,7 +378,6 @@ public class Registry {
 		createBlock("autocrafting_table", new BlockAutocraftingTable());
 		
 		createBlockNoItem("naphtha_fire", new BlockNaphthaFire());
-		createItem("naphtha_fire", new BlockItem(Registry.getBlock("naphtha_fire"), new Item.Properties()));
 		
 		createBlock("pump", new BlockPump());
 		createBlock("pumpshaft", new BlockPumpshaft());
@@ -379,7 +385,8 @@ public class Registry {
 		createBlockNoItem("mystium_block", Material.IRON, 11f, 80f, 3, ToolType.PICKAXE, SoundType.METAL);
 		createItem("mystium_block", new ItemBlockFormattedName(Registry.getBlock("mystium_block"), TextFormatting.LIGHT_PURPLE));
 		
-		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT));
+		createBlockNoItem("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT));
+		createItem("mystium_fluid_tank", new BlockItemFluidTank(Registry.getBlock("mystium_fluid_tank")));
 		
 		createBlock("tool_charger", new BlockToolCharger());
 		
@@ -590,6 +597,13 @@ public class Registry {
 		registerScreen("quantum_link", ContainerQuantumLink.class, ScreenQuantumLink.class);
 		
 		registerScreen("metal_shaper", ContainerMetalShaper.class, ScreenMetalShaper.class);
+		
+		((ItemMystiumTool<?>) Registry.getItem("mystium_pickaxe")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_axe")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_sword")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_shovel")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_hoe")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_hammer")).connectItemProperties();
 	}
 	
 	@SubscribeEvent

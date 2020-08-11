@@ -217,6 +217,8 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 			super.read(compound);
 			if(compound.contains("assemblylinemachines:output")) {
 				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+			}else {
+				output = null;
 			}
 			if(compound.contains("assemblylinemachines:ntimer")) {
 				nTimer = compound.getInt("assemblylinemachines:ntimer");
@@ -237,6 +239,8 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 				output.write(sub);
 				compound.put("assemblylinemachines:output", sub);
 				
+			}else {
+				compound.remove("assemblylinemachines:output");
 			}
 			return super.write(compound);
 		}
@@ -296,6 +300,7 @@ public class BlockAlloySmelter extends BlockScreenTileEntity<BlockAlloySmelter.T
 			super.blit(x+95, y+35, 176, 64, prog, 14);
 			
 			if(tsfm.output != null) {
+				
 				super.blit(x+76, y+53, 176, 52, 13, 12);
 			}
 			

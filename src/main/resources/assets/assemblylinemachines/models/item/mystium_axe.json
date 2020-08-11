@@ -1,7 +1,15 @@
 {
 	"parent": "item/handheld",
 	"textures":{
-		"layer0": "assemblylinemachines:item/mystium_axe"
-	}
+		"layer0": "assemblylinemachines:item/mystium_tools/mystium_axe"
+	},
+	"overrides":[
+		{
+			"predicate":{
+				"assemblylinemachines:active": 1
+			},
+			"model": "assemblylinemachines:item/mystium_axe_active"
+		}
+	]
 	
 }

@@ -79,8 +79,8 @@ public class BlockCrank extends Block {
 						if(chance != -1 && RAND.nextInt(chance) == 0) {
 							world.playSound(null, pos, SoundEvents.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 1f, 1f);
 							world.setBlockState(pos, Blocks.AIR.getDefaultState());
-							General.spawnItem(new ItemStack(Items.STICK, 2), pos, world);
-							General.spawnItem(new ItemStack(Registry.getItem("steel_ingot")), pos, world);
+							General.spawnItem(new ItemStack(Items.STICK, 5), pos, world);
+							General.spawnItem(new ItemStack(Registry.getItem("steel_nugget"), 27), pos, world);
 						}else {
 							world.playSound(null, pos, SoundEvents.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 0.7f, 1f);
 						}
@@ -89,8 +89,9 @@ public class BlockCrank extends Block {
 			}
 		}
 		
-			
-		world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(), pos.getY() + getPartNext(), pos.getZ() + getPartNext(), 0, 0, 0);
+		if(world.isRemote) {	
+			world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(), pos.getY() + getPartNext(), pos.getZ() + getPartNext(), 0, 0, 0);
+		}
 		return ActionResultType.CONSUME;
 
 	}

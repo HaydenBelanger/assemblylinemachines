@@ -44,7 +44,7 @@ public class MetalShaperRecipeCategory implements IRecipeCategory<MetalCrafting>
 
 	@Override
 	public String getTitle() {
-		return "Grinding Recipe";
+		return "Metal Shaper Recipe";
 	}
 
 	@Override

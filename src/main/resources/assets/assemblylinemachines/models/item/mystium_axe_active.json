@@ -1,0 +1,7 @@
+{
+	"parent": "item/handheld",
+	"textures":{
+		"layer0": "assemblylinemachines:item/mystium_tools/mystium_axe_active"
+	}
+	
+}

@@ -137,7 +137,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 								}
 							}
 						}else {
-							if(cranks >= 3) {
+							if(cranks >= 1) {
 								cranks = 0;
 								if(progress == cycles) {
 									pendingOutput = true;

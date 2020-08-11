@@ -6,6 +6,19 @@
 			"entries": [
 				{
 					"type": "minecraft:item",
+					"functions": [
+            {
+              "function": "minecraft:copy_nbt",
+              "source": "block_entity",
+              "ops": [
+                {
+                  "source": "assemblylinemachines:fluidstack",
+                  "target": "assemblylinemachines:fluidstack",
+                  "op": "replace"
+                }
+              ]
+            }
+          ],
 					"name": "assemblylinemachines:mystium_fluid_tank"
 				}
 			]

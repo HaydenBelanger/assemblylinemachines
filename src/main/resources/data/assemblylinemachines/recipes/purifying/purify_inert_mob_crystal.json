@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:purifier",
+	"part_a":{
+		"tag": "forge:gravel"
+	},
+	"part_b":{
+		"tag": "minecraft:sand"
+	},
+	"tobepurified":{
+		"item": "assemblylinemachines:mob_crystal"
+	},
+	"output":{
+		"item": "assemblylinemachines:mob_crystal"
+	},
+	"time": 300
+}

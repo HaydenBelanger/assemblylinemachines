@@ -73,7 +73,7 @@ public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankab
 					
 					if(!compound.contains("assemblylinemachines:cranks")) {
 						compound.putInt("assemblylinemachines:cranks", 30);
-						compound.putBoolean("assemblylinemachines:hascranks", true);
+						compound.putBoolean("assemblylinemachines:canbreakblackgranite", true);
 						changed = true;
 					}else {
 						int prevCranks = compound.getInt("assemblylinemachines:cranks");

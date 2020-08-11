@@ -228,7 +228,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 								max = 8;
 							}
 							for (int i = 0; i < output.getSlots(); i++) {
-								ItemStack origStack = output.getStackInSlot(i);
+								ItemStack origStack = output.extractItem(i, max, true);
 								if (origStack != ItemStack.EMPTY && checkWhiteBlackList(origStack)) {
 									ItemStack copyStack = origStack.copy();
 									if (copyStack.getCount() > max) {

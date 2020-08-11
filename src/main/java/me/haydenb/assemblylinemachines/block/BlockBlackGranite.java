@@ -33,7 +33,7 @@ public class BlockBlackGranite extends Block{
 			ItemStack item = player.getHeldItemMainhand();
 			if(item != ItemStack.EMPTY && item.hasTag()) {
 				CompoundNBT compound = item.getTag();
-				if(compound.getBoolean("assemblylinemachines:hascranks")) {
+				if(compound.getBoolean("assemblylinemachines:canbreakblackgranite")) {
 					return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
 				}
 			}

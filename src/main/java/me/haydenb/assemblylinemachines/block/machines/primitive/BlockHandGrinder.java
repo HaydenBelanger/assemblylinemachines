@@ -104,18 +104,18 @@ public class BlockHandGrinder extends Block {
 				if(world.getTileEntity(pos) instanceof TEHandGrinder) {
 					TEHandGrinder entity = (TEHandGrinder) world.getTileEntity(pos);
 					
-					if(player.isSneaking()) {
+					if(player.isSneaking() && player.getHeldItemMainhand().isEmpty()) {
+						
 						
 						if(entity.blade == null || entity.blade == ItemStack.EMPTY) {
 							player.sendStatusMessage(new StringTextComponent("There is no blade installed."), true);
 						}else {
 							if(entity.blade.getItem() instanceof ItemGrindingBlade) {
-								ItemGrindingBlade igb = (ItemGrindingBlade) entity.blade.getItem();
-								if(entity.blade.getMaxDamage() - entity.blade.getDamage() == 1) {
-									player.sendStatusMessage(new StringTextComponent("You have a " + igb.blade.friendlyname + " Blade with 1 use left."), true);
-								}else {
-									player.sendStatusMessage(new StringTextComponent("You have a " + igb.blade.friendlyname + " Blade with " + (entity.blade.getMaxDamage() - entity.blade.getDamage()) + " uses left."), true);
-								}
+								player.sendStatusMessage(new StringTextComponent("Uninstalled blade."), true);
+								ItemHandlerHelper.giveItemToPlayer(player, entity.blade);
+								entity.blade = ItemStack.EMPTY;
+								world.setBlockState(pos, state.with(BLADE_PROPERTY, Blades.NONE));
+								entity.sendUpdates();
 							}
 							
 							
@@ -238,7 +238,7 @@ public class BlockHandGrinder extends Block {
 	}
 	
 	public static enum Blades implements IStringSerializable{
-		TITANIUM(0, 110, "Titanium", "titanium_blade"), PUREGOLD(1, 170, "Pure Gold", "pure_gold_blade"), NONE(-999, -999, null, null);
+		TITANIUM(0, 360, "Titanium", "titanium_blade"), PUREGOLD(1, 590, "Pure Gold", "pure_gold_blade"), STEEL(2, 1000, "Steel", "steel_blade"), NONE(-999, -999, null, null);
 
 		public int tier;
 		public int uses;

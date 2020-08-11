@@ -51,7 +51,6 @@ public class ItemLockRemover extends Item {
 	@Override
 	public boolean onBlockStartBreak(ItemStack is, BlockPos pos, PlayerEntity player) {
 		
-		System.out.println("break!");
 		World world = player.getEntityWorld();
 		if(!world.isRemote) {
 			if(!is.hasTag() || !is.getTag().contains("assemblylinemachines:lockcode")){

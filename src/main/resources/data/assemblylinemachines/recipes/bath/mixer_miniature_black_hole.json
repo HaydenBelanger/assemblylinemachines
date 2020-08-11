@@ -4,7 +4,7 @@
 		"item": "assemblylinemachines:singularity"
 	},
 	"input_b":{
-		"item": "minecraft:nether_star"
+		"item": "assemblylinemachines:nether_star_shard"
 	},
 	"output":{
 		"item": "assemblylinemachines:miniature_black_hole"

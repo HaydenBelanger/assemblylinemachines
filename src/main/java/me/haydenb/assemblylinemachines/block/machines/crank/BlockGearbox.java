@@ -174,24 +174,24 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 								burnTime = ForgeHooks.getBurnTime(contents.get(1));
 								maxBurnTime = burnTime;
 								contents.get(1).shrink(1);
-								if(getBlockState().get(StateProperties.MACHINE_ACTIVE) == false) {
-									world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
-									
-								}
 								sendUpdate = true;
 							}else {
 								if(maxBurnTime != 0) {
 									burnTime = 0;
 									maxBurnTime = 0;
-									if(getBlockState().get(StateProperties.MACHINE_ACTIVE) == true) {
-										world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
-										
-									}
 									sendUpdate = true;
 								}
 							}
 						}
 						
+						
+						if(burnTime == 0 && getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+							sendUpdate = true;
+						}else if(burnTime != 0 && !getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
+							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+							sendUpdate = true;
+						}
 						if(sendUpdate) {
 							sendUpdates();
 						}

@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sps",
+		"aqb",
+		"sps"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:attuned_titanium_plate"
+		},
+		"a":{
+			"item": "assemblylinemachines:microprocessor"
+		},
+		"b":{
+			"item": "assemblylinemachines:enhanced_battery"
+		},
+		"p":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"q":{
+			"item": "assemblylinemachines:miniature_black_hole"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:quantum_link",
+		"count": 2
+	}
+}

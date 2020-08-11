@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:gravel"
+	},
+	"output":{
+		"item": "minecraft:sand"
+	},
+	"grinds": 4,
+	"bladetype": "TITANIUM"
+}

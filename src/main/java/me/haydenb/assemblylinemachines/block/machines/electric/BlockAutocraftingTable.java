@@ -146,7 +146,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 
 		@Override
 		public boolean canInsertToSide(int slot, Direction direction) {
-			return (slot > 13 && slot < 17) || (slot > 22 && slot < 26);
+			return (slot == -1) || (slot > 13 && slot < 17) || (slot > 22 && slot < 26);
 		}
 		
 		@Override

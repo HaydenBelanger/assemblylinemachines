@@ -140,7 +140,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 							}else {
 								naphthaActive = false;
 							}
-							int burnTime = ForgeHooks.getBurnTime(contents.get(0));
+							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0)) * 2f);
 							if(burnTime != 0) {
 								contents.get(0).shrink(1);
 								genper = Math.round((float)(burnTime * 3f) / 90f);
@@ -216,7 +216,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
 				List<ITextComponent> tt = func_231151_a_(stack);
 				
-				int burnTime = ForgeHooks.getBurnTime(stack);
+				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack) * 2f);
 				float mul;
 				if(tsfm.naphthaActive) {
 					mul = 240f;

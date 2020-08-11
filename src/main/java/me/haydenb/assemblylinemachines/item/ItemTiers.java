@@ -15,12 +15,10 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 
 
-public enum ItemTiers implements IItemTier, IArmorMaterial {
-	
-	
+public enum ItemTiers {
 	
 	TITANIUM(6f, 7f, 20, 3, 2200, 153, 0.05f, new int[] {8, 11, 10, 7}, "titanium", 1.7f, ()->{return Ingredient.fromItems(Registry.getItem("titanium_ingot"));}),
-	STEEL(8f, 15f, 0, 3, 1100, 98, 0.15f, new int[] {11, 15, 12, 9}, "steel", 2.4f, ()->{return Ingredient.fromItems(Registry.getItem("steel_ingot"));}),
+	STEEL(8f, 15f, 2, 3, 1100, 98, 0.15f, new int[] {11, 15, 12, 9}, "steel", 2.4f, ()->{return Ingredient.fromItems(Registry.getItem("steel_ingot"));}),
 	CRANK(10f, 22f, 35, 3, 50, 0, 0f, new int[] {0, 0, 0, 0}, "", 0f,  ()->{return Ingredient.fromTag(ItemTags.getCollection().get(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
 	MYSTIUM(14f, 24f, 60, 3, 125, 0, 0f, new int[] {0, 0, 0, 0}, "", 0f,  ()->{return Ingredient.fromItems(Registry.getItem("mystium_ingot"));});
 	
@@ -52,77 +50,117 @@ public enum ItemTiers implements IItemTier, IArmorMaterial {
 		this.ingredient = new LazyValue<>(ingredient);
 	}
 	
+	public static enum ArmorTiers implements IArmorMaterial{
+		TITANIUM(ItemTiers.TITANIUM), STEEL(ItemTiers.STEEL);
+		
+		private final ItemTiers baseTier;
+		ArmorTiers(ItemTiers base){
+			this.baseTier = base;
+		}
+
+		@Override
+		public float func_230304_f_() {
+			return baseTier.armorKnockbackResistance;
+		}
+
+		@Override
+		public int getDamageReductionAmount(EquipmentSlotType est) {
+			
+			switch(est) {
+			case HEAD:
+				return baseTier.damageReduction[0];
+			case CHEST:
+				return baseTier.damageReduction[1];
+			case LEGS:
+				return baseTier.damageReduction[2];
+			case FEET:
+				return baseTier.damageReduction[3];
+			default:
+				return 0;
+			}
+		}
+
+		@Override
+		public int getDurability(EquipmentSlotType est) {
+			
+			switch(est) {
+			case HEAD:
+				return ARMOR_DURABILITY_OFFSET[0] * baseTier.armorDurabilityBase;
+			case CHEST:
+				return ARMOR_DURABILITY_OFFSET[1] * baseTier.armorDurabilityBase;
+			case LEGS:
+				return ARMOR_DURABILITY_OFFSET[2] * baseTier.armorDurabilityBase;
+			case FEET:
+				return ARMOR_DURABILITY_OFFSET[3] * baseTier.armorDurabilityBase;
+			default:
+				return 0;
+			}
+		}
+
+		@Override
+		public int getEnchantability() {
+			return baseTier.enchantability;
+		}
+
+		@Override
+		public String getName() {
+			return AssemblyLineMachines.MODID + ":" + baseTier.armorSetName;
+		}
+
+		@Override
+		public Ingredient getRepairMaterial() {
+			return baseTier.ingredient.getValue();
+		}
+
+		@Override
+		public SoundEvent getSoundEvent() {
+			return SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND;
+		}
+
+		@Override
+		public float getToughness() {
+			return baseTier.toughness;
+		}
+	}
 	
+	public static enum ToolTiers implements IItemTier{
+		TITANIUM(ItemTiers.TITANIUM), STEEL(ItemTiers.STEEL), CRANK(ItemTiers.CRANK), MYSTIUM(ItemTiers.MYSTIUM);
+		
+		private final ItemTiers baseTier;
+		ToolTiers(ItemTiers tier){
+			this.baseTier = tier;
+		}
 
-	@Override
-	public float getAttackDamage() {
-		return attack;
-	}
+		@Override
+		public float getAttackDamage() {
+			return baseTier.attack;
+		}
 
-	@Override
-	public float getEfficiency() {
-		return efficiency;
-	}
+		@Override
+		public float getEfficiency() {
+			return baseTier.efficiency;
+		}
 
-	@Override
-	public int getEnchantability() {
-		return enchantability;
-	}
+		@Override
+		public int getEnchantability() {
+			return baseTier.enchantability;
+		}
 
-	@Override
-	public int getHarvestLevel() {
-		return harvestLevel;
-	}
+		@Override
+		public int getHarvestLevel() {
+			return baseTier.harvestLevel;
+		}
 
-	@Override
-	public int getMaxUses() {
-		return durability;
-	}
+		@Override
+		public int getMaxUses() {
+			return baseTier.durability;
+		}
 
-	@Override
-	public Ingredient getRepairMaterial() {
-		return ingredient.getValue();
-	}
-
-	@Override
-	public int getDamageReductionAmount(EquipmentSlotType est) {
-		return damageReduction[est.getIndex()];
-	}
-
-
-
-	@Override
-	public int getDurability(EquipmentSlotType est) {
-		return ARMOR_DURABILITY_OFFSET[est.getIndex()] * armorDurabilityBase;
-	}
-
-
-
-	@Override
-	public String getName() {
-		return AssemblyLineMachines.MODID + ":" + armorSetName;
-	}
-
-
-
-	@Override
-	public SoundEvent getSoundEvent() {
-		return SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND;
-	}
-
-
-
-	@Override
-	public float getToughness() {
-		return toughness;
-	}
-
-
-
-	//Armor KB Resist
-	@Override
-	public float func_230304_f_() {
-		return armorKnockbackResistance;
+		@Override
+		public Ingredient getRepairMaterial() {
+			return baseTier.ingredient.getValue();
+		}
+		
 	}
 
 }

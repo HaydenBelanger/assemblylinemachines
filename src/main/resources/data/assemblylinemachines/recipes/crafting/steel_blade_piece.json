@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" y ",
+		"yxy"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:steel_ingot"
+		},
+		"y":{
+			"item": "assemblylinemachines:steel_nugget"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:steel_blade_piece"
+	}
+}

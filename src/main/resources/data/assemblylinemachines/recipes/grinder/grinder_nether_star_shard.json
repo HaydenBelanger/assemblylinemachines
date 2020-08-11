@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:nether_star"
+	},
+	"output":{
+		"item": "assemblylinemachines:nether_star_shard",
+		"count": 4
+	},
+	"grinds": 11,
+	"bladetype": "PUREGOLD",
+	"machine_required": true
+}

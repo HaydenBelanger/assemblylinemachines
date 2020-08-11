@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.1-0.1.0'
+version = '1.16.1-1.0pre4'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -117,7 +117,7 @@ dependencies {
             url = "https://modmaven.k-4u.nl"
         }
     }
-    minecraft 'net.minecraftforge:forge:1.16.1-32.0.98'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.106'
 
 	//JEI
     compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6:api")

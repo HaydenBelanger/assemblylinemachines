@@ -131,6 +131,9 @@
 	"item.assemblylinemachines.attuned_titanium_ingot": "Attuned Titanium Ingot",
 	"item.assemblylinemachines.attuned_titanium_plate": "Attuned Titanium Plate",
 	"item.assemblylinemachines.purifier_upgrade_enhanced": "Purifier Upgrade: Enhanced Filtering",
+	"item.assemblylinemachines.steel_blade_piece": "Steel Blade Piece",
+	"item.assemblylinemachines.steel_blade": "Steel Blade",
+	"item.assemblylinemachines.nether_star_shard": "Nether Star Shard",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.titanium_block": "Titanium Block",

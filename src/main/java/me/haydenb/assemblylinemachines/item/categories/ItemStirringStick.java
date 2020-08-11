@@ -32,4 +32,13 @@ public class ItemStirringStick extends Item {
 	}
 
 	
+	@Override
+	public int getBurnTime(ItemStack itemStack) {
+		if(this == Registry.getItem("wooden_stirring_stick")) {
+			return 200;
+		}
+		
+		return -1;
+	}
+	
 }

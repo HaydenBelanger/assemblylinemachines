@@ -193,6 +193,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 					
 					if(output == null || output.isEmpty()) {
 						
+						boolean doShutoff = true;
 						Optional<BathCrafting> rOpt = world.getRecipeManager().getRecipe(BathCrafting.BATH_RECIPE, this, world);
 						BathCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
@@ -218,6 +219,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 									}
 									fluid.shrink(cons);
 									inProgress = ff;
+									doShutoff = false;
 									
 									sendUpdates = true;
 									if(getBlockState().get(StateProperties.FLUID) != ff) {
@@ -227,12 +229,13 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 							}
 							
 							
-						}else {
-							if(getBlockState().get(StateProperties.FLUID) != BathCraftingFluids.NONE) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, BathCraftingFluids.NONE));
-								sendUpdates = true;
-							}
 						}
+						if(doShutoff && getBlockState().get(StateProperties.FLUID) != BathCraftingFluids.NONE) {
+							world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, BathCraftingFluids.NONE));
+							sendUpdates = true;
+						}
+						
+							
 					}
 					
 					if(output != null && !output.isEmpty()) {

@@ -1,7 +1,15 @@
 {
 	"parent": "item/handheld",
 	"textures":{
-		"layer0": "assemblylinemachines:item/mystium_sword"
-	}
+		"layer0": "assemblylinemachines:item/mystium_tools/mystium_sword"
+	},
+	"overrides":[
+		{
+			"predicate":{
+				"assemblylinemachines:active": 1
+			},
+			"model": "assemblylinemachines:item/mystium_sword_active"
+		}
+	]
 	
 }

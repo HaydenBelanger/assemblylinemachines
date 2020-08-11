@@ -157,7 +157,7 @@ public class BlockElectricFurnace extends BlockScreenTileEntity<BlockElectricFur
 						FurnaceRecipe recipe = rOpt.orElse(null);
 						if(recipe != null) {
 							output = recipe.getCraftingResult(wrapper);
-							cycles = ((float) recipe.getCookTime() / 10F);
+							cycles = ((float) recipe.getCookTime() / 20F);
 							
 							contents.get(1).shrink(1);
 							sendUpdates = true;
@@ -215,6 +215,8 @@ public class BlockElectricFurnace extends BlockScreenTileEntity<BlockElectricFur
 			
 			if(compound.contains("assemblylinemachines:output")) {
 				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+			}else {
+				output = null;
 			}
 			if(compound.contains("assemblylinemachines:ntimer")) {
 				nTimer = compound.getInt("assemblylinemachines:ntimer");
@@ -233,6 +235,8 @@ public class BlockElectricFurnace extends BlockScreenTileEntity<BlockElectricFur
 				CompoundNBT sub = new CompoundNBT();
 				output.write(sub);
 				compound.put("assemblylinemachines:output", sub);
+			}else {
+				compound.remove("assemblylinemachines:output");
 			}
 			return super.write(compound);
 		}

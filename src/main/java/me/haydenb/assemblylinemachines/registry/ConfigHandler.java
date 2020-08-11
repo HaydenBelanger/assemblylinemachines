@@ -54,7 +54,7 @@ public class ConfigHandler {
 		public ASMConfig(final ForgeConfigSpec.Builder builder) {
 			
 			builder.push("Machine Options");
-			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps? Higher number means lower chance. Set to -1 to disable snapping completely.").define("crankSnapChance", 40);
+			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps? Higher number means lower chance. Set to -1 to disable snapping completely.").define("crankSnapChance", 100);
 			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?").define("interactorInteractMode", true);
 			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
 			
@@ -75,7 +75,7 @@ public class ConfigHandler {
 		
 		public void validateConfig() {
 			if(crankSnapChance.get() < 1 && crankSnapChance.get() != -1) {
-				crankSnapChance.set(40);
+				crankSnapChance.set(100);
 			}
 			
 			checkFluidLists(Pair.of(geothermalFluidsRaw.get().iterator(), geothermalFluids), Pair.of(combustionFluidsRaw.get().iterator(), combustionFluids), Pair.of(coolantFluidsRaw.get().iterator(), coolantFluids));

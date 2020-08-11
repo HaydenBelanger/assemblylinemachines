@@ -144,7 +144,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 							
 						}else {
 							
-							if(cranks >= 3) {
+							if(cranks >= 1) {
 								cranks = 0;
 								if(progress == cycles) {
 									pendingOutput = true;
@@ -175,7 +175,6 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 								isb = contents.get(1);
 								check = false;
 								
-								System.out.println("CHECK");
 								BathCrafting crafting = world.getRecipeManager().getRecipe(BathCrafting.BATH_RECIPE, this, world).orElse(null);
 								if(crafting != null && crafting.getFluid().isElectricMixerOnly() == false) {
 									if(crafting.getFluid().getAssocFluid() == handler.getFluidInTank(0).getFluid() && handler.drain(1000, FluidAction.SIMULATE).getAmount() == 1000) {

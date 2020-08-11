@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.block.utility;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank.FluidTankHandler;
@@ -9,9 +10,11 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -19,7 +22,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
@@ -78,6 +81,38 @@ public class BlockFluidTank extends Block {
 		tef.capacity = _capacity;
 		tef.trs = _tempres;
 		return tef;
+	}
+	
+	@Override
+	public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		if(stack.hasTag()) {
+			
+			CompoundNBT nbt = stack.getTag();
+			
+			if(world.getTileEntity(pos) instanceof TEFluidTank && nbt.contains("assemblylinemachines:fluidstack")) {
+				TEFluidTank tank = (TEFluidTank) world.getTileEntity(pos);
+				
+				tank.fluid = FluidStack.loadFluidStackFromNBT(nbt.getCompound("assemblylinemachines:fluidstack"));
+				tank.sendUpdates();
+			}
+		}
+		super.onBlockPlacedBy(world, pos, state, placer, stack);
+	}
+	public static class BlockItemFluidTank extends BlockItem{
+		public BlockItemFluidTank(Block block) {
+			super(block, new Item.Properties().group(Registry.creativeTab));
+		}
+		
+		@Override
+		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+			if(stack.hasTag()) {
+				CompoundNBT nbt = stack.getTag();
+				if(nbt.contains("assemblylinemachines:fluidstack")) {
+					tooltip.add(1, new StringTextComponent("This Tank has a fluid stored!").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+				}
+			}
+			super.addInformation(stack, worldIn, tooltip, flagIn);
+		}
 	}
 
 	@Override

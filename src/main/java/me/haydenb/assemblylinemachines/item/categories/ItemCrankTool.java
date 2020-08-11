@@ -55,7 +55,7 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 				int cranks = compound.getInt("assemblylinemachines:cranks");
 				if((cranks - amount) < 1) {
 					compound.remove("assemblylinemachines:cranks");
-					compound.remove("assemblylinemachines:hascranks");
+					compound.remove("assemblylinemachines:canbreakblackgranite");
 				}else {
 					compound.putInt("assemblylinemachines:cranks", cranks - amount);
 				}
@@ -145,7 +145,7 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 			}
 		}
 		
-		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).func_230532_e_().func_240699_a_(TextFormatting.DARK_GREEN));
+		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
 	}
 	/**
 	 * Returns a CrankTool version of A.
@@ -170,5 +170,33 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public double getDurabilityForDisplay(ItemStack stack) {
+		if(stack.hasTag()) {
+			
+			CompoundNBT compound = stack.getTag();
+			
+			if(compound.contains("assemblylinemachines:cranks")) {
+				
+				
+				return (double) ((compound.getInt("assemblylinemachines:cranks") - getMaxCranks()) * -1) / (double) getMaxCranks();
+			}
+		}
+		
+		return super.getDurabilityForDisplay(stack);
+	}
+	
+	@Override
+	public boolean showDurabilityBar(ItemStack stack) {
+		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:cranks")) {
+			
+			if(stack.getTag().getInt("assemblylinemachines:cranks") == getMaxCranks()) {
+				return false;
+			}
+			return true;
+		}
+		return super.showDurabilityBar(stack);
 	}
 }

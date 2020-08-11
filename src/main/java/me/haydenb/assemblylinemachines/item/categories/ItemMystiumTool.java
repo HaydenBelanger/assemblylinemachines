@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General.IPoweredTool;
@@ -17,18 +18,25 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.*;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -47,6 +55,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		this.parent = parent;
 		this.maxPower = maxPower;
 		this.item = new ItemStack(parent);
+		
 	}
 
 	@Override
@@ -59,6 +68,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				int power = compound.getInt("assemblylinemachines:fe");
 				if ((power - (amount * 150)) < 1) {
 					compound.remove("assemblylinemachines:fe");
+					compound.remove("assemblylinemachines:canbreakblackgranite");
 				} else {
 					compound.putInt("assemblylinemachines:fe", power - (amount * 150));
 				}
@@ -70,12 +80,32 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 		return super.damageItem(stack, amount, entity, onBroken);
 	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public void connectItemProperties() {
+		ItemModelsProperties.func_239418_a_(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
+			
+			@Override
+			public float call(ItemStack stack, ClientWorld cliWorld, LivingEntity entity) {
+				if(stack.hasTag()) {
+					CompoundNBT compound = stack.getTag();
+					if(compound.contains("assemblylinemachines:secondarystyle") && compound.contains("assemblylinemachines:fe") && compound.getInt("assemblylinemachines:fe") > 0) {
+						return 1f;
+					}
+				}
+				
+				return 0f;
+			}
+		});
+	}
 
 	// Use A (Sword, Pickaxe, Hoe, Shovel, Axe)
 	@Override
 	public boolean canHarvestBlock(BlockState blockIn) {
 		return parent.canHarvestBlock(blockIn);
 	}
+	
+	
 
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
@@ -131,11 +161,22 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				}
 
 				int cost = 0;
+				
+				ServerWorld sw = null;
+				if(!world.isRemote) {
+					sw = world.getServer().getWorld(world.func_234923_W_());
+				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
-					if (world.getBlockState(posx).getBlock() != Blocks.AIR) {
+					BlockState bs = world.getBlockState(posx);
+					if (bs.getBlock() != Blocks.AIR && bs.getBlockHardness(world, posx) != -1f) {
 						cost = cost + 2;
-						world.destroyBlock(posx, true, player);
+						world.destroyBlock(posx, false, player);
+						
+						if(!world.isRemote) {
+							
+							performDrops(bs, posx, player, sw);
+						}
 					}
 
 				}
@@ -147,8 +188,13 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 
 				BlockState bs = world.getBlockState(pos);
-				if(bs.getMaterial() == Material.WOOD) {
-					stack.damageItem(breakAndBreakConnected(world, bs, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+				
+				ServerWorld sw = null;
+				if(!world.isRemote) {
+					sw = world.getServer().getWorld(world.func_234923_W_());
+				}
+				if(bs.getBlock().getTags().contains(new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
+					stack.damageItem(breakAndBreakConnected(world, bs, sw, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
 				}
 				return true;
 
@@ -158,12 +204,20 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				Iterator<BlockPos> iter = BlockPos.getAllInBox(pos, pos.offset(d, 5)).iterator();
 
 				int cost = 0;
+				ServerWorld sw = null;
+				if(!world.isRemote) {
+					sw = world.getServer().getWorld(world.func_234923_W_());
+				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
 					BlockState bs = world.getBlockState(posx);
 					if (bs.getBlock() != Blocks.AIR && (bs.getMaterial() == Material.EARTH || bs.getMaterial() == Material.CLAY || bs.getMaterial() == Material.SNOW || bs.getMaterial() == Material.SNOW_BLOCK || bs.getMaterial() == Material.SAND)) {
 						cost = cost + 2;
-						world.destroyBlock(posx, true, player);
+						world.destroyBlock(posx, false, player);
+						
+						if(!world.isRemote) {
+							performDrops(bs, posx, player, sw);
+						}
 					}
 
 				}
@@ -175,8 +229,12 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		return parent.onBlockDestroyed(stack, world, state, pos, player);
 	}
 
-	private int breakAndBreakConnected(World world, BlockState origState, int ctx, BlockPos posx, LivingEntity player) {
-		world.destroyBlock(posx, true, player);
+	private int breakAndBreakConnected(World world, BlockState origState, ServerWorld sw, int ctx, BlockPos posx, LivingEntity player) {
+		world.destroyBlock(posx, false, player);
+		
+		if(sw != null) {
+			performDrops(world.getBlockState(posx), posx, player, sw);
+		}
 
 		int cost = 2;
 		if(ctx <= 20) {
@@ -187,7 +245,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				BlockState bs = world.getBlockState(posq);
 				if(bs.getBlock() == origState.getBlock()) {
-					cost = cost + breakAndBreakConnected(world, origState, ctx++, posq, player);
+					cost = cost + breakAndBreakConnected(world, origState, sw, ctx++, posq, player);
 				}
 			}
 		}
@@ -195,12 +253,18 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		return cost;
 	}
 
+	private void performDrops(BlockState bs, BlockPos pos, LivingEntity player, ServerWorld sw) {
+		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.POSITION, pos));
+		InventoryHelper.dropItems(sw.getWorld(), pos, NonNullList.from(ItemStack.EMPTY, drops.toArray(new ItemStack[drops.size()])));
+	}
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		return parent.getAttributeModifiers(equipmentSlot);
 	}
 
+	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 
@@ -214,6 +278,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				BlockPos blockpos = context.getPos();
 				World world = context.getWorld();
+				@SuppressWarnings("deprecation")
 				int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
 				if (hook != 0) return hook > 0 ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 				if (context.getFace() != Direction.DOWN && world.isAirBlock(blockpos.up())) {
@@ -299,6 +364,12 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			}
 
 		}
+		
+		if(amt != 0) {
+			nbt.putBoolean("assemblylinemachines:canbreakblackgranite", true);
+		}else {
+			nbt.remove("assemblylinemachines:canbreakblackgranite");
+		}
 
 		stack.setTag(nbt);
 	}
@@ -369,7 +440,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
 
-		if (!world.isRemote) {
+		if (!world.isRemote && player.isSneaking() && this != Registry.getItem("mystium_hammer")) {
 
 			ItemStack stack = player.getHeldItemMainhand();
 
@@ -416,6 +487,32 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
 
+	}
+	
+	@Override
+	public double getDurabilityForDisplay(ItemStack stack) {
+		if(stack.hasTag()) {
+			
+			CompoundNBT compound = stack.getTag();
+			
+			if(compound.contains("assemblylinemachines:fe")) {
+				
+				return (double) ((compound.getInt("assemblylinemachines:fe") - getMaxPower()) * -1) / (double) getMaxPower();
+			}
+		}
+		
+		return super.getDurabilityForDisplay(stack);
+	}
+	
+	@Override
+	public boolean showDurabilityBar(ItemStack stack) {
+		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe")) {
+			if(stack.getTag().getInt("assemblylinemachines:fe") == getMaxPower()) {
+				return false;
+			}
+			return true;
+		}
+		return super.showDurabilityBar(stack);
 	}
 
 	/**

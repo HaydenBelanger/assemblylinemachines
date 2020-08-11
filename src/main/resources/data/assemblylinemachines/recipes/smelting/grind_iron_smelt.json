@@ -1,8 +1,8 @@
 {
-	"type": "minecraft:blasting",
+	"type": "minecraft:smelting",
 	"ingredient":{
 		"item": "assemblylinemachines:ground_iron"
 	},
 	"result": "minecraft:iron_ingot",
-	"cookingtime": 100
+	"cookingtime": 200
 }

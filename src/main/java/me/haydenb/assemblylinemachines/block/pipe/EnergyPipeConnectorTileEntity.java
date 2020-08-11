@@ -84,9 +84,9 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 						
 						PipeBase<?> pb = (PipeBase<?>) getBlockState().getBlock();
 						if(pb.type == Type.ADVANCED_POWER) {
-							transferRate = 5000;
+							transferRate = 1000;
 						}else if(pb.type == Type.BASIC_POWER) {
-							transferRate = 800;
+							transferRate = 200;
 						}else {
 							transferRate = 0;
 						}
@@ -101,33 +101,19 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 						if (output == null && connectToOutput() == false) {
 							return;
 						}
-						int max = output.extractEnergy(transferRate, true);
-						if (max != 0) {
-							int extracted = 0;
-							double waitTime = 0;
+						double waitTime = 0;
+						for (EnergyPipeConnectorTileEntity tpc : targets.descendingSet()) {
+							if (tpc != null) {
+								int extracted = tpc.attemptAcceptPower(output.extractEnergy(transferRate, true));
 
-							for (EnergyPipeConnectorTileEntity tpc : targets.descendingSet()) {
-								if (tpc != null) {
-									extracted = +tpc.attemptAcceptPower(max);
+								waitTime += pos.distanceSq(tpc.pos);
 
-									double thisdist = pos.distanceSq(tpc.pos);
-
-									if (thisdist > waitTime) {
-										waitTime = thisdist;
-									}
-
-									if (extracted != 0) {
-										break;
-									}
-								}
-							}
-
-							if (extracted != 0) {
-								pendingCooldown = waitTime / 20;
 								output.extractEnergy(extracted, false);
 							}
-							sendUpdates();
 						}
+						
+						pendingCooldown = waitTime / 20;
+						sendUpdates();
 
 					}
 				}
