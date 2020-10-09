@@ -1,6 +1,38 @@
 {
     "variants": {
-        "": { "model": "assemblylinemachines:block/mystium_farmland" }
+		"exhaustion=32": {"model": "assemblylinemachines:block/mystium_farmland_exhausted"},
+        "exhaustion=31": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=30": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=29": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=28": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=27": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=26": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=25": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=24": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=23": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=22": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=21": { "model": "assemblylinemachines:block/mystium_farmland_tired" },
+		"exhaustion=20": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=19": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=18": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=17": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=16": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=15": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=14": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=13": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=12": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=11": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=10": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=9": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=8": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=7": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=6": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=5": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=4": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=3": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=2": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=1": { "model": "assemblylinemachines:block/mystium_farmland" },
+		"exhaustion=0": { "model": "assemblylinemachines:block/mystium_farmland" }
 
     }
 }

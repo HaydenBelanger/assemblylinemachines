@@ -81,6 +81,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		return super.damageItem(stack, amount, entity, onBroken);
 	}
 	
+	//Called from Registry
 	@OnlyIn(Dist.CLIENT)
 	public void connectItemProperties() {
 		ItemModelsProperties.func_239418_a_(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
@@ -189,12 +190,8 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				BlockState bs = world.getBlockState(pos);
 				
-				ServerWorld sw = null;
-				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.func_234923_W_());
-				}
 				if(bs.getBlock().getTags().contains(new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
-					stack.damageItem(breakAndBreakConnected(world, bs, sw, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+					stack.damageItem(breakAndBreakConnected(world, bs, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
 				}
 				return true;
 
@@ -229,12 +226,8 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		return parent.onBlockDestroyed(stack, world, state, pos, player);
 	}
 
-	private int breakAndBreakConnected(World world, BlockState origState, ServerWorld sw, int ctx, BlockPos posx, LivingEntity player) {
-		world.destroyBlock(posx, false, player);
-		
-		if(sw != null) {
-			performDrops(world.getBlockState(posx), posx, player, sw);
-		}
+	private int breakAndBreakConnected(World world, BlockState origState, int ctx, BlockPos posx, LivingEntity player) {
+		world.destroyBlock(posx, true, player);
 
 		int cost = 2;
 		if(ctx <= 20) {
@@ -245,7 +238,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				BlockState bs = world.getBlockState(posq);
 				if(bs.getBlock() == origState.getBlock()) {
-					cost = cost + breakAndBreakConnected(world, origState, sw, ctx++, posq, player);
+					cost = cost + breakAndBreakConnected(world, origState, ctx++, posq, player);
 				}
 			}
 		}

@@ -41,6 +41,8 @@ public class ConfigHandler {
 		
 		public final ConfigValue<Integer> crankSnapChance;
 		
+		public final BooleanValue mystiumFarmlandDeath;
+		
 		private final ConfigValue<List<? extends Config>> geothermalFluidsRaw;
 		private final ConfigValue<List<? extends Config>> combustionFluidsRaw;
 		private final ConfigValue<List<? extends Config>> coolantFluidsRaw;
@@ -63,6 +65,9 @@ public class ConfigHandler {
 			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:gasoline", 600000), Pair.of("assemblylinemachines:diesel", 1050000)), fluidTestPredicate);
 			coolantFluidsRaw = builder.comment("What fluids should be valid for use as coolant in various Generators? Value is multiplier on burn time.").defineList("coolantFluids", getFluidDefaultConfig(Pair.of("minecraft:water", 2), Pair.of("assemblylinemachines:condensed_void", 4)), fluidTestPredicate);
 			
+			builder.pop();
+			builder.push("World");
+			mystiumFarmlandDeath = builder.comment("Should Mystium Farmland get exhausted over time and stop performing grow operations?").define("mystiumFarmlandDeath", true);
 			builder.pop();
 			builder.push("Miscellaneous");
 			coolDudeMode = builder.comment("Are you cool?").define("coolDudeMode", false);
