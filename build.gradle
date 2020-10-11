@@ -13,44 +13,15 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.2-1.0'
+version = '1.16.3-1.0'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
 sourceCompatibility = targetCompatibility = '11'
 compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = 'sources'
-	from sourceSets.main.allSource
-}
-build.dependsOn sourcesJar
-
-artifacts {
-	archives sourcesJar
-}
-
-// Process resources on build
-processResources {
-	// This will ensure that this task is redone when the versions change.
-	inputs.property 'version', project.version
-
-	// Replace stuff in mods.toml, nothing else
-	from(sourceSets.main.resources.srcDirs) {
-		include 'META-INF/mods.toml'
-
-		// Replace version
-		expand 'version':project.version
-	}
-
-	// Copy everything else except the mods.toml
-	from(sourceSets.main.resources.srcDirs) {
-		exclude 'META-INF/mods.toml'
-	}
-}
-
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-
     mappings channel: 'snapshot', version: '20200514-1.16'
     
     runs {
@@ -64,7 +35,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                assemblylinemachines {
+                examplemod {
                     source sourceSets.main
                 }
             }
@@ -80,7 +51,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                assemblylinemachines {
+                examplemod {
                     source sourceSets.main
                 }
             }
@@ -107,7 +78,9 @@ minecraft {
 }
 
 dependencies {
-    repositories{
+    minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
+    
+	 repositories{
         maven {
             name = "Progwml6 maven"
             url = "https://dvs1.progwml6.com/files/maven/"
@@ -117,13 +90,12 @@ dependencies {
             url = "https://maven.latmod.com"
         }
     }
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.61'
 
 	compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	//JEI
-    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28:api")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44:api")
   	// at runtime, use the full JEI jar
- 	runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28")
+ 	runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44")
 
 }
