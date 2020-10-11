@@ -204,7 +204,7 @@ public class PipeBase<T> extends Block {
 	@Override
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn,
 			BlockPos currentPos, BlockPos facingPos) {
-		World world = worldIn.getWorld();
+		World world = (World) worldIn;
 		if (world.getBlockState(currentPos.offset(facing)).getBlock() instanceof PipeBase) {
 			PipeBase<?> pb = (PipeBase<?>) world.getBlockState(currentPos.offset(facing)).getBlock();
 			if (pb.type == this.type) {

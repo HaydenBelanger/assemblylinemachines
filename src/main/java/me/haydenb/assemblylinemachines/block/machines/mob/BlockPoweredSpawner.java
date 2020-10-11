@@ -29,6 +29,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
@@ -47,6 +48,7 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 		private EntityType<?> spawnType = null;
 		private int timer = 0;
 		private int nTimer = 160;
+		private ServerWorld sw = null;
 	
 		private Entity client_entity = null;
 		public float client_renderRot = 0f;
@@ -127,6 +129,10 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 						}
 						
 						int spamt = 0;
+						
+						if(sw == null) {
+							sw = world.getServer().getWorld(world.func_234923_W_());
+						}
 						for(int i = 0; i < rand; i++) {
 							
 							if(cost * (spamt + 1) > amount) {
@@ -138,8 +144,10 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 							double d1 = (double)(pos.getY() + world.rand.nextInt(3) - 1);
 							double d2 = (double)pos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * (double) size + 0.5D;
 							
+							
 							for(int j = 0; j < 10; j++) {
-								if(world.hasNoCollisions(spawnType.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(spawnType, world, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
+								
+								if(world.hasNoCollisions(spawnType.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(spawnType, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
 									Entity entity = spawnType.create(world);
 									entity.setLocationAndAngles(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
 									

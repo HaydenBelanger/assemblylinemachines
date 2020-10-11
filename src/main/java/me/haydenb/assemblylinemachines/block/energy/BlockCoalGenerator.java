@@ -225,7 +225,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 				}
 				tt.add(1, new StringTextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").func_230532_e_().func_240699_a_(TextFormatting.YELLOW));
 				tt.add(1, new StringTextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
-				super.func_238654_b_(mx, tt, mouseX, mouseY);
+				super.func_243308_b(mx, tt, mouseX, mouseY);
 				return;
 			}
 			super.func_230457_a_(mx, stack, mouseX, mouseY);

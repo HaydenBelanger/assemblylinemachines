@@ -12,7 +12,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
@@ -48,11 +47,7 @@ public class General {
 		ItemEntity ent = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
 		world.addEntity(ent);
 	}
-
-	public static void spawnItem(ItemStack stack, BlockPos pos, IWorld world) {
-		ItemEntity ent = new ItemEntity(world.getWorld(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-		world.addEntity(ent);
-	}
+	
 	/**
 	 * Attempts to deposit into all slots in a handler. Returns the remainder.
 	 */

@@ -28,6 +28,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.*;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.*;
@@ -244,7 +245,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 									ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
 									pick.addEnchantment(Enchantments.FORTUNE, fortune);
 									
-									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.POSITION, mpos));
+									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.field_237457_g_, new Vector3d(mpos.getX(), mpos.getY(), mpos.getZ())));
 									
 									for(ItemStack stack : stackList) {
 										pending = General.attemptDepositIntoAllSlots(stack, handler);

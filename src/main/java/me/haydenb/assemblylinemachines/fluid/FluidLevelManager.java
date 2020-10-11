@@ -12,11 +12,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.*;
-import net.minecraft.world.biome.Biome.TempCategory;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -60,38 +58,40 @@ public class FluidLevelManager {
 		if (fs == null) {
 
 			List<FluidInGroundRecipe> recipes = world.getRecipeManager().getRecipes(FluidInGroundRecipe.FIG_RECIPE, null, world);
-			TempCategory tc = world.getBiome(pos).getTempCategory();
-			RegistryKey<DimensionType> dk = world.func_234922_V_();
+			
+			float tc = world.getBiome(pos).getTemperature(pos);
+			DimensionType dc = world.func_230315_m_();
 			for (FluidInGroundRecipe recipe : recipes) {
 
 				int chance = recipe.getChance();
 				boolean half = false;
 
-				if (dk.equals(DimensionType.field_235999_c_)) {
+				if (dc.func_242725_p().equals(DimensionType.field_242710_a)) {
 
 					if (recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ANY && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYCOLD
 							&& recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYHOT && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_PREFCOLD
 							&& recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_PREFHOT) {
 						chance = -1;
-					} else if ((recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD && tc != TempCategory.COLD)
-							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYHOT && tc != TempCategory.WARM)
-							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD && tc == TempCategory.WARM)
-							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT && tc == TempCategory.COLD)) {
+					} else if ((recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD && tc > 0f)
+							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYHOT && tc < 1f)
+							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD && tc >= 1f)
+							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT && tc <= 0f)) {
 						chance = -1;
-					} else if ((recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD && tc != TempCategory.COLD)
-							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT && tc != TempCategory.WARM)) {
+					} else if ((recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD && tc > 0f)
+							|| (recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT && tc < 1f)) {
 						chance = Math.round((float) chance / 2f);
 						half = true;
 					}
-				}else if(dk.equals(DimensionType.field_236000_d_)) {
+				}else if(dc.func_242725_p().equals(DimensionType.field_242711_b)) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.NETHER) {
 						chance = -1;
 					}
-				}else if(dk.equals(DimensionType.field_236001_e_)) {
+				}else if(dc.func_242725_p().equals(DimensionType.field_242712_c)) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.END) {
 						chance = -1;
 					}
 				}else {
+					System.out.println("nochance");
 					chance = -1;
 				}
 

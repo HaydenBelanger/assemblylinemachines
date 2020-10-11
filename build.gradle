@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.1-1.0'
+version = '1.16.2-1.0'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -112,34 +112,18 @@ dependencies {
             name = "Progwml6 maven"
             url = "https://dvs1.progwml6.com/files/maven/"
         }
-        maven {
-            name = "ModMaven"
-            url = "https://modmaven.k-4u.nl"
+        maven{
+            name = "Latmod maven"
+            url = "https://maven.latmod.com"
         }
     }
-    minecraft 'net.minecraftforge:forge:1.16.1-32.0.106'
+    minecraft 'net.minecraftforge:forge:1.16.2-33.0.61'
 
+	compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
+	runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	//JEI
-    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28:api")
+  	// at runtime, use the full JEI jar
+ 	runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28")
 
-}
-
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact reobfArtifact
-        }
-    }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
-    }
-    
 }

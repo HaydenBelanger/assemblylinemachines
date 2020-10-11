@@ -32,6 +32,7 @@ import net.minecraft.loot.LootParameters;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -247,7 +248,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	private void performDrops(BlockState bs, BlockPos pos, LivingEntity player, ServerWorld sw) {
-		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.POSITION, pos));
+		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.field_237457_g_, new Vector3d(pos.getX(), pos.getY(), pos.getZ())));
 		InventoryHelper.dropItems(sw.getWorld(), pos, NonNullList.from(ItemStack.EMPTY, drops.toArray(new ItemStack[drops.size()])));
 	}
 	

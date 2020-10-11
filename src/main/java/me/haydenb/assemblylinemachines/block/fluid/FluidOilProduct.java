@@ -109,6 +109,7 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 					Block.Properties.create(Material.WATER).hardnessAndResistance(100f).noDrops());
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
 			if (entity instanceof LivingEntity) {

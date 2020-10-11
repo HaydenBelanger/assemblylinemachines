@@ -442,17 +442,17 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 		}
 
 		protected void renderTooltip(String a, int b, int c) {
-			List<StringTextComponent> list = new ArrayList<>();
+			List<ITextComponent> list = new ArrayList<>();
 			list.add(new StringTextComponent(a));
-			super.func_238654_b_(mx, list, b, c);
+			super.func_243308_b(mx, list, b, c);
 		}
 
 		public void renderTooltip(List<String> a, int b, int c) {
-			List<StringTextComponent> list = new ArrayList<>();
+			List<ITextComponent> list = new ArrayList<>();
 			for (String s : a) {
 				list.add(new StringTextComponent(s));
 			}
-			super.func_238654_b_(mx, list, b, c);
+			super.func_243308_b(mx, list, b, c);
 
 		}
 
@@ -462,11 +462,11 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			if (renderTitleText == true) {
-				this.field_230712_o_.func_238422_b_(mx, this.field_230704_d_, titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
+				this.field_230712_o_.func_243248_b(mx, this.field_230704_d_, titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
 				
 			}
 			if(renderInventoryText == true) {
-				this.field_230712_o_.func_238422_b_(mx, this.playerInventory.getDisplayName(), invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
+				this.field_230712_o_.func_243248_b(mx, this.playerInventory.getDisplayName(), invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
 			}
 		}
 		

@@ -232,7 +232,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 					name = new TranslationTextComponent(world.getBlockState(pos).getBlock().getTranslationKey());
 					return name;
 				}catch(NullPointerException e) {
-					return ITextComponent.func_241827_a_("Generator");
+					return ITextComponent.func_244388_a("Generator");
 				}
 			}
 			
