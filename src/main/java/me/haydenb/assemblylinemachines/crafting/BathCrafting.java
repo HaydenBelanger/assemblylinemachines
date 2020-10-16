@@ -36,9 +36,10 @@ public class BathCrafting implements IRecipe<IInventory>{
 	private final int stirs;
 	private final ResourceLocation id;
 	private final int color;
-	private final boolean machineReqd;
+	private final BathOption type;
+	private final BathPercentage percent;
 	
-	public BathCrafting(ResourceLocation id, Ingredient inputa, Ingredient inputb, ItemStack output, int stirs, BathCraftingFluids fluid, int color, boolean machineReqd) {
+	public BathCrafting(ResourceLocation id, Ingredient inputa, Ingredient inputb, ItemStack output, int stirs, BathCraftingFluids fluid, int color, BathOption type, BathPercentage percent) {
 		this.inputa = inputa;
 		this.inputb = inputb;
 		this.output = output;
@@ -46,13 +47,14 @@ public class BathCrafting implements IRecipe<IInventory>{
 		this.fluid = fluid;
 		this.id = id;
 		this.color = color;
-		this.machineReqd = machineReqd;
+		this.type = type;
+		this.percent = percent;
 	}
 	@Override
 	public boolean matches(IInventory inv, World worldIn) {
 		if(inv != null) {
 			if(inv instanceof TEFluidBath) {
-				if(machineReqd == true) {
+				if(type == BathOption.MIXER_ONLY) {
 					return false;
 				}
 				TEFluidBath finv = (TEFluidBath) inv;
@@ -69,6 +71,9 @@ public class BathCrafting implements IRecipe<IInventory>{
 					}
 				}
 			}else if(inv instanceof TEElectricFluidMixer){
+				if(type == BathOption.BASIN_ONLY) {
+					return false;
+				}
 				if(inputa.test(inv.getStackInSlot(1))) {
 					if(inputb.test(inv.getStackInSlot(2))) {
 						return true;
@@ -81,6 +86,9 @@ public class BathCrafting implements IRecipe<IInventory>{
 					}
 				}
 			}else {
+				if(type == BathOption.BASIN_ONLY) {
+					return false;
+				}
 				if(inputa.test(inv.getStackInSlot(0))) {
 					if(inputb.test(inv.getStackInSlot(1))) {
 						return true;
@@ -100,8 +108,8 @@ public class BathCrafting implements IRecipe<IInventory>{
 		
 	}
 
-	public boolean getMachineReqd() {
-		return machineReqd;
+	public BathOption getMachineMode() {
+		return type;
 	}
 	
 	@Override
@@ -150,7 +158,8 @@ public class BathCrafting implements IRecipe<IInventory>{
 		
 		Item mixerHandler = Registry.getItem("simple_fluid_mixer");
 		Item electricMixer = Registry.getItem("electric_fluid_mixer");
-		if(this.machineReqd) {
+		Item basin = Registry.getItem("fluid_bath");
+		if(this.type == BathOption.MIXER_ONLY) {
 			
 			if(fluid.isElectricMixerOnly()) {
 				nnl.add(Ingredient.fromItems(electricMixer));
@@ -158,8 +167,10 @@ public class BathCrafting implements IRecipe<IInventory>{
 				nnl.add(Ingredient.fromItems(mixerHandler, electricMixer));
 			}
 			
+		}else if(this.type == BathOption.BASIN_ONLY){
+			nnl.add(Ingredient.fromItems(basin));
 		}else {
-			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer, Registry.getItem("fluid_bath")));
+			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer, basin));
 		}
 		return nnl;
 	}
@@ -180,6 +191,11 @@ public class BathCrafting implements IRecipe<IInventory>{
 	public int getColor() {
 		return color;
 	}
+	
+	public BathPercentage getPercentage() {
+		return percent;
+	}
+	
 	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<BathCrafting>{
 
 		@Override
@@ -196,14 +212,22 @@ public class BathCrafting implements IRecipe<IInventory>{
 				}
 				
 				final int color = Integer.parseInt(JSONUtils.getString(json, "mix_color").replace("#", ""), 16);
-				final boolean machineReqd;
-				if(JSONUtils.hasField(json, "machine_required") && JSONUtils.getBoolean(json, "machine_required")) {
-					machineReqd = true;
+				final BathOption machineReqd;
+				if(JSONUtils.hasField(json, "mixer_type")) {
+					machineReqd = BathOption.valueOf(JSONUtils.getString(json, "mixer_type").toUpperCase());
 				}else {
-					machineReqd = false;
+					machineReqd = BathOption.ALL;
 				}
 				
-				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, color, machineReqd);
+				final BathPercentage percent;
+				
+				if(JSONUtils.hasField(json, "drain_percent")) {
+					percent = BathPercentage.valueOf(JSONUtils.getString(json, "drain_percent").toUpperCase());
+				}else {
+					percent = BathPercentage.FULL;
+				}
+				
+				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, color, machineReqd, percent);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Bath Crafting Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
@@ -221,9 +245,10 @@ public class BathCrafting implements IRecipe<IInventory>{
 			final int stirs = buffer.readInt();
 			final BathCraftingFluids fluid = buffer.readEnumValue(BathCraftingFluids.class);
 			final int color = buffer.readInt();
-			final boolean machineReqd = buffer.readBoolean();
+			final BathOption machineReqd = buffer.readEnumValue(BathOption.class);
+			final BathPercentage percent = buffer.readEnumValue(BathPercentage.class);
 			
-			return new BathCrafting(recipeId, inputa, inputb, output, stirs, fluid, color, machineReqd);
+			return new BathCrafting(recipeId, inputa, inputb, output, stirs, fluid, color, machineReqd, percent);
 		}
 
 		@Override
@@ -234,7 +259,8 @@ public class BathCrafting implements IRecipe<IInventory>{
 			buffer.writeInt(recipe.stirs);
 			buffer.writeEnumValue(recipe.fluid);
 			buffer.writeInt(recipe.color);
-			buffer.writeBoolean(recipe.machineReqd);
+			buffer.writeEnumValue(recipe.type);
+			buffer.writeEnumValue(recipe.percent);
 			
 		}
 		
@@ -248,5 +274,26 @@ public class BathCrafting implements IRecipe<IInventory>{
 		}
 	}
 
+	public static enum BathOption{
+		ALL, BASIN_ONLY, MIXER_ONLY;
+	}
 	
+	public static enum BathPercentage{
+		FULL(4, 1000), HALF(2, 500), QUARTER(1, 250);
+		
+		final int drop;
+		final int crankmixeruse;
+		BathPercentage(int drop, int use){
+			this.drop = drop;
+			this.crankmixeruse = use;
+		}
+		
+		public int getDrop() {
+			return drop;
+		}
+		
+		public int getCrankUse() {
+			return crankmixeruse;
+		}
+	}
 }

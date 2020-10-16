@@ -10,36 +10,25 @@ import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.Tempera
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.StateProperties;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.state.EnumProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
+import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -51,14 +40,14 @@ public class BlockFluidBath extends Block {
 				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
 			}).get();
 
-	public static final EnumProperty<BathStatus> STATUS = EnumProperty.create("status", BathStatus.class);
+	public static final IntegerProperty STATUS = IntegerProperty.create("status", 0, 5);
 	
 	private static final Random RAND = new Random();
 
 	public BlockFluidBath() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(4f, 15f).harvestLevel(0).
 				harvestTool(ToolType.PICKAXE).sound(SoundType.WOOD));
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.NONE));
+		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, 0));
 	}
 
 	@Override
@@ -123,9 +112,10 @@ public class BlockFluidBath extends Block {
 							entity.inputa = null;
 							entity.fluidColor = 0;
 							entity.inputb = null;
+							entity.drainAmt = 0;
 							entity.sendUpdates();
 							world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1f, 1f);
-							world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.NONE));
+							world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, 0));
 							player.sendStatusMessage(new StringTextComponent("Drained basin."), true);
 							
 							ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), RAND.nextInt(maxSludge)));
@@ -149,7 +139,7 @@ public class BlockFluidBath extends Block {
 									ItemHandlerHelper.giveItemToPlayer(player, held.getContainerItem());
 									held.shrink(1);
 								}
-								world.setBlockState(pos, state.with(StateProperties.FLUID, f));
+								world.setBlockState(pos, state.with(StateProperties.FLUID, f).with(STATUS, 4));
 								entity.fluid = f;
 								entity.sendUpdates();
 								player.sendStatusMessage(new StringTextComponent("Filled basin."), true);
@@ -160,7 +150,7 @@ public class BlockFluidBath extends Block {
 						} else {
 							if (entity.inputa == null) {
 								Item i = held.getItem();
-								if (!held.isEmpty() && i != Registry.getItem("wooden_stirring_stick") && i != Registry.getItem("pure_iron_stirring_stick") && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+								if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
 									entity.inputa = new ItemStack(held.getItem());
 									held.shrink(1);
 									entity.sendUpdates();
@@ -170,26 +160,27 @@ public class BlockFluidBath extends Block {
 
 							} else if (entity.inputb == null) {
 								Item i = held.getItem();
-								if (!held.isEmpty() && i != Registry.getItem("wooden_stirring_stick") && i != Registry.getItem("pure_iron_stirring_stick") && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+								if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
 									world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS,
 											1f, 1f);
 									entity.inputb = new ItemStack(held.getItem());
 									held.shrink(1);
 									BathCrafting crafting = world.getRecipeManager()
 											.getRecipe(BathCrafting.BATH_RECIPE, entity, world).orElse(null);
-									if (crafting != null && crafting.getFluid().equals(entity.fluid)) {
+									if (crafting != null && crafting.getFluid().equals(entity.fluid) && state.get(STATUS) - crafting.getPercentage().getDrop() >= 0) {
+										
 										
 										entity.output = crafting.getRecipeOutput().copy();
 										entity.stirsRemaining = crafting.getStirs();
 										entity.fluidColor = crafting.getColor();
+										entity.drainAmt = crafting.getPercentage().getDrop();
 										entity.sendUpdates();
-										world.setBlockState(pos, world.getBlockState(pos).with(STATUS, BathStatus.SUCCESS), 3);
 										
 										
 										
 									}else {
 										entity.sendUpdates();
-										world.setBlockState(pos, state.with(STATUS, BathStatus.FAIL));
+										world.setBlockState(pos, state.with(STATUS, 5));
 									}
 								}
 
@@ -197,16 +188,22 @@ public class BlockFluidBath extends Block {
 								if (entity.output != null) {
 									if (entity.stirsRemaining <= 0) {
 										ItemHandlerHelper.giveItemToPlayer(player, entity.output);
-										entity.fluid = BathCraftingFluids.NONE;
+										int setDrain = state.get(STATUS) - entity.drainAmt;
+										BathCraftingFluids newFluid = entity.fluid;
+										if(setDrain <= 0) {
+											newFluid = BathCraftingFluids.NONE;
+										}
+										entity.fluid = newFluid;
 										entity.stirsRemaining = -1;
 										entity.fluidColor = 0;
 										entity.output = null;
 										entity.inputa = null;
 										entity.inputb = null;
+										entity.drainAmt = 0;
 										entity.sendUpdates();
 										world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS,
 												1f, 1f);
-										world.setBlockState(pos, state.with(StateProperties.FLUID, BathCraftingFluids.NONE).with(STATUS, BathStatus.NONE));
+										world.setBlockState(pos, state.with(StateProperties.FLUID, newFluid).with(STATUS, setDrain));
 									} else {
 
 										if(!(held.getItem() instanceof ItemStirringStick)) {
@@ -216,8 +213,8 @@ public class BlockFluidBath extends Block {
 											if(entity.fluid == BathCraftingFluids.LAVA && tss.getStirringResistance() == TemperatureResistance.COLD) {
 												player.sendStatusMessage(new StringTextComponent("You need a metal Stirring Stick to stir Lava."), true);
 											}else {
-												tss.useStirStick(held);
 												entity.stirsRemaining--;
+												tss.useStirStick(held);
 											}
 										}
 
@@ -249,6 +246,7 @@ public class BlockFluidBath extends Block {
 		private ItemStack inputb = null;
 		private ItemStack output = null;
 		private int fluidColor = -1;
+		private int drainAmt = 0;
 
 		public TEFluidBath(final TileEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn);
@@ -280,6 +278,10 @@ public class BlockFluidBath extends Block {
 			if (compound.contains("assemblylinemachines:output")) {
 				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
 			}
+			
+			if(compound.contains("assemblylinemachines:drainamt")) {
+				drainAmt = compound.getInt("assemblylinemachines:drainamt");
+			}
 		}
 
 		@Override
@@ -289,6 +291,7 @@ public class BlockFluidBath extends Block {
 			compound.putInt("assemblylinemachines:stirs", stirsRemaining);
 			compound.putString("assemblylinemachines:fluid", fluid.toString());
 			compound.putInt("assemblylinemachines:fluidcolor", fluidColor);
+			compound.putInt("assemblylinemachines:drainamt", drainAmt);
 			if (inputa != null) {
 				CompoundNBT sub = new CompoundNBT();
 				inputa.write(sub);
@@ -365,21 +368,24 @@ public class BlockFluidBath extends Block {
 		public void setInventorySlotContents(int arg0, ItemStack arg1) {
 		}
 		
-		public int getFluidColor() {
-			return fluidColor;
-		}
+		public int getFluidColor(IBlockDisplayReader reader, BlockPos pos) {
+			
+			
+			if(output != null && fluidColor != 0) {
+				return fluidColor;
+			}
 
-	}
-	
-	public static enum BathStatus implements IStringSerializable {
-		NONE, FAIL, SUCCESS;
-
-		@Override
-		public String func_176610_l() {
-			return toString().toLowerCase();
+			if(getBlockState().get(StateProperties.FLUID) == BathCraftingFluids.LAVA) {
+				return 0xcb3d07;
+			}else {
+				return BiomeColors.getWaterColor(reader, pos);
+			}
 		}
 		
-		
+		public boolean hasOutput() {
+			return output != null;
+		}
+
 	}
 
 }

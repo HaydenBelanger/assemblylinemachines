@@ -207,15 +207,15 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 									contents.get(2).shrink(1);
 									
 									int rand = RAND.nextInt(9) * getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
-									int cons = 1000;
+									int cons = recipe.getPercentage().getCrankUse();
 									if(rand > 21) {
 										cons = 0;
 									}else if(rand > 15) {
-										cons = 250;
+										cons = (int) Math.round((double) cons * 0.25d);
 									}else if(rand > 10) {
-										cons = 500;
+										cons = (int) Math.round((double) cons * 0.5d);
 									}else if(rand > 5) {
-										cons = 750;
+										cons = (int) Math.round((double) cons * 0.75d);
 									}
 									fluid.shrink(cons);
 									inProgress = ff;

@@ -1,15 +1,15 @@
 {
 	"parent": "block/cube",
 	"textures": {
-		"3": "block/black_concrete_powder",
+		"3": "assemblylinemachines:block/lava_still_grayscale",
 		"particle": "assemblylinemachines:block/fluid_bath"
 	},
 	"elements": [
 		{
 			"from": [2, 1, 2],
-			"to": [14, 14, 14],
+			"to": [14, 9, 14],
 			"faces": {
-				"up": {"texture": "#3", "cullface": "up"}
+				"up": {"texture": "#3", "cullface": "up", "tintindex": 0}
 			}
 		}
 	]

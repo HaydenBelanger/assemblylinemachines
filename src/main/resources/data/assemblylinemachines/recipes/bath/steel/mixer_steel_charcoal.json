@@ -1,16 +1,16 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"tag": "forge:dusts/coal"
+		"tag": "forge:dusts/iron"
 	},
 	"input_b":{
-		"tag": "forge:dusts/redstone"
+		"tag": "forge:dusts/charcoal"
 	},
 	"output":{
-		"item": "assemblylinemachines:empowered_coal",
+		"item": "assemblylinemachines:steel_ingot",
 		"count": 2
 	},
-	"stirs": 5,
+	"stirs": 4,
 	"fluid": "lava",
 	"mix_color": "0",
 	"mixer_type": "MIXER_ONLY",

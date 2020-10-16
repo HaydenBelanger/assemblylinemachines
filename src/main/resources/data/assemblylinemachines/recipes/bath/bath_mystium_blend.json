@@ -13,5 +13,6 @@
 	"stirs": 5,
 	"fluid": "lava",
 	"mix_color": "#000000",
-	"machine_required": true
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "FULL"
 }

@@ -177,14 +177,14 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 								
 								BathCrafting crafting = world.getRecipeManager().getRecipe(BathCrafting.BATH_RECIPE, this, world).orElse(null);
 								if(crafting != null && crafting.getFluid().isElectricMixerOnly() == false) {
-									if(crafting.getFluid().getAssocFluid() == handler.getFluidInTank(0).getFluid() && handler.drain(1000, FluidAction.SIMULATE).getAmount() == 1000) {
-										handler.drain(1000, FluidAction.EXECUTE);
+									if(crafting.getFluid().getAssocFluid() == handler.getFluidInTank(0).getFluid() && handler.drain(crafting.getPercentage().getCrankUse(), FluidAction.SIMULATE).getAmount() == crafting.getPercentage().getCrankUse()) {
+										handler.drain(crafting.getPercentage().getCrankUse(), FluidAction.EXECUTE);
 										isa.shrink(1);
 										isb.shrink(1);
 										isa = null;
 										isb = null;
 										output = crafting.getRecipeOutput().copy();
-										cycles = crafting.getStirs() * 2;
+										cycles = crafting.getStirs();
 										f = crafting.getFluid();
 										pendingOutput = false;
 										sendUpdates();

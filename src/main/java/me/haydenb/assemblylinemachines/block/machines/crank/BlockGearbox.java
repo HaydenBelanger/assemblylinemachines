@@ -80,7 +80,7 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 		public int timer = 0;
 		public float maxBurnTime = 0;
 		public float burnTime = 0;
-		public int nTimer = 40;
+		public int nTimer = 20;
 		public ICrankableMachine mch;
 		public TEGearbox(final TileEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn, 2, new TranslationTextComponent(Registry.getBlock("gearbox").getTranslationKey()), Registry.getContainerId("gearbox"), ContainerGearbox.class);
@@ -135,16 +135,16 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 						int mul;
 						switch (u) {
 						case UNIVERSAL_SPEED:
-							nTimer = 20;
-							mul = 120;
+							nTimer = 10;
+							mul = 40;
 							break;
 						case GB_EFFICIENCY:
-							nTimer = 80;
-							mul = 20;
+							nTimer = 40;
+							mul = 10;
 							break;
 						default:
-							nTimer = 40;
-							mul = 40;
+							nTimer = 20;
+							mul = 20;
 							break;
 						}
 						

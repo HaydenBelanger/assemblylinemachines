@@ -7,7 +7,8 @@
 		"tag": "forge:dusts/coal"
 	},
 	"output":{
-		"item": "assemblylinemachines:steel_ingot"
+		"item": "assemblylinemachines:steel_ingot",
+		"count": 2
 	},
 	"time": 150
 }

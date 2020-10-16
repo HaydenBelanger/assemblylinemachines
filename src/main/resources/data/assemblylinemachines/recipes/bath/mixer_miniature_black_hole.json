@@ -12,5 +12,6 @@
 	"stirs": 15,
 	"fluid": "condensed_void",
 	"mix_color": "0",
-	"machine_required": true
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "FULL"
 }

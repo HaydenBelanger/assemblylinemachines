@@ -1,17 +1,18 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"item": "minecraft:glass_bottle"
+		"item": "minecraft:sand"
 	},
 	"input_b":{
-		"item": "minecraft:enchanted_book"
+		"item": "minecraft:gravel"
 	},
 	"output":{
-		"item": "minecraft:experience_bottle"
+		"item": "assemblylinemachines:silt",
+		"count": 4
 	},
-	"stirs": 3,
+	"stirs": 4,
 	"fluid": "water",
-	"mix_color": "0",
+	"mix_color": "#b8b4ab",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"
 }

@@ -11,5 +11,6 @@
 	},
 	"stirs": 10,
 	"fluid": "water",
-	"mix_color": "#ffffff"
+	"mix_color": "#ffffff",
+	"drain_percent": "QUARTER"
 }

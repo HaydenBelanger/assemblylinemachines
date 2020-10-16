@@ -44,7 +44,6 @@ import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefineryAddon.*;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath;
-import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.BathStatus;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
@@ -67,8 +66,6 @@ import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.Tempera
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.rendering.*;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.IHasContainer;
@@ -96,7 +93,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -191,8 +187,6 @@ public class Registry {
 		createItem("gearbox_upgrade_efficiency", new ItemUpgrade(false, "Gearbox will use less fuel.", "Gearbox will run slower."));
 		createItem("gearbox_upgrade_compatability", new ItemUpgrade(false, "Gearbox can use any fuel."));
 		
-		
-		
 		createItem("item_pipe_upgrade_stack", new ItemUpgrade(true, "Item Pipe can take larger stacks."));
 		createItem("item_pipe_upgrade_filter", new ItemUpgrade(true, "Item Pipe's filter space will grow."));
 		createItem("item_pipe_upgrade_redstone", new ItemUpgrade(false, "Item Pipe will gain Redstone control."));
@@ -208,8 +202,10 @@ public class Registry {
 		
 		createItem("experience_mill_upgrade_level", new ItemUpgrade(true, "Experience Mill will perform a higher level enchantment."));
 		
-		createItem("wooden_stirring_stick", new ItemStirringStick(35, TemperatureResistance.COLD));
-		createItem("pure_iron_stirring_stick", new ItemStirringStick(135, TemperatureResistance.HOT));
+		createItem("wooden_stirring_stick", new ItemStirringStick(TemperatureResistance.COLD, true, 290));
+		createItem("pure_iron_stirring_stick", new ItemStirringStick(TemperatureResistance.HOT, false, 765));
+		createItem("steel_stirring_stick", new ItemStirringStick(TemperatureResistance.HOT, false, 1690));
+		
 		createItem("mystium_dowsing_rod", new ItemDowsingRod());
 		
 		createItem("ground_lapis_lazuli");
@@ -646,28 +642,12 @@ public class Registry {
 
 			@Override
 			public int getColor(BlockState state, IBlockDisplayReader reader, BlockPos pos, int tint) {
-				if(reader != null && pos != null) {
+				if(reader != null && pos != null && reader.getTileEntity(pos) instanceof TEFluidBath) {
 					
-					if(state.func_235901_b_(BlockFluidBath.STATUS)) {
-						if(state.get(BlockFluidBath.STATUS) == BathStatus.SUCCESS) {
-							
-							TileEntity te = reader.getTileEntity(pos);
-							if(te != null && te instanceof TEFluidBath) {
-								
-								TEFluidBath tef = (TEFluidBath) te;
-								if(tef.getFluidColor() >= 0) {
-									return tef.getFluidColor();
-								}
-							}
-						}
-					}
+					TEFluidBath te = (TEFluidBath) reader.getTileEntity(pos);
 					
+					return te.getFluidColor(reader, pos);
 					
-					if(state.get(StateProperties.FLUID) == BathCraftingFluids.LAVA) {
-						return 0xcb3d07;
-					}else {
-						return BiomeColors.getWaterColor(reader, pos);
-					}
 				}
 				
 				return 0;

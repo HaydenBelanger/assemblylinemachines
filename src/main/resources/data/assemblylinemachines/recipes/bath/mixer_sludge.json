@@ -13,5 +13,6 @@
 	"stirs": 5,
 	"fluid": "water",
 	"mix_color": "0",
-	"machine_required": true
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "HALF"
 }

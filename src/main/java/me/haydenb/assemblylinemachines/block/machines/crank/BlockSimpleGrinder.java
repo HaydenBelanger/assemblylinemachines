@@ -145,7 +145,10 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 								}
 								ItemStack isa = contents.get(0);
 								if(isa.isDamageable() && isa.getItem() instanceof ItemGrindingBlade) {
-									isa.setDamage(isa.getDamage() + 1);
+									
+									if(General.RAND.nextInt(3) == 0) {
+										isa.setDamage(isa.getDamage() + 1);
+									}
 									if(isa.getDamage() >= isa.getMaxDamage()) {
 										contents.set(0, ItemStack.EMPTY);
 									}
