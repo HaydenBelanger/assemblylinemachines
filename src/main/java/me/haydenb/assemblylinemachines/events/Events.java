@@ -5,6 +5,7 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon;
 import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
 import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.item.items.ItemMobCrystal;
+import me.haydenb.assemblylinemachines.plugins.other.PatchouliALMImpl;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.*;
@@ -18,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.world.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -160,5 +162,20 @@ public class Events {
 			}
 		}
 			
+	}
+	
+	@SubscribeEvent
+	public static void joinGiveBook(PlayerLoggedInEvent event) {
+		
+		
+		CompoundNBT nbt = event.getPlayer().getPersistentData();
+		if(!nbt.contains("assemblylinemachines:book") || nbt.getBoolean("assemblylinemachines:book") == false) {
+			
+			if(PatchouliALMImpl.get().isPatchouliInstalled()) {
+				nbt.putBoolean("assemblylinemachines:book", true);
+				event.getPlayer().addItemStackToInventory(new ItemStack(Registry.getItem("guidebook")));
+			}
+			
+		}
 	}
 }

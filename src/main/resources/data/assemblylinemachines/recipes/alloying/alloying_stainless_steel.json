@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:alloying",
 	"part_a":{
-		"tag": "forge:storage_blocks/chromium"
+		"item": "assemblylinemachines:chromium_plate"
 	},
 	"part_b":{
 		"item": "assemblylinemachines:steel_plate"

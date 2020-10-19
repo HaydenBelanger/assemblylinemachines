@@ -7,25 +7,25 @@
 	],
 	"key":{
 		"a":{
-			"item": "assemblylinemachines:conduction_component"
+			"item": "assemblylinemachines:empowered_conduction_component"
 		},
 		"c":{
-			"item": "assemblylinemachines:convection_component"
+			"item": "assemblylinemachines:empowered_convection_component"
 		},
 		"d":{
-			"tag": "forge:gems/diamond"
+			"item": "assemblylinemachines:mystium_plate"
 		},
 		"b":{
-			"item": "assemblylinemachines:basic_battery"
+			"item": "assemblylinemachines:basic_battery_cell"
 		},
 		"p":{
-			"tag": "assemblylinemachines:crafting/gears/precious"
+			"item": "assemblylinemachines:enhanced_battery"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"item": "assemblylinemachines:plastic_sheet"
 		}
 	},
 	"result":{
-		"item": "assemblylinemachines:basic_battery_cell"
+		"item": "assemblylinemachines:advanced_battery_cell"
 	}
 }

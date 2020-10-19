@@ -141,6 +141,8 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
+		createItem("guidebook", new ItemGuidebook());
+		
 		createItem("titanium_ingot");
 		createItem("titanium_nugget");
 		createItem("titanium_blade_piece");

@@ -37,7 +37,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
@@ -66,7 +65,6 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 		Integer password = null;
 		int timer = 0;
 		FluidStack tank = FluidStack.EMPTY;
-		ServerWorld sw = null;
 		String status = "";
 		int statusTimer = 0;
 
@@ -103,11 +101,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 							sendupdates = true;
 						}
 						if(configured == true) {
-							if(sw == null) {
-								sw = getServerWorld(world);
-							}
 
-							Pair<QuantumLinkStatus, Optional<QuantumLinkNetwork>> result = QuantumLinkManager.getInstance(sw).getHandler().getOrCreateQuantumLink(id, password);
+							Pair<QuantumLinkStatus, Optional<QuantumLinkNetwork>> result = QuantumLinkManager.getInstance(world.getServer()).getHandler().getOrCreateQuantumLink(id, password);
 
 							if(result.getFirst() != QuantumLinkStatus.WRONG_PASSWORD) {
 								qln = result.getSecond().orElseThrow(() ->
@@ -689,10 +684,5 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				te.sendUpdates();
 			}
 		}
-	}
-
-
-	private static ServerWorld getServerWorld(World world) {
-		return world.getServer().getWorld(world.func_234923_W_());
 	}
 }

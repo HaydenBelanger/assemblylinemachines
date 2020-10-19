@@ -1,0 +1,11 @@
+{
+	"name": "Assembly Lines & You",
+	"landing_text": "This is Assembly Line Machines, a complete reemagining of Minecraft's technological side. This walkthrough will help you understand and work through this mod from start to end.",
+	"version": 1,
+	"book_texture": "patchouli:textures/gui/book_cyan.png",
+	"show_progress": false,
+	"creative_tab": "assemblylinemachines",
+	"dont_generate_book": true,
+	"custom_book_item": "assemblylinemachines:guidebook",
+	"filler_texture": "assemblylinemachines:textures/gui/patchouli/page_filler.png"
+}
