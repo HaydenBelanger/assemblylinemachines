@@ -7,9 +7,12 @@
 		"tag": "forge:dusts/coal"
 	},
 	"output":{
-		"item": "assemblylinemachines:steel_ingot"
+		"item": "assemblylinemachines:steel_ingot",
+		"count": 2
 	},
-	"stirs": 9,
+	"stirs": 7,
 	"fluid": "lava",
-	"mix_color": "#8a8a8a"
+	"mix_color": "0",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "HALF"
 }

@@ -11,5 +11,7 @@
 	},
 	"stirs": 4,
 	"fluid": "water",
-	"mix_color": "#b8b4ab"
+	"mix_color": "#b8b4ab",
+	"mixer_type": "BASIN_ONLY",
+	"drain_percent": "QUARTER"
 }

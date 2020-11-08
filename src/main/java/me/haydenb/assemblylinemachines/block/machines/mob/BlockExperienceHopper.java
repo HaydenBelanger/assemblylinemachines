@@ -19,7 +19,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.*;
+import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -31,8 +32,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -103,7 +102,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 	
 	public static class TEExperienceHopper extends BasicTileEntity implements ITickableTileEntity{
 		
-		private IFluidHandler output;
+		public IFluidHandler output;
 		private int internalStoredXp;
 		private int timer = 0;
 		private int subTimer = 0;
@@ -139,7 +138,11 @@ public class BlockExperienceHopper extends BlockTileEntity {
 				if(timer++ == 40) {
 					boolean sendUpdates = false;
 					timer = 0;
-					if(connectToOutput()) {
+					
+					if(output == null) {
+						output = General.getCapabilityFromDirection(this, "output", getBlockState().get(BlockStateProperties.FACING_EXCEPT_UP), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+					}
+					if(output != null) {
 						if(internalStoredXp != 0 && subTimer++ == 5) {
 							subTimer = 0;
 							
@@ -185,39 +188,6 @@ public class BlockExperienceHopper extends BlockTileEntity {
 			pd.writeDouble("y", y);
 			pd.writeDouble("z", z);
 			HashPacketImpl.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), pd);
-		}
-		
-		private boolean connectToOutput() {
-			
-			if(output != null) {
-				return true;
-			}
-			
-			Direction d = getBlockState().get(BlockStateProperties.FACING_EXCEPT_UP);
-			
-			TileEntity te = world.getTileEntity(pos.offset(d));
-			if (te != null) {
-				LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
-						d.getOpposite());
-				IFluidHandler output = cap.orElse(null);
-				if (output != null) {
-					TEExperienceHopper ipcte = this;
-					cap.addListener(new NonNullConsumer<LazyOptional<IFluidHandler>>() {
-
-						@Override
-						public void accept(LazyOptional<IFluidHandler> t) {
-							if (ipcte != null) {
-								ipcte.output = null;
-							}
-						}
-					});
-
-					this.output = output;
-					return true;
-				}
-			}
-
-			return false;
 		}
 	}
 

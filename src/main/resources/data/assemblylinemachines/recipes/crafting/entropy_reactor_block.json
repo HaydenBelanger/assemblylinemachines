@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"asa",
+		"s s",
+		"asa"
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:steel_plate"
+		},
+		"a":{
+			"item": "assemblylinemachines:attuned_titanium_plate"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:entropy_reactor_block",
+		"count": 5
+	}
+}

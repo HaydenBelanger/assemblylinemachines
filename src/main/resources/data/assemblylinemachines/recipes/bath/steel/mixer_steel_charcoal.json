@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "forge:dusts/iron"
+	},
+	"input_b":{
+		"tag": "forge:dusts/charcoal"
+	},
+	"output":{
+		"item": "assemblylinemachines:steel_ingot",
+		"count": 2
+	},
+	"stirs": 4,
+	"fluid": "lava",
+	"mix_color": "0",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "HALF"
+}

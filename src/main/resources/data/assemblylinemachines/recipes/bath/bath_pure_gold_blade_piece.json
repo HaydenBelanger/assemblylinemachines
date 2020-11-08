@@ -11,5 +11,6 @@
 	},
 	"stirs": 15,
 	"fluid": "lava",
-	"mix_color": "#f5f242"
+	"mix_color": "#f5f242",
+	"drain_percent": "FULL"
 }

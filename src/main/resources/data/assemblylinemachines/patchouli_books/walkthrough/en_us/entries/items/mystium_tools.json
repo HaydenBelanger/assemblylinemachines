@@ -1,0 +1,41 @@
+{
+	"name": "Mystium Tools",
+	"category": "assemblylinemachines:items",
+	"icon": "assemblylinemachines:mystium_sword",
+	"pages":[
+		{
+			"type": "text",
+			"text": "Mystium Tools all have very unique abilities, those which make them even more powerful.$(p)They are activated by SHIFT-RIGHT CLICKING them, but this only works if they are charged. Speaking of charging..."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tool_charger",
+			"text": "The Mystium Tools have a power capacity which will use the charge before durability. The tools can be charged by placing a Chest on the Tool Charger and placing the Mystium Tools in the Chest."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/mystium_pickaxe",
+			"text": "The Pickaxe's $(3)Secondary Ability $()is to mine in a 3x3 pattern, allowing you to hollow the earth with ease."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/mystium_shovel",
+			"text": "The Shovel's $(3)Secondary Ability $()is to mine soft Dirt downwards up to 5 blocks in a row, allowing you to quickly terraform hills and fields."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/mystium_sword",
+			"text": "The Sword's $(3)Secondary Ability $()is to harvest and bind an $(l:blocks/mob_farming)Inert Mob Crystal,$() allowing you to harness the power of mob spawning."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/mystium_axe",
+			"text": "The Sword's $(3)Secondary Ability $()is to chop down an entire tree at once while only breaking the bottom block, allowing forests to be felled quickly and swiftly."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/mystium_hoe",
+			"text": "The Hoe's $(3)Secondary Ability $()is to generate $(item)Mystium Farmland,$() a block that acts as normal Farmland, accelerates plant growth, and never dehydrates!"
+		}
+	]
+}

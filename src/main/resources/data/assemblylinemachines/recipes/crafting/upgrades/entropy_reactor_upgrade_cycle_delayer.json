@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sxs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"x":{
+			"item": "minecraft:clock"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:entropy_reactor_upgrade_cycle_delayer"
+	}
+}

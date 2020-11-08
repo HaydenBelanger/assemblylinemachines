@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" b ",
+		"bxb",
+		" b "
+	],
+	"key":{
+		"b":{
+			"item": "assemblylinemachines:entropy_reactor_block"
+		},
+		"x":{
+			"item": "assemblylinemachines:miniature_black_hole"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:entropy_reactor_core"
+	}
+}

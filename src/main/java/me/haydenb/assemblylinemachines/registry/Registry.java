@@ -5,10 +5,12 @@ import java.util.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.*;
+import me.haydenb.assemblylinemachines.block.corrupt.*;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
+import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.*;
 import me.haydenb.assemblylinemachines.block.fluid.*;
 import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
@@ -44,7 +46,6 @@ import me.haydenb.assemblylinemachines.block.machines.oil.BlockPump.TEPump;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.*;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefineryAddon.*;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath;
-import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.BathStatus;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
@@ -55,6 +56,7 @@ import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.It
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.utility.*;
 import me.haydenb.assemblylinemachines.block.utility.BlockBottomlessStorageUnit.*;
+import me.haydenb.assemblylinemachines.block.utility.BlockCorruptingBasin.*;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidRouter.*;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.BlockItemFluidTank;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank;
@@ -67,8 +69,7 @@ import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.Tempera
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.rendering.*;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.world.EffectEntropyPoisoning;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.IHasContainer;
@@ -89,6 +90,7 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.potion.Effect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
@@ -96,7 +98,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.biome.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -137,6 +138,7 @@ public class Registry {
 	private static final HashMap<String, TileEntityType<?>> teRegistry = new HashMap<>();
 	private static final HashMap<String, ContainerType<?>> containerRegistry = new HashMap<>();
 	private static final HashMap<ContainerType<?>, Integer> containerIdRegistry = new HashMap<>();
+	private static final HashMap<String, Effect> effectRegistry = new HashMap<>();
 	
 	private static final HashMap<String, Fluid> fluidRegistry = new HashMap<>();
 	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
@@ -144,6 +146,8 @@ public class Registry {
 	//EVENTS
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
+		
+		createItem("guidebook", new ItemGuidebook());
 		
 		createItem("titanium_ingot");
 		createItem("titanium_nugget");
@@ -191,8 +195,6 @@ public class Registry {
 		createItem("gearbox_upgrade_efficiency", new ItemUpgrade(false, "Gearbox will use less fuel.", "Gearbox will run slower."));
 		createItem("gearbox_upgrade_compatability", new ItemUpgrade(false, "Gearbox can use any fuel."));
 		
-		
-		
 		createItem("item_pipe_upgrade_stack", new ItemUpgrade(true, "Item Pipe can take larger stacks."));
 		createItem("item_pipe_upgrade_filter", new ItemUpgrade(true, "Item Pipe's filter space will grow."));
 		createItem("item_pipe_upgrade_redstone", new ItemUpgrade(false, "Item Pipe will gain Redstone control."));
@@ -208,8 +210,10 @@ public class Registry {
 		
 		createItem("experience_mill_upgrade_level", new ItemUpgrade(true, "Experience Mill will perform a higher level enchantment."));
 		
-		createItem("wooden_stirring_stick", new ItemStirringStick(35, TemperatureResistance.COLD));
-		createItem("pure_iron_stirring_stick", new ItemStirringStick(135, TemperatureResistance.HOT));
+		createItem("wooden_stirring_stick", new ItemStirringStick(TemperatureResistance.COLD, true, 290));
+		createItem("pure_iron_stirring_stick", new ItemStirringStick(TemperatureResistance.HOT, false, 765));
+		createItem("steel_stirring_stick", new ItemStirringStick(TemperatureResistance.HOT, false, 1690));
+		
 		createItem("mystium_dowsing_rod", new ItemDowsingRod());
 		
 		createItem("ground_lapis_lazuli");
@@ -308,6 +312,14 @@ public class Registry {
 		createItem("purifier_upgrade_enhanced", new ItemUpgrade(false, "Purifier can process more recipes.", "Increases power consumption."));
 		
 		createItem("nether_star_shard", new ItemBasicFormattedName(TextFormatting.GOLD));
+		
+		createItem("entropy_reactor_upgrade_capacity", new ItemUpgrade(true, "Entropy Reactor has a higher capacity."));
+		createItem("entropy_reactor_upgrade_cycle_delayer", new ItemUpgrade(true, "Entropy Reactor waits longer to clear capacity."));
+		createItem("entropy_reactor_upgrade_variety", new ItemUpgrade(false, "Higher Variety has greater performance.", "Lower Variety has worsened performance."));
+		
+		createItem("poor_strange_matter");
+		createItem("strange_matter");
+		createItem("rich_strange_matter");
 		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
@@ -428,6 +440,16 @@ public class Registry {
 		createBlock("quantum_link", new BlockQuantumLink());
 		createBlock("metal_shaper", new BlockMetalShaper());
 		
+		createBlock("entropy_reactor_block", new BlockEntropyReactor());
+		createBlock("entropy_reactor_core", Material.IRON, 3f, 15f, 0, ToolType.PICKAXE, SoundType.METAL);
+		
+		createBlock("corrupt_dirt", new CorruptBlock(AbstractBlock.Properties.create(Material.EARTH).harvestTool(ToolType.SHOVEL).sound(SoundType.GROUND)));
+		createBlock("corrupt_grass", new CorruptGrassBlock());
+		createBlock("corrupt_sand", new CorruptSandBlock());
+		createBlock("corrupt_stone", new CorruptBlock(AbstractBlock.Properties.create(Material.ROCK).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		
+		createBlock("corrupting_basin", new BlockCorruptingBasin());
+		
 		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
 		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(), getBucketItem("condensed_void"));
@@ -502,6 +524,11 @@ public class Registry {
 		
 		createTileEntity("metal_shaper", TEMetalShaper.class);
 		
+		createTileEntity("entropy_reactor", TEEntropyReactor.class, blockRegistry.get("entropy_reactor_block"));
+		createTileEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, blockRegistry.get("entropy_reactor_block"));
+		
+		createTileEntity("corrupting_basin", TECorruptingBasin.class);
+		
 		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
 	}
 	
@@ -536,10 +563,21 @@ public class Registry {
 		
 		createContainer("quantum_link", 1072, ContainerQuantumLink.class);
 		
-		createContainer("metal_shaper", 1073, ContainerMetalShaper.class);
+		createContainer("metal_shaper", 1073, ContainerMetalShaper.class); 
+		createContainer("entropy_reactor", 1074, ContainerEntropyReactor.class);
+		
+		createContainer("corrupting_basin", 1075, ContainerCorruptingBasin.class);
 		
 		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
 		
+	}
+	
+	@SubscribeEvent
+	public static void registerPotions(RegistryEvent.Register<Effect> event) {
+		
+		createEffect("entropy_poisoning", new EffectEntropyPoisoning());
+		
+		event.getRegistry().registerAll(effectRegistry.values().toArray(new Effect[effectRegistry.size()]));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -598,6 +636,10 @@ public class Registry {
 		
 		registerScreen("metal_shaper", ContainerMetalShaper.class, ScreenMetalShaper.class);
 		
+		registerScreen("entropy_reactor", ContainerEntropyReactor.class, ScreenEntropyReactor.class);
+		
+		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
+		
 		((ItemMystiumTool<?>) Registry.getItem("mystium_pickaxe")).connectItemProperties();
 		((ItemMystiumTool<?>) Registry.getItem("mystium_axe")).connectItemProperties();
 		((ItemMystiumTool<?>) Registry.getItem("mystium_sword")).connectItemProperties();
@@ -646,28 +688,12 @@ public class Registry {
 
 			@Override
 			public int getColor(BlockState state, IBlockDisplayReader reader, BlockPos pos, int tint) {
-				if(reader != null && pos != null) {
+				if(reader != null && pos != null && reader.getTileEntity(pos) instanceof TEFluidBath) {
 					
-					if(state.func_235901_b_(BlockFluidBath.STATUS)) {
-						if(state.get(BlockFluidBath.STATUS) == BathStatus.SUCCESS) {
-							
-							TileEntity te = reader.getTileEntity(pos);
-							if(te != null && te instanceof TEFluidBath) {
-								
-								TEFluidBath tef = (TEFluidBath) te;
-								if(tef.getFluidColor() >= 0) {
-									return tef.getFluidColor();
-								}
-							}
-						}
-					}
+					TEFluidBath te = (TEFluidBath) reader.getTileEntity(pos);
 					
+					return te.getFluidColor(reader, pos);
 					
-					if(state.get(StateProperties.FLUID) == BathCraftingFluids.LAVA) {
-						return 0xcb3d07;
-					}else {
-						return BiomeColors.getWaterColor(reader, pos);
-					}
 				}
 				
 				return 0;
@@ -712,7 +738,15 @@ public class Registry {
 	
 	//===============================================
 	
+	//EFFECTS
+	private static void createEffect(String name, Effect effect) {
+		effect.setRegistryName(name);
+		effectRegistry.put(name, effect);
+	}
 	
+	public static Effect getEffect(String name) {
+		return effectRegistry.get(name);
+	}
 	
 	//ITEMS
 	private static void createItem(String name) {
@@ -901,14 +935,14 @@ public class Registry {
 		containerIdRegistry.put(containerRegistry.get(name), id);
 	}
 	
-	@OnlyIn(Dist.CLIENT)
 	@SuppressWarnings("unchecked")
+	@OnlyIn(Dist.CLIENT)
 	//Use carefully! Unchecked
-	public static <T extends Container, F extends Screen & IHasContainer<T>> void registerScreen(String name, Class<T> ctc, Class<F> scc) {
-		ScreenManager.registerFactory((ContainerType<T>) getContainerType(name), new IScreenFactory<T, F>() {
+	public static <T extends Container, X extends Screen & IHasContainer<T>> void registerScreen(String name, Class<T> ctc, Class<X> scc) {
+		ScreenManager.registerFactory((ContainerType<T>) getContainerType(name), new IScreenFactory<T, X>() {
 
 			@Override
-			public F create(T p_create_1_, PlayerInventory p_create_2_, ITextComponent p_create_3_) {
+			public X create(T p_create_1_, PlayerInventory p_create_2_, ITextComponent p_create_3_) {
 				try {
 					return scc.getConstructor(ctc, PlayerInventory.class, ITextComponent.class).newInstance(p_create_1_, p_create_2_, p_create_3_);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException

@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sbs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "minecraft:cobblestone"
+		},
+		"b":{
+			"item": "minecraft:book"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:guidebook"
+	},
+	"conditions":[
+		{
+			"type": "forge:mod_loaded",
+			"modid": "patchouli"
+		}
+	]
+}

@@ -134,6 +134,14 @@
 	"item.assemblylinemachines.steel_blade_piece": "Steel Blade Piece",
 	"item.assemblylinemachines.steel_blade": "Steel Blade",
 	"item.assemblylinemachines.nether_star_shard": "Nether Star Shard",
+	"item.assemblylinemachines.steel_stirring_stick": "Steel Stirring Stick",
+	"item.assemblylinemachines.guidebook": "Assembly Lines & You",
+	"item.assemblylinemachines.entropy_reactor_upgrade_capacity": "Entropy Reactor Upgrade: Shard Capacity",
+	"item.assemblylinemachines.entropy_reactor_upgrade_cycle_delayer": "Entropy Reactor Upgrade: Cycle Delayer",
+	"item.assemblylinemachines.entropy_reactor_upgrade_variety": "Entropy Reactor Upgrade: Variety Enhancer",
+	"item.assemblylinemachines.poor_strange_matter": "Poor Strange Matter",
+	"item.assemblylinemachines.strange_matter": "Strange Matter",
+	"item.assemblylinemachines.rich_strange_matter": "Rich Strange Matter",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.titanium_block": "Titanium Block",
@@ -209,6 +217,13 @@
 	"block.assemblylinemachines.quarry_speed_addon": "Quarry Addon: Speed",
 	"block.assemblylinemachines.quantum_link": "Quantum Link",
 	"block.assemblylinemachines.metal_shaper": "Metal Shaper",
+	"block.assemblylinemachines.entropy_reactor_block": "Entropy Reactor Block",
+	"block.assemblylinemachines.corrupt_sand": "Corrupt Sand",
+	"block.assemblylinemachines.corrupt_stone": "Corrupt Stone",
+	"block.assemblylinemachines.corrupt_dirt": "Corrupt Dirt",
+	"block.assemblylinemachines.corrupt_grass": "Corrupt Grass",
+	"block.assemblylinemachines.entropy_reactor_core": "Entropy Reactor Core",
+	"block.assemblylinemachines.corrupting_basin": "Corrupting Basin",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",
@@ -224,5 +239,9 @@
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
 	"death.attack.interactor": "%1$s was killed by %2$s's Interactor",
-	"death.attack.interactor.item": "%1$s was killed by %2$s's Interactor using %3$s"
+	"death.attack.interactor.item": "%1$s was killed by %2$s's Interactor using %3$s",
+	
+	"tileEntity.assemblylinemachines.entropy_reactor": "Entropy Reactor",
+	
+	"effect.assemblylinemachines.entropy_poisoning": "Entropy"
 }

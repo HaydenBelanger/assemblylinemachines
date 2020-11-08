@@ -80,6 +80,10 @@ public class ItemUpgrade extends Item {
 		
 		PURIFIER_EXPANDED(Registry.getItem("purifier_upgrade_enhanced")),
 		
+		E_R_CAPACITY(Registry.getItem("entropy_reactor_upgrade_capacity")), E_R_CYCLE_DELAY(Registry.getItem("entropy_reactor_upgrade_cycle_delayer")),
+		
+		E_R_VARIETY(Registry.getItem("entropy_reactor_upgrade_variety")),
+		
 		NONE(null);
 		
 		public final Item i;

@@ -1,0 +1,16 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"3": "block/water_still",
+		"particle": "assemblylinemachines:block/fluid_bath"
+	},
+	"elements": [
+		{
+			"from": [2, 1, 2],
+			"to": [14, 11, 14],
+			"faces": {
+				"up": {"tintindex": 0, "texture": "#3", "cullface": "up"}
+			}
+		}
+	]
+}

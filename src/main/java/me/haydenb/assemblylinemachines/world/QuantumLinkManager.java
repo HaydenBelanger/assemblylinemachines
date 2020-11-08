@@ -9,6 +9,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.TEQuantumLink;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.HopperTileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.world.server.ServerWorld;
@@ -30,29 +31,25 @@ public class QuantumLinkManager extends WorldSavedData{
 	private static final String DATA_PATH = AssemblyLineMachines.MODID + "_QUANTUMLINKMANAGER";
 	
 	private static QuantumLinkManager manager = null;
-	private static ServerWorld cachedServerWorld = null;
+	private static ServerWorld csw = null;
 	
 	public QuantumLinkManager() {
 		super(DATA_PATH);
 		
 	}
 
-	public static QuantumLinkManager getInstance(ServerWorld world) {
+	public static QuantumLinkManager getInstance(MinecraftServer server) {
 		
-		if(world != null) {
-			if(manager != null && cachedServerWorld.equals(world)) {
-				return manager;
-			}else {
-				DimensionSavedDataManager dsdm = world.getSavedData();
-				QuantumLinkManager qlm = dsdm.getOrCreate(QuantumLinkManager::new, DATA_PATH);
-				manager = qlm;
-				cachedServerWorld = world;
-				
-				return qlm;
-			}
+		
+		
+		if(manager == null) {
+			csw = server.getWorld(ServerWorld.field_234918_g_);
+			DimensionSavedDataManager dsdm = csw.getSavedData();
+			manager = dsdm.getOrCreate(QuantumLinkManager::new, DATA_PATH);
+			
 		}
 		
-		return null;
+		return manager;
 	}
 	
 	public QuantumLinkHandler getHandler() {

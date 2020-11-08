@@ -1,6 +1,6 @@
 {
 	"type": "assemblylinemachines:refining",
-	"attachment": "assemblylinemachines:refinery_attachment_cracking",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
 	"input_fluid":{
 		"fluid": "assemblylinemachines:ethylene",
 		"amount": 1000
