@@ -33,6 +33,7 @@
 		{
 			"type": "spotlight",
 			"item": "assemblylinemachines:condensed_void_bucket",
+			"anchor": "condensed_void",
 			"link_recipe": true,
 			"title": "Condensed Void",
 			"text": "Condensed Void is extremely unstable, and is found by dowsing in The End.$(br)This violent liquid is deadly, destructive, and unpleasant once placed. It will break down all Stone and completely destroy all natural materials.$(p)$(c)Use at your own risk."

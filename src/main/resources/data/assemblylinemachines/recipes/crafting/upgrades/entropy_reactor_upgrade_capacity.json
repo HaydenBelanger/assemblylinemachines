@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" s ",
+		"sxs",
+		" s "
+	],
+	"key":{
+		"s":{
+			"item": "assemblylinemachines:plastic_sheet"
+		},
+		"x":{
+			"item": "assemblylinemachines:singularity"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:entropy_reactor_upgrade_capacity"
+	}
+}

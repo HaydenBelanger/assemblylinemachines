@@ -228,7 +228,9 @@ public class PipeBase<T> extends Block {
 		}
 		
 		if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.NONE) {
-			if(world.getTileEntity(currentPos) != null) {
+			
+			if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR && world.getTileEntity(currentPos.offset(facing)) == null) {
+				System.out.println("test");
 				world.removeTileEntity(currentPos);
 			}
 			

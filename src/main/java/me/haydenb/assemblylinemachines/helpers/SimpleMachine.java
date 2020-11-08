@@ -44,13 +44,18 @@ public abstract class SimpleMachine<A extends Container> extends AbstractMachine
 			itemHandler.invalidate();
 		}
 	}
+	
+	
+	public boolean canBeExtracted(ItemStack stack) {
+		return true;
+	}
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		return this.getCapability(cap);
 	}
 	
-	private static class SimpleInventoryHandlerWrapper extends InvWrapper {
+	private class SimpleInventoryHandlerWrapper extends InvWrapper {
 		
 		
 		private final boolean supp;
@@ -62,7 +67,7 @@ public abstract class SimpleMachine<A extends Container> extends AbstractMachine
 		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
 			
-			if(supp == false || slot != 0) {
+			if(supp == false || slot != 0 || !canBeExtracted(getStackInSlot(slot))) {
 				return ItemStack.EMPTY;
 			}else {
 				return super.extractItem(slot, amount, simulate);

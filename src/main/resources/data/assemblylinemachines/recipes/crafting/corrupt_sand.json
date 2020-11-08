@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" a ",
+		"aba",
+		" a "
+	],
+	"key":{
+		"a":{
+			"tag": "assemblylinemachines:crafting/strange_matters"
+		},
+		"b":{
+			"item": "minecraft:sand"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_sand",
+		"count": 4
+	}
+}

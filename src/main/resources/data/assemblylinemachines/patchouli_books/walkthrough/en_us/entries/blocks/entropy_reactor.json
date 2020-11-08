@@ -1,0 +1,59 @@
+{
+	"name": "Entropy Reactor",
+	"category": "assemblylinemachines:blocks",
+	"icon": "assemblylinemachines:entropy_reactor_core",
+	"pages":[
+		{
+			"type": "text",
+			"text": "The Entropy Reactor is your late-game power generation. This block, when used correctly, can produce very large amounts of energy.$(p)Keep reading to learn how to set it up."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/entropy_reactor_block",
+			"recipe2": "assemblylinemachines:crafting/entropy_reactor_core"
+		},
+		{
+			"type": "multiblock",
+			"multiblock":{
+				"mapping":{
+					"a": "assemblylinemachines:entropy_reactor_block",
+					"0": "assemblylinemachines:entropy_reactor_core"
+				},
+				"pattern":[
+					["aaa", "aaa", "aaa"], ["aaa", "a0a", "aaa"], ["aaa", "aaa", "aaa"]
+				]
+			},
+			"name": "Entropy Reactor",
+			"text": "$(7)$(o)This is the setup, 26 Entropy Reactor Blocks and a Core in the middle."
+		},
+		{
+			"type": "text",
+			"text": "When complete, SHIFT-RIGHT CLICK the center block on any side to finish the construction.$(p)This block has four important blocks around the outside:$(li)$(3)Screen, $()on the front, where you can access the machine.$(li)$(4)Power Port, $()left side of the Screen, allows removal of power.$(li)$(9)Item Port, $()right and back side of the Screen, allows insertion of fuel and removal of waste."
+		},
+		{
+			"type": "text",
+			"text": "The Entropy Reactor's basic function is to burn $(5)Corrupted Shards,$() produced from $(l:blocks/liquids#condensed_void)Condensed Void.$()$(p)When idle, the Reactor will accept Shards through any Item Port. As soon as a Shard is put in, the Reactor will heat up for fifteen seconds, before combusting all Shards contained and providing a large burst of power."
+		},
+		{
+			"type": "text",
+			"text": "More Shards will increase the FE/t, but to increase the length of time the power burst lasts for, you need to increase your $(6)Variety Rating.$()$(p)This is a percentage for every generation cycle that will be increased based on the variety of the original items the Shards are composed of."
+		},
+		{
+			"type": "text",
+			"text": "For example, adding 20 of the identical corrupted item will generate 6,000FE/t, but only for one second, as the Variety is extremely low, totalling 120KFE generated.$(p)By contrast, adding 20 completely unique items in one cycle will generate 6,000FE/t, but for a whopping 10 seconds, totalling almost 1.1MFE.$(p)$(d)In summary, less unique items is better than more of the same item."
+		},
+		{
+			"type": "text",
+			"text": "Of course, low power output is not the only reason to keep $(6)Variety$() high.$(br)Constantly low $(6)Variety$() will saturate your Core with $(c)Entropy, $()a dangerous compound that will cause more and more adverse effects the higher the saturation gets.$(br)$(c)If you let the core saturate completely, the Reactor will explode.$()$(p)Entropy can be lowered again by keeping $(6)Variety$() high."
+		},
+		{
+			"type": "text",
+			"text": "Along with power, the Reactor will also generate $(5)Strange Matter$() as waste.$(p)This can be removed from any item port. This comes in three flavors: Regular, Poor, or Rich. The level of Strange Matter produced depends on the $(6)Variety Rating.$(p)$()Using Rich Strange Matter, we can craft a handy implement to make automation of this easier."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/corrupting_basin",
+			"text": "Place this on a Tank filled with Condensed Void, and add any item into the GUI. It will very slowly consume the Condensed Void and corrupt the item. Only Corrupted Shards can be removed with Pipes."
+		}
+	]
+}

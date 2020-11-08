@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "active=false": { "model": "assemblylinemachines:block/corrupting_basin" },
+        "active=true": { "model": "assemblylinemachines:block/corrupting_basin_full"}
+    }
+}

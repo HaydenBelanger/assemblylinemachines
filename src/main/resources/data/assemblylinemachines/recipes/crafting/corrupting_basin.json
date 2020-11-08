@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"c c",
+		"m m",
+		"ccc"
+	],
+	"key":{
+		"c":{
+			"item": "assemblylinemachines:chromium_plate"
+		},
+		"m":{
+			"item": "assemblylinemachines:rich_strange_matter"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupting_basin"
+	}
+}

@@ -1,0 +1,60 @@
+{
+    "variants": {
+        "facing=north,part=top_edge": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_edge" },
+        "facing=south,part=top_edge": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_edge", "y": 180 },
+        "facing=west,part=top_edge":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_edge", "y": 270 },
+        "facing=east,part=top_edge":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_edge", "y": 90 },
+
+		"facing=north,part=bottom_edge": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_edge" },
+        "facing=south,part=bottom_edge": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_edge", "y": 180 },
+        "facing=west,part=bottom_edge":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_edge", "y": 270 },
+        "facing=east,part=bottom_edge":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_edge", "y": 90 },
+
+		"facing=north,part=top_corner": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_corner" },
+        "facing=south,part=top_corner": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_corner", "y": 180 },
+        "facing=west,part=top_corner":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_corner", "y": 270 },
+        "facing=east,part=top_corner":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_upper_corner", "y": 90 },
+
+		"facing=north,part=bottom_corner": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_corner" },
+        "facing=south,part=bottom_corner": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_corner", "y": 180 },
+        "facing=west,part=bottom_corner":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_corner", "y": 270 },
+        "facing=east,part=bottom_corner":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_lower_corner", "y": 90 },
+
+		"facing=north,part=side_edge": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_side_edge" },
+        "facing=south,part=side_edge": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_side_edge", "y": 180 },
+        "facing=west,part=side_edge":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_side_edge", "y": 270 },
+        "facing=east,part=side_edge":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_side_edge", "y": 90 },
+
+		"facing=north,part=wall": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_wall"},
+        "facing=south,part=wall": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_wall"},
+        "facing=west,part=wall":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_wall"},
+        "facing=east,part=wall":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_wall"},
+
+		"facing=north,part=item": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_item_port"},
+        "facing=south,part=item": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_item_port"},
+        "facing=west,part=item":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_item_port"},
+        "facing=east,part=item":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_item_port"},
+
+		"facing=north,part=energy": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_power_port"},
+        "facing=south,part=energy": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_power_port"},
+        "facing=west,part=energy":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_power_port"},
+        "facing=east,part=energy":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_power_port"},
+
+		"facing=north,part=screen": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen"},
+        "facing=south,part=screen": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen", "y": 180 },
+        "facing=west,part=screen":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen", "y": 270 },
+        "facing=east,part=screen":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen", "y": 90 },
+
+		"facing=north,part=screen_active": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen_active" },
+        "facing=south,part=screen_active": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen_active", "y": 180 },
+        "facing=west,part=screen_active":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen_active", "y": 270 },
+        "facing=east,part=screen_active":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_screen_active", "y": 90 },
+
+		"facing=north,part=block": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_block"},
+        "facing=south,part=block": { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_block"},
+        "facing=west,part=block":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_block"},
+        "facing=east,part=block":  { "model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_block"}
+
+
+    }
+}

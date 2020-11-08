@@ -13,6 +13,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.IItemHandler;
 
 public class General {
@@ -64,5 +67,32 @@ public class General {
 	
 	public static interface IPoweredTool{
 		public int getMaxPower();
+	}
+	
+	public static <H> H getCapabilityFromDirection(TileEntity pte, String fieldName, Direction dir, Capability<H> capType) {
+		TileEntity te = pte.getWorld().getTileEntity(pte.getPos().offset(dir));
+		
+		if(te != null) {
+			LazyOptional<H> cap = te.getCapability(capType, dir.getOpposite());
+			H output = cap.orElse(null);
+			if(output != null) {
+				cap.addListener(new NonNullConsumer<LazyOptional<H>>() {
+					@Override
+					public void accept(LazyOptional<H> t) {
+						try {
+							if(pte != null) {
+								pte.getClass().getField(fieldName).set(pte, null);
+							}
+						} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
+				return output;
+			}
+		}
+		
+		return null;
 	}
 }

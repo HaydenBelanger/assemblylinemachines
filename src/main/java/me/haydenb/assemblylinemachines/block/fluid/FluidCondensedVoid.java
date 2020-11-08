@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines.block.fluid;
 import java.util.Iterator;
 import java.util.Random;
 
+import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -11,7 +12,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.fluid.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.state.StateContainer.Builder;
@@ -119,15 +119,7 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 				ItemEntity itemEntity = (ItemEntity) entity;
 				ItemStack stack = itemEntity.getItem();
 				if(stack.getItem() != Registry.getItem("corrupted_shard")) {
-					
-					CompoundNBT main = new CompoundNBT();
-					CompoundNBT sub = new CompoundNBT();
-					new ItemStack(stack.getItem(), 1).write(sub);
-					main.put("assemblylinemachines:internalitem", sub);
-					
-					ItemStack is = new ItemStack(Registry.getItem("corrupted_shard"), stack.getCount());
-					is.setTag(main);
-					itemEntity.setItem(is);
+					itemEntity.setItem(ItemCorruptedShard.corruptItem(stack));
 				}else {
 					itemEntity.setPositionAndUpdate(itemEntity.lastTickPosX + ((RAND.nextDouble() * 2D) - 1D), itemEntity.lastTickPosY + ((RAND.nextDouble() * 4D) - 2D), itemEntity.lastTickPosZ + ((RAND.nextDouble() * 2D) - 1D));
 				}

@@ -6,35 +6,25 @@ import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
 import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import me.haydenb.assemblylinemachines.util.*;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -110,7 +100,7 @@ public class BlockPump extends BlockTileEntity {
 	public static class TEPump extends BasicTileEntity implements ITickableTileEntity {
 
 		private int timer = 0;
-		private IFluidHandler handler = null;
+		public IFluidHandler handler = null;
 		private FluidStack extracted = FluidStack.EMPTY;
 		private String prevStatusMessage = "";
 
@@ -173,6 +163,9 @@ public class BlockPump extends BlockTileEntity {
 				if (timer++ == 20) {
 					timer = 0;
 
+					if(handler == null) {
+						handler = General.getCapabilityFromDirection(this, "handler", Direction.UP, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+					}
 					if (world.getBlockState(pos.down()).getBlock() != Registry.getBlock("pumpshaft")) {
 						prevStatusMessage = "Not connected to Pumpshaft.";
 						forceState(false);
@@ -198,7 +191,7 @@ public class BlockPump extends BlockTileEntity {
 
 						if (!extracted.isEmpty()) {
 
-							if (handler != null || connectToOutput()) {
+							if (handler != null) {
 								if (handler.fill(extracted, FluidAction.SIMULATE) == extracted.getAmount()) {
 									handler.fill(extracted, FluidAction.EXECUTE);
 									extracted = FluidStack.EMPTY;
@@ -257,32 +250,6 @@ public class BlockPump extends BlockTileEntity {
 
 			compound.putInt("assemblylinemachines:amount", amount);
 			return super.write(compound);
-		}
-
-		private boolean connectToOutput() {
-
-			TileEntity te = world.getTileEntity(pos.up());
-			if (te != null) {
-				LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.DOWN);
-				IFluidHandler output = cap.orElse(null);
-				if (output != null) {
-					TEPump ipcte = this;
-					cap.addListener(new NonNullConsumer<LazyOptional<IFluidHandler>>() {
-
-						@Override
-						public void accept(LazyOptional<IFluidHandler> t) {
-							if (ipcte != null) {
-								ipcte.handler = null;
-							}
-						}
-					});
-
-					this.handler = output;
-					return true;
-				}
-			}
-
-			return false;
 		}
 		
 		private void forceState(boolean status) {

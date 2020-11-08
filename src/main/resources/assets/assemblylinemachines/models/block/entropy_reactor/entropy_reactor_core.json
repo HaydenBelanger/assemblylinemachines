@@ -1,0 +1,6 @@
+{
+	"parent": "block/cube_all",
+	"textures": {
+		"all": "assemblylinemachines:block/entropy_reactor/entropy_reactor_core"
+	}
+}

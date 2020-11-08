@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/cube",
+	"textures": {
+		"1": "assemblylinemachines:block/entropy_reactor/entropy_reactor_edge",
+		"particle": "assemblylinemachines:block/entropy_reactor/entropy_reactor_edge"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"south": {"uv": [0, 16, 16, 0], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		}
+	]
+}

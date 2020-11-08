@@ -13,10 +13,7 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -25,9 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -35,7 +30,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -111,10 +105,12 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 		
 		@Override
 		public void tick() {
-			if(timer++ == 20) {
-				if(!world.isRemote) {
+			if(!world.isRemote) {
+				if(timer++ == 20) {
 					timer = 0;
-					
+					if(handler == null) {
+						handler = General.getCapabilityFromDirection(this, "handler", Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+					}
 					if(output != null) {
 						boolean sendupdate = false;
 						boolean end = false;
@@ -165,7 +161,7 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 						}
 						
 					}else {
-						if(handler != null || connectToOutput() == true) {
+						if(handler != null) {
 							if(contents.get(0) != isa || contents.get(1) != isb) {
 								
 								check = true;
@@ -200,32 +196,6 @@ public class BlockSimpleFluidMixer extends BlockScreenTileEntity<BlockSimpleFlui
 				
 			}
 			
-		}
-		
-		private boolean connectToOutput() {
-
-			TileEntity te = world.getTileEntity(pos.down());
-			if (te != null) {
-				LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.UP);
-				IFluidHandler output = cap.orElse(null);
-				if (output != null) {
-					TESimpleFluidMixer ipcte = this;
-					cap.addListener(new NonNullConsumer<LazyOptional<IFluidHandler>>() {
-
-						@Override
-						public void accept(LazyOptional<IFluidHandler> t) {
-							if (ipcte != null) {
-								ipcte.handler = null;
-							}
-						}
-					});
-
-					this.handler = output;
-					return true;
-				}
-			}
-
-			return false;
 		}
 		
 		@Override

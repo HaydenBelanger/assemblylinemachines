@@ -1,0 +1,9 @@
+{
+	"parent": "block/orientable",
+	"textures": {
+		"top": "assemblylinemachines:block/corrupt/grass_top",
+		"bottom": "assemblylinemachines:block/corrupt/dirt",
+		"side": "assemblylinemachines:block/corrupt/grass",
+		"front": "assemblylinemachines:block/corrupt/grass"
+	}
+}
