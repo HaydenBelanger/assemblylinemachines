@@ -43,7 +43,6 @@ public class PatchouliALMImpl {
 		@Override
 		public void openBook(ServerPlayerEntity player, World world) {
 			PatchouliAPI.instance.openBookGUI(player, new ResourceLocation("assemblylinemachines", "walkthrough"));
-			
 		}
 
 		@Override
