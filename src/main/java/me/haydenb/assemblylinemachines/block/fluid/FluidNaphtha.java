@@ -3,46 +3,25 @@ package me.haydenb.assemblylinemachines.block.fluid;
 import java.util.Iterator;
 import java.util.Random;
 
+import me.haydenb.assemblylinemachines.registry.FluidRegistration;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.fluid.*;
-import net.minecraft.state.StateContainer.Builder;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
 
-public class FluidNaphtha extends ForgeFlowingFluid {
-
-	private static final FluidAttributes.Builder ATTRIBUTES = Registry.getFluidAttributes("naphtha").temperature(2200);
-	private static final ForgeFlowingFluid.Properties PROPERTIES = Registry.getFluidProperties("naphtha", ATTRIBUTES);
-	private final boolean source;
+public class FluidNaphtha extends ALMFluid {
 
 	public FluidNaphtha(boolean source) {
-		super(PROPERTIES);
-		this.source = source;
-		if (!source) {
-			setDefaultState(getStateContainer().getBaseState().with(LEVEL_1_8, 7));
-		}
-	}
-
-	@Override
-	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
-		super.fillStateContainer(builder);
-
-		if (!source) {
-			builder.add(LEVEL_1_8);
-		}
-	}
-
-	@Override
-	public boolean isSource(FluidState state) {
-		return source;
+		super(FluidRegistration.buildProperties("naphtha", 2200, false, true, true), source);
 	}
 
 	@Override
@@ -59,22 +38,11 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 			}
 				
 		}
-		
-		//super.randomTick(world, pos, state, random);
 	}
 	
 	@Override
 	protected boolean ticksRandomly() {
 		return true;
-	}
-
-	@Override
-	public int getLevel(FluidState state) {
-		if (!source) {
-			return state.get(LEVEL_1_8);
-		} else {
-			return 8;
-		}
 	}
 
 	private boolean isSurroundingBlockFlammable(IWorldReader worldIn, BlockPos pos) {
@@ -98,11 +66,20 @@ public class FluidNaphtha extends ForgeFlowingFluid {
 		return 4;
 	}
 
-	public static class FluidNaphthaBlock extends FlowingFluidBlock {
+	public static class FluidNaphthaBlock extends ALMFluidBlock {
 
 		public FluidNaphthaBlock() {
-			super(() -> (FlowingFluid) Registry.getFluid("naphtha"),
-					Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).func_235838_a_((state) -> 11).noDrops());
+			super("naphtha", ALMFluid.NAPHTHA, Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).func_235838_a_((state) -> 11).noDrops());
+		}
+		
+		@Override
+		public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
+			
+			if(entity instanceof LivingEntity) {
+				LivingEntity living = (LivingEntity) entity;
+				living.addPotionEffect(new EffectInstance(Registry.getEffect("deep_burn"), 300, 0));
+			}
+			super.onEntityCollision(state, worldIn, pos, entity);
 		}
 		
 	}

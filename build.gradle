@@ -13,11 +13,11 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.4-1.1'
+version = '1.16.4-1.1.1'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
-sourceCompatibility = targetCompatibility = '11'
+sourceCompatibility = targetCompatibility = '1.8'
 compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -81,7 +81,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.0.7'
+    minecraft 'net.minecraftforge:forge:1.16.4-35.1.11'
     
 	repositories{
         maven {
@@ -96,16 +96,34 @@ dependencies {
         	name = "Vazkii maven"
         	url = "https://maven.blamejared.com"
         }
+        maven {
+        	name = "Modmaven"
+         	url "https://modmaven.dev/"
+        }
+        
+        maven {
+        	name 'tterrag maven'
+        	url "https://maven.tterrag.com/"
+    	}
     }
 
+	//FTB GUI LIBRARY
 	compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
+	
 	//JEI
     compileOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44:api")
  	runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44")
  	
- 	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.2-45")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.2-45")
+ 	//PATCHOULI
+ 	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-48")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-48")
     
-
+	//MEKANISM
+	compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
+    runtimeOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
+    
+    //TOP
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
+    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
 }

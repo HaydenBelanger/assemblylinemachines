@@ -119,7 +119,7 @@ public class BlockFluidTank extends Block {
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 
 		if (!world.isRemote) {
-			if (player.getActiveHand() == Hand.MAIN_HAND) {
+			if (handIn.equals(Hand.MAIN_HAND)) {
 				if (world.getTileEntity(pos) instanceof TEFluidTank) {
 					TEFluidTank entity = (TEFluidTank) world.getTileEntity(pos);
 					FluidTankHandler handler = entity.fluids;

@@ -3,9 +3,13 @@ package me.haydenb.assemblylinemachines.block;
 import java.util.Iterator;
 import java.util.Random;
 
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -17,7 +21,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 public class BlockNaphthaFire extends AbstractFireBlock {
 	public BlockNaphthaFire() {
 		super(Block.Properties.create(Material.FIRE, MaterialColor.TNT).doesNotBlockMovement().tickRandomly()
-				.hardnessAndResistance(0f).func_235838_a_((state) -> 15).sound(SoundType.CLOTH).noDrops(), 4f);
+				.hardnessAndResistance(0f).func_235838_a_((state) -> 15).sound(SoundType.CLOTH).noDrops(), 1f);
 		this.setDefaultState(this.stateContainer.getBaseState().with(FireBlock.AGE, 0));
 	}
 
@@ -69,6 +73,16 @@ public class BlockNaphthaFire extends AbstractFireBlock {
 		}
 	}
 
+	@Override
+	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
+
+		if(entity instanceof LivingEntity) {
+			LivingEntity living = (LivingEntity) entity;
+			living.addPotionEffect(new EffectInstance(Registry.getEffect("deep_burn"), 140, 0));
+		}
+		
+		super.onEntityCollision(state, worldIn, pos, entity);
+	}
 	
 	@Override
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {

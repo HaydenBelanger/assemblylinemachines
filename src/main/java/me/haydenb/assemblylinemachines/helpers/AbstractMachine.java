@@ -12,6 +12,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixer;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.rendering.GUIHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -432,8 +433,13 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 			super.func_238474_b_(mx, a, b, c, d, e, f);
 		}
 
-		protected void blit(int a, int b, int c, int d, int e, TextureAtlasSprite tas) {
-			super.func_238470_a_(mx, a, b, c, d, e, tas);
+		protected void blit(int x, int y, int w, int h, TextureAtlasSprite tas) {
+			//super.func_238470_a_(mx, a, b, c, d, e, tas);
+			GUIHelper.fillAreaWithIcon(tas, x, y, w, h);
+		}
+		
+		protected void blit(int x, int y, int w, int h, int v, TextureAtlasSprite tas) {
+			this.blit(x, y, w, h, tas);
 		}
 
 		@Override

@@ -292,7 +292,7 @@ public class BathCrafting implements IRecipe<IInventory>{
 			return drop;
 		}
 		
-		public int getCrankUse() {
+		public int getMB() {
 			return crankmixeruse;
 		}
 	}

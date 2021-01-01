@@ -19,6 +19,7 @@ import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
+import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
@@ -188,12 +189,12 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		private RefiningCrafting outputRecipe = null;
 		private ResourceLocation outputRecipeRL = null;
 
-		private FluidStack tankin = FluidStack.EMPTY;
+		public FluidStack tankin = FluidStack.EMPTY;
 
-		private FluidStack tankouta = FluidStack.EMPTY;
-		private FluidStack tankoutb = FluidStack.EMPTY;
+		public FluidStack tankouta = FluidStack.EMPTY;
+		public FluidStack tankoutb = FluidStack.EMPTY;
 
-		protected IFluidHandler fluids = new IFluidHandler() {
+		public IFluidHandler fluids = new IFluidHandler() {
 
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
@@ -239,7 +240,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 
 				if (action != FluidAction.SIMULATE) {
 					if (tankin.isEmpty()) {
-						tankin = resource;
+						tankin = new FluidStack(resource.getFluid(), attemptedInsert);
 					} else {
 						tankin.setAmount(tankin.getAmount() + attemptedInsert);
 					}
@@ -327,8 +328,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 					if (getUpgradeAmount(Upgrades.MACHINE_GAS) != 0) {
 						hasGas = true;
 						cost = Math.round((float) cost * 2.5f);
-					}
-
+					}		
+					
 					//Below determines if the recipe is valid or not. If so, sets outputRecipe to not null.
 					if (outputRecipe == null) {
 
@@ -648,15 +649,19 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
 				return fhandler.cast();
 			}
+			
+			if(PluginMekanism.get().isMekanismInstalled()) {
+				LazyOptional<T> lO = PluginMekanism.get().getRefineryCapability(cap, this);
+				if(lO != null) {
+					return lO;
+				}
+			}
 			return super.getCapability(cap, side);
 		}
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-				return fhandler.cast();
-			}
-			return super.getCapability(cap);
+			return this.getCapability(cap, null);
 		}
 
 		@Override
@@ -742,8 +747,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		protected void init() {
 			super.init();
 
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = guiLeft;
+			int y = guiTop;
 
 			this.addButton(new SimpleButton(x + 65, y + 23, 0, 0, 8, 37, "", (button) -> {
 				sendDumpTank(tsfm.getPos());

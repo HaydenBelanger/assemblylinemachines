@@ -89,7 +89,7 @@ public class BlockFluidBath extends Block {
 			Hand handIn, BlockRayTraceResult hit) {
 
 		if (!world.isRemote) {
-			if (player.getActiveHand() == Hand.MAIN_HAND) {
+			if (handIn.equals(Hand.MAIN_HAND)) {
 
 				if (world.getTileEntity(pos) instanceof TEFluidBath) {
 					TEFluidBath entity = (TEFluidBath) world.getTileEntity(pos);

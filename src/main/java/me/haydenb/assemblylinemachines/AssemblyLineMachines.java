@@ -8,6 +8,8 @@ import me.haydenb.assemblylinemachines.packets.HashPacketImpl.DecoderConsumer;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.EncoderConsumer;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.MessageHandler;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
+import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
+import me.haydenb.assemblylinemachines.plugins.other.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -27,5 +29,13 @@ public final class AssemblyLineMachines{
 		
 		
 		HashPacketImpl.INSTANCE.registerMessage(HashPacketImpl.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
+		
+		if(PluginMekanism.get().isMekanismInstalled()) {
+			PluginMekanism.get().registerAllGas();
+		}
+		
+		PluginTOP.register();
 	}
+	
+	
 }

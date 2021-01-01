@@ -63,7 +63,7 @@ public abstract class BlockTileEntity extends Block{
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
 			Hand hand, BlockRayTraceResult hit) {
 		
-		if(player.getActiveHand() == Hand.MAIN_HAND) {
+		if(hand.equals(Hand.MAIN_HAND)) {
 			if(!worldIn.isRemote) {
 				return blockRightClickServer(state, worldIn, pos, player);
 			}else {

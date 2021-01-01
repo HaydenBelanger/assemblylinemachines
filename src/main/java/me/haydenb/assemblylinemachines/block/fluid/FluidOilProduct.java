@@ -2,63 +2,27 @@ package me.haydenb.assemblylinemachines.block.fluid;
 
 import java.util.Iterator;
 import java.util.Random;
-import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.registry.FluidRegistration;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion.Mode;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
 
-public class FluidOilProduct extends ForgeFlowingFluid {
+public class FluidOilProduct extends ALMFluid {
 
-	private final boolean source;
-
-	public FluidOilProduct(ForgeFlowingFluid.Properties properties, boolean source) {
-		super(properties);
-		this.source = source;
-		if (!source) {
-			setDefaultState(getStateContainer().getBaseState().with(LEVEL_1_8, 7));
-		}
+	public FluidOilProduct(String name, boolean source) {
+		super(FluidRegistration.buildProperties(name, 350, false, true, true), source);
 	}
-
-	@Override
-	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
-		super.fillStateContainer(builder);
-
-		if (!source) {
-			builder.add(LEVEL_1_8);
-		}
-	}
-
-	@Override
-	public boolean isSource(FluidState state) {
-		return source;
-	}
-
-	@Override
-	public int getLevel(FluidState state) {
-		if (!source) {
-			return state.get(LEVEL_1_8);
-		} else {
-			return 8;
-		}
-	}
-
+	
 	@Override
 	protected boolean ticksRandomly() {
 		return true;
@@ -102,14 +66,12 @@ public class FluidOilProduct extends ForgeFlowingFluid {
 		return pow;
 	}
 	
-	public static class FluidOilProductBlock extends FlowingFluidBlock {
+	public static class FluidOilProductBlock extends ALMFluidBlock {
 
-		public FluidOilProductBlock(Supplier<FlowingFluid> fluid) {
-			super(fluid,
-					Block.Properties.create(Material.WATER).hardnessAndResistance(100f).noDrops());
+		public FluidOilProductBlock(String name) {
+			super(name, ALMFluid.OIL_BYPRODUCT, Material.WATER);
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
 			if (entity instanceof LivingEntity) {

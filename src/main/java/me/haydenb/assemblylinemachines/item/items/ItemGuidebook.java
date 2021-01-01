@@ -1,6 +1,6 @@
 package me.haydenb.assemblylinemachines.item.items;
 
-import me.haydenb.assemblylinemachines.plugins.other.PatchouliALMImpl;
+import me.haydenb.assemblylinemachines.plugins.other.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -17,7 +17,7 @@ public class ItemGuidebook extends Item {
 	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand handIn) {
 		
 		if(!world.isRemote) {
-			PatchouliALMImpl.get().openBook((ServerPlayerEntity) player, world);
+			PluginPatchouli.get().openBook((ServerPlayerEntity) player, world);
 		}
 		
 		return super.onItemRightClick(world, player, handIn);

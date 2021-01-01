@@ -69,7 +69,8 @@ import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.Tempera
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.rendering.*;
-import me.haydenb.assemblylinemachines.world.EffectEntropyPoisoning;
+import me.haydenb.assemblylinemachines.world.*;
+import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRender.EntityCorruptShellRenderFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.IHasContainer;
@@ -80,9 +81,12 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
+import net.minecraft.entity.EntitySpawnPlacementRegistry.PlacementType;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.container.Container;
@@ -98,6 +102,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -107,11 +112,11 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
@@ -126,21 +131,21 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class Registry {
 	
 	//REGISTRY
-	private static final TreeMap<String, Item> itemRegistry = new TreeMap<>(new Comparator<String>() {
+	static final TreeMap<String, Item> itemRegistry = new TreeMap<>(new Comparator<String>() {
 
 		@Override
 		public int compare(String o1, String o2) {
 			return o1.compareTo(o2);
 		}
 	});
-	private static final HashMap<String, Block> blockRegistry = new HashMap<>();
+	static final HashMap<String, Block> blockRegistry = new HashMap<>();
 	
 	private static final HashMap<String, TileEntityType<?>> teRegistry = new HashMap<>();
 	private static final HashMap<String, ContainerType<?>> containerRegistry = new HashMap<>();
 	private static final HashMap<ContainerType<?>, Integer> containerIdRegistry = new HashMap<>();
 	private static final HashMap<String, Effect> effectRegistry = new HashMap<>();
+	static final HashMap<String, ForgeFlowingFluid> fluidRegistry = new HashMap<>();
 	
-	private static final HashMap<String, Fluid> fluidRegistry = new HashMap<>();
 	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
 	
 	//EVENTS
@@ -321,10 +326,13 @@ public class Registry {
 		createItem("strange_matter");
 		createItem("rich_strange_matter");
 		
+		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().group(creativeTab)));
+		createItem("galactic_flesh");
+		createItem("reality_crystal");
+		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
 		}
-		
 	}
 	
 	@SubscribeEvent
@@ -451,19 +459,17 @@ public class Registry {
 		createBlock("corrupting_basin", new BlockCorruptingBasin());
 		
 		//FLUIDS
-		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(), getBucketItem("oil"));
-		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(), getBucketItem("condensed_void"));
-		createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(), getBucketItem("naphtha"));
+		FluidRegistration.buildAndRegister("oil", new FluidOil(true), new FluidOil(false), true, new FluidOilBlock());
+		FluidRegistration.buildAndRegister("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), true, new FluidCondensedVoidBlock());
+		FluidRegistration.buildAndRegister("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), true, new FluidNaphthaBlock());
+		FluidRegistration.buildAndRegister("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), true, new FluidOilProductBlock("gasoline"));
+		FluidRegistration.buildAndRegister("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), true, new FluidOilProductBlock("diesel"));
+		FluidRegistration.buildAndRegister("liquid_experience", 35, false, true, ALMFluid.LIQUID_EXPERIENCE, Material.WATER);
 		
-		createFluid("gasoline", new FluidOilProduct(getFluidProperties("gasoline", getFluidAttributes("gasoline").temperature(200)), true), new FluidOilProduct(getFluidProperties("gasoline", 
-				getFluidAttributes("gasoline").temperature(200)), false), new FluidOilProductBlock(() -> (FlowingFluid)Registry.getFluid("gasoline")), getBucketItem("gasoline"));
-		createFluid("diesel", new FluidOilProduct(getFluidProperties("diesel", getFluidAttributes("diesel").temperature(200)), true), new FluidOilProduct(getFluidProperties("diesel", 
-				getFluidAttributes("diesel").temperature(200)), false), new FluidOilProductBlock(() -> (FlowingFluid)Registry.getFluid("diesel")), getBucketItem("diesel"));
-		createGaseousFluid("ethane", 600);
-		createGaseousFluid("propane", 600);
-		createGaseousFluid("ethylene", 600);
-		createGaseousFluid("propylene", 600);
-		createFluid("liquid_experience");
+		FluidRegistration.buildAndRegister("ethane", new GaseousFluid("ethane", true, 0x135f0f), null, false, null);
+		FluidRegistration.buildAndRegister("ethylene", new GaseousFluid("ethylene", true, 0xb3aac3), null, false, null);
+		FluidRegistration.buildAndRegister("propane", new GaseousFluid("propane", true, 0x5f0f1c), null, false, null);
+		FluidRegistration.buildAndRegister("propylene", new GaseousFluid("propylene", true, 0x290d55), null, false, null);
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
@@ -573,9 +579,18 @@ public class Registry {
 	}
 	
 	@SubscribeEvent
+	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
+		
+		event.getRegistry().register(EntityCorruptShell.CORRUPT_SHELL.setRegistryName("corrupt_shell"));
+		EntitySpawnPlacementRegistry.register(EntityCorruptShell.CORRUPT_SHELL, PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::canSpawnOn);
+		GlobalEntityTypeAttributes.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().func_233813_a_());
+	}
+	
+	@SubscribeEvent
 	public static void registerPotions(RegistryEvent.Register<Effect> event) {
 		
 		createEffect("entropy_poisoning", new EffectEntropyPoisoning());
+		createEffect("deep_burn", new EffectDeepBurn());
 		
 		event.getRegistry().registerAll(effectRegistry.values().toArray(new Effect[effectRegistry.size()]));
 	}
@@ -646,6 +661,8 @@ public class Registry {
 		((ItemMystiumTool<?>) Registry.getItem("mystium_shovel")).connectItemProperties();
 		((ItemMystiumTool<?>) Registry.getItem("mystium_hoe")).connectItemProperties();
 		((ItemMystiumTool<?>) Registry.getItem("mystium_hammer")).connectItemProperties();
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
 	
 	@SubscribeEvent
@@ -807,82 +824,15 @@ public class Registry {
 		return blockRegistry.get(name);
 	}
 	
+	
 	//FLUIDS
-	
-	/**
-	 * This must be called during Block registry, despite being targeted at fluids. This allows all maps to be populated first.
-	 * Will register x, x_flowing, x_block, x_bucket.
-	 */
-	
-	private static void createFluid(String name) {
-		createFluid(name, getFluidAttributes(name));
-		
-	}
-	
-	private static void createFluid(String name, FluidAttributes.Builder attributes) {
-		
-		
-		
-		createFluid(name, attributes, getFluidProperties(name, attributes));
-		
-	}
-	
-	private static void createFluid(String name, FluidAttributes.Builder attributes, ForgeFlowingFluid.Properties properties) {
-		
-		
-		
-		createFluid(name, getSourceFluid(properties), getFlowingFluid(properties), getFlowingFluidBlock(name), getBucketItem(name));
-	}
-	
-	private static void createFluid(String name, ForgeFlowingFluid source, ForgeFlowingFluid flowing, FlowingFluidBlock block, BucketItem bucket) {
-		
-		fluidRegistry.put(name, source.setRegistryName(name));
-		fluidRegistry.put(name + "_flowing", flowing.setRegistryName(name + "_flowing"));
-		blockRegistry.put(name + "_block", block.setRegistryName(name + "_block"));
-		itemRegistry.put(name + "_bucket", bucket.setRegistryName(name + "_bucket"));
-	}
-	
-	
-	private static void createGaseousFluid(String name, int temp) {
-		ForgeFlowingFluid.Properties props = new ForgeFlowingFluid.Properties(() -> fluidRegistry.get(name), () -> fluidRegistry.get(name + "_flowing"), FluidAttributes.builder(new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name),
-				new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name)).gaseous().temperature(temp));
-		GaseousFluid fl = new GaseousFluid(true, props);
-		GaseousFluid gfl = new GaseousFluid(false, props);
-		createFluidOnly(name, fl, gfl);
-	}
-	
-	private static void createFluidOnly(String name, ForgeFlowingFluid source, ForgeFlowingFluid flowing) {
-		fluidRegistry.put(name, source.setRegistryName(name));
-		fluidRegistry.put(name + "_flowing", flowing.setRegistryName(name + "_flowing"));
-	}
-	
-	//FLUID GETTERS
-	public static FluidAttributes.Builder getFluidAttributes(String name){
-		return FluidAttributes.builder(new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name), new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name + "_flowing"));
-	}
-	
-	public static ForgeFlowingFluid.Properties getFluidProperties(String name, FluidAttributes.Builder attributes){
-		return new ForgeFlowingFluid.Properties(() -> fluidRegistry.get(name), () -> fluidRegistry.get(name + "_flowing"), attributes).block(() -> (FlowingFluidBlock) blockRegistry.get(name + "_block")).bucket(() -> itemRegistry.get(name + "_bucket"));
-	}
-	
-	private static ForgeFlowingFluid.Source getSourceFluid(ForgeFlowingFluid.Properties properties){
-		return new ForgeFlowingFluid.Source(properties);
-	}
-	
-	private static ForgeFlowingFluid.Flowing getFlowingFluid(ForgeFlowingFluid.Properties properties){
-		return new ForgeFlowingFluid.Flowing(properties);
-	}
-	
-	private static FlowingFluidBlock getFlowingFluidBlock(String name) {
-		return new FlowingFluidBlock(() -> (FlowingFluid) fluidRegistry.get(name), Block.Properties.create(Material.WATER).hardnessAndResistance(100f).noDrops());
-	}
-	
-	private static BucketItem getBucketItem(String name) {
-		return new BucketItem(() -> fluidRegistry.get(name), new Item.Properties().maxStackSize(1).containerItem(Items.BUCKET).group(creativeTab));
-	}
-	
+	//Fluid Registration is handled in a separate class.
 	public static Fluid getFluid(String name) {
 		return fluidRegistry.get(name);
+	}
+	
+	public static Collection<ForgeFlowingFluid> getFluids(){
+		return fluidRegistry.values();
 	}
 	
 	//TILE ENTITIES
@@ -890,7 +840,6 @@ public class Registry {
 		return teRegistry.get(name);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static <T extends TileEntity> void createTileEntity(String name, Class<T> clazz, Block... blocks){
 		teRegistry.put(name, TileEntityType.Builder.create(() -> {
 			T inst;

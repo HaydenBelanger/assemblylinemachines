@@ -1,5 +1,9 @@
 package me.haydenb.assemblylinemachines.helpers;
 
+import java.util.ArrayList;
+
+import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -34,5 +38,13 @@ public class BasicTileEntity extends TileEntity {
 		world.markBlockRangeForRenderUpdate(pos, getBlockState(), getBlockState());
 		world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), 2);
 		markDirty();
+	}
+	
+	public boolean supportsTOP() {
+		return false;
+	}
+	
+	public ArrayList<Pair<String, Object>> getTOPObjectList(){
+		return null;
 	}
 }

@@ -34,7 +34,7 @@ public abstract class SimpleMachine<A extends Container> extends AbstractMachine
 			return itemHandler.cast();
 		}
 		
-		return LazyOptional.empty();
+		return super.getCapability(cap);
 	}
 	
 	@Override
@@ -52,7 +52,11 @@ public abstract class SimpleMachine<A extends Container> extends AbstractMachine
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		return this.getCapability(cap);
+		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return itemHandler.cast();
+		}
+		
+		return super.getCapability(cap, side);
 	}
 	
 	private class SimpleInventoryHandlerWrapper extends InvWrapper {

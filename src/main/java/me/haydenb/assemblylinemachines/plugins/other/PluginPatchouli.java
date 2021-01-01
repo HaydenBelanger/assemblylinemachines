@@ -1,23 +1,23 @@
 package me.haydenb.assemblylinemachines.plugins.other;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.ModList;
 import vazkii.patchouli.api.PatchouliAPI;
 
-public class PatchouliALMImpl {
+public class PluginPatchouli {
 
 	private static PatchouliInterface pInt = null;
 	
-	@SuppressWarnings("deprecation")
 	public static PatchouliInterface get() {
 		
 		if(pInt == null) {
 			if(ModList.get().isLoaded("patchouli")) {
 				try {
-					pInt = Class.forName("me.haydenb.assemblylinemachines.plugins.other.PatchouliALMImpl$PatchouliPresent").asSubclass(PatchouliInterface.class).newInstance();
+					pInt = Class.forName("me.haydenb.assemblylinemachines.plugins.other.PluginPatchouli$PatchouliPresent").asSubclass(PatchouliInterface.class).newInstance();
+					AssemblyLineMachines.LOGGER.info("Detected Patchouli in installation. Creating in-game walkthrough book...");
 				}catch(Exception e) {
 					pInt = new PatchouliNotPresent();
 					e.printStackTrace();
@@ -32,16 +32,20 @@ public class PatchouliALMImpl {
 	}
 	
 	public interface PatchouliInterface{
+	
+		default void openBook(ServerPlayerEntity player, World world) {}
 		
-		void openBook(ServerPlayerEntity player, World world);
-		
-		boolean isPatchouliInstalled();
+		default boolean isPatchouliInstalled() {
+			return false;
+		}
 	}
 	
 	static class PatchouliPresent implements PatchouliInterface{
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void openBook(ServerPlayerEntity player, World world) {
+			
 			PatchouliAPI.instance.openBookGUI(player, new ResourceLocation("assemblylinemachines", "walkthrough"));
 		}
 
@@ -55,18 +59,6 @@ public class PatchouliALMImpl {
 	}
 	
 	static class PatchouliNotPresent implements PatchouliInterface{
-
-		@Override
-		public void openBook(ServerPlayerEntity player, World world) {
-			
-			player.sendMessage(new StringTextComponent("Patchouli is not installed! Please install Patchouli to access the Guidebook! https://www.curseforge.com/minecraft/mc-mods/patchouli"), player.getUniqueID());
-			
-		}
-
-		@Override
-		public boolean isPatchouliInstalled() {
-			return false;
-		}
 		
 		
 	}
