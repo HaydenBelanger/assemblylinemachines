@@ -142,6 +142,9 @@
 	"item.assemblylinemachines.poor_strange_matter": "Poor Strange Matter",
 	"item.assemblylinemachines.strange_matter": "Strange Matter",
 	"item.assemblylinemachines.rich_strange_matter": "Rich Strange Matter",
+	"item.assemblylinemachines.corrupt_shell_spawn_egg": "Spawn Corrupt Shell",
+	"item.assemblylinemachines.galactic_flesh": "Galactic Flesh",
+	"item.assemblylinemachines.reality_crystal": "Reality Crystal",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.titanium_block": "Titanium Block",
@@ -236,6 +239,12 @@
 	"fluid.assemblylinemachines.propylene": "Propylene",
 	"fluid.assemblylinemachines.liquid_experience": "Liquid Experience",
 	
+	//Used when Mekanism is loaded to show displays in Gas Tanks.
+	"gas.assemblylinemachines.ethane": "Ethane",
+	"gas.assemblylinemachines.propane": "Propane",
+	"gas.assemblylinemachines.ethylene": "Ethylene",
+	"gas.assemblylinemachines.propylene": "Propylene",
+	
 	"itemGroup.assemblylinemachines": "Assembly Line Machines",
 	
 	"death.attack.interactor": "%1$s was killed by %2$s's Interactor",
@@ -243,5 +252,8 @@
 	
 	"tileEntity.assemblylinemachines.entropy_reactor": "Entropy Reactor",
 	
-	"effect.assemblylinemachines.entropy_poisoning": "Entropy"
+	"effect.assemblylinemachines.entropy_poisoning": "Entropy",
+	"effect.assemblylinemachines.deep_burn": "Deep Burn",
+	
+	"entity.assemblylinemachines.corrupt_shell": "Corrupt Shell"
 }

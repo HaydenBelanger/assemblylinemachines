@@ -4,53 +4,27 @@ import java.util.Iterator;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
+import me.haydenb.assemblylinemachines.registry.FluidRegistration;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.*;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
 
-public class FluidCondensedVoid extends ForgeFlowingFluid {
-
-	private static final FluidAttributes.Builder ATTRIBUTES = Registry.getFluidAttributes("condensed_void").temperature(-200);
-	private static final ForgeFlowingFluid.Properties PROPERTIES = Registry.getFluidProperties("condensed_void",
-			ATTRIBUTES);
-	private final boolean source;
-	private static final Random RAND = new Random();
+public class FluidCondensedVoid extends ALMFluid {
 
 	public FluidCondensedVoid(boolean source) {
-		super(PROPERTIES);
-		this.source = source;
-		if (!source) {
-			setDefaultState(getStateContainer().getBaseState().with(LEVEL_1_8, 7));
-		}
-	}
-
-	@Override
-	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
-		super.fillStateContainer(builder);
-
-		if (!source) {
-			builder.add(LEVEL_1_8);
-		}
-	}
-
-	@Override
-	public boolean isSource(FluidState state) {
-		return source;
+		super(FluidRegistration.buildProperties("condensed_void", -200, false, true, true), source);
 	}
 
 	@Override
@@ -91,29 +65,19 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 	}
 
 	@Override
-	public int getLevel(FluidState state) {
-		if (!source) {
-			return state.get(LEVEL_1_8);
-		} else {
-			return 8;
-		}
-	}
-
-	@Override
 	public int getTickRate(IWorldReader world) {
 		return 5;
 	}
 
-	public static class FluidCondensedVoidBlock extends FlowingFluidBlock {
+	public static class FluidCondensedVoidBlock extends ALMFluidBlock {
 
 		public FluidCondensedVoidBlock() {
-			super(() -> (FlowingFluid) Registry.getFluid("condensed_void"),
-					Block.Properties.create(Material.WATER).hardnessAndResistance(100f).noDrops());
+			super("condensed_void", ALMFluid.CONDENSED_VOID, Material.WATER);
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
+			
 			if(entity instanceof ItemEntity) {
 				
 				ItemEntity itemEntity = (ItemEntity) entity;
@@ -121,7 +85,7 @@ public class FluidCondensedVoid extends ForgeFlowingFluid {
 				if(stack.getItem() != Registry.getItem("corrupted_shard")) {
 					itemEntity.setItem(ItemCorruptedShard.corruptItem(stack));
 				}else {
-					itemEntity.setPositionAndUpdate(itemEntity.lastTickPosX + ((RAND.nextDouble() * 2D) - 1D), itemEntity.lastTickPosY + ((RAND.nextDouble() * 4D) - 2D), itemEntity.lastTickPosZ + ((RAND.nextDouble() * 2D) - 1D));
+					itemEntity.setPositionAndUpdate(itemEntity.lastTickPosX + ((worldIn.rand.nextDouble() * 2D) - 1D), itemEntity.lastTickPosY + ((worldIn.rand.nextDouble() * 4D) - 2D), itemEntity.lastTickPosZ + ((worldIn.rand.nextDouble() * 2D) - 1D));
 				}
 			}else if (entity instanceof LivingEntity) {
 				LivingEntity player = (LivingEntity) entity;

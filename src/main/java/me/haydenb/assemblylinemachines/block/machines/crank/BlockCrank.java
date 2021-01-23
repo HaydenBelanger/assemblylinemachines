@@ -68,7 +68,7 @@ public class BlockCrank extends Block {
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
 			Hand handIn, BlockRayTraceResult hit) {
 		if(!world.isRemote) {
-			if(handIn == Hand.MAIN_HAND) {
+			if(handIn.equals(Hand.MAIN_HAND)) {
 				TileEntity te = world.getTileEntity(pos.offset(state.get(HorizontalBlock.HORIZONTAL_FACING).getOpposite()));
 				if(te != null && te instanceof ICrankableMachine) {
 					ICrankableMachine crankable = (ICrankableMachine) te;

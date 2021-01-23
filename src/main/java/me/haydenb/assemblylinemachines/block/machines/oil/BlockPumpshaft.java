@@ -56,7 +56,7 @@ public class BlockPumpshaft extends Block{
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		if(!world.isRemote && hand == Hand.MAIN_HAND) {
+		if(!world.isRemote && hand.equals(Hand.MAIN_HAND)) {
 			
 		}
 		return ActionResultType.CONSUME;

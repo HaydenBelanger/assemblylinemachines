@@ -4,42 +4,36 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
 import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
 import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.plugins.other.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.math.shapes.*;
+import net.minecraft.util.text.*;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrankmill> implements ICrankableBlock {
 
@@ -108,7 +102,7 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 	}
 
 	public static class TECrankmill extends EnergyMachine<ContainerCrankmill>
-			implements ICrankableMachine, ITickableTileEntity {
+			implements ICrankableMachine, ITickableTileEntity, TOPProvider {
 
 		
 		public int rfDif = 0;
@@ -124,6 +118,17 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 			this(Registry.getTileEntity("crankmill"));
 		}
 
+		@Override
+		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
+			
+			if(fept == 0) {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+			}else {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
+			}
+			
+		}
+		
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if (ForgeHooks.getBurnTime(stack) != 0) {
@@ -168,20 +173,6 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 				}
 			}
 			
-		}
-		
-		@Override
-		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(getBlockState().get(HorizontalBlock.HORIZONTAL_FACING) == side.getOpposite()) {
-				return super.getCapability(cap, side);
-			}
-			
-			return super.getCapability(cap, side);
-		}
-		
-		@Override
-		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			return super.getCapability(cap);
 		}
 
 	}

@@ -5,7 +5,7 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon;
 import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
 import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.item.items.ItemMobCrystal;
-import me.haydenb.assemblylinemachines.plugins.other.PatchouliALMImpl;
+import me.haydenb.assemblylinemachines.plugins.other.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.*;
@@ -171,7 +171,7 @@ public class Events {
 		CompoundNBT nbt = event.getPlayer().getPersistentData();
 		if(!nbt.contains("assemblylinemachines:book") || nbt.getBoolean("assemblylinemachines:book") == false) {
 			
-			if(PatchouliALMImpl.get().isPatchouliInstalled()) {
+			if(PluginPatchouli.get().isPatchouliInstalled()) {
 				nbt.putBoolean("assemblylinemachines:book", true);
 				event.getPlayer().addItemStackToInventory(new ItemStack(Registry.getItem("guidebook")));
 			}

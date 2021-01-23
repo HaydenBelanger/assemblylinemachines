@@ -6,19 +6,21 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Pair;
 
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
 import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
 import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.plugins.other.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
@@ -29,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.*;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
@@ -80,7 +83,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 	}
 	
 	
-	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ITickableTileEntity{
+	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ITickableTileEntity, TOPProvider{
 
 		
 		private int genper = 0;
@@ -96,6 +99,16 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			this(Registry.getTileEntity("coal_generator"));
 		}
 
+		@Override
+		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
+			if(genper == 0) {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+			}else {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Math.round((float)genper / 2f) + " FE/t"));
+			}
+			
+			
+		}
 		
 		@Override
 		public void read(CompoundNBT compound) {

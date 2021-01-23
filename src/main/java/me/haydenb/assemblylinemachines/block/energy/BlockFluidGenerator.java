@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.TEFluidGenerator;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
@@ -18,6 +19,7 @@ import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBase
 import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.other.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
@@ -27,11 +29,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
@@ -41,9 +43,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
@@ -96,7 +98,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		}
 	}
 
-	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ITickableTileEntity{
+	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ITickableTileEntity, TOPProvider{
 		
 		private int burnTimeLeft = 0;
 		private float increasedCost = 1f;
@@ -223,6 +225,17 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		
 		public TEFluidGenerator() {
 			this(Registry.getTileEntity("fluid_generator"));
+		}
+		
+		@Override
+		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
+			
+			if(fept == 0) {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+			}else {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
+			}
+			
 		}
 		
 		@Override

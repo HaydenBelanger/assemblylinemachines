@@ -85,7 +85,7 @@ public class PipeBase<T> extends Block {
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
 			Hand handIn, BlockRayTraceResult hit) {
 		if (!world.isRemote) {
-			if (handIn == Hand.MAIN_HAND) {
+			if (handIn.equals(Hand.MAIN_HAND)) {
 				if(!(player.getHeldItemMainhand().getItem() instanceof BlockItem) || !(((BlockItem) player.getHeldItemMainhand().getItem()).getBlock() instanceof PipeBase<?>)) {
 					for (Direction d : Direction.values()) {
 						if (world.getBlockState(pos)
@@ -230,7 +230,6 @@ public class PipeBase<T> extends Block {
 		if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.NONE) {
 			
 			if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR && world.getTileEntity(currentPos.offset(facing)) == null) {
-				System.out.println("test");
 				world.removeTileEntity(currentPos);
 			}
 			

@@ -6,24 +6,26 @@ import java.util.*;
 import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.helpers.*;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
 import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.other.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.MathHelper;
+import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.potion.EffectInstance;
@@ -85,7 +87,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		if(!world.isRemote) {
-			if(hand == Hand.MAIN_HAND) {
+			if(hand.equals(Hand.MAIN_HAND)) {
 				if(hasTileEntity(state) == true && (state.get(ENTROPY_REACTOR_PIECE) == EntropyReactorOptions.SCREEN || state.get(ENTROPY_REACTOR_PIECE) == EntropyReactorOptions.SCREEN_ACTIVE)) {
 					//Open screen if segment is of type SCREEN.
 					return super.blockRightClickServer(state, world, pos, player);
@@ -498,7 +500,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 
 	}
 
-	public static class TEEntropyReactor extends EnergyMachine<ContainerEntropyReactor> implements ITickableTileEntity{
+	public static class TEEntropyReactor extends EnergyMachine<ContainerEntropyReactor> implements ITickableTileEntity, TOPProvider{
 
 		private static final Gson GSON = new Gson();
 
@@ -528,6 +530,24 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 
 		public TEEntropyReactor() {
 			this(Registry.getTileEntity("entropy_reactor"));
+		}
+		
+		@Override
+		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
+			
+			if(cyclesRemaining != 0) {
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aDischarging...")).text(new StringTextComponent("§a+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t"));
+			}else {
+				if(shardMap.isEmpty()) {
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+				}else {
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§dWarming Up...")).text(new StringTextComponent("0 FE/t"));
+				}
+			}
+			
+			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text(new StringTextComponent("§dShards")).progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
+			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new StringTextComponent("§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Registry.getItem("poor_strange_matter"))).vertical().text(new StringTextComponent("§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
 		}
 
 		@Override
@@ -792,7 +812,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 						sw = world.getServer().getWorld(world.func_234923_W_());
 					}
 					
-					int count = Math.round(entropy * 10f);
+					int count = Math.round(entropy * 4f);
 					
 					float spamt = 0;
 					
@@ -801,24 +821,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 						double d1 = (double)(pos.getY() + world.rand.nextInt(3) - 1);
 						double d2 = (double)pos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * (double) 6 + 0.5D;
 						
-						EntityType<?> type = null;
-						switch(world.rand.nextInt(Math.round(entropy * 5f))) {
-						case 0:
-							type = EntityType.ZOMBIE;
-							break;
-						case 1:
-							type = EntityType.SKELETON;
-							break;
-						case 2:
-							type = EntityType.SPIDER;
-							break;
-						case 3:
-							type = EntityType.CREEPER;
-							break;
-						case 4:
-							type = EntityType.BLAZE;
-							break;
-						}
+						EntityType<?> type = EntityCorruptShell.CORRUPT_SHELL;
 						for(int j = 0; j < 10; j++) {
 							
 							if(world.hasNoCollisions(type.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(type, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {

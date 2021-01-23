@@ -114,7 +114,7 @@ public abstract class EnergyMachine<A extends Container> extends SimpleMachine<A
 			return energyHandler.cast();
 		}
 		
-		return super.getCapability(cap);
+		return LazyOptional.empty();
 	}
 	
 	@Override
