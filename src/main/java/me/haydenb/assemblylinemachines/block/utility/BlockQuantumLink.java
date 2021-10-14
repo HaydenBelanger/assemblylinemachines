@@ -479,20 +479,23 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			@Override
 			public void renderToolTip(PoseStack pMatrixStack, int pMouseX, int pMouseY) {
 				if(this.isHovered()) {
-					String a = "";
+					List<String> vals = new ArrayList<>();
 					switch(tsfm.pfi[channel]) {
 					case 0:
-						a = tooltip + " Input Mode";
+						vals.add(tooltip + " Receive Mode");
+						vals.add("§8§oWill receive " + tooltip + " from other QLs.");
 						break;
 					case 1:
-						a = tooltip + " Output Mode";
+						vals.add(tooltip + " Send Mode");
+						vals.add("§8§oWill transfer " + tooltip + " to other QLs.");
 						break;
 					case 2:
-						a = tooltip + " Disabled";
+						vals.add(tooltip + " Disabled");
+						vals.add("§8§oWill not interact with " + tooltip + ".");
 						break;
 					}
 					
-					renderComponentTooltip(a, pMouseX, pMouseY);
+					renderComponentTooltip(vals, pMouseX, pMouseY);
 				}
 			}
 		}

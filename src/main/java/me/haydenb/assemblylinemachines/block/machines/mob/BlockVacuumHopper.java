@@ -54,7 +54,6 @@ public class BlockVacuumHopper extends HopperBlock {
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.EAST, Direction.SOUTH, SHAPE_E);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.EAST, Direction.WEST, SHAPE_E);
 	private static final VoxelShape SHAPE_N = General.rotateShape(Direction.EAST, Direction.NORTH, SHAPE_E);
-	private BlockEntity entityForTicker = null;
 
 	public BlockVacuumHopper() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
@@ -64,17 +63,24 @@ public class BlockVacuumHopper extends HopperBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-		entityForTicker = Registry.getBlockEntity("vacuum_hopper").create(pPos, pState);
-		return entityForTicker;
+		return Registry.getBlockEntity("vacuum_hopper").create(pPos, pState);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-		if(entityForTicker != null && entityForTicker instanceof BlockEntityTicker) {
-			return (BlockEntityTicker<T>) entityForTicker;
-		}
-		return null;
+		return new BlockEntityTicker<T>() {
+
+			@Override
+			public void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+				if(blockEntity instanceof ALMTicker) {
+					((ALMTicker<?>) blockEntity).tick();
+				}else if(blockEntity instanceof BlockEntityTicker) {
+					((BlockEntityTicker<T>) blockEntity).tick(level, pos, state, blockEntity);
+				}
+				
+			}
+		};
 	}
 
 	@Override

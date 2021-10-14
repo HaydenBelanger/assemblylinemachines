@@ -184,7 +184,7 @@ public class Events {
 				
 				if(result.status() == Status.BETA_OUTDATED || result.status() == Status.OUTDATED) {
 					TextComponent tc = new TextComponent("[§aAssemblyLineMachines§f] Update available, version §e" + result.target().getCanonical() + ",§f you're using §e" + imi.getVersion().toString() + ". §2Click to Update!");
-					tc.withStyle(tc.getStyle().withClickEvent(new ClickEvent(Action.OPEN_URL, "https://www.curseforge.com/minecraft/mc-mods/assembly-line-machines")));
+					tc.withStyle(tc.getStyle().withClickEvent(new ClickEvent(Action.OPEN_URL, result.url())));
 					player.sendMessage(tc, null);
 				}
 			}

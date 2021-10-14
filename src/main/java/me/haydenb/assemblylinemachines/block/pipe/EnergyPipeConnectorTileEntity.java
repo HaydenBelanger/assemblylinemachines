@@ -83,9 +83,9 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements AL
 						
 						PipeBase<?> pb = (PipeBase<?>) getBlockState().getBlock();
 						if(pb.type == Type.ADVANCED_POWER) {
-							transferRate = 5000;
+							transferRate = 25000;
 						}else if(pb.type == Type.BASIC_POWER) {
-							transferRate = 1000;
+							transferRate = 5000;
 						}else {
 							transferRate = 0;
 						}
