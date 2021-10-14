@@ -11,4 +11,4 @@ We are always growing features with regular updates planned, so please stay tune
 
 ## Downloads
 
-This mod is currently available for Minecraft 1.17.2, used with the Forge Mod Loader, and can be downloaded from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/assembly-line-machines). Please note that these two locations are the only two officially available versions of this mod at this time, and thus any redistribution websites shall not be considered official, and therefore will not receive support.
+This mod is currently available for Minecraft 1.17.1, used with the Forge Mod Loader, and can be downloaded from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/assembly-line-machines). Please note that these two locations are the only two officially available versions of this mod at this time, and thus any redistribution websites shall not be considered official, and therefore will not receive support.
