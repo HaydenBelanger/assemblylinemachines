@@ -16,10 +16,15 @@ out
 # gradle
 build
 .gradle
+src/generated/resources/.cache
+src/test
 
 # other
 eclipse
 run
 
 # Files from Forge MDK
-forge*changelog.txt
+README.txt
+LICENSE.txt
+CREDITS.txt
+changelog.txt
