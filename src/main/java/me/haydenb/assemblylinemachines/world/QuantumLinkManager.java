@@ -7,14 +7,14 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.TEQuantumLink;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.HopperTileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.DimensionSavedDataManager;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -22,7 +22,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
-public class QuantumLinkManager extends WorldSavedData{
+public class QuantumLinkManager extends SavedData{
 
 	private static final Gson GSON = new Gson();
 	
@@ -31,10 +31,10 @@ public class QuantumLinkManager extends WorldSavedData{
 	private static final String DATA_PATH = AssemblyLineMachines.MODID + "_QUANTUMLINKMANAGER";
 	
 	private static QuantumLinkManager manager = null;
-	private static ServerWorld csw = null;
+	private static ServerLevel csw = null;
 	
 	public QuantumLinkManager() {
-		super(DATA_PATH);
+		super();
 		
 	}
 
@@ -43,9 +43,25 @@ public class QuantumLinkManager extends WorldSavedData{
 		
 		
 		if(manager == null) {
-			csw = server.getWorld(ServerWorld.field_234918_g_);
-			DimensionSavedDataManager dsdm = csw.getSavedData();
-			manager = dsdm.getOrCreate(QuantumLinkManager::new, DATA_PATH);
+			csw = server.getLevel(ServerLevel.OVERWORLD);
+			DimensionDataStorage dsdm = csw.getDataStorage();
+			manager = dsdm.computeIfAbsent((compound) -> {
+
+				if(compound.contains("assemblylinemachines:handler")) {
+					QuantumLinkManager interimQlm = new QuantumLinkManager();
+					AssemblyLineMachines.LOGGER.info("Loading Quantum Link Network data from Level...");
+					try {
+						interimQlm.handler = GSON.fromJson(compound.getString("assemblylinemachines.handler"), QuantumLinkHandler.class);
+						return interimQlm;
+					}catch(Exception e) {
+						AssemblyLineMachines.LOGGER.error("A fatal exception was thrown deserializing the Quantum Link Manager: ");
+						e.printStackTrace();
+					}
+				}
+				return new QuantumLinkManager();
+			}, () -> {
+				return new QuantumLinkManager();
+			}, DATA_PATH);
 			
 		}
 		
@@ -61,27 +77,9 @@ public class QuantumLinkManager extends WorldSavedData{
 	}
 
 	@Override
-	public void read(CompoundNBT compound) {
-		if(compound.contains("assemblylinemachines:handler")) {
-			
-			AssemblyLineMachines.LOGGER.info("Loading Quantum Link Network data from World...");
-			
-			try {
-				
-				handler = GSON.fromJson(compound.getString("assemblylinemachines:handler"), QuantumLinkHandler.class);
-			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("A fatal exception was thrown deserializing the Quantum Link Manager: ");
-				e.printStackTrace();
-			}
-			
-		}
+	public CompoundTag save(CompoundTag compound) {
 		
-	}
-
-	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		
-		AssemblyLineMachines.LOGGER.info("Saving Quantum Link Network data to World...");
+		AssemblyLineMachines.LOGGER.info("Saving Quantum Link Network data to Level...");
 		
 		if(handler != null) {
 			try {
@@ -108,7 +106,7 @@ public class QuantumLinkManager extends WorldSavedData{
 				net = new QuantumLinkNetwork(id, password);
 				network.put(id, net);
 				if(manager != null) {
-					manager.markDirty();
+					manager.setDirty();
 				}
 				
 				if(password != null) {
@@ -176,7 +174,7 @@ public class QuantumLinkManager extends WorldSavedData{
 						iter.remove();
 					}else {
 						if(src != targ && targ.pfi[2] == 0) {
-							is = HopperTileEntity.putStackInInventoryAllSlots(src, targ, is, Direction.DOWN);
+							is = HopperBlockEntity.addItem(src, targ, is, Direction.DOWN);
 							if(is.isEmpty()) {
 								break;
 							}

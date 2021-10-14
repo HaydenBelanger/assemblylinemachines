@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"i":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		},
 		"g":{
-			"item": "assemblylinemachines:stainless_steel_plate"
+			"tag": "forge:plates/stainless_steel"
 		},
 		"r":{
 			"item": "assemblylinemachines:item_pipe_upgrade_filter"

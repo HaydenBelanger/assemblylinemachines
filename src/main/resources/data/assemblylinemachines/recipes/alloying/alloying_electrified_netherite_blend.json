@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:ingots/energized_gold"
+	},
+	"part_b":{
+		"tag": "forge:dusts/netherite"
+	},
+	"output":{
+		"item": "assemblylinemachines:electrified_netherite_blend"
+	},
+	"time": 350
+}

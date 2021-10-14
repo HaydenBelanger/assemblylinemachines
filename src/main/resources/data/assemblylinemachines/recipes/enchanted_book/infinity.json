@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "assemblylinemachines:mystium_blend"
+		"tag": "forge:dusts/mystium"
 	},
 	"amount": 2,
 	"enchantment": "minecraft:infinity",

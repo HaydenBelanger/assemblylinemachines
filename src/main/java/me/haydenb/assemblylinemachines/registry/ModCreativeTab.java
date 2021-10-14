@@ -1,13 +1,14 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 
-import net.minecraft.item.*;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ModCreativeTab extends ItemGroup {
+public class ModCreativeTab extends CreativeModeTab {
 
 	
 	
@@ -16,14 +17,14 @@ public class ModCreativeTab extends ItemGroup {
 		
 	}
 
+	
 	@Override
-	public ItemStack createIcon() {
+	public ItemStack makeIcon() {
 		return new ItemStack(Registry.getItem("steel_gear"));
 	}
 	
-	
 	@Override
-	public void fill(NonNullList<ItemStack> items) {
+	public void fillItemList(NonNullList<ItemStack> items) {
 		
 		
 		ArrayList<Item> data = new ArrayList<>(ForgeRegistries.ITEMS.getValues());
@@ -37,15 +38,14 @@ public class ModCreativeTab extends ItemGroup {
 				}else if(i2 instanceof BlockItem && !(i1 instanceof BlockItem)) {
 					return 1;
 				}else {
-					return i1.getName().getUnformattedComponentText().compareTo(i2.getName().getUnformattedComponentText());
+					return i1.getName(i1.getDefaultInstance()).getContents().compareTo(i2.getName(i2.getDefaultInstance()).getContents());
 					
 				}
 			}
 		});
 		
 		for(Item i : data) {
-			
-			i.fillItemGroup(this, items);
+			i.fillItemCategory(this, items);
 		}
 	}
 	

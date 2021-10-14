@@ -1,8 +1,9 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 
 
 public class ItemGearboxBasicFuel extends Item implements IGearboxFuel{
@@ -10,17 +11,18 @@ public class ItemGearboxBasicFuel extends Item implements IGearboxFuel{
 	public final int burnTime;
 	
 	public ItemGearboxBasicFuel(int burnTime) {
-		super(new Item.Properties().group(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.creativeTab));
 		this.burnTime = burnTime;
 	}
 	
 	@Override
-	public int getBurnTime(ItemStack itemStack) {
+	public int getBurnTime(ItemStack itemStack, RecipeType<?> recipeType) {
+		
 		return burnTime;
 	}
 
 	@Override
 	public int getGearboxBurnTime(ItemStack stack) {
-		return this.getBurnTime(stack);
+		return this.getBurnTime(stack, null);
 	}
 }

@@ -4,28 +4,32 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Stream;
 
+import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank.FluidTankHandler;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.*;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.*;
@@ -33,129 +37,121 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockFluidTank extends Block {
+public class BlockFluidTank extends Block implements EntityBlock {
 
 	private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###");
 
-	private static final VoxelShape SHAPE = Stream.of(Block.makeCuboidShape(0, 0, 0, 16, 1, 16), Block.makeCuboidShape(0, 1, 15, 1, 15, 16),
-			Block.makeCuboidShape(15, 1, 15, 16, 15, 16), Block.makeCuboidShape(0, 1, 0, 1, 15, 1), Block.makeCuboidShape(15, 1, 0, 16, 15, 1),
-			Block.makeCuboidShape(0, 15, 0, 16, 16, 16), Block.makeCuboidShape(1, 1, 0, 15, 15, 1), Block.makeCuboidShape(1, 1, 15, 15, 15, 16),
-			Block.makeCuboidShape(0, 1, 1, 1, 15, 15), Block.makeCuboidShape(15, 1, 1, 16, 15, 15)).reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
+	private static final VoxelShape SHAPE = Stream.of(Block.box(0, 0, 0, 16, 1, 16), Block.box(0, 1, 15, 1, 15, 16),
+			Block.box(15, 1, 15, 16, 15, 16), Block.box(0, 1, 0, 1, 15, 1), Block.box(15, 1, 0, 16, 15, 1),
+			Block.box(0, 15, 0, 16, 16, 16), Block.box(1, 1, 0, 15, 15, 1), Block.box(1, 1, 15, 15, 15, 16),
+			Block.box(0, 1, 1, 1, 15, 15), Block.box(15, 1, 1, 16, 15, 15)).reduce((v1, v2) -> {
+				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 	private final int _capacity;
 	private final TemperatureResistance _tempres;
 
 	public BlockFluidTank(int capacity, TemperatureResistance resist) {
-		super(Block.Properties.create(Material.GLASS).notSolid().hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.GLASS)
-				.variableOpacity());
+		super(Block.Properties.of(Material.GLASS).noOcclusion().strength(4f, 15f).sound(SoundType.GLASS)
+				.dynamicShape());
 		_capacity = capacity;
 		_tempres = resist;
 	}
 
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			if (worldIn.getTileEntity(pos) instanceof TEFluidTank) {
-				worldIn.removeTileEntity(pos);
+			if (worldIn.getBlockEntity(pos) instanceof TEFluidTank) {
+				worldIn.removeBlockEntity(pos);
 			}
 		}
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
-
+	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		if (state.getBlock() == this) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		TEFluidTank tef = (TEFluidTank) Registry.getTileEntity("fluid_tank").create();
+	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+		TEFluidTank tef = (TEFluidTank) Registry.getBlockEntity("fluid_tank").create(pPos, pState);
 		tef.capacity = _capacity;
 		tef.trs = _tempres;
 		return tef;
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		if(stack.hasTag()) {
 			
-			CompoundNBT nbt = stack.getTag();
+			CompoundTag nbt = stack.getTag();
 			
-			if(world.getTileEntity(pos) instanceof TEFluidTank && nbt.contains("assemblylinemachines:fluidstack")) {
-				TEFluidTank tank = (TEFluidTank) world.getTileEntity(pos);
+			if(world.getBlockEntity(pos) instanceof TEFluidTank && nbt.contains("assemblylinemachines:fluidstack")) {
+				TEFluidTank tank = (TEFluidTank) world.getBlockEntity(pos);
 				
 				tank.fluid = FluidStack.loadFluidStackFromNBT(nbt.getCompound("assemblylinemachines:fluidstack"));
 				tank.sendUpdates();
 			}
 		}
-		super.onBlockPlacedBy(world, pos, state, placer, stack);
+		super.setPlacedBy(world, pos, state, placer, stack);
 	}
 	public static class BlockItemFluidTank extends BlockItem{
 		public BlockItemFluidTank(Block block) {
-			super(block, new Item.Properties().group(Registry.creativeTab));
+			super(block, new Item.Properties().tab(Registry.creativeTab));
 		}
 		
 		@Override
-		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 			if(stack.hasTag()) {
-				CompoundNBT nbt = stack.getTag();
+				CompoundTag nbt = stack.getTag();
 				if(nbt.contains("assemblylinemachines:fluidstack")) {
-					tooltip.add(1, new StringTextComponent("This Tank has a fluid stored!").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+					tooltip.add(1, new TextComponent("This Tank has a fluid stored!").withStyle(ChatFormatting.GREEN));
 				}
 			}
-			super.addInformation(stack, worldIn, tooltip, flagIn);
+			super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		}
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 
-		if (!world.isRemote) {
-			if (handIn.equals(Hand.MAIN_HAND)) {
-				if (world.getTileEntity(pos) instanceof TEFluidTank) {
-					TEFluidTank entity = (TEFluidTank) world.getTileEntity(pos);
+		if (!world.isClientSide) {
+			if (handIn.equals(InteractionHand.MAIN_HAND)) {
+				if (world.getBlockEntity(pos) instanceof TEFluidTank) {
+					TEFluidTank entity = (TEFluidTank) world.getBlockEntity(pos);
 					FluidTankHandler handler = entity.fluids;
 					if (handler != null) {
-						if (player.isSneaking()) {
+						if (player.isShiftKeyDown()) {
 							FluidStack f = handler.getFluidInTank(0);
 							if (f.isEmpty() || f.getAmount() == 0) {
-								player.sendStatusMessage(new StringTextComponent("This tank is empty."), true);
+								player.displayClientMessage(new TextComponent("This tank is empty."), true);
 							} else {
-								player.sendStatusMessage(new StringTextComponent(FORMAT.format(f.getAmount()) + "/" + FORMAT.format(handler.getTankCapacity(0)) + " mB "
-										+ f.getFluid().getAttributes().getDisplayName(f).func_230532_e_().getString()), true);
+								player.displayClientMessage(new TextComponent(FORMAT.format(f.getAmount()) + "/" + FORMAT.format(handler.getTankCapacity(0)) + " mB "
+										+ f.getFluid().getAttributes().getDisplayName(f).getString()), true);
 							}
 						} else {
-							ItemStack stack = player.getHeldItemMainhand();
+							ItemStack stack = player.getMainHandItem();
 
 							if (!handler.getFluidInTank(0).getFluid().getAttributes().isGaseous()) {
 								FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
 								if (!player.isCreative() && far.isSuccess()) {
 									if (stack.getCount() == 1) {
-										player.inventory.removeStackFromSlot(player.inventory.currentItem);
+										player.getInventory().removeItemNoUpdate(player.getInventory().selected);
 									} else {
 										stack.shrink(1);
 									}
 									ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-									return ActionResultType.CONSUME;
+									return InteractionResult.CONSUME;
 
 								}
 								FluidActionResult farx = FluidUtil.tryFillContainer(stack, handler, 1000, player, true);
 								if (!player.isCreative() && farx.isSuccess()) {
 									if (stack.getCount() == 1) {
-										player.inventory.removeStackFromSlot(player.inventory.currentItem);
+										player.getInventory().removeItemNoUpdate(player.getInventory().selected);
 									} else {
 										stack.shrink(1);
 									}
 									ItemHandlerHelper.giveItemToPlayer(player, farx.getResult());
-									return ActionResultType.CONSUME;
+									return InteractionResult.CONSUME;
 								}
 							}
 						}
@@ -164,11 +160,11 @@ public class BlockFluidTank extends Block {
 			}
 		}
 		
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
 
 	}
 
-	public static class TEFluidTank extends me.haydenb.assemblylinemachines.helpers.BasicTileEntity {
+	public static class TEFluidTank extends BasicTileEntity {
 
 		public FluidStack fluid = FluidStack.EMPTY;
 		public int capacity = 0;
@@ -178,17 +174,17 @@ public class BlockFluidTank extends Block {
 
 		protected LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> fluids);
 
-		public TEFluidTank(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn);
+		public TEFluidTank(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, pos, state);
 		}
 
-		public TEFluidTank() {
-			this(Registry.getTileEntity("fluid_tank"));
+		public TEFluidTank(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("fluid_tank"), pos, state);
 		}
 
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			if (compound.contains("assemblylinemachines:capacity")) {
 				capacity = compound.getInt("assemblylinemachines:capacity");
@@ -217,21 +213,21 @@ public class BlockFluidTank extends Block {
 		}
 
 		@Override
-		public void remove() {
-			super.remove();
+		public void setRemoved() {
+			super.setRemoved();
 			if (handler != null) {
 				handler.invalidate();
 			}
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
-			super.write(compound);
+		public CompoundTag save(CompoundTag compound) {
+			super.save(compound);
 
 			compound.putInt("assemblylinemachines:capacity", capacity);
 			compound.putString("assemblylinemachines:temperatureresistance", trs.toString());
 			if (fluid != null) {
-				CompoundNBT sub = new CompoundNBT();
+				CompoundTag sub = new CompoundTag();
 				fluid.writeToNBT(sub);
 				compound.put("assemblylinemachines:fluidstack", sub);
 			}
@@ -274,7 +270,7 @@ public class BlockFluidTank extends Block {
 				return te.fluid;
 			}
 
-			public int fill(FluidStack resource, FluidAction action, PlayerEntity player) {
+			public int fill(FluidStack resource, FluidAction action, Player player) {
 				if (!te.fluid.isEmpty()) {
 					if (resource.getFluid() != te.fluid.getFluid()) {
 						sendIfNotNull(player, "This is not the same fluid.");
@@ -335,9 +331,9 @@ public class BlockFluidTank extends Block {
 				return drain(resource.getAmount(), action);
 			}
 
-			private void sendIfNotNull(PlayerEntity player, String message) {
+			private void sendIfNotNull(Player player, String message) {
 				if (player != null) {
-					player.sendStatusMessage(new StringTextComponent(message), true);
+					player.displayClientMessage(new TextComponent(message), true);
 				}
 			}
 

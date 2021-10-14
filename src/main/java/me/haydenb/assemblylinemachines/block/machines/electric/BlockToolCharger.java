@@ -2,36 +2,25 @@ package me.haydenb.assemblylinemachines.block.machines.electric;
 
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity;
+import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import me.haydenb.assemblylinemachines.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
@@ -43,45 +32,62 @@ import net.minecraftforge.items.IItemHandler;
 public class BlockToolCharger extends BlockTileEntity{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(5, 5, 11, 11, 11, 13),
-			Block.makeCuboidShape(5, 11, 5, 11, 13, 11),
-			Block.makeCuboidShape(5, 5, 5, 11, 11, 11),
-			Block.makeCuboidShape(0, 0, 0, 16, 3, 16),
-			Block.makeCuboidShape(0, 13, 0, 16, 16, 16),
-			Block.makeCuboidShape(0, 3, 0, 3, 13, 3),
-			Block.makeCuboidShape(13, 3, 0, 16, 13, 3),
-			Block.makeCuboidShape(0, 3, 13, 16, 13, 16)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(5, 5, 11, 11, 11, 13),
+			Block.box(5, 11, 5, 11, 13, 11),
+			Block.box(5, 5, 5, 11, 11, 11),
+			Block.box(0, 0, 0, 16, 3, 16),
+			Block.box(0, 13, 0, 16, 16, 16),
+			Block.box(0, 3, 0, 3, 13, 3),
+			Block.box(13, 3, 0, 16, 13, 3),
+			Block.box(0, 3, 13, 16, 13, 16)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockToolCharger() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "tool_charger");
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "tool_charger");
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.MACHINE_ACTIVE, false));
+		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
+	}
+	
+	
+	
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
-	}
-	
-	@Override
-	public ActionResultType blockRightClickServer(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		if (world.getTileEntity(pos) instanceof TEToolCharger) {
-			TEToolCharger pump = (TEToolCharger) world.getTileEntity(pos);
-			player.sendStatusMessage(new StringTextComponent(pump.prevStatusMessage), true);
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if (world.getBlockEntity(pos) instanceof TEToolCharger) {
+			TEToolCharger pump = (TEToolCharger) world.getBlockEntity(pos);
+			player.displayClientMessage(new TextComponent(pump.prevStatusMessage), true);
 		}
 		
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
+	}
+	
+	@Override
+	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
+		
+		return InteractionResult.PASS;
+	}
+	
+	@Override
+	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
+		return bteDefaultReturnBlockEntity(pPos, pState);
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+		return bteDefaultReturnTicker(level, state, blockEntityType);
+	}
+	
+	@Override
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -95,18 +101,13 @@ public class BlockToolCharger extends BlockTileEntity{
 	
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(StateProperties.MACHINE_ACTIVE);
-	}
-	
-	@Override
-	public ActionResultType blockRightClickClient(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		return ActionResultType.PASS;
+		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.MACHINE_ACTIVE);
 	}
 	
 	
-	public static class TEToolCharger extends BasicTileEntity implements ITickableTileEntity{
+	public static class TEToolCharger extends BasicTileEntity implements ALMTicker<TEToolCharger>{
 
 		
 		private IItemHandler handler = null;
@@ -114,12 +115,12 @@ public class BlockToolCharger extends BlockTileEntity{
 		private int timer = 0;
 		
 		
-		public TEToolCharger(TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn);
+		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, pos, state);
 		}
 
-		public TEToolCharger() {
-			this(Registry.getTileEntity("tool_charger"));
+		public TEToolCharger(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("tool_charger"), pos, state);
 		}
 		
 		private int amount;
@@ -169,7 +170,7 @@ public class BlockToolCharger extends BlockTileEntity{
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (side == getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
+			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
 				return energyHandler.cast();
 			}
 			
@@ -183,21 +184,21 @@ public class BlockToolCharger extends BlockTileEntity{
 		}
 		
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			amount = compound.getInt("assemblylinemachines:amount");
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 
 			compound.putInt("assemblylinemachines:amount", amount);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		private boolean getCapability() {
-			TileEntity te = world.getTileEntity(pos.offset(Direction.UP));
+			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
 				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
 						Direction.DOWN);
@@ -224,8 +225,8 @@ public class BlockToolCharger extends BlockTileEntity{
 
 		@Override
 		public void tick() {
-			if(!world.isRemote) {
-				if(timer++ == 20) {
+			if(!level.isClientSide) {
+				if(timer++ == 8) {
 					timer = 0;
 					
 					boolean didSomething = false;
@@ -248,7 +249,7 @@ public class BlockToolCharger extends BlockTileEntity{
 								int ext = storage.receiveEnergy(max, false);
 								if(ext != 0) {
 									amount = amount - ext;
-									prevStatusMessage = stack.getItem().getDisplayName(stack).getUnformattedComponentText();
+									prevStatusMessage = stack.getItem().getName(stack).getString();
 									didSomething = true;
 									break;
 								}
@@ -260,13 +261,13 @@ public class BlockToolCharger extends BlockTileEntity{
 					
 					if(didSomething) {
 						prevStatusMessage = "Charging " + prevStatusMessage + "...";
-						if(getBlockState().get(StateProperties.MACHINE_ACTIVE) == false) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 						}
 					}else {
 						prevStatusMessage = "Charger idle...";
-						if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						}
 					}
 					prevStatusMessage = prevStatusMessage + " (" + Formatting.GENERAL_FORMAT.format(amount) + "/30,000 FE)";

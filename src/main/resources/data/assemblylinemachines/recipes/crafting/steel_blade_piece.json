@@ -6,10 +6,10 @@
 	],
 	"key":{
 		"x":{
-			"item": "assemblylinemachines:steel_ingot"
+			"tag": "forge:ingots/steel"
 		},
 		"y":{
-			"item": "assemblylinemachines:steel_nugget"
+			"tag": "forge:nuggets/steel"
 		}
 	},
 	"result":{

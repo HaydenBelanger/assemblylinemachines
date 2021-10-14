@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"i":{
-			"item": "assemblylinemachines:iron_plate"
+			"tag": "forge:plates/iron"
 		},
 		"g":{
-			"item": "assemblylinemachines:gold_plate"
+			"tag": "forge:plates/gold"
 		},
 		"d":{
 			"tag": "forge:gems/diamond"

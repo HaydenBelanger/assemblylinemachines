@@ -2,118 +2,109 @@ package me.haydenb.assemblylinemachines.block.pipe;
 
 import com.google.common.base.Supplier;
 
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
-public class PipeBase<T> extends Block {
+public class PipeBase<T> extends Block implements EntityBlock {
 
-	private static final VoxelShape SHAPE_BASE = Block.makeCuboidShape(4, 4, 4, 12, 12, 12);
-	private static final VoxelShape SHAPE_CARDINAL = Block.makeCuboidShape(0, 4, 4, 4, 12, 12);
-	private static final VoxelShape SHAPE_UP = Block.makeCuboidShape(4, 12, 4, 12, 16, 12);
-	private static final VoxelShape SHAPE_DOWN = Block.makeCuboidShape(4, 0, 4, 12, 4, 12);
+	private static final VoxelShape SHAPE_BASE = Block.box(4, 4, 4, 12, 12, 12);
+	private static final VoxelShape SHAPE_CARDINAL = Block.box(0, 4, 4, 4, 12, 12);
+	private static final VoxelShape SHAPE_UP = Block.box(4, 12, 4, 12, 16, 12);
+	private static final VoxelShape SHAPE_DOWN = Block.box(4, 0, 4, 12, 4, 12);
 
-	private static final VoxelShape SHAPE_CONN_CARDINAL = Block.makeCuboidShape(3, 3, 0, 13, 13, 4);
-	private static final VoxelShape SHAPE_CONN_UP = Block.makeCuboidShape(3, 12, 3, 13, 16, 13);
-	private static final VoxelShape SHAPE_CONN_DOWN = Block.makeCuboidShape(3, 0, 3, 13, 4, 13);
+	private static final VoxelShape SHAPE_CONN_CARDINAL = Block.box(3, 3, 0, 13, 13, 4);
+	private static final VoxelShape SHAPE_CONN_UP = Block.box(3, 12, 3, 13, 16, 13);
+	private static final VoxelShape SHAPE_CONN_DOWN = Block.box(3, 0, 3, 13, 4, 13);
 
 	private final Supplier<Capability<T>> cap;
 	public final Type type;
 
 	public PipeBase(Supplier<Capability<T>> cap, Type type) {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(1f, 2f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL));
+		super(Block.Properties.of(Material.METAL).strength(1f, 2f).sound(SoundType.METAL));
 		this.cap = cap;
 		this.type = type;
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		for (EnumProperty<PipeConnOptions> b : PipeProperties.DIRECTION_BOOL.values()) {
 			builder.add(b);
 		}
 	}
 
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if(state.getBlock() != newState.getBlock()) {
-			if(worldIn.getTileEntity(pos) instanceof ItemPipeConnectorTileEntity) {
-				ItemPipeConnectorTileEntity tefm = (ItemPipeConnectorTileEntity) worldIn.getTileEntity(pos);
+			if(worldIn.getBlockEntity(pos) instanceof ItemPipeConnectorTileEntity) {
+				ItemPipeConnectorTileEntity tefm = (ItemPipeConnectorTileEntity) worldIn.getBlockEntity(pos);
 				for (int i = 0; i < 9; i++) {
-					tefm.setInventorySlotContents(i, ItemStack.EMPTY);
+					tefm.setItem(i, ItemStack.EMPTY);
 				}
-				InventoryHelper.dropItems(worldIn, pos, tefm.getItems());
-				worldIn.removeTileEntity(pos);
+				Containers.dropContents(worldIn, pos, tefm.getItems());
+				worldIn.removeBlockEntity(pos);
 				
-			}else if(worldIn.getTileEntity(pos) instanceof FluidPipeConnectorTileEntity || worldIn.getTileEntity(pos) instanceof EnergyPipeConnectorTileEntity) {
-				worldIn.removeTileEntity(pos);
+			}else if(worldIn.getBlockEntity(pos) instanceof FluidPipeConnectorTileEntity || worldIn.getBlockEntity(pos) instanceof EnergyPipeConnectorTileEntity) {
+				worldIn.removeBlockEntity(pos);
 			}
 		}
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-		if (!world.isRemote) {
-			if (handIn.equals(Hand.MAIN_HAND)) {
-				if(!(player.getHeldItemMainhand().getItem() instanceof BlockItem) || !(((BlockItem) player.getHeldItemMainhand().getItem()).getBlock() instanceof PipeBase<?>)) {
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+			InteractionHand handIn, BlockHitResult hit) {
+		if (!world.isClientSide) {
+			if (handIn.equals(InteractionHand.MAIN_HAND)) {
+				if(!(player.getMainHandItem().getItem() instanceof BlockItem) || !(((BlockItem) player.getMainHandItem().getItem()).getBlock() instanceof PipeBase<?>)) {
 					for (Direction d : Direction.values()) {
 						if (world.getBlockState(pos)
-								.get(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
+								.getValue(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
 
-							TileEntity te = world.getTileEntity(pos);
+							BlockEntity te = world.getBlockEntity(pos);
 							if(te instanceof ItemPipeConnectorTileEntity) {
 								try {
-									NetworkHooks.openGui((ServerPlayerEntity) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
+									NetworkHooks.openGui((ServerPlayer) player, (ItemPipeConnectorTileEntity) te, buf -> buf.writeBlockPos(pos));
 								}catch(NullPointerException e) {}
-								return ActionResultType.CONSUME;
+								return InteractionResult.CONSUME;
 							}else if(te instanceof FluidPipeConnectorTileEntity) {
 								FluidPipeConnectorTileEntity fpcte = (FluidPipeConnectorTileEntity) te;
 								fpcte.outputMode = !fpcte.outputMode;
 								fpcte.sendUpdates();
 								if(fpcte.outputMode) {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+									player.displayClientMessage(new TextComponent("Set Connector to Output Mode."), true);
 								}else {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+									player.displayClientMessage(new TextComponent("Set Connector to Input Mode."), true);
 								}
 							}else if(te instanceof EnergyPipeConnectorTileEntity) {
 								EnergyPipeConnectorTileEntity fpcte = (EnergyPipeConnectorTileEntity) te;
 								fpcte.outputMode = !fpcte.outputMode;
 								fpcte.sendUpdates();
 								if(fpcte.outputMode) {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Output Mode."), true);
+									player.displayClientMessage(new TextComponent("Set Connector to Output Mode."), true);
 								}else {
-									player.sendStatusMessage(new StringTextComponent("Set Connector to Input Mode."), true);
+									player.displayClientMessage(new TextComponent("Set Connector to Input Mode."), true);
 								}
 							}
 						}
@@ -121,40 +112,40 @@ public class PipeBase<T> extends Block {
 				}
 			}
 		}
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 		
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		VoxelShape rt = SHAPE_BASE;
 		for (Direction d : Direction.values()) {
-			PipeConnOptions pco = state.get(PipeProperties.DIRECTION_BOOL.get(d));
+			PipeConnOptions pco = state.getValue(PipeProperties.DIRECTION_BOOL.get(d));
 			if (pco != PipeConnOptions.NONE) {
 				switch (d) {
 				case UP:
 					if (pco == PipeConnOptions.CONNECTOR) {
-						rt = VoxelShapes.combineAndSimplify(rt, SHAPE_CONN_UP, IBooleanFunction.OR);
+						rt = Shapes.join(rt, SHAPE_CONN_UP, BooleanOp.OR);
 					} else {
-						rt = VoxelShapes.combineAndSimplify(rt, SHAPE_UP, IBooleanFunction.OR);
+						rt = Shapes.join(rt, SHAPE_UP, BooleanOp.OR);
 					}
 
 					break;
 				case DOWN:
 					if (pco == PipeConnOptions.CONNECTOR) {
-						rt = VoxelShapes.combineAndSimplify(rt, SHAPE_CONN_DOWN, IBooleanFunction.OR);
+						rt = Shapes.join(rt, SHAPE_CONN_DOWN, BooleanOp.OR);
 					} else {
-						rt = VoxelShapes.combineAndSimplify(rt, SHAPE_DOWN, IBooleanFunction.OR);
+						rt = Shapes.join(rt, SHAPE_DOWN, BooleanOp.OR);
 					}
 
 					break;
 				default:
 					if (pco == PipeConnOptions.CONNECTOR) {
-						rt = VoxelShapes.combineAndSimplify(rt,
-								General.rotateShape(Direction.NORTH, d, SHAPE_CONN_CARDINAL), IBooleanFunction.OR);
+						rt = Shapes.join(rt,
+								General.rotateShape(Direction.NORTH, d, SHAPE_CONN_CARDINAL), BooleanOp.OR);
 					} else {
-						rt = VoxelShapes.combineAndSimplify(rt, General.rotateShape(Direction.WEST, d, SHAPE_CARDINAL),
-								IBooleanFunction.OR);
+						rt = Shapes.join(rt, General.rotateShape(Direction.WEST, d, SHAPE_CARDINAL),
+								BooleanOp.OR);
 					}
 
 				}
@@ -166,32 +157,32 @@ public class PipeBase<T> extends Block {
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		BlockState bs = this.getDefaultState();
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		BlockState bs = this.defaultBlockState();
 		for (Direction d : Direction.values()) {
-			Block b = context.getWorld().getBlockState(context.getPos().offset(d)).getBlock();
+			Block b = context.getLevel().getBlockState(context.getClickedPos().relative(d)).getBlock();
 			if (b instanceof PipeBase) {
 				PipeBase<?> pb = (PipeBase<?>) b;
 				if (this.type == pb.type) {
-					bs = bs.with(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.PIPE);
+					bs = bs.setValue(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.PIPE);
 				} else {
-					bs = bs.with(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
+					bs = bs.setValue(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
 				}
 			} else {
-				TileEntity te = context.getWorld().getTileEntity(context.getPos().offset(d));
+				BlockEntity te = context.getLevel().getBlockEntity(context.getClickedPos().relative(d));
 				if (te != null) {
 					if (te.getCapability(cap.get(), d.getOpposite()).orElse(null) != null) {
-						if (context.getFace().getOpposite() == d && context.getPlayer().isSneaking()) {
-							bs = bs.with(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.CONNECTOR);
+						if (context.getClickedFace().getOpposite() == d && context.getPlayer().isShiftKeyDown()) {
+							bs = bs.setValue(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.CONNECTOR);
 						} else {
-							bs = bs.with(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
+							bs = bs.setValue(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
 						}
 
 					} else {
-						bs = bs.with(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
+						bs = bs.setValue(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
 					}
 				} else {
-					bs = bs.with(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
+					bs = bs.setValue(PipeProperties.DIRECTION_BOOL.get(d), PipeConnOptions.NONE);
 				}
 			}
 		}
@@ -202,23 +193,23 @@ public class PipeBase<T> extends Block {
 	
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn,
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn,
 			BlockPos currentPos, BlockPos facingPos) {
-		World world = (World) worldIn;
-		if (world.getBlockState(currentPos.offset(facing)).getBlock() instanceof PipeBase) {
-			PipeBase<?> pb = (PipeBase<?>) world.getBlockState(currentPos.offset(facing)).getBlock();
+		Level world = (Level) worldIn;
+		if (world.getBlockState(currentPos.relative(facing)).getBlock() instanceof PipeBase) {
+			PipeBase<?> pb = (PipeBase<?>) world.getBlockState(currentPos.relative(facing)).getBlock();
 			if (pb.type == this.type) {
-				if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.PIPE) {
-					return stateIn.with(PipeProperties.DIRECTION_BOOL.get(facing), PipeConnOptions.PIPE);
+				if(stateIn.getValue(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.PIPE) {
+					return stateIn.setValue(PipeProperties.DIRECTION_BOOL.get(facing), PipeConnOptions.PIPE);
 				}else {
 					return stateIn;
 				}
 			}
 		}
 
-		if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR) {
+		if(stateIn.getValue(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR) {
 			
-			TileEntity te = world.getTileEntity(currentPos.offset(facing));
+			BlockEntity te = world.getBlockEntity(currentPos.relative(facing));
 			if (te != null) {
 				if (te.getCapability(cap.get(), facing.getOpposite()).orElse(null) != null) {
 					return stateIn;
@@ -227,13 +218,13 @@ public class PipeBase<T> extends Block {
 			}
 		}
 		
-		if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.NONE) {
+		if(stateIn.getValue(PipeProperties.DIRECTION_BOOL.get(facing)) != PipeConnOptions.NONE) {
 			
-			if(stateIn.get(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR && world.getTileEntity(currentPos.offset(facing)) == null) {
-				world.removeTileEntity(currentPos);
+			if(stateIn.getValue(PipeProperties.DIRECTION_BOOL.get(facing)) == PipeConnOptions.CONNECTOR && world.getBlockEntity(currentPos.relative(facing)) == null) {
+				world.removeBlockEntity(currentPos);
 			}
 			
-			return stateIn.with(PipeProperties.DIRECTION_BOOL.get(facing), PipeConnOptions.NONE);
+			return stateIn.setValue(PipeProperties.DIRECTION_BOOL.get(facing), PipeConnOptions.NONE);
 		}else {
 			return stateIn;
 		}
@@ -241,13 +232,13 @@ public class PipeBase<T> extends Block {
 	
 	
 	@Override
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
+	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
 			boolean isMoving) {
-		if(!worldIn.isRemote) {
-			TileEntity te = worldIn.getTileEntity(pos);
+		if(!worldIn.isClientSide) {
+			BlockEntity te = worldIn.getBlockEntity(pos);
 			if(te != null && te instanceof ItemPipeConnectorTileEntity) {
 				ItemPipeConnectorTileEntity ipcte = (ItemPipeConnectorTileEntity) te;
-				if(ipcte.isRedstoneActive() && worldIn.isBlockPowered(pos)) {
+				if(ipcte.isRedstoneActive() && worldIn.hasNeighborSignal(pos)) {
 					ipcte.setRedstoneActive(true);
 					ipcte.sendUpdates();
 				}else {
@@ -259,28 +250,41 @@ public class PipeBase<T> extends Block {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		for(EnumProperty<PipeConnOptions> ep : PipeProperties.DIRECTION_BOOL.values()) {
-			if(state.get(ep) == PipeConnOptions.CONNECTOR) {
-				return true;
+			if(state.getValue(ep) == PipeConnOptions.CONNECTOR) {
+				if(type.getMainType() == MainType.ITEM) {
+					
+					return Registry.getBlockEntity("pipe_connector_item").create(pos, state);
+				}else if(type.getMainType() == MainType.FLUID) {
+					return Registry.getBlockEntity("pipe_connector_fluid").create(pos, state);
+				}else if(type.getMainType() == MainType.POWER){
+					
+					return Registry.getBlockEntity("pipe_connector_energy").create(pos, state);
+				}else {
+					throw new IllegalArgumentException("Invalid MainType found. No associated Tile Entity available.");
+				}
 			}
 		}
-		return false;
+		return null;
 	}
 	
+	@SuppressWarnings("hiding")
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if(type.getMainType() == MainType.ITEM) {
-			return Registry.getTileEntity("pipe_connector_item").create();
-		}else if(type.getMainType() == MainType.FLUID) {
-			return Registry.getTileEntity("pipe_connector_fluid").create();
-		}else if(type.getMainType() == MainType.POWER){
-			
-			return Registry.getTileEntity("pipe_connector_energy").create();
-		}else {
-			throw new IllegalArgumentException("Invalid MainType found. No associated Tile Entity available.");
-		}
-		
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
+		return new BlockEntityTicker<T>() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
+				if(blockEntity instanceof ALMTicker) {
+					((ALMTicker<?>) blockEntity).tick();
+				}else if(blockEntity instanceof BlockEntityTicker) {
+					((BlockEntityTicker<T>) blockEntity).tick(level, pos, state, blockEntity);
+				}
+				
+			}
+		};
 	}
 
 	public static enum Type {

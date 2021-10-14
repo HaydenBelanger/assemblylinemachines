@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:stainless_steel_plate"
+			"tag": "forge:plates/stainless_steel"
 		},
 		"p":{
-			"item": "assemblylinemachines:energized_gold_plate"
+			"tag": "forge:plates/energized_gold"
 		}
 		
 	},

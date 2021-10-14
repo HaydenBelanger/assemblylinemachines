@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"g":{
-			"item": "assemblylinemachines:gold_plate"
+			"tag": "forge:plates/gold"
 		},
 		"x":{
 			"item": "minecraft:sugar"

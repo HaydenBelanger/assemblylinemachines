@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"item": "assemblylinemachines:ground_gold"
+		"tag": "forge:dusts/gold"
 	},
 	"input_b":{
 		"item": "assemblylinemachines:silt"

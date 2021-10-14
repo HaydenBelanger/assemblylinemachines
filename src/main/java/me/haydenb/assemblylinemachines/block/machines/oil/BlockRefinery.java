@@ -3,54 +3,53 @@ package me.haydenb.assemblylinemachines.block.machines.oil;
 import java.util.*;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.TERefinery;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.*;
@@ -58,17 +57,17 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
+public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
-	private static final VoxelShape SHAPE_N = Stream.of(Block.makeCuboidShape(3, 5, 4, 13, 10, 11), Block.makeCuboidShape(3, 5, 2, 5, 10, 4),
-			Block.makeCuboidShape(11, 5, 2, 13, 10, 4), Block.makeCuboidShape(9, 6, 2, 10, 8, 3), Block.makeCuboidShape(6, 6, 2, 7, 8, 3),
-			Block.makeCuboidShape(5, 8, 2, 11, 10, 4), Block.makeCuboidShape(5, 5, 2, 11, 6, 4), Block.makeCuboidShape(5, 6, 3, 11, 8, 3),
-			Block.makeCuboidShape(1, 5, 6, 6, 13, 11), Block.makeCuboidShape(10, 5, 6, 15, 13, 11), Block.makeCuboidShape(3, 10, 5, 4, 14, 6),
-			Block.makeCuboidShape(12, 10, 5, 13, 14, 6), Block.makeCuboidShape(3, 13, 6, 4, 14, 7), Block.makeCuboidShape(3, 13, 10, 4, 14, 11),
-			Block.makeCuboidShape(12, 13, 6, 13, 14, 7), Block.makeCuboidShape(12, 13, 10, 13, 14, 11), Block.makeCuboidShape(11, 13, 7, 14, 14, 10),
-			Block.makeCuboidShape(2, 13, 7, 5, 14, 10), Block.makeCuboidShape(12, 13, 8, 13, 16, 9), Block.makeCuboidShape(3, 13, 8, 4, 16, 9),
-			Block.makeCuboidShape(0, 0, 0, 16, 5, 16), Block.makeCuboidShape(0, 5, 11, 16, 16, 16)).reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
+	private static final VoxelShape SHAPE_N = Stream.of(Block.box(3, 5, 4, 13, 10, 11), Block.box(3, 5, 2, 5, 10, 4),
+			Block.box(11, 5, 2, 13, 10, 4), Block.box(9, 6, 2, 10, 8, 3), Block.box(6, 6, 2, 7, 8, 3),
+			Block.box(5, 8, 2, 11, 10, 4), Block.box(5, 5, 2, 11, 6, 4), Block.box(5, 6, 3, 11, 8, 3),
+			Block.box(1, 5, 6, 6, 13, 11), Block.box(10, 5, 6, 15, 13, 11), Block.box(3, 10, 5, 4, 14, 6),
+			Block.box(12, 10, 5, 13, 14, 6), Block.box(3, 13, 6, 4, 14, 7), Block.box(3, 13, 10, 4, 14, 11),
+			Block.box(12, 13, 6, 13, 14, 7), Block.box(12, 13, 10, 13, 14, 11), Block.box(11, 13, 7, 14, 14, 10),
+			Block.box(2, 13, 7, 5, 14, 10), Block.box(12, 13, 8, 13, 16, 9), Block.box(3, 13, 8, 4, 16, 9),
+			Block.box(0, 0, 0, 16, 5, 16), Block.box(0, 5, 11, 16, 16, 16)).reduce((v1, v2) -> {
+				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
@@ -76,31 +75,33 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 
 	public BlockRefinery() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "refinery",
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "refinery",
 				BlockRefinery.TERefinery.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+
+	@Override
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
-	}
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 
-	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-
-		BlockState bs = context.getWorld().getBlockState(context.getPos().up());
-		if (bs.getBlock() instanceof BlockRefineryAddon && bs.func_235901_b_(HorizontalBlock.HORIZONTAL_FACING)) {
-			return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, bs.get(HorizontalBlock.HORIZONTAL_FACING));
+		BlockState bs = context.getLevel().getBlockState(context.getClickedPos().above());
+		if (bs.getBlock() instanceof BlockRefineryAddon && bs.hasProperty(HorizontalDirectionalBlock.FACING)) {
+			return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, bs.getValue(HorizontalDirectionalBlock.FACING));
 		} else {
-			return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+			return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 		}
 
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -113,39 +114,39 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 	}
 
 	@Override
-	public ActionResultType blockRightClickServer(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		ItemStack stack = player.getHeldItemMainhand();
-		if (stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null) != null && world.getTileEntity(pos) instanceof TERefinery) {
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null) != null && world.getBlockEntity(pos) instanceof TERefinery) {
 
-			IFluidHandler handler = ((TERefinery) world.getTileEntity(pos)).fluids;
+			IFluidHandler handler = ((TERefinery) world.getBlockEntity(pos)).fluids;
 
 			if (!handler.getFluidInTank(0).getFluid().getAttributes().isGaseous()) {
 				FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
 				if (far.isSuccess()) {
 					if(!player.isCreative()) {
 						if (stack.getCount() == 1) {
-							player.inventory.removeStackFromSlot(player.inventory.currentItem);
+							player.getInventory().removeItemNoUpdate(player.getInventory().selected);
 						} else {
 							stack.shrink(1);
 						}
 						ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
 						
 					}
-					return ActionResultType.CONSUME;
+					return InteractionResult.CONSUME;
 
 				}
 				FluidActionResult farx = FluidUtil.tryFillContainer(stack, handler, 1000, player, true);
 				if (farx.isSuccess()) {
 					if(!player.isCreative()) {
 						if (stack.getCount() == 1) {
-							player.inventory.removeStackFromSlot(player.inventory.currentItem);
+							player.getInventory().removeItemNoUpdate(player.getInventory().selected);
 						} else {
 							stack.shrink(1);
 						}
 						ItemHandlerHelper.giveItemToPlayer(player, farx.getResult());
 					}
 					
-					return ActionResultType.CONSUME;
+					return InteractionResult.CONSUME;
 				}
 			}
 			
@@ -155,13 +156,13 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 	}
 
 	@Override
-	public void animateTick(BlockState stateIn, World world, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level world, BlockPos pos, Random rand) {
 
-		Block bsu = world.getBlockState(pos.up()).getBlock();
-		if (stateIn.get(StateProperties.MACHINE_ACTIVE)) {
+		Block bsu = world.getBlockState(pos.above()).getBlock();
+		if (stateIn.getValue(StateProperties.MACHINE_ACTIVE)) {
 
 			if (bsu instanceof BlockRefineryAddon) {
-				((BlockRefineryAddon) bsu).animateTickFromBase(stateIn, world, pos.up(), rand);
+				((BlockRefineryAddon) bsu).animateTickFromBase(stateIn, world, pos.above(), rand);
 			} else {
 				world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(rand), pos.getY() + getPartNext(rand), pos.getZ() + getPartNext(rand), 0, 0, 0);
 			}
@@ -178,7 +179,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		return d;
 	}
 
-	public static class TERefinery extends ManagedSidedMachine<ContainerRefinery> implements ITickableTileEntity {
+	public static class TERefinery extends ManagedSidedMachine<ContainerRefinery> implements ALMTicker<TERefinery> {
 
 		private int timer = 0;
 		private int nTimer = 20;
@@ -299,7 +300,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 
 		@Override
 		public void tick() {
-			if (!world.isRemote) {
+			if (!level.isClientSide) {
 				if (timer++ == nTimer) {
 
 					boolean sendUpdates = false;
@@ -333,14 +334,14 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 					//Below determines if the recipe is valid or not. If so, sets outputRecipe to not null.
 					if (outputRecipe == null) {
 
-						List<RefiningCrafting> rList = world.getRecipeManager().getRecipes(RefiningCrafting.REFINING_RECIPE, this, world);
-						Block b = world.getBlockState(pos.up()).getBlock();
+						List<RefiningCrafting> rList = this.getLevel().getRecipeManager().getRecipesFor(RefiningCrafting.REFINING_RECIPE, this, this.getLevel());
+						Block b = this.getLevel().getBlockState(this.getBlockPos().above()).getBlock();
 						RefiningCrafting recipe = null;
 						for (RefiningCrafting r : rList) {
 							if (b == r.attachmentBlock) {
-								if (!r.itemInput.getFirst().hasNoMatchingItems()) {
+								if (!r.itemInput.getFirst().isEmpty()) {
 
-									if (r.itemInput.getFirst().test(getStackInSlot(1))) {
+									if (r.itemInput.getFirst().test(getItem(1))) {
 										if (!r.fluidInput.getFirst().isEmpty()) {
 											if (!tankin.isEmpty() && r.fluidInput.getFirst().isFluidEqual(tankin) && r.fluidInput.getFirst().getAmount() <= tankin.getAmount()) {
 												recipe = r;
@@ -382,7 +383,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 
 							}
 
-							if (!recipe.itemInput.getFirst().hasNoMatchingItems()) {
+							if (!recipe.itemInput.getFirst().isEmpty()) {
 
 								float chance = recipe.itemInput.getSecond();
 								switch (getUpgradeAmount(Upgrades.MACHINE_CONSERVATION)) {
@@ -397,13 +398,13 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 								}
 
 								if (!(General.RAND.nextFloat() < chance)) {
-									getStackInSlot(1).shrink(1);
+									getItem(1).shrink(1);
 								}
 							}
 							cycles = recipe.time;
 							outputRecipe = recipe;
-							if (this.getBlockState().get(StateProperties.MACHINE_ACTIVE) == false) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+							if (this.getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 							}
 							sendUpdates = true;
 
@@ -553,8 +554,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 
 						}
 
-					} else if (getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-						world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+					} else if (getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						sendUpdates = true;
 					}
 
@@ -566,8 +567,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		}
 
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			nTimer = compound.getInt("assemblylinemachines:ntimer");
 			progress = compound.getFloat("assemblylinemachines:progress");
 			cycles = compound.getFloat("assemblylinemachines:cycles");
@@ -590,8 +591,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
-			super.write(compound);
+		public CompoundTag save(CompoundTag compound) {
+			super.save(compound);
 
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:progress", progress);
@@ -601,15 +602,15 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 			if (outputRecipe != null) {
 				compound.putString("assemblylinemachines:outputrecipe", outputRecipe.getId().toString());
 			}
-			CompoundNBT subin = new CompoundNBT();
+			CompoundTag subin = new CompoundTag();
 			tankin.writeToNBT(subin);
 			compound.put("assemblylinemachines:tankin", subin);
 
-			CompoundNBT subouta = new CompoundNBT();
+			CompoundTag subouta = new CompoundTag();
 			tankouta.writeToNBT(subouta);
 			compound.put("assemblylinemachines:tankouta", subouta);
 
-			CompoundNBT suboutb = new CompoundNBT();
+			CompoundTag suboutb = new CompoundTag();
 			tankoutb.writeToNBT(suboutb);
 			compound.put("assemblylinemachines:tankoutb", suboutb);
 
@@ -622,11 +623,11 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 			super.onLoad();
 
 			if (outputRecipeRL != null) {
-				IRecipe<?> rc = world.getRecipeManager().getRecipe(outputRecipeRL).orElse(null);
+				Recipe<?> rc = this.getLevel().getRecipeManager().byKey(outputRecipeRL).orElse(null);
 				if (rc != null && rc instanceof RefiningCrafting) {
 					outputRecipe = (RefiningCrafting) rc;
 				} else {
-					AssemblyLineMachines.LOGGER.warn("Error loading active recipe from NBT for Refinery @ " + pos + ". A recipe may have been lost.");
+					AssemblyLineMachines.LOGGER.warn("Error loading active recipe from NBT for Refinery @ " + this.getBlockPos() + ". A recipe may have been lost.");
 					progress = 0;
 					cycles = 0;
 
@@ -635,13 +636,13 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 			}
 		}
 
-		public TERefinery(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 5, new TranslationTextComponent(Registry.getBlock("refinery").getTranslationKey()), Registry.getContainerId("refinery"),
-					ContainerRefinery.class, new EnergyProperties(true, false, 160000));
+		public TERefinery(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 5, new TranslatableComponent(Registry.getBlock("refinery").getDescriptionId()), Registry.getContainerId("refinery"),
+					ContainerRefinery.class, new EnergyProperties(true, false, 160000), pos, state);
 		}
 
-		public TERefinery() {
-			this(Registry.getTileEntity("refinery"));
+		public TERefinery(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("refinery"), pos, state);
 		}
 
 		@Override
@@ -650,12 +651,15 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 				return fhandler.cast();
 			}
 			
+			/* PLUGIN DISABLED DUE TO MEKANISM NON UPDATE
 			if(PluginMekanism.get().isMekanismInstalled()) {
 				LazyOptional<T> lO = PluginMekanism.get().getRefineryCapability(cap, this);
 				if(lO != null) {
 					return lO;
 				}
 			}
+			
+			*/
 			return super.getCapability(cap, side);
 		}
 
@@ -692,7 +696,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 
-		public ContainerRefinery(final int windowId, final PlayerInventory playerInventory, final TERefinery tileEntity) {
+		public ContainerRefinery(final int windowId, final Inventory playerInventory, final TERefinery tileEntity) {
 			super(Registry.getContainerType("refinery"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 125, 34, tileEntity, true));
@@ -702,8 +706,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 57, tileEntity));
 		}
 
-		public ContainerRefinery(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TERefinery.class));
+		public ContainerRefinery(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TERefinery.class));
 		}
 
 	}
@@ -714,7 +718,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
 		TERefinery tsfm;
 
-		public ScreenRefinery(ContainerRefinery screenContainer, PlayerInventory inv, ITextComponent titleIn) {
+		public ScreenRefinery(ContainerRefinery screenContainer, Inventory inv, Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "refinery", false, new Pair<>(14, 17), screenContainer.tileEntity,
 					true);
 			tsfm = screenContainer.tileEntity;
@@ -722,9 +726,10 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			RenderSystem.setShader(GameRenderer::getPositionTexShader);
+			RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 
 			renderFluid(tsfm.tankin, x + 65, y + 23);
 			renderFluid(tsfm.tankouta, x + 99, y + 23);
@@ -747,26 +752,24 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		protected void init() {
 			super.init();
 
-			int x = guiLeft;
-			int y = guiTop;
+			int x = leftPos;
+			int y = topPos;
 
-			this.addButton(new SimpleButton(x + 65, y + 23, 0, 0, 8, 37, "", (button) -> {
-				sendDumpTank(tsfm.getPos());
-			}));
+			this.addRenderableWidget(new TrueFalseButton(x+65, y+23, 8, 37, null, (b) -> sendDumpTank(tsfm.getBlockPos())));
 		}
 
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 
 			renderFluidTooltip(tsfm.tankin, mouseX, mouseY, x + 65, y + 23, x, y, true);
 			renderFluidTooltip(tsfm.tankouta, mouseX, mouseY, x + 99, y + 23, x, y, false);
 			renderFluidTooltip(tsfm.tankoutb, mouseX, mouseY, x + 112, y + 23, x, y, false);
 			if (tsfm.showGasMsg) {
-				renderTooltip("Needs Gas Upgrade", 41, 50);
+				renderComponentTooltip("Needs Gas Upgrade", 41, 50);
 			}
 		}
 
@@ -774,14 +777,14 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(fs.getFluid().getAttributes().getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fs.getFluid().getAttributes().getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
 				if (fs.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
-					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
+					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				} else {
-					GL11.glColor4f(1f, 1f, 1f, 1f);
+					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 				}
 
 				super.blit(xblit, yblit, 37, 37, 37, tas);
@@ -799,8 +802,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 				if (!fs.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(fs.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(fs.getDisplayName().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
@@ -811,9 +814,9 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
-					this.renderTooltip(str, mouseX - bx, mouseY - by);
+					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);
 				} else {
-					this.renderTooltip("Empty", mouseX - bx, mouseY - by);
+					this.renderComponentTooltip("Empty", mouseX - bx, mouseY - by);
 				}
 			}
 		}
@@ -825,10 +828,10 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		HashPacketImpl.INSTANCE.sendToServer(pd);
 	}
 
-	public static void dumpFluid(PacketData pd, World world) {
+	public static void dumpFluid(PacketData pd, Level world) {
 
-		if (world.getTileEntity(pd.get("pos", BlockPos.class)) instanceof TERefinery) {
-			TERefinery tef = (TERefinery) world.getTileEntity(pd.get("pos", BlockPos.class));
+		if (world.getBlockEntity(pd.get("pos", BlockPos.class)) instanceof TERefinery) {
+			TERefinery tef = (TERefinery) world.getBlockEntity(pd.get("pos", BlockPos.class));
 
 			if (!tef.tankin.isEmpty()) {
 				if (tef.tankouta.isEmpty() || (tef.tankouta.isFluidEqual(tef.tankin) && tef.tankouta.getAmount() + tef.tankin.getAmount() <= 4000)) {

@@ -4,7 +4,7 @@
 		"item": "assemblylinemachines:titanium_blade_piece"
 	},
 	"input_b":{
-		"item": "assemblylinemachines:pure_gold"
+		"tag": "forge:ingots/pure_gold"
 	},
 	"output":{
 		"item": "assemblylinemachines:pure_gold_blade_piece"

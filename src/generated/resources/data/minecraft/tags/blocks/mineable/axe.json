@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "assemblylinemachines:fluid_bath",
+    "assemblylinemachines:compressed_crafting_table"
+  ]
+}

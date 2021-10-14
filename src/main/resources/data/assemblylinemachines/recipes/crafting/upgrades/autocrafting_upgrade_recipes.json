@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"p":{
 			"item": "assemblylinemachines:compressed_crafting_table"

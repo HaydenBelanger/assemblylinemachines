@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:attuned_titanium_plate"
+			"tag": "forge:plates/attuned_titanium"
 		},
 		"a":{
 			"item": "assemblylinemachines:microprocessor"
@@ -16,7 +16,7 @@
 			"item": "assemblylinemachines:enhanced_battery"
 		},
 		"p":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		},
 		"q":{
 			"item": "assemblylinemachines:miniature_black_hole"

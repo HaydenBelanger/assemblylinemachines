@@ -1,0 +1,20 @@
+{
+	"shadow_ambient": {
+		"subtitle": "sound.assemblylinemachines.shadow_ambient",
+		"sounds": ["assemblylinemachines:shadow/ambient1", "assemblylinemachines:shadow/ambient2", "assemblylinemachines:shadow/ambient3", "assemblylinemachines:shadow/ambient4",
+		"assemblylinemachines:shadow/ambient5", "assemblylinemachines:shadow/ambient6", "assemblylinemachines:shadow/ambient7", "assemblylinemachines:shadow/ambient8", "assemblylinemachines:shadow/ambient9",
+		"assemblylinemachines:shadow/ambient10"]
+	},
+	"shadow_hurt":{
+		"subtitle": "sound.assemblylinemachines.shadow_hurt",
+		"sounds": ["assemblylinemachines:shadow/hurt1", "assemblylinemachines:shadow/hurt2"]
+	},
+	"shadow_death":{
+		"subtitle": "sound.assemblylinemachines.shadow_death",
+		"sounds": ["assemblylinemachines:shadow/death1", "assemblylinemachines:shadow/death2", "assemblylinemachines:shadow/death3"]
+	},
+	"shadow_step":{
+		"subtitle": "sound.assemblylinemachines.shadow_step",
+		"sounds": ["assemblylinemachines:shadow/step1", "assemblylinemachines:shadow/step2", "assemblylinemachines:shadow/step3", "assemblylinemachines:shadow/step4"]
+	}
+}

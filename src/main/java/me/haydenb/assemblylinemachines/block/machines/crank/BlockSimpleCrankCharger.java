@@ -1,24 +1,20 @@
 package me.haydenb.assemblylinemachines.block.machines.crank;
 
-import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity;
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -27,32 +23,43 @@ import net.minecraftforge.items.IItemHandler;
 public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankableBlock{
 
 	public BlockSimpleCrankCharger() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_crank_charger");
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_crank_charger");
 	}
 	
 	
+	
+	
 	@Override
-	public ActionResultType blockRightClickServer(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		return ActionResultType.PASS;
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		return InteractionResult.PASS;
 	}
 
 
 	@Override
-	public ActionResultType blockRightClickClient(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		return ActionResultType.PASS;
+	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
+		return InteractionResult.PASS;
+	}
+	
+	@Override
+	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
+		return bteDefaultReturnBlockEntity(pPos, pState);
+	}
+	
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+		return bteDefaultReturnTicker(level, state, blockEntityType);
 	}
 	
 	public static class TESimpleCrankCharger extends BasicTileEntity implements ICrankableMachine{
 
 		
 		private IItemHandler handler = null;
-		public TESimpleCrankCharger(TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn);
+		public TESimpleCrankCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, pos, state);
 		}
 
-		public TESimpleCrankCharger() {
-			this(Registry.getTileEntity("simple_crank_charger"));
+		public TESimpleCrankCharger(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("simple_crank_charger"), pos, state);
 		}
 		
 		@Override
@@ -66,9 +73,9 @@ public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankab
 				if(stack != ItemStack.EMPTY && stack.getItem() instanceof ICrankableItem) {
 					ICrankableItem cr = (ICrankableItem) stack.getItem();
 					boolean changed = false;
-					CompoundNBT compound = stack.getTag();
+					CompoundTag compound = stack.getTag();
 					if(compound == null) {
-						compound = new CompoundNBT();
+						compound = new CompoundTag();
 					}
 					
 					if(!compound.contains("assemblylinemachines:cranks")) {
@@ -102,7 +109,7 @@ public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankab
 		}
 		
 		private boolean getCapability() {
-			TileEntity te = world.getTileEntity(pos.offset(Direction.UP));
+			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
 				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
 						Direction.DOWN);

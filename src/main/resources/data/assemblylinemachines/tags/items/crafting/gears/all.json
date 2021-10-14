@@ -4,6 +4,7 @@
 		"assemblylinemachines:steel_gear",
 		"assemblylinemachines:iron_gear",
 		"assemblylinemachines:gold_gear",
-		"assemblylinemachines:titanium_gear"
+		"assemblylinemachines:titanium_gear",
+		"assemblylinemachines:copper_gear"
 	]
 }

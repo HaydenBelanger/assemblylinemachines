@@ -2,53 +2,55 @@ package me.haydenb.assemblylinemachines.block.energy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.opengl.GL11;
+
+import com.google.common.base.Supplier;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.TEFluidGenerator;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine.ManagedDirection;
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.other.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.*;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -56,23 +58,24 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator> {
+public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator> {
 	
 	private FluidGeneratorTypes type;
 	
 	public BlockFluidGenerator(FluidGeneratorTypes type) {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(3f, 15f).notSolid().variableOpacity().harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "fluid_generator", TEFluidGenerator.class);
+		super(Block.Properties.of(Material.METAL).strength(3f, 15f).noOcclusion().dynamicShape().sound(SoundType.METAL), "fluid_generator", TEFluidGenerator.class);
 		
-		this.setDefaultState(
-				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.MACHINE_ACTIVE, false));
+		this.registerDefaultState(
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
 		this.type = type;
 	}
+	
+	
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING,
-				context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING,
+				context.getHorizontalDirection().getOpposite());
 	}
 	
 	public FluidGeneratorTypes getType() {
@@ -80,13 +83,13 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalBlock.HORIZONTAL_FACING, StateProperties.MACHINE_ACTIVE);
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(HorizontalDirectionalBlock.FACING, StateProperties.MACHINE_ACTIVE);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return type.shapeW;
 		} else if (d == Direction.SOUTH) {
@@ -98,14 +101,14 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		}
 	}
 
-	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ITickableTileEntity, TOPProvider{
+	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ALMTicker<TEFluidGenerator>, TOPProvider{
 		
 		private int burnTimeLeft = 0;
 		private float increasedCost = 1f;
 		private FluidStack burnTank = FluidStack.EMPTY;
 		private FluidStack coolTank = FluidStack.EMPTY;
 		private FluidGeneratorTypes type = null;
-		private TranslationTextComponent name = null;
+		private TranslatableComponent name = null;
 		
 		private IFluidHandler fluids = new IFluidHandler() {
 			
@@ -219,33 +222,34 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		protected LazyOptional<IFluidHandler> fhandler = LazyOptional.of(() -> fluids);
 		private int timer = 0;
 		
-		public TEFluidGenerator(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 3, null, Registry.getContainerId("fluid_generator"), ContainerFluidGenerator.class, new EnergyProperties(false, true, 75000));
+		public TEFluidGenerator(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 3, null, Registry.getContainerId("fluid_generator"), ContainerFluidGenerator.class, new EnergyProperties(false, true, 75000), pos, state);
 		}
 		
-		public TEFluidGenerator() {
-			this(Registry.getTileEntity("fluid_generator"));
+		public TEFluidGenerator(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("fluid_generator"), pos, state);
 		}
 		
 		@Override
-		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
+		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
 			if(fept == 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§cIdle")).text(new TextComponent("0 FE/t"));
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§aGenerating...")).text(new TextComponent("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
 			}
 			
 		}
 		
+		
 		@Override
-		public ITextComponent getDefaultName() {
+		public BaseComponent getDefaultName() {
 			if(name == null) {
 				try {
-					name = new TranslationTextComponent(world.getBlockState(pos).getBlock().getTranslationKey());
+					name = new TranslatableComponent(this.getLevel().getBlockState(this.getBlockPos()).getBlock().getDescriptionId());
 					return name;
 				}catch(NullPointerException e) {
-					return ITextComponent.func_244388_a("Generator");
+					return new TextComponent("Generator");
 				}
 			}
 			
@@ -256,7 +260,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		@Override
 		public void tick() {
 			
-			if(checkGeneratorType() && !world.isRemote) {
+			if(checkGeneratorType() && !level.isClientSide) {
 				
 				if(timer++ == 20) {
 					timer = 0;
@@ -341,13 +345,13 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 							sendUpdates = true;
 						}
 						
-						if(!getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+						if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 						}
 					}else {
 						
-						if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						}
 						fept = 0f;
 					}
@@ -373,7 +377,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 					if(type.outputSide == null) {
 						return super.getCapability(cap);
 					}else {
-						if(side == type.outputSide.getDirection(getBlockState().get(HorizontalBlock.HORIZONTAL_FACING))) {
+						if(side == type.outputSide.getDirection(getBlockState().getValue(HorizontalDirectionalBlock.FACING))) {
 							return super.getCapability(cap);
 						}else {
 							return LazyOptional.empty();
@@ -387,7 +391,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 					if(type.inputSide == null) {
 						return fhandler.cast();
 					}else {
-						if(side == type.inputSide.getDirection(getBlockState().get(HorizontalBlock.HORIZONTAL_FACING))) {
+						if(side == type.inputSide.getDirection(getBlockState().getValue(HorizontalDirectionalBlock.FACING))) {
 							return fhandler.cast();
 						}else {
 							return LazyOptional.empty();
@@ -403,8 +407,8 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			burnTank = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:burntank"));
 			coolTank = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:cooltank"));
@@ -413,17 +417,17 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
-			CompoundNBT sub = new CompoundNBT();
+		public CompoundTag save(CompoundTag compound) {
+			CompoundTag sub = new CompoundTag();
 			burnTank.writeToNBT(sub);
 			compound.put("assemblylinemachines:burntank", sub);
-			CompoundNBT sub2 = new CompoundNBT();
+			CompoundTag sub2 = new CompoundTag();
 			coolTank.writeToNBT(sub2);
 			compound.put("assemblylinemachines:cooltank", sub2);
 			
 			compound.putInt("assemblylinemachines:burntimeleft", burnTimeLeft);
 			compound.putFloat("assemblylinemachines:cost", increasedCost);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
@@ -440,7 +444,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 				return true;
 			}else {
 				
-				Block bl = world.getBlockState(pos).getBlock();
+				Block bl = this.getLevel().getBlockState(this.getBlockPos()).getBlock();
 				if(bl instanceof BlockFluidGenerator) {
 					type = ((BlockFluidGenerator) bl).getType();
 					return true;
@@ -463,7 +467,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 	
 	public static class ContainerFluidGenerator extends ContainerALMBase<TEFluidGenerator>{
 		
-		public ContainerFluidGenerator(final int windowId, final PlayerInventory playerInventory, final TEFluidGenerator tileEntity) {
+		public ContainerFluidGenerator(final int windowId, final Inventory playerInventory, final TEFluidGenerator tileEntity) {
 			super(Registry.getContainerType("fluid_generator"), windowId, tileEntity, playerInventory, com.mojang.datafixers.util.Pair.of(8, 84), com.mojang.datafixers.util.Pair.of(8, 142), 0);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 149, 21, tileEntity));
@@ -472,8 +476,8 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		}
 		
 		
-		public ContainerFluidGenerator(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEFluidGenerator.class));
+		public ContainerFluidGenerator(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEFluidGenerator.class));
 		}
 	}
 	
@@ -489,8 +493,8 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		}
 		HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
 		
-		public ScreenFluidGenerator(ContainerFluidGenerator screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenFluidGenerator(ContainerFluidGenerator screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new com.mojang.datafixers.util.Pair<>(176, 166), new com.mojang.datafixers.util.Pair<>(11, 6), new com.mojang.datafixers.util.Pair<>(11, 73), "", false, new com.mojang.datafixers.util.Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -498,9 +502,10 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			RenderSystem.setShader(GameRenderer::getPositionTexShader);
+			RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			renderFluid(tsfm.burnTank, x + 49, y + 23);
 			renderFluid(tsfm.coolTank, x + 62, y + 23);
@@ -508,9 +513,10 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 			ResourceLocation rl = FG_BACKGROUNDS.get(tsfm.type);
 			
 			if(rl != null) {
-				GL11.glColor4f(1f, 1f, 1f, 1f);
-				this.field_230706_i_.getTextureManager().bindTexture(rl);
-				this.blit(x, y, 0, 0, this.xSize, this.ySize);
+				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderTexture(0, rl);
+				this.blit(x, y, 0, 0, this.imageWidth, this.imageHeight);
 			}
 			
 			int prog = Math.round(((float) machine.amount / (float) machine.properties.getCapacity()) * 52F);
@@ -545,8 +551,8 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 			
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			renderFluidTooltip(tsfm.burnTank, mouseX, mouseY, x + 49, y + 23, x, y);
 			if(hasSuffUpgrades) {
@@ -560,14 +566,14 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(fs.getFluid().getAttributes().getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fs.getFluid().getAttributes().getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
 				if (fs.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
-					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
+					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				} else {
-					GL11.glColor4f(1f, 1f, 1f, 1f);
+					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 				}
 
 				super.blit(xblit, yblit, 37, 37, 37, tas);
@@ -585,8 +591,8 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 				if (!fs.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(fs.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(fs.getDisplayName().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
@@ -594,9 +600,9 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
-					this.renderTooltip(str, mouseX - bx, mouseY - by);
+					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);
 				} else {
-					this.renderTooltip("Empty", mouseX - bx, mouseY - by);
+					this.renderComponentTooltip("Empty", mouseX - bx, mouseY - by);
 				}
 			}
 		}
@@ -606,31 +612,31 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		
 		
 		COMBUSTION(Stream.of(
-				Block.makeCuboidShape(3, 3, 3, 13, 7, 13),Block.makeCuboidShape(0, 0, 0, 16, 3, 16),
-				Block.makeCuboidShape(0, 7, 0, 16, 10, 16),Block.makeCuboidShape(0, 3, 0, 16, 7, 3),
-				Block.makeCuboidShape(0, 3, 13, 3, 7, 16),Block.makeCuboidShape(13, 3, 13, 16, 7, 16),
-				Block.makeCuboidShape(4, 10, 4, 12, 14, 12),Block.makeCuboidShape(3, 14, 3, 13, 16, 13),
-				Block.makeCuboidShape(4, 3, 15, 5, 5, 16),Block.makeCuboidShape(6, 3, 15, 7, 5, 16),
-				Block.makeCuboidShape(9, 3, 15, 10, 5, 16),Block.makeCuboidShape(11, 3, 15, 12, 5, 16),
-				Block.makeCuboidShape(4, 5, 13, 5, 6, 16),Block.makeCuboidShape(6, 5, 13, 7, 6, 16),
-				Block.makeCuboidShape(9, 5, 13, 10, 6, 16),Block.makeCuboidShape(11, 5, 13, 12, 6, 16),
-				Block.makeCuboidShape(13, 3, 11, 16, 7, 12),Block.makeCuboidShape(13, 3, 9, 16, 7, 10),
-				Block.makeCuboidShape(13, 3, 6, 16, 7, 7),Block.makeCuboidShape(13, 3, 4, 16, 7, 5),
-				Block.makeCuboidShape(0, 3, 4, 3, 7, 5),Block.makeCuboidShape(0, 3, 6, 3, 7, 7),
-				Block.makeCuboidShape(0, 3, 9, 3, 7, 10),Block.makeCuboidShape(0, 3, 11, 3, 7, 12),
-				Block.makeCuboidShape(13, 4, 3, 15, 6, 13),Block.makeCuboidShape(1, 4, 3, 3, 6, 13)
-				).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get(), true, null, ManagedDirection.TOP, () -> ConfigHolder.COMMON.combustionFluids, 350),
+				Block.box(3, 3, 3, 13, 7, 13),Block.box(0, 0, 0, 16, 3, 16),
+				Block.box(0, 7, 0, 16, 10, 16),Block.box(0, 3, 0, 16, 7, 3),
+				Block.box(0, 3, 13, 3, 7, 16),Block.box(13, 3, 13, 16, 7, 16),
+				Block.box(4, 10, 4, 12, 14, 12),Block.box(3, 14, 3, 13, 16, 13),
+				Block.box(4, 3, 15, 5, 5, 16),Block.box(6, 3, 15, 7, 5, 16),
+				Block.box(9, 3, 15, 10, 5, 16),Block.box(11, 3, 15, 12, 5, 16),
+				Block.box(4, 5, 13, 5, 6, 16),Block.box(6, 5, 13, 7, 6, 16),
+				Block.box(9, 5, 13, 10, 6, 16),Block.box(11, 5, 13, 12, 6, 16),
+				Block.box(13, 3, 11, 16, 7, 12),Block.box(13, 3, 9, 16, 7, 10),
+				Block.box(13, 3, 6, 16, 7, 7),Block.box(13, 3, 4, 16, 7, 5),
+				Block.box(0, 3, 4, 3, 7, 5),Block.box(0, 3, 6, 3, 7, 7),
+				Block.box(0, 3, 9, 3, 7, 10),Block.box(0, 3, 11, 3, 7, 12),
+				Block.box(13, 4, 3, 15, 6, 13),Block.box(1, 4, 3, 3, 6, 13)
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true, null, ManagedDirection.TOP, () -> ConfigHolder.COMMON.combustionFluids, 350),
 		GEOTHERMAL(Stream.of(
-				Block.makeCuboidShape(0, 0, 0, 16, 2, 16),Block.makeCuboidShape(5, 6, 0, 11, 16, 16),Block.makeCuboidShape(2, 2, 1, 14, 5, 16),Block.makeCuboidShape(5, 5, 1, 11, 6, 16),
-				Block.makeCuboidShape(14, 2, 0, 16, 5, 16),Block.makeCuboidShape(14, 5, 0, 16, 6, 2),Block.makeCuboidShape(0, 5, 0, 2, 6, 2),Block.makeCuboidShape(11, 5, 1, 14, 6, 2),
-				Block.makeCuboidShape(2, 5, 1, 5, 6, 2),Block.makeCuboidShape(11, 6, 0, 16, 11, 2),Block.makeCuboidShape(0, 6, 0, 5, 11, 2),Block.makeCuboidShape(11, 5, 11, 16, 16, 16),
-				Block.makeCuboidShape(0, 5, 11, 5, 16, 16),Block.makeCuboidShape(11, 14, 0, 16, 16, 11),Block.makeCuboidShape(0, 14, 0, 5, 16, 11),Block.makeCuboidShape(11, 11, 0, 16, 14, 5),
-				Block.makeCuboidShape(0, 11, 0, 5, 14, 5),Block.makeCuboidShape(0, 2, 0, 2, 5, 16),Block.makeCuboidShape(1, 10, 6, 5, 14, 10),Block.makeCuboidShape(11, 10, 6, 15, 14, 10),
-				Block.makeCuboidShape(1, 6, 2, 5, 10, 10),Block.makeCuboidShape(11, 6, 2, 15, 10, 10),Block.makeCuboidShape(0, 5, 3, 5, 11, 4),Block.makeCuboidShape(11, 5, 3, 16, 11, 4),
-				Block.makeCuboidShape(0, 5, 5, 5, 11, 6),Block.makeCuboidShape(11, 5, 5, 16, 11, 6),Block.makeCuboidShape(0, 10, 6, 5, 11, 11),Block.makeCuboidShape(11, 10, 6, 16, 11, 11),
-				Block.makeCuboidShape(0, 12, 5, 5, 13, 11),Block.makeCuboidShape(11, 12, 5, 16, 13, 11),Block.makeCuboidShape(2, 2, 1, 14, 6, 1),Block.makeCuboidShape(11, 2, 0, 12, 6, 1),
-				Block.makeCuboidShape(9, 2, 0, 10, 6, 1),Block.makeCuboidShape(6, 2, 0, 7, 6, 1),Block.makeCuboidShape(4, 2, 0, 5, 6, 1)
-				).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get(), true, null, null, () -> ConfigHolder.COMMON.geothermalFluids, 200);
+				Block.box(0, 0, 0, 16, 2, 16),Block.box(5, 6, 0, 11, 16, 16),Block.box(2, 2, 1, 14, 5, 16),Block.box(5, 5, 1, 11, 6, 16),
+				Block.box(14, 2, 0, 16, 5, 16),Block.box(14, 5, 0, 16, 6, 2),Block.box(0, 5, 0, 2, 6, 2),Block.box(11, 5, 1, 14, 6, 2),
+				Block.box(2, 5, 1, 5, 6, 2),Block.box(11, 6, 0, 16, 11, 2),Block.box(0, 6, 0, 5, 11, 2),Block.box(11, 5, 11, 16, 16, 16),
+				Block.box(0, 5, 11, 5, 16, 16),Block.box(11, 14, 0, 16, 16, 11),Block.box(0, 14, 0, 5, 16, 11),Block.box(11, 11, 0, 16, 14, 5),
+				Block.box(0, 11, 0, 5, 14, 5),Block.box(0, 2, 0, 2, 5, 16),Block.box(1, 10, 6, 5, 14, 10),Block.box(11, 10, 6, 15, 14, 10),
+				Block.box(1, 6, 2, 5, 10, 10),Block.box(11, 6, 2, 15, 10, 10),Block.box(0, 5, 3, 5, 11, 4),Block.box(11, 5, 3, 16, 11, 4),
+				Block.box(0, 5, 5, 5, 11, 6),Block.box(11, 5, 5, 16, 11, 6),Block.box(0, 10, 6, 5, 11, 11),Block.box(11, 10, 6, 16, 11, 11),
+				Block.box(0, 12, 5, 5, 13, 11),Block.box(11, 12, 5, 16, 13, 11),Block.box(2, 2, 1, 14, 6, 1),Block.box(11, 2, 0, 12, 6, 1),
+				Block.box(9, 2, 0, 10, 6, 1),Block.box(6, 2, 0, 7, 6, 1),Block.box(4, 2, 0, 5, 6, 1)
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true, null, null, () -> ConfigHolder.COMMON.geothermalFluids, 200);
 		
 		private final VoxelShape shapeN;
 		private final VoxelShape shapeS;

@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"m":{
-			"item": "assemblylinemachines:mystium_plate"
+			"tag": "forge:plates/mystium"
 		},
 		"c":{
-			"item": "assemblylinemachines:chromium_plate"
+			"tag": "forge:plates/chromium"
 		},
 		"p":{
 			"item": "assemblylinemachines:pneumatic_device"

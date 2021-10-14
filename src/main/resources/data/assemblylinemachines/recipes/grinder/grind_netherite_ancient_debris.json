@@ -1,0 +1,14 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "forge:ores/netherite_scrap"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_netherite",
+		"count": 2
+	},
+	"grinds": 16,
+	"bladetype": "PUREGOLD",
+	"machine_required": true
+	
+}

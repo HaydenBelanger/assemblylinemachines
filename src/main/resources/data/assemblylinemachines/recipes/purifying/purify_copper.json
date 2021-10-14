@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:purifier",
+	"part_a":{
+		"tag": "forge:gravel"
+	},
+	"part_b":{
+		"tag": "minecraft:sand"
+	},
+	"tobepurified":{
+		"item": "minecraft:copper_ingot"
+	},
+	"output":{
+		"item": "assemblylinemachines:pure_copper"
+	},
+	"time": 200
+}

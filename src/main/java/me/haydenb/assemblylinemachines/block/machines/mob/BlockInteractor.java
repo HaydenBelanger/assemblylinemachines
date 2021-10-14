@@ -1,110 +1,117 @@
 package me.haydenb.assemblylinemachines.block.machines.mob;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.*;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
+import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.*;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.DebugOptions;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 
-public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInteractor> {
+public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEInteractor> {
 
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(0, 0, 0, 16, 3, 16),
-			Block.makeCuboidShape(0, 13, 0, 16, 16, 16),
-			Block.makeCuboidShape(0, 3, 0, 16, 13, 3),
-			Block.makeCuboidShape(0, 3, 13, 16, 13, 16),
-			Block.makeCuboidShape(2, 3, 3, 14, 13, 13)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(0, 0, 0, 16, 3, 16),
+			Block.box(0, 13, 0, 16, 16, 16),
+			Block.box(0, 3, 0, 16, 13, 3),
+			Block.box(0, 3, 13, 16, 13, 16),
+			Block.box(2, 3, 3, 14, 13, 13)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockInteractor() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "interactor",
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "interactor",
 				BlockInteractor.TEInteractor.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+
+	@Override
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.FLUID).add(HorizontalBlock.HORIZONTAL_FACING);
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection());
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing());
-	}
-
-	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos) {
-		if(facing == state.get(HorizontalBlock.HORIZONTAL_FACING)) {
-			if(!world.isRemote() && world.getTileEntity(currentPos) instanceof TEInteractor) {
-				TEInteractor te = (TEInteractor) world.getTileEntity(currentPos);
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos) {
+		if(facing == state.getValue(HorizontalDirectionalBlock.FACING)) {
+			if(!world.isClientSide() && world.getBlockEntity(currentPos) instanceof TEInteractor) {
+				TEInteractor te = (TEInteractor) world.getBlockEntity(currentPos);
 				if(te.bbProg != 0f) {
 					te.bbProg = 0f;
-					te.getWorld().sendBlockBreakProgress(-1, te.getPos(), -1);
+					te.getLevel().destroyBlockProgress(-1, te.getBlockPos(), -1);
 				}
 				
 			}
 		}
 		return state;
 	}
+	
 	@Override
-	public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 
-		if (world.getTileEntity(pos) instanceof TEInteractor) {
-			TEInteractor te = (TEInteractor) world.getTileEntity(pos);
-			te.origPlayerUUID = placer.getUniqueID();
+		if (world.getBlockEntity(pos) instanceof TEInteractor) {
+			TEInteractor te = (TEInteractor) world.getBlockEntity(pos);
+			te.origPlayerUUID = placer.getUUID();
 			te.sendUpdates();
 
 		}
-		super.onBlockPlacedBy(world, pos, state, placer, stack);
+		super.setPlacedBy(world, pos, state, placer, stack);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -116,7 +123,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 		}
 	}
 
-	public static class TEInteractor extends SimpleMachine<ContainerInteractor> implements ITickableTileEntity {
+	public static class TEInteractor extends SimpleMachine<ContainerInteractor> implements ALMTicker<TEInteractor> {
 		
 		private static boolean hasSentInteractorMessage = false;
 		
@@ -132,13 +139,13 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 		
 		private static final List<Integer> UNORDERED_VALS = Arrays.asList(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
 
-		public TEInteractor(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 9, new TranslationTextComponent(Registry.getBlock("interactor").getTranslationKey()), Registry.getContainerId("interactor"),
-					ContainerInteractor.class);
+		public TEInteractor(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 9, new TranslatableComponent(Registry.getBlock("interactor").getDescriptionId()), Registry.getContainerId("interactor"),
+					ContainerInteractor.class, pos, state);
 		}
 
-		public TEInteractor() {
-			this(Registry.getTileEntity("interactor"));
+		public TEInteractor(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("interactor"), pos, state);
 		}
 
 		
@@ -153,7 +160,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 			if(timer++ == 20) {
 				timer = 0;
 				
-				if(!world.isRemote) {
+				if(!level.isClientSide) {
 					ItemStack stack = ItemStack.EMPTY;
 					
 					if(ordered) {
@@ -175,24 +182,24 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 					
 					if(fp == null) {
 						if(origPlayerUUID != null) {
-							fp = FakePlayerFactory.get(world.getServer().getWorld(world.func_234923_W_()), world.getServer().getPlayerProfileCache().getProfileByUUID(origPlayerUUID));
+							fp = FakePlayerFactory.get(this.getLevel().getServer().getLevel(this.getLevel().dimension()), this.getLevel().getServer().getProfileCache().get(origPlayerUUID).orElse(null));
 						}
 					}
 					if(fp != null && stack != null) {
 						
-						BlockPos offsetPos = pos.offset(getBlockState().get(HorizontalBlock.HORIZONTAL_FACING));
-						BlockState bs = world.getBlockState(offsetPos);
+						BlockPos offsetPos = this.getBlockPos().relative(getBlockState().getValue(HorizontalDirectionalBlock.FACING));
+						BlockState bs = this.getLevel().getBlockState(offsetPos);
 						
 						if(mode == 0) {
 							
 							if(!stack.isEmpty()) {
 								if(bs.getBlock() == Blocks.AIR) {
-									Block block = Block.getBlockFromItem(stack.getItem());
+									Block block = Block.byItem(stack.getItem());
 									
 									if(block != Blocks.AIR) {
-										SoundType st = block.getDefaultState().getSoundType(world, offsetPos, fp);
-										world.setBlockState(offsetPos, block.getDefaultState());
-										world.playSound(null, offsetPos, st.getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
+										SoundType st = block.defaultBlockState().getSoundType(this.getLevel(), offsetPos, fp);
+										this.getLevel().setBlockAndUpdate(offsetPos, block.defaultBlockState());
+										this.getLevel().playSound(null, offsetPos, st.getPlaceSound(), SoundSource.BLOCKS, 1f, 1f);
 										stack.shrink(1);
 									}
 									
@@ -202,8 +209,8 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 							
 							
 						}else {
-							if((stack.isEmpty() && !fp.getHeldItemMainhand().isEmpty()) || (fp.getHeldItemMainhand() != stack)) {
-								fp.inventory.setInventorySlotContents(fp.inventory.currentItem, stack);
+							if((stack.isEmpty() && !fp.getMainHandItem().isEmpty()) || (fp.getMainHandItem() != stack)) {
+								fp.getInventory().setItem(fp.getInventory().selected, stack);
 							}
 							
 							if(mode == 1) {
@@ -213,14 +220,14 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 								}
 								if(checkInteractMode) {
 									try {
-										fp.interactionManager.func_219441_a(fp, world, stack, Hand.MAIN_HAND, new BlockRayTraceResult(new Vector3d(0.5d, 0.5d, 0.5d), getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).getOpposite(), offsetPos, false));
+										fp.gameMode.useItemOn(fp, this.getLevel(), stack, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(0.5d, 0.5d, 0.5d), getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite(), offsetPos, false));
 									}catch(Exception e) {
 										
 										DebugOptions db = ConfigHolder.COMMON.interactorInteractDebug.get();
 										if(db == DebugOptions.BASIC) {
-											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " triggered exception: " + e.getMessage() + ".");
+											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + this.getBlockPos().getX() + ", " + this.getBlockPos().getY() + ", " + this.getBlockPos().getZ() + " triggered exception: " + e.getMessage() + ".");
 										}else if(db == DebugOptions.COMPLETE) {
-											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " triggered stack trace: ");
+											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + this.getBlockPos().getX() + ", " + this.getBlockPos().getY() + ", " + this.getBlockPos().getZ() + " triggered stack trace: ");
 											e.printStackTrace();
 										}
 										
@@ -232,13 +239,13 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 									}
 									
 									
-									for(int i = 0; i < fp.inventory.getSizeInventory(); i++) {
-										ItemStack nStack = fp.inventory.getStackInSlot(i);
+									for(int i = 0; i < fp.getInventory().getContainerSize(); i++) {
+										ItemStack nStack = fp.getInventory().getItem(i);
 										if(!nStack.isEmpty()) {
 											if(nStack != stack) {
-												General.spawnItem(nStack, offsetPos.up(), world);
+												General.spawnItem(nStack, offsetPos.above(), this.getLevel());
 											}
-											fp.inventory.removeStackFromSlot(i);
+											fp.getInventory().removeItemNoUpdate(i);
 										}
 									}
 								}
@@ -246,25 +253,25 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 							}else if(mode == 2) {
 								if(bs.getBlock() != Blocks.AIR) {
 									
-									bbProg = bbProg + (bs.getPlayerRelativeBlockHardness(fp, world, offsetPos) * 4f);
+									bbProg = bbProg + (bs.getDestroyProgress(fp, this.getLevel(), offsetPos) * 4f);
 									if(bbProg >= 1f) {
-										world.destroyBlock(offsetPos, true, fp);
-										world.sendBlockBreakProgress(-1, offsetPos, -1);
-										stack.damageItem(1, fp, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+										this.getLevel().destroyBlock(offsetPos, true, fp);
+										this.getLevel().destroyBlockProgress(-1, offsetPos, -1);
+										stack.hurtAndBreak(1, fp, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 										bbProg = 0f;
 									}else {
-										world.sendBlockBreakProgress(-1, offsetPos, (int) Math.floor(bbProg * 10f));
+										this.getLevel().destroyBlockProgress(-1, offsetPos, (int) Math.floor(bbProg * 10f));
 									}
 								}
 							}else {
 								
-								List<LivingEntity> list = world.getEntitiesWithinAABB(LivingEntity.class, new AxisAlignedBB(offsetPos.offset(getBlockState().get(HorizontalBlock.HORIZONTAL_FACING))).grow(1));
+								List<LivingEntity> list = this.getLevel().getEntitiesOfClass(LivingEntity.class, new AABB(offsetPos.relative(getBlockState().getValue(HorizontalDirectionalBlock.FACING))).inflate(1));
 								for(LivingEntity le : list) {
 									boolean cont = true;
-									if(le instanceof PlayerEntity) {
+									if(le instanceof Player) {
 										
-										PlayerEntity pe = (PlayerEntity) le;
-										if(pe.getUniqueID().equals(fp.getUniqueID())) {
+										Player pe = (Player) le;
+										if(pe.getUUID().equals(fp.getUUID())) {
 											cont = false;
 										}
 									}
@@ -275,12 +282,12 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 										float amt = 0.5f;
 										
 										if(!stack.isEmpty()) {
-											for(AttributeModifier am : stack.getAttributeModifiers(EquipmentSlotType.MAINHAND).get(Attributes.field_233823_f_)) {
+											for(AttributeModifier am : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
 												amt += am.getAmount();
 											}
 										}
-										le.attackEntityFrom(new EntityDamageSource("interactor", fp), amt);
-										stack.damageItem(1, fp, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+										le.hurt(new EntityDamageSource("interactor", fp), amt);
+										stack.hurtAndBreak(1, fp, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 									}
 									
 								}
@@ -295,30 +302,30 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 
 			nTimer = compound.getInt("assemblylinemachines:ntimer");
 			mode = compound.getInt("assemblylinemachines:mode");
 
 			if (compound.contains("assemblylinemachines:uuid")) {
-				origPlayerUUID = compound.getUniqueId("assemblylinemachines:uuid");
+				origPlayerUUID = compound.getUUID("assemblylinemachines:uuid");
 			}
 
 			ordered = compound.getBoolean("assemblylinemachines:ordered");
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putInt("assemblylinemachines:mode", mode);
 
 			if (origPlayerUUID != null) {
-				compound.putUniqueId("assemblylinemachines:uuid", origPlayerUUID);
+				compound.putUUID("assemblylinemachines:uuid", origPlayerUUID);
 			}
 
 			compound.putBoolean("assemblylinemachines:ordered", ordered);
-			return super.write(compound);
+			return super.save(compound);
 		}
 
 		@Override
@@ -332,7 +339,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 
-		public ContainerInteractor(final int windowId, final PlayerInventory playerInventory, final TEInteractor tileEntity) {
+		public ContainerInteractor(final int windowId, final Inventory playerInventory, final TEInteractor tileEntity) {
 			super(Registry.getContainerType("interactor"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0, 0);
 
 			for (int row = 0; row < 3; ++row) {
@@ -342,8 +349,8 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 			}
 		}
 
-		public ContainerInteractor(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEInteractor.class));
+		public ContainerInteractor(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEInteractor.class));
 		}
 
 	}
@@ -353,11 +360,9 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 
 		HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
 		TEInteractor tsfm;
-		private SimpleButton dirB;
-		private SupplierWrapper dirW;
-		private SimpleButton modeB;
+		private TrueFalseButton modeB;
 
-		public ScreenInteractor(ContainerInteractor screenContainer, PlayerInventory inv, ITextComponent titleIn) {
+		public ScreenInteractor(ContainerInteractor screenContainer, Inventory inv, Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "interactor", false);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -366,35 +371,17 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 		protected void init() {
 			super.init();
 
-			int x = guiLeft;
-			int y = guiTop;
+			int x = leftPos;
+			int y = topPos;
 
-			dirB = new SimpleButton(x + 48, y + 20, 176, 33, 11, 11, "", (button) -> {
-				sendSelChange(tsfm.getPos());
-			});
-
-			dirW = new SupplierWrapper("Top-Left to Bottom-Right", "Random Selection", new Supplier<Boolean>() {
-
-				@Override
-				public Boolean get() {
-					return tsfm.ordered;
-				}
-			});
-
-			modeB = new SimpleButton(x + 48, y + 33, 176, 0, 11, 11, "", (button) -> {
-				sendModeChange(tsfm.getPos());
-			});
 			
-			addButton(dirB);
-			addButton(modeB);
+			this.addRenderableWidget(new TrueFalseButton(x+48, y+20, 176, 33, 11, 11, new TrueFalseButtonSupplier("Top-Left to Bottom-Right", "Random Selection", () -> tsfm.ordered), (b) -> sendSelChange(tsfm.getBlockPos())));
+			modeB = this.addRenderableWidget(new TrueFalseButton(x+48, y+33, 11, 11, null, (b) -> sendModeChange(tsfm.getBlockPos())));
 		}
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			if(dirW.supplier.get()) {
-				super.blit(dirB.getX(), dirB.getY(), dirB.blitx, dirB.blity, dirB.sizex, dirB.sizey);
-			}
 			
 			int add = -1;
 			switch(tsfm.mode) {
@@ -410,40 +397,32 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 			}
 			
 			if(add != -1) {
-				super.blit(modeB.getX(), modeB.getY(), modeB.blitx, modeB.blity + add, modeB.sizex, modeB.sizey);
+				super.blit(modeB.x, modeB.y, 176, 0 + add, modeB.getWidth(), modeB.getHeight());
 			}
 		};
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			
-			if (mouseX >= modeB.getX() && mouseX <= modeB.getX() + modeB.sizex && mouseY >= modeB.getY() && mouseY <= modeB.getY() + modeB.sizey) {
+			if (modeB.isHovered()) {
 				
-				int x = (this.width - this.xSize) / 2;
-				int y = (this.height - this.ySize) / 2;
+				int x = (this.width - this.imageWidth) / 2;
+				int y = (this.height - this.imageHeight) / 2;
 				
 				switch(tsfm.mode) {
 				case 3:
-					this.renderTooltip("Attack Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Attack Mode", mouseX - x, mouseY - y);
 					break;
 				case 2:
-					this.renderTooltip("Break Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Break Mode", mouseX - x, mouseY - y);
 					break;
 				case 1:
-					this.renderTooltip("Interact Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Interact Mode", mouseX - x, mouseY - y);
 					break;
 				default:
-					this.renderTooltip("Place Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Place Mode", mouseX - x, mouseY - y);
 					break;
 				}
-			}
-			
-			if (mouseX >= dirB.getX() && mouseX <= dirB.getX() + dirB.sizex && mouseY >= dirB.getY() && mouseY <= dirB.getY() + dirB.sizey) {
-				
-				int x = (this.width - this.xSize) / 2;
-				int y = (this.height - this.ySize) / 2;
-				
-				this.renderTooltip(dirW.getTextFromSupplier(), mouseX - x, mouseY - y);
 			}
 		}
 	}
@@ -451,7 +430,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 	private static void sendSelChange(BlockPos pos) {
 		PacketData pd = new PacketData("interactor_gui");
 		pd.writeBlockPos("pos", pos);
-		pd.writeString("button", "dir");
+		pd.writeUtf("button", "dir");
 
 		HashPacketImpl.INSTANCE.sendToServer(pd);
 	}
@@ -459,16 +438,16 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 	private static void sendModeChange(BlockPos pos) {
 		PacketData pd = new PacketData("interactor_gui");
 		pd.writeBlockPos("pos", pos);
-		pd.writeString("button", "mode");
+		pd.writeUtf("button", "mode");
 
 		HashPacketImpl.INSTANCE.sendToServer(pd);
 	}
 
-	public static void updateDataFromPacket(PacketData pd, World world) {
+	public static void updateDataFromPacket(PacketData pd, Level world) {
 
 		if (pd.getCategory().equals("interactor_gui")) {
 			BlockPos pos = pd.get("pos", BlockPos.class);
-			TileEntity tex = world.getTileEntity(pos);
+			BlockEntity tex = world.getBlockEntity(pos);
 			if (tex instanceof TEInteractor) {
 				TEInteractor te = (TEInteractor) tex;
 				String b = pd.get("button", String.class);

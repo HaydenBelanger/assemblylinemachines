@@ -1,0 +1,51 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "assemblylinemachines:block/entropy_reactor/entropy_reactor_corner",
+		"1": "assemblylinemachines:block/entropy_reactor/entropy_reactor_top_corner",
+		"2": "assemblylinemachines:block/entropy_reactor/entropy_reactor_corner_top",
+		"3": "assemblylinemachines:block/entropy_reactor/entropy_reactor_corner_inner",
+		"particle": "assemblylinemachines:block/entropy_reactor/entropy_reactor_block"
+	},
+	"elements": [
+		{
+			"name": "Bottom",
+			"from": [0, 0, 0],
+			"to": [16, 3, 16],
+			"faces": {
+				"north": {"uv": [16, 0, 0, 3], "rotation": 180, "texture": "#0"},
+				"west": {"uv": [16, 13, 0, 16], "texture": "#0"},
+				"up": {"uv": [16, 16, 0, 0], "texture": "#2"},
+				"down": {"uv": [0, 16, 16, 0], "texture": "#1"}
+			}
+		}, 
+		{
+			"name": "Mid",
+			"from": [3, 3, 3],
+			"to": [16, 13, 16],
+			"faces": {
+				"north": {"uv": [0, 3, 13, 13], "texture": "#3"},
+				"west": {"uv": [13, 3, 0, 13], "texture": "#3"}
+			}
+		}, 
+		{
+			"name": "Top",
+			"from": [0, 13, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"west": {"uv": [16, 0, 0, 3], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [16, 0, 0, 16], "texture": "#2"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShape",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

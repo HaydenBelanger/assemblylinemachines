@@ -7,25 +7,21 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFlui
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class BathCrafting implements IRecipe<IInventory>{
+public class BathCrafting implements Recipe<Container>{
 
 	
-	public static final IRecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
+	public static final RecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	
@@ -50,8 +46,23 @@ public class BathCrafting implements IRecipe<IInventory>{
 		this.type = type;
 		this.percent = percent;
 	}
+	
 	@Override
-	public boolean matches(IInventory inv, World worldIn) {
+	public boolean canCraftInDimensions(int pWidth, int pHeight) {
+		return false;
+	}
+	
+	@Override
+	public RecipeSerializer<?> getSerializer() {
+		return SERIALIZER;
+	}
+	@Override
+	public RecipeType<?> getType() {
+		return BATH_RECIPE;
+	}
+	
+	@Override
+	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
 			if(inv instanceof TEFluidBath) {
 				if(type == BathOption.MIXER_ONLY) {
@@ -59,14 +70,14 @@ public class BathCrafting implements IRecipe<IInventory>{
 				}
 				TEFluidBath finv = (TEFluidBath) inv;
 				
-				if(inputa.test(finv.getStackInSlot(1))) {
-					if(inputb.test(finv.getStackInSlot(2))) {
+				if(inputa.test(finv.getItem(1))) {
+					if(inputb.test(finv.getItem(2))) {
 						return true;
 					}
 				}
 				
-				if(inputa.test(finv.getStackInSlot(2))) {
-					if(inputb.test(finv.getStackInSlot(1))) {
+				if(inputa.test(finv.getItem(2))) {
+					if(inputb.test(finv.getItem(1))) {
 						return true;
 					}
 				}
@@ -74,14 +85,14 @@ public class BathCrafting implements IRecipe<IInventory>{
 				if(type == BathOption.BASIN_ONLY) {
 					return false;
 				}
-				if(inputa.test(inv.getStackInSlot(1))) {
-					if(inputb.test(inv.getStackInSlot(2))) {
+				if(inputa.test(inv.getItem(1))) {
+					if(inputb.test(inv.getItem(2))) {
 						return true;
 					}
 				}
 				
-				if(inputa.test(inv.getStackInSlot(2))) {
-					if(inputb.test(inv.getStackInSlot(1))) {
+				if(inputa.test(inv.getItem(2))) {
+					if(inputb.test(inv.getItem(1))) {
 						return true;
 					}
 				}
@@ -89,14 +100,14 @@ public class BathCrafting implements IRecipe<IInventory>{
 				if(type == BathOption.BASIN_ONLY) {
 					return false;
 				}
-				if(inputa.test(inv.getStackInSlot(0))) {
-					if(inputb.test(inv.getStackInSlot(1))) {
+				if(inputa.test(inv.getItem(0))) {
+					if(inputb.test(inv.getItem(1))) {
 						return true;
 					}
 				}
 				
-				if(inputa.test(inv.getStackInSlot(1))) {
-					if(inputb.test(inv.getStackInSlot(0))) {
+				if(inputa.test(inv.getItem(1))) {
+					if(inputb.test(inv.getItem(0))) {
 						return true;
 					}
 				}
@@ -113,33 +124,23 @@ public class BathCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public boolean isDynamic() {
+	public boolean isSpecial() {
 		return true;
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(IInventory inv) {
+	public ItemStack assemble(Container inv) {
 		return this.output.copy();
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
-		return false;
-	}
-
-	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return output;
 	}
 
 	@Override
 	public ResourceLocation getId() {
 		return id;
-	}
-
-	@Override
-	public IRecipeSerializer<?> getSerializer() {
-		return SERIALIZER;
 	}
 	
 	@Override
@@ -162,22 +163,17 @@ public class BathCrafting implements IRecipe<IInventory>{
 		if(this.type == BathOption.MIXER_ONLY) {
 			
 			if(fluid.isElectricMixerOnly()) {
-				nnl.add(Ingredient.fromItems(electricMixer));
+				nnl.add(Ingredient.of(electricMixer));
 			}else {
-				nnl.add(Ingredient.fromItems(mixerHandler, electricMixer));
+				nnl.add(Ingredient.of(mixerHandler, electricMixer));
 			}
 			
 		}else if(this.type == BathOption.BASIN_ONLY){
-			nnl.add(Ingredient.fromItems(basin));
+			nnl.add(Ingredient.of(basin));
 		}else {
-			nnl.add(Ingredient.fromItems(mixerHandler, electricMixer, basin));
+			nnl.add(Ingredient.of(mixerHandler, electricMixer, basin));
 		}
 		return nnl;
-	}
-
-	@Override
-	public IRecipeType<?> getType() {
-		return BATH_RECIPE;
 	}
 	
 	public BathCraftingFluids getFluid() {
@@ -196,33 +192,33 @@ public class BathCrafting implements IRecipe<IInventory>{
 		return percent;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<BathCrafting>{
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<BathCrafting>{
 
 		@Override
-		public BathCrafting read(ResourceLocation recipeId, JsonObject json) {
+		public BathCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient ingredienta = Ingredient.deserialize(JSONUtils.getJsonObject(json, "input_a"));
-				final Ingredient ingredientb = Ingredient.deserialize(JSONUtils.getJsonObject(json, "input_b"));
+				final Ingredient ingredienta = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_a"));
+				final Ingredient ingredientb = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_b"));
 				
-				final ItemStack output = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "output"));
-				final int stirs = JSONUtils.getInt(json, "stirs");
-				final BathCraftingFluids fluid = BathCraftingFluids.valueOf(JSONUtils.getString(json, "fluid").toUpperCase());
+				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				final int stirs = GsonHelper.getAsInt(json, "stirs");
+				final BathCraftingFluids fluid = BathCraftingFluids.valueOf(GsonHelper.getAsString(json, "fluid").toUpperCase());
 				if(fluid == BathCraftingFluids.NONE) {
 					throw new IllegalArgumentException("Fluid cannot be 'NONE'.");
 				}
 				
-				final int color = Integer.parseInt(JSONUtils.getString(json, "mix_color").replace("#", ""), 16);
+				final int color = Integer.parseInt(GsonHelper.getAsString(json, "mix_color").replace("#", ""), 16);
 				final BathOption machineReqd;
-				if(JSONUtils.hasField(json, "mixer_type")) {
-					machineReqd = BathOption.valueOf(JSONUtils.getString(json, "mixer_type").toUpperCase());
+				if(GsonHelper.isValidNode(json, "mixer_type")) {
+					machineReqd = BathOption.valueOf(GsonHelper.getAsString(json, "mixer_type").toUpperCase());
 				}else {
 					machineReqd = BathOption.ALL;
 				}
 				
 				final BathPercentage percent;
 				
-				if(JSONUtils.hasField(json, "drain_percent")) {
-					percent = BathPercentage.valueOf(JSONUtils.getString(json, "drain_percent").toUpperCase());
+				if(GsonHelper.isValidNode(json, "drain_percent")) {
+					percent = BathPercentage.valueOf(GsonHelper.getAsString(json, "drain_percent").toUpperCase());
 				}else {
 					percent = BathPercentage.FULL;
 				}
@@ -238,35 +234,35 @@ public class BathCrafting implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public BathCrafting read(ResourceLocation recipeId, PacketBuffer buffer) {
-			final Ingredient inputa = Ingredient.read(buffer);
-			final Ingredient inputb = Ingredient.read(buffer);
-			final ItemStack output = buffer.readItemStack();
+		public BathCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+			final Ingredient inputa = Ingredient.fromNetwork(buffer);
+			final Ingredient inputb = Ingredient.fromNetwork(buffer);
+			final ItemStack output = buffer.readItem();
 			final int stirs = buffer.readInt();
-			final BathCraftingFluids fluid = buffer.readEnumValue(BathCraftingFluids.class);
+			final BathCraftingFluids fluid = buffer.readEnum(BathCraftingFluids.class);
 			final int color = buffer.readInt();
-			final BathOption machineReqd = buffer.readEnumValue(BathOption.class);
-			final BathPercentage percent = buffer.readEnumValue(BathPercentage.class);
+			final BathOption machineReqd = buffer.readEnum(BathOption.class);
+			final BathPercentage percent = buffer.readEnum(BathPercentage.class);
 			
 			return new BathCrafting(recipeId, inputa, inputb, output, stirs, fluid, color, machineReqd, percent);
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, BathCrafting recipe) {
-			recipe.inputa.write(buffer);
-			recipe.inputb.write(buffer);
-			buffer.writeItemStack(recipe.output);
+		public void toNetwork(FriendlyByteBuf buffer, BathCrafting recipe) {
+			recipe.inputa.toNetwork(buffer);
+			recipe.inputb.toNetwork(buffer);
+			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.stirs);
-			buffer.writeEnumValue(recipe.fluid);
+			buffer.writeEnum(recipe.fluid);
 			buffer.writeInt(recipe.color);
-			buffer.writeEnumValue(recipe.type);
-			buffer.writeEnumValue(recipe.percent);
+			buffer.writeEnum(recipe.type);
+			buffer.writeEnum(recipe.percent);
 			
 		}
 		
 	}
 	
-	public static class TypeBathCrafting implements IRecipeType<BathCrafting>{
+	public static class TypeBathCrafting implements RecipeType<BathCrafting>{
 		
 		@Override
 		public String toString() {

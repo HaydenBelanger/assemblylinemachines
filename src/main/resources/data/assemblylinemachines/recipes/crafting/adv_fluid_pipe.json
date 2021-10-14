@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"i":{
 			"item": "assemblylinemachines:fluid_pipe"
 		},
 		"m":{
-			"item": "assemblylinemachines:mystium_plate"
+			"tag": "forge:plates/mystium"
 		}
 	},
 	"result":{

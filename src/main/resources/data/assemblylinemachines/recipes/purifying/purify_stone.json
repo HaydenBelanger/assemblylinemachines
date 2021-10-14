@@ -7,7 +7,7 @@
 		"tag": "minecraft:sand"
 	},
 	"tobepurified":{
-		"item": "minecraft:smooth_stone"
+		"tag": "forge:stone"
 	},
 	"output":{
 		"item": "assemblylinemachines:polished_rock"

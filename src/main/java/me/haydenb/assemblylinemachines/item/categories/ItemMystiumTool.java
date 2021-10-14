@@ -5,64 +5,70 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 import com.google.common.collect.Multimap;
+import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.General.IPoweredTool;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.*;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.core.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+@SuppressWarnings("deprecation")
 public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements IPoweredTool {
 
 	private final A parent;
 	private final ItemStack item;
 	private final int maxPower;
 
-	public ItemMystiumTool(float damage, float speed, ToolType tt, Item.Properties builder, int maxPower, A parent) {
+	public ItemMystiumTool(float damage, float speed, Item.Properties builder, int maxPower, A parent) {
 		super(parent.getTier(), builder);
 		this.parent = parent;
 		this.maxPower = maxPower;
 		this.item = new ItemStack(parent);
-		
+
 	}
 
 	@Override
 	public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<T> onBroken) {
 		if (stack.hasTag()) {
-			CompoundNBT compound = stack.getTag();
+			CompoundTag compound = stack.getTag();
 
 			if (compound.contains("assemblylinemachines:fe")) {
 
@@ -81,33 +87,34 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 		return super.damageItem(stack, amount, entity, onBroken);
 	}
-	
+
 	//Called from Registry
 	@OnlyIn(Dist.CLIENT)
 	public void connectItemProperties() {
-		ItemModelsProperties.func_239418_a_(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
-			
+		ItemProperties.register(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new ItemPropertyFunction() {
+
 			@Override
-			public float call(ItemStack stack, ClientWorld cliWorld, LivingEntity entity) {
+			public float call(ItemStack stack, ClientLevel p_174677_, LivingEntity p_174678_, int p_174679_) {
 				if(stack.hasTag()) {
-					CompoundNBT compound = stack.getTag();
+					CompoundTag compound = stack.getTag();
 					if(compound.contains("assemblylinemachines:secondarystyle") && compound.contains("assemblylinemachines:fe") && compound.getInt("assemblylinemachines:fe") > 0) {
 						return 1f;
 					}
 				}
-				
+
 				return 0f;
 			}
+
+
 		});
 	}
 
 	// Use A (Sword, Pickaxe, Hoe, Shovel, Axe)
 	@Override
-	public boolean canHarvestBlock(BlockState blockIn) {
-		return parent.canHarvestBlock(blockIn);
+	public boolean isCorrectToolForDrops(BlockState blockIn) {
+		return parent.isCorrectToolForDrops(blockIn);
 	}
-	
-	
+
 
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
@@ -121,12 +128,12 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	@Override
-	public boolean canPlayerBreakBlockWhileHolding(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
-		return parent.canPlayerBreakBlockWhileHolding(state, worldIn, pos, player);
+	public boolean canAttackBlock(BlockState state, Level worldIn, BlockPos pos, Player player) {
+		return parent.canAttackBlock(state, worldIn, pos, player);
 	}
 
 	@Override
-	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 
 		if (stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
 
@@ -134,105 +141,104 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 			if (item == Registry.getItem("mystium_sword")) {
 
-				stack.damageItem(2, attacker, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+				stack.hurtAndBreak(2, attacker, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 				return false;
 
 			}
 		}
 
-		return parent.hitEntity(stack, target, attacker);
+		return parent.hurtEnemy(stack, target, attacker);
 	}
 
-
 	@Override
-	public boolean onBlockDestroyed(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity player) {
+	public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity player) {
 
 		if (stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
 
 			Item item = stack.getItem();
 
 			if (item == Registry.getItem("mystium_pickaxe")) {
-				Direction d = Direction.getFacingDirections(player)[0];
+				Direction d = Direction.orderedByNearest(player)[0];
 
 				Iterator<BlockPos> iter;
 				if (d == Direction.UP || d == Direction.DOWN) {
 
-					iter = BlockPos.getAllInBox(pos.north().west(), pos.south().east()).iterator();
+					iter = BlockPos.betweenClosedStream(pos.north().west(), pos.south().east()).iterator();
 				} else {
-					iter = BlockPos.getAllInBox(pos.up().offset(d.rotateY()), pos.down().offset(d.rotateYCCW())).iterator();
+					iter = BlockPos.betweenClosedStream(pos.above().relative(d.getClockWise()), pos.below().relative(d.getCounterClockWise())).iterator();
 				}
 
 				int cost = 0;
-				
-				ServerWorld sw = null;
-				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.func_234923_W_());
+
+				ServerLevel sw = null;
+				if(!world.isClientSide) {
+					sw = world.getServer().getLevel(world.dimension());
 				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
 					BlockState bs = world.getBlockState(posx);
-					if (bs.getBlock() != Blocks.AIR && bs.getBlockHardness(world, posx) != -1f) {
+					if (bs.getBlock() != Blocks.AIR && bs.getDestroySpeed(world, posx) != -1f) {
 						cost = cost + 2;
 						world.destroyBlock(posx, false, player);
-						
-						if(!world.isRemote) {
-							
+
+						if(!world.isClientSide) {
+
 							performDrops(bs, posx, player, sw);
 						}
 					}
 
 				}
 
-				stack.damageItem(cost, player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+				stack.hurtAndBreak(cost, player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 				return true;
 
 			} else if (item == Registry.getItem("mystium_axe")) {
 
 
 				BlockState bs = world.getBlockState(pos);
-				
+
 				if(bs.getBlock().getTags().contains(new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
-					stack.damageItem(breakAndBreakConnected(world, bs, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+					stack.hurtAndBreak(breakAndBreakConnected(world, bs, 0, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 				}
 				return true;
 
 			} else if (item == Registry.getItem("mystium_shovel")) {
-				Direction d = Direction.getFacingDirections(player)[0];
+				Direction d = Direction.orderedByNearest(player)[0];
 
-				Iterator<BlockPos> iter = BlockPos.getAllInBox(pos, pos.offset(d, 5)).iterator();
+				Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos, pos.relative(d, 5)).iterator();
 
 				int cost = 0;
-				ServerWorld sw = null;
-				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.func_234923_W_());
+				ServerLevel sw = null;
+				if(!world.isClientSide) {
+					sw = world.getServer().getLevel(world.dimension());
 				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
 					BlockState bs = world.getBlockState(posx);
-					if (bs.getBlock() != Blocks.AIR && (bs.getMaterial() == Material.EARTH || bs.getMaterial() == Material.CLAY || bs.getMaterial() == Material.SNOW || bs.getMaterial() == Material.SNOW_BLOCK || bs.getMaterial() == Material.SAND)) {
+					if (bs.getBlock() != Blocks.AIR && (bs.getMaterial() == Material.DIRT || bs.getMaterial() == Material.CLAY || bs.getMaterial() == Material.SNOW || bs.getMaterial() == Material.TOP_SNOW|| bs.getMaterial() == Material.SAND)) {
 						cost = cost + 2;
 						world.destroyBlock(posx, false, player);
-						
-						if(!world.isRemote) {
+
+						if(!world.isClientSide) {
 							performDrops(bs, posx, player, sw);
 						}
 					}
 
 				}
 
-				stack.damageItem(cost, player, (p_220038_0_) -> {p_220038_0_.sendBreakAnimation(EquipmentSlotType.MAINHAND);});
+				stack.hurtAndBreak(cost, player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 				return true;
 			}
 		}
-		return parent.onBlockDestroyed(stack, world, state, pos, player);
+		return parent.mineBlock(stack, world, state, pos, player);
 	}
 
-	private int breakAndBreakConnected(World world, BlockState origState, int ctx, BlockPos posx, LivingEntity player) {
+	private int breakAndBreakConnected(Level world, BlockState origState, int ctx, BlockPos posx, LivingEntity player) {
 		world.destroyBlock(posx, true, player);
 
 		int cost = 2;
 		if(ctx <= 20) {
-			Iterator<BlockPos> iter = BlockPos.getAllInBox(posx.down().north().west(), posx.up().south().east()).iterator();
+			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(posx.below().north().west(), posx.above().south().east()).iterator();
 
 			while(iter.hasNext()) {
 				BlockPos posq = iter.next();
@@ -247,22 +253,21 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		return cost;
 	}
 
-	private void performDrops(BlockState bs, BlockPos pos, LivingEntity player, ServerWorld sw) {
-		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.field_237457_g_, new Vector3d(pos.getX(), pos.getY(), pos.getZ())));
-		InventoryHelper.dropItems(sw.getWorld(), pos, NonNullList.from(ItemStack.EMPTY, drops.toArray(new ItemStack[drops.size()])));
-	}
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		return parent.getAttributeModifiers(equipmentSlot);
+	private void performDrops(BlockState bs, BlockPos pos, LivingEntity player, ServerLevel sw) {
+		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootContextParams.TOOL, player.getMainHandItem()).withParameter(LootContextParams.ORIGIN, new Vec3(pos.getX(), pos.getY(), pos.getZ())));
+		Containers.dropContents(sw.getLevel(), pos, NonNullList.of(ItemStack.EMPTY, drops.toArray(new ItemStack[drops.size()])));
 	}
 
-	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public Multimap<net.minecraft.world.entity.ai.attributes.Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pSlot) {
+		return parent.getDefaultAttributeModifiers(pSlot);
+	}
 
-		ItemStack stack = context.getItem();
+
+	@Override
+	public InteractionResult useOn(UseOnContext pContext) {
+
+		ItemStack stack = pContext.getItemInHand();
 		if (stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
 
 			Item item = stack.getItem();
@@ -270,48 +275,51 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 			if(item == Registry.getItem("mystium_hoe")) {
 
-				BlockPos blockpos = context.getPos();
-				World world = context.getWorld();
-				@SuppressWarnings("deprecation")
-				int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
-				if (hook != 0) return hook > 0 ? ActionResultType.SUCCESS : ActionResultType.FAIL;
-				if (context.getFace() != Direction.DOWN && world.isAirBlock(blockpos.up())) {
-					BlockState blockstate = ItemPublicHoe.HOE_LOOKUP.get(world.getBlockState(blockpos).getBlock());
-					if (blockstate != null) {
-						
-						blockstate = Registry.getBlock("mystium_farmland").getDefaultState();
-						PlayerEntity playerentity = context.getPlayer();
-						world.playSound(playerentity, blockpos, SoundEvents.ITEM_HOE_TILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
-						if (!world.isRemote) {
-							world.setBlockState(blockpos, blockstate, 11);
-							if (playerentity != null) {
-								context.getItem().damageItem(15, playerentity, (p_220043_1_) -> {
-									p_220043_1_.sendBreakAnimation(context.getHand());
-								});
+				Level level = pContext.getLevel();
+				BlockPos blockpos = pContext.getClickedPos();
+				Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = General.getTillableMap().get(level.getBlockState(blockpos).getBlock());
+				int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(pContext);
+				if (hook != 0) return hook > 0 ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+				if (pContext.getClickedFace() != Direction.DOWN && level.isEmptyBlock(blockpos.above())) {
+					if (pair == null) {
+						return InteractionResult.PASS;
+					} else {
+						Predicate<UseOnContext> predicate = pair.getFirst();
+						if (predicate.test(pContext)) {
+							Player player = pContext.getPlayer();
+							level.playSound(player, blockpos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+							if (!level.isClientSide) {
+								level.setBlock(blockpos, Registry.getBlock("mystium_farmland").defaultBlockState(), 11);
+								if (player != null) {
+									pContext.getItemInHand().hurtAndBreak(15, player, (p_150845_) -> {
+										p_150845_.broadcastBreakEvent(pContext.getHand());
+									});
+								}
 							}
-						}
 
-						return ActionResultType.func_233537_a_(world.isRemote);
+							return InteractionResult.sidedSuccess(level.isClientSide);
+						} else {
+							return InteractionResult.PASS;
+						}
 					}
 				}
 
-				return ActionResultType.PASS;
+				return InteractionResult.PASS;
 
 			}
 		}
 
-		return parent.onItemUse(context);
+		return parent.useOn(pContext);
 	}
 
 	@Override
-	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE);
+	public Component getName(ItemStack stack) {
+		return super.getName(stack).copy().withStyle(ChatFormatting.DARK_PURPLE);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public boolean hasContainerItem() {
-		return parent.hasContainerItem();
+	public boolean hasContainerItem(ItemStack stack) {
+		return parent.hasContainerItem(stack);
 	}
 
 	@Override
@@ -342,11 +350,11 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 	private void setCurrentPower(ItemStack stack, int amt) {
 
-		CompoundNBT nbt;
+		CompoundTag nbt;
 		if(stack.hasTag()) {
 			nbt = stack.getTag();
 		}else {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		if(amt <= 0) {
 			nbt.remove("assemblylinemachines:fe");
@@ -358,7 +366,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			}
 
 		}
-		
+
 		if(amt != 0) {
 			nbt.putBoolean("assemblylinemachines:canbreakblackgranite", true);
 		}else {
@@ -369,7 +377,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
+	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
 		return new ICapabilityProvider() {
 
 			protected IEnergyStorage energy = new IEnergyStorage() {
@@ -432,72 +440,72 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 
-		if (!world.isRemote && player.isSneaking() && this != Registry.getItem("mystium_hammer")) {
+		if (!world.isClientSide && player.isShiftKeyDown() && this != Registry.getItem("mystium_hammer")) {
 
-			ItemStack stack = player.getHeldItemMainhand();
+			ItemStack stack = player.getMainHandItem();
 
-			CompoundNBT nbt;
+			CompoundTag nbt;
 			if (stack.hasTag()) {
 				nbt = stack.getTag();
 			} else {
-				nbt = new CompoundNBT();
+				nbt = new CompoundTag();
 			}
 
 			if (nbt.contains("assemblylinemachines:secondarystyle")) {
 				nbt.remove("assemblylinemachines:secondarystyle");
-				player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
+				player.displayClientMessage(new TextComponent("Disabled Secondary Ability.").withStyle(ChatFormatting.RED), true);
 			} else {
 				nbt.putBoolean("assemblylinemachines:secondarystyle", true);
-				player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.AQUA), true);
+				player.displayClientMessage(new TextComponent("Enabled Secondary Ability.").withStyle(ChatFormatting.AQUA), true);
 			}
 
 			stack.setTag(nbt);
-			return new ActionResult<ItemStack>(ActionResultType.CONSUME, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.CONSUME, stack);
 		}
-		return super.onItemRightClick(world, player, hand);
+		return super.use(world, player, hand);
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if (stack.hasTag()) {
 
-			CompoundNBT compound = stack.getTag();
+			CompoundTag compound = stack.getTag();
 
 			if (compound.contains("assemblylinemachines:fe")) {
-				tooltip.add(new StringTextComponent(
+				tooltip.add(new TextComponent(
 						Formatting.GENERAL_FORMAT.format(compound.getInt("assemblylinemachines:fe")) + "/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE")
-						.func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE));
+						.withStyle(ChatFormatting.DARK_PURPLE));
 			} else {
-				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
+				tooltip.add(new TextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").withStyle(ChatFormatting.DARK_RED));
 			}
 
 			if (compound.contains("assemblylinemachines:secondarystyle")) {
-				tooltip.add(new StringTextComponent("Secondary Ability Enabled").func_230532_e_().func_240699_a_(TextFormatting.AQUA));
+				tooltip.add(new TextComponent("Secondary Ability Enabled").withStyle(ChatFormatting.AQUA));
 			}
 			return;
 		}
 
-		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
+		tooltip.add(new TextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").withStyle(ChatFormatting.DARK_RED));
 
 	}
-	
+
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
 		if(stack.hasTag()) {
-			
-			CompoundNBT compound = stack.getTag();
-			
+
+			CompoundTag compound = stack.getTag();
+
 			if(compound.contains("assemblylinemachines:fe")) {
-				
+
 				return (double) ((compound.getInt("assemblylinemachines:fe") - getMaxPower()) * -1) / (double) getMaxPower();
 			}
 		}
-		
+
 		return super.getDurabilityForDisplay(stack);
 	}
-	
+
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
 		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe")) {
@@ -518,17 +526,14 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	 * @return Made PowerTool
 	 */
 	@SuppressWarnings("unchecked")
-	public static <A extends TieredItem> ItemMystiumTool<A> makePowerTool(IItemTier tier, @Nullable ToolType tt, int attackDamage, float attackSpeed, Item.Properties props,
+	public static <A extends TieredItem> ItemMystiumTool<A> makePowerTool(Tier tier, int attackDamage, float attackSpeed, Item.Properties props,
 			int maxCranks, Class<A> clazz) {
-		if (tt != null) {
-			props = props.addToolType(tt, tier.getHarvestLevel());
-		}
 		try {
 			for (Constructor<?> c : clazz.getConstructors()) {
 				if (c.getParameterCount() == 4) {
-					return new ItemMystiumTool<A>((float) attackDamage, attackSpeed, tt, props, maxCranks, (A) c.newInstance(tier, attackDamage, attackSpeed, props));
+					return new ItemMystiumTool<A>((float) attackDamage, attackSpeed, props, maxCranks, (A) c.newInstance(tier, attackDamage, attackSpeed, props));
 				} else {
-					return new ItemMystiumTool<A>((float) attackDamage, attackSpeed, tt, props, maxCranks, (A) c.newInstance(tier, attackSpeed, props));
+					return new ItemMystiumTool<A>((float) attackDamage, attackSpeed, props, maxCranks, (A) c.newInstance(tier, attackSpeed, props));
 				}
 			}
 		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

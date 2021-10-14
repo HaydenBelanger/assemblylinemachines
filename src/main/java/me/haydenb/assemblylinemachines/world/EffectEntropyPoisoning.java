@@ -1,35 +1,35 @@
 package me.haydenb.assemblylinemachines.world;
 
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.*;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.*;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
-public class EffectEntropyPoisoning extends Effect {
+public class EffectEntropyPoisoning extends MobEffect {
 
 	public EffectEntropyPoisoning() {
-		super(EffectType.HARMFUL, 0x03fc5e);
+		super(MobEffectCategory.HARMFUL, 0x03fc5e);
 	}
 	
 	@Override
-	public void performEffect(LivingEntity livingEntity, int amplifier) {
-		livingEntity.attackEntityFrom(DamageSource.MAGIC, 0.5F);
+	public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
+		livingEntity.hurt(DamageSource.MAGIC, 0.5F);
 		
-		livingEntity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 60));
-		livingEntity.addPotionEffect(new EffectInstance(Effects.NAUSEA, 60));
-		livingEntity.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 60));
+		livingEntity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60));
+		livingEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 60));
+		livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60));
 		
 		
 		
-		if(livingEntity instanceof PlayerEntity && General.RAND.nextInt(3) == 0) {
+		if(livingEntity instanceof Player && General.RAND.nextInt(3) == 0) {
 			
-			BlockPos pos = new BlockPos(livingEntity.getPositionVec());
-			World world = livingEntity.getEntityWorld();
+			BlockPos pos = new BlockPos(livingEntity.position());
+			Level world = livingEntity.getCommandSenderWorld();
 			
 			for(int i = 0; i < 15; i++) {
 				
@@ -38,18 +38,18 @@ public class EffectEntropyPoisoning extends Effect {
 				int ix = 1;
 				
 				while(General.RAND.nextInt(ix) == 0) {
-					rand = rand.offset(Direction.func_239631_a_(General.RAND), General.RAND.nextInt(6));
-					rand = rand.offset(Direction.func_239631_a_(General.RAND), General.RAND.nextInt(6));
-					rand = rand.offset(Direction.func_239631_a_(General.RAND), General.RAND.nextInt(6));
+					rand = rand.relative(Direction.getRandom(General.RAND), General.RAND.nextInt(6));
+					rand = rand.relative(Direction.getRandom(General.RAND), General.RAND.nextInt(6));
+					rand = rand.relative(Direction.getRandom(General.RAND), General.RAND.nextInt(6));
 					
 					ix++;
 				}
 				
-				BlockPos rand2 = pos.offset(Direction.UP);
+				BlockPos rand2 = pos.relative(Direction.UP);
 				
 				
 				if(world.getBlockState(rand).getBlock() == Blocks.AIR && world.getBlockState(rand2).getBlock() == Blocks.AIR) {
-					livingEntity.setLocationAndAngles(rand.getX() + 0.5, rand.getY() + 0.5, rand.getZ() + 0.5, (General.RAND.nextFloat() * 360f) - 180f, (General.RAND.nextFloat() * 180f) - 90f);
+					livingEntity.moveTo(rand.getX() + 0.5, rand.getY() + 0.5, rand.getZ() + 0.5, (General.RAND.nextFloat() * 360f) - 180f, (General.RAND.nextFloat() * 180f) - 90f);
 				}
 			}
 		}
@@ -59,12 +59,12 @@ public class EffectEntropyPoisoning extends Effect {
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amplifier) {
+	public boolean isDurationEffectTick(int duration, int amplifier) {
 		return duration % 10 == 0;
 	}
 
 	@Override
-	public boolean isInstant() {
+	public boolean isInstantenous() {
 		return false;
 	}
 	

@@ -4,48 +4,49 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.crafting.EnchantmentBookCrafting;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.enchantment.*;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -53,40 +54,42 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMill.TEExperienceMill> {
+public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceMill.TEExperienceMill> {
 
 	
 	//OFF, ENCHANTMENT, BOOK, ANVIL
 	private static final IntegerProperty EXP_MILL_PROP = IntegerProperty.create("display", 0, 3);
 	
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(0, 0, 0, 16, 7, 16),
-			Block.makeCuboidShape(6, 7, 6, 10, 10, 10),
-			Block.makeCuboidShape(3, 10, 3, 13, 13, 13)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(0, 0, 0, 16, 7, 16),
+			Block.box(6, 7, 6, 10, 10, 10),
+			Block.box(3, 10, 3, 13, 13, 13)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
 	public BlockExperienceMill() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "experience_mill",
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "experience_mill",
 				BlockExperienceMill.TEExperienceMill.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(EXP_MILL_PROP, 0).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(EXP_MILL_PROP, 0).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
+	
+	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SHAPE_N;
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(EXP_MILL_PROP).add(HorizontalBlock.HORIZONTAL_FACING);
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(EXP_MILL_PROP).add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection());
 	}
 	
-	public static class TEExperienceMill extends SimpleMachine<ContainerExperienceMill> implements ITickableTileEntity{
+	public static class TEExperienceMill extends SimpleMachine<ContainerExperienceMill> implements ALMTicker<TEExperienceMill>{
 		
 		private byte mode = 1;
 		//1 - Enchantment
@@ -100,18 +103,18 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 		private float cycles = 0;
 		private ItemStack output = null;
 		
-		public TEExperienceMill(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 6, new TranslationTextComponent(Registry.getBlock("experience_mill").getTranslationKey()), Registry.getContainerId("experience_mill"),
-					ContainerExperienceMill.class, true);
+		public TEExperienceMill(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 6, new TranslatableComponent(Registry.getBlock("experience_mill").getDescriptionId()), Registry.getContainerId("experience_mill"),
+					ContainerExperienceMill.class, true, pos, state);
 		}
 
-		public TEExperienceMill() {
-			this(Registry.getTileEntity("experience_mill"));
+		public TEExperienceMill(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("experience_mill"), pos, state);
 		}
 
 		@Override
 		public void tick() {
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				
 				if(timer++ == 20) {
 					boolean sendUpdates = false;
@@ -168,12 +171,12 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 								ItemStack encht = ItemStack.EMPTY;
 								int n = 0;
 								if(contents.get(1).isEnchantable()) {
-									encht = EnchantmentHelper.addRandomEnchantment(General.RAND, contents.get(1).copy(), level, false);
+									encht = EnchantmentHelper.enchantItem(General.RAND, contents.get(1).copy(), level, false);
 									n = 1;
 								}
 								
 								if(!encht.isEnchanted() && contents.get(2).isEnchantable()) {
-									encht = EnchantmentHelper.addRandomEnchantment(General.RAND, contents.get(2).copy(), level, false);
+									encht = EnchantmentHelper.enchantItem(General.RAND, contents.get(2).copy(), level, false);
 									n = 2;
 								}
 								if(encht.isEnchanted()) {
@@ -187,7 +190,7 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 							
 						}else if(mode == 2) {
 							
-							EnchantmentBookCrafting recipe = world.getRecipeManager().getRecipe(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, this, world).orElse(null);
+							EnchantmentBookCrafting recipe = this.getLevel().getRecipeManager().getRecipeFor(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, this, this.getLevel()).orElse(null);
 							if(recipe != null) {
 								int cx = recipe.getCost();
 								int cycles = Math.round((float) cx / 10f);
@@ -255,9 +258,9 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 									Set<Enchantment> tieredItemEnchs = tiE.keySet();
 									for(Entry<Enchantment, Integer> i : EnchantmentHelper.getEnchantments(secondItem).entrySet()) {
 										
-										if(EnchantmentHelper.areAllCompatibleWith(tieredItemEnchs, i.getKey())) {
+										if(EnchantmentHelper.isEnchantmentCompatible(tieredItemEnchs, i.getKey())) {
 											if(!tieredItemEnchs.contains(i.getKey())){
-												tieredItem.addEnchantment(i.getKey(), i.getValue());
+												tieredItem.enchant(i.getKey(), i.getValue());
 											}
 										}else {
 											fail = true;
@@ -294,25 +297,25 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 								}else {
 									TieredItem ti = (TieredItem) tieredItem.getItem();
 									ItemStack opb = null;
-									if(ti.getIsRepairable(tieredItem, secondItem) && tieredItem.isDamaged()) {
+									if(ti.isValidRepairItem(tieredItem, secondItem) && tieredItem.isDamaged()) {
 										int fix = Math.round(tieredItem.getMaxDamage() * 0.25f);
 										
-										if(fix > tieredItem.getDamage()) {
-											fix = tieredItem.getDamage();
+										if(fix > tieredItem.getDamageValue()) {
+											fix = tieredItem.getDamageValue();
 										}
 										
-										tieredItem.setDamage(tieredItem.getDamage() - fix);
+										tieredItem.setDamageValue(tieredItem.getDamageValue() - fix);
 										opb = tieredItem;
 										
 									}else if(ti == secondItem.getItem() && tieredItem.isDamaged() && secondItem.isDamaged()) {
 										
-										int fix = secondItem.getMaxDamage() - secondItem.getDamage();
+										int fix = secondItem.getMaxDamage() - secondItem.getDamageValue();
 										
-										if(fix > tieredItem.getDamage()) {
-											fix = tieredItem.getDamage();
+										if(fix > tieredItem.getDamageValue()) {
+											fix = tieredItem.getDamageValue();
 										}
 										
-										tieredItem.setDamage(tieredItem.getDamage() - fix);
+										tieredItem.setDamageValue(tieredItem.getDamageValue() - fix);
 										opb = tieredItem;
 									}
 									
@@ -349,7 +352,7 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 										if(lenchantments.contains(i.getKey())) {
 											lenchantments.remove(i.getKey());
 										}
-										if(EnchantmentHelper.areAllCompatibleWith(lenchantments, i.getKey()) && finalEnchantments.getOrDefault(i.getKey(), 0) + i.getValue() <= i.getKey().getMaxLevel()){
+										if(EnchantmentHelper.isEnchantmentCompatible(lenchantments, i.getKey()) && finalEnchantments.getOrDefault(i.getKey(), 0) + i.getValue() <= i.getKey().getMaxLevel()){
 											finalEnchantments.put(i.getKey(), i.getValue() + finalEnchantments.getOrDefault(i.getKey(), 0));
 										}else {
 											fail = true;
@@ -361,7 +364,7 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 										cycles = 2;
 										ItemStack is = new ItemStack(Items.ENCHANTED_BOOK);
 										for(Entry<Enchantment, Integer> i : finalEnchantments.entrySet()) {
-											EnchantedBookItem.addEnchantment(is, new EnchantmentData(i.getKey(), i.getValue()));
+											EnchantedBookItem.addEnchantment(is, new EnchantmentInstance(i.getKey(), i.getValue()));
 											cx += (i.getValue() * 7);
 											cycles += (i.getValue() * 2);
 										}
@@ -417,11 +420,11 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 						}
 					}
 					
-					if(output == null && getBlockState().get(EXP_MILL_PROP) != 0) {
-						world.setBlockState(pos, getBlockState().with(EXP_MILL_PROP, 0));
+					if(output == null && getBlockState().getValue(EXP_MILL_PROP) != 0) {
+						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(EXP_MILL_PROP, 0));
 						sendUpdates = true;
-					}else if(output != null && getBlockState().get(EXP_MILL_PROP) != mode) {
-						world.setBlockState(pos, getBlockState().with(EXP_MILL_PROP, (int) mode));
+					}else if(output != null && getBlockState().getValue(EXP_MILL_PROP) != mode) {
+						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(EXP_MILL_PROP, (int) mode));
 						sendUpdates = true;
 					}
 					if(sendUpdates == true) {
@@ -433,25 +436,25 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			
 			compound.putByte("assemblylinemachines:mode", mode);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
-			CompoundNBT sub = new CompoundNBT();
+			CompoundTag sub = new CompoundTag();
 			tank.writeToNBT(sub);
 			compound.put("assemblylinemachines:tank", sub);
 			
 			if(output != null) {
-				sub = new CompoundNBT();
-				output.write(sub);
+				sub = new CompoundTag();
+				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
+		public void load(CompoundTag compound) {
 			mode = compound.getByte("assemblylinemachines:mode");
 			progress = compound.getFloat("assemblylinemachines:progress");
 			cycles = compound.getFloat("assemblylinemachines:cycles");
@@ -461,9 +464,9 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 			}
 			
 			if(compound.contains("assemblylinemachines:output")) {
-				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
-			super.read(compound);
+			super.load(compound);
 		}
 
 		@Override
@@ -580,11 +583,11 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerExperienceMill(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEExperienceMill.class));
+		public ContainerExperienceMill(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEExperienceMill.class));
 		}
 		
-		public ContainerExperienceMill(final int windowId, final PlayerInventory playerInventory, final TEExperienceMill tileEntity) {
+		public ContainerExperienceMill(final int windowId, final Inventory playerInventory, final TEExperienceMill tileEntity) {
 			super(Registry.getContainerType("experience_mill"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			
@@ -603,10 +606,10 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 	public static class ScreenExperienceMill extends ScreenALMBase<ContainerExperienceMill>{
 		TEExperienceMill tsfm;
 		HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
-		private SimpleButton modeB;
+		private TrueFalseButton modeB;
 		
-		public ScreenExperienceMill(ContainerExperienceMill screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenExperienceMill(ContainerExperienceMill screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), null, null, "experience_mill", false);
 			tsfm = screenContainer.tileEntity;
 			this.renderInventoryText = false;
@@ -614,22 +617,33 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 		}
 		
 		@Override
+		protected void init() {
+			super.init();
+			
+			int x = leftPos;
+			int y = topPos;
+			
+			modeB = this.addRenderableWidget(new TrueFalseButton(x+130, y+56, 11, 11, null, (b) -> sendModeChange(tsfm.getBlockPos())));
+		}
+		
+		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			if(!tsfm.tank.isEmpty() && tsfm.tank.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(tsfm.tank.getFluid());
 				if(tas == null) {
-					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(tsfm.tank.getFluid().getAttributes().getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(tsfm.tank.getFluid().getAttributes().getStillTexture());
 				}
 				
 				if(tsfm.tank.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
-					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
+					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
 				
 				super.blit(x+13, y+13, 57, 57, 57, tas);
 			}
@@ -649,7 +663,7 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 			}
 			
 			if(add != -1) {
-				super.blit(modeB.getX(), modeB.getY(), modeB.blitx, modeB.blity + add, modeB.sizex, modeB.sizey);
+				super.blit(modeB.x, modeB.y, 176, 9 + add, modeB.getWidth(), modeB.getHeight());
 			}
 			
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 51f);
@@ -659,57 +673,39 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			if (mouseX >= x+13 && mouseY >= y+13 && mouseX <= x+20 && mouseY <= y+69) {
 				if (!tsfm.tank.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(tsfm.tank.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(tsfm.tank.getDisplayName().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					} else {
 						str.add(Formatting.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000D) + " B");
 					}
-					this.renderTooltip(str, mouseX - x, mouseY - y);
+					this.renderComponentTooltip(str, mouseX - x, mouseY - y);
 				} else {
-					this.renderTooltip("Empty", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Empty", mouseX - x, mouseY - y);
 				}
 			}
 			
-			if (mouseX >= modeB.getX() && mouseX <= modeB.getX() + modeB.sizex && mouseY >= modeB.getY() && mouseY <= modeB.getY() + modeB.sizey) {
-				
+			if(modeB.isHovered()) {
 				switch(tsfm.mode) {
 				case 3:
-					this.renderTooltip("Anvil Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Anvil Mode", mouseX - x, mouseY - y);
 					break;
 				case 2:
-					this.renderTooltip("Book Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Book Mode", mouseX - x, mouseY - y);
 					break;
 				case 1:
-					this.renderTooltip("Enchantment Mode", mouseX - x, mouseY - y);
+					this.renderComponentTooltip("Enchantment Mode", mouseX - x, mouseY - y);
 					break;
 				}
 			}
 		}
-		
-		@Override
-		protected void init() {
-			super.init();
-			
-			int x = guiLeft;
-			int y = guiTop;
-			
-			modeB = new SimpleButton(x + 130, y + 56, 176, 9, 11, 11, "", (button) -> {
-				sendModeChange(tsfm.getPos());
-			});
-			
-			addButton(modeB);
-		}
-		
-		
-		
 		
 		
 		
@@ -722,11 +718,11 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 		HashPacketImpl.INSTANCE.sendToServer(pd);
 	}
 	
-	public static void updateDataFromPacket(PacketData pd, World world) {
+	public static void updateDataFromPacket(PacketData pd, Level world) {
 
 		if (pd.getCategory().equals("exp_mill_gui")) {
 			BlockPos pos = pd.get("pos", BlockPos.class);
-			TileEntity tex = world.getTileEntity(pos);
+			BlockEntity tex = world.getBlockEntity(pos);
 			if (tex instanceof TEExperienceMill) {
 				TEExperienceMill te = (TEExperienceMill) tex;
 				if (te.mode == 3) {

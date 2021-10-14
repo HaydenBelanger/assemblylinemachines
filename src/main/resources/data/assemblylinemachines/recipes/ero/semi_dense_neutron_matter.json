@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:entropy_reactor",
+	"output":{
+		"item": "assemblylinemachines:semi_dense_neutron_matter"
+	},
+	"varietyReqd": 0.0,
+	"odds": 0.6,
+	"max": 4
+}

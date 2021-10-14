@@ -2,68 +2,67 @@ package me.haydenb.assemblylinemachines.block.machines.mob;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawner.TEPoweredSpawner>{
+public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpawner.TEPoweredSpawner>{
 
 	public BlockPoweredSpawner() {
-		super(Block.Properties.create(Material.IRON).notSolid().variableOpacity().hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "powered_spawner", BlockPoweredSpawner.TEPoweredSpawner.class);
+		super(Block.Properties.of(Material.METAL).noOcclusion().dynamicShape().strength(4f, 15f).sound(SoundType.METAL), "powered_spawner", BlockPoweredSpawner.TEPoweredSpawner.class);
 	}
 	
-	public static class TEPoweredSpawner extends ManagedSidedMachine<ContainerPoweredSpawner> implements ITickableTileEntity{
+	
+	
+	public static class TEPoweredSpawner extends ManagedSidedMachine<ContainerPoweredSpawner> implements ALMTicker<TEPoweredSpawner>{
 		
 		
 		private EntityType<?> spawnType = null;
 		private int timer = 0;
 		private int nTimer = 160;
-		private ServerWorld sw = null;
+		private ServerLevel sw = null;
 	
 		private Entity client_entity = null;
 		public float client_renderRot = 0f;
 		
-		public TEPoweredSpawner(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 4, new TranslationTextComponent(Registry.getBlock("powered_spawner").getTranslationKey()), Registry.getContainerId("powered_spawner"), ContainerPoweredSpawner.class, new EnergyProperties(true, false, 100000));
+		public TEPoweredSpawner(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 4, new TranslatableComponent(Registry.getBlock("powered_spawner").getDescriptionId()), Registry.getContainerId("powered_spawner"), ContainerPoweredSpawner.class, new EnergyProperties(true, false, 100000), pos, state);
 		}
 		
-		public TEPoweredSpawner() {
-			this(Registry.getTileEntity("powered_spawner"));
+		public TEPoweredSpawner(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("powered_spawner"), pos, state);
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			if(compound.contains("assemblylinemachines:spawntype")) {
 				spawnType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(compound.getString("assemblylinemachines:spawntype")));
@@ -72,13 +71,13 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			
 			if(spawnType != null) {
 				compound.putString("assemblylinemachines:spawntype", spawnType.getRegistryName().toString());
 			}
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
@@ -91,7 +90,7 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 		public void tick() {
 
 
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				boolean sendUpdates = false;
 				if(spawnType == null) {
 					
@@ -131,7 +130,7 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 						int spamt = 0;
 						
 						if(sw == null) {
-							sw = world.getServer().getWorld(world.func_234923_W_());
+							sw = this.getLevel().getServer().getLevel(this.getLevel().dimension());
 						}
 						for(int i = 0; i < rand; i++) {
 							
@@ -140,25 +139,25 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 							}
 							int size = 5;
 							int max = 5;
-							double d0 = (double)pos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * (double) size + 0.5D;
-							double d1 = (double)(pos.getY() + world.rand.nextInt(3) - 1);
-							double d2 = (double)pos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * (double) size + 0.5D;
+							double d0 = (double)this.getBlockPos().getX() + (level.random.nextDouble() - level.random.nextDouble()) * (double) size + 0.5D;
+							double d1 = (double)(this.getBlockPos().getY() + level.random.nextInt(3) - 1);
+							double d2 = (double)this.getBlockPos().getZ() + (level.random.nextDouble() - level.random.nextDouble()) * (double) size + 0.5D;
 							
 							
 							for(int j = 0; j < 10; j++) {
 								
-								if(world.hasNoCollisions(spawnType.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(spawnType, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
-									Entity entity = spawnType.create(world);
-									entity.setLocationAndAngles(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
+								if(this.getLevel().noCollision(spawnType.getAABB(d0, d1, d2)) && SpawnPlacements.checkSpawnRules(spawnType, sw, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), this.getLevel().getRandom())) {
+									Entity entity = spawnType.create(this.getLevel());
+									entity.moveTo(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
 									
-									if(world.getEntitiesWithinAABB(entity.getClass(), new AxisAlignedBB(pos).grow(size)).size() >= max) {
+									if(this.getLevel().getEntitiesOfClass(entity.getClass(), new AABB(this.getBlockPos()).inflate(size)).size() >= max) {
 										break;
 									}
 									
-									world.addEntity(entity);
-									world.playEvent(2004, pos, 0);
-									if(entity instanceof MobEntity) {
-										((MobEntity) entity).spawnExplosionParticle();
+									this.getLevel().addFreshEntity(entity);
+									this.getLevel().levelEvent(2004, this.getBlockPos(), 0);
+									if(entity instanceof Mob) {
+										((Mob) entity).spawnAnim();
 									}
 									
 									spamt++;
@@ -186,7 +185,7 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 				}
 			}else {
 				if(spawnType != null && client_entity == null) {
-					client_entity = spawnType.create(world);
+					client_entity = spawnType.create(this.getLevel());
 				}else if(spawnType == null && client_entity != null){
 					client_entity = null;
 				}
@@ -234,11 +233,11 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 91);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 149);
 		
-		public ContainerPoweredSpawner(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEPoweredSpawner.class));
+		public ContainerPoweredSpawner(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEPoweredSpawner.class));
 		}
 		
-		public ContainerPoweredSpawner(final int windowId, final PlayerInventory playerInventory, final TEPoweredSpawner tileEntity) {
+		public ContainerPoweredSpawner(final int windowId, final Inventory playerInventory, final TEPoweredSpawner tileEntity) {
 			super(Registry.getContainerType("powered_spawner"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 4, 0);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 68, 66, tileEntity));
@@ -248,17 +247,16 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 		}
 		
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-			ItemStack is = super.slotClick(slotId, dragType, clickTypeIn, player);
+		public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+			super.clicked(slotId, dragType, clickTypeIn, player);
 			
 			tileEntity.spawnType = null;
 			tileEntity.sendUpdates();
-			return is;
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-			ItemStack is = super.transferStackInSlot(playerIn, index);
+		public ItemStack quickMoveStack(Player playerIn, int index) {
+			ItemStack is = super.quickMoveStack(playerIn, index);
 			
 			tileEntity.spawnType = null;
 			tileEntity.sendUpdates();
@@ -271,8 +269,8 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 	public static class ScreenPoweredSpawner extends ScreenALMEnergyBased<ContainerPoweredSpawner>{
 		TEPoweredSpawner tsfm;
 		
-		public ScreenPoweredSpawner(ContainerPoweredSpawner screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenPoweredSpawner(ContainerPoweredSpawner screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 173), null, new Pair<>(11, 81), "powered_spawner", false, new Pair<>(68, 6), screenContainer.tileEntity, true);
 			
 			renderTitleText = false;

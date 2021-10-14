@@ -13,7 +13,7 @@
 			"item": "minecraft:blaze_powder"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		}
 	},
 	"result":{

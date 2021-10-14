@@ -10,7 +10,7 @@
 			"item": "assemblylinemachines:mystium_ingot"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		}
 	},
 	"result":{

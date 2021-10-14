@@ -6,10 +6,10 @@
 	],
 	"key":{
 		"t":{
-			"item": "assemblylinemachines:titanium_ingot"
+			"tag": "forge:ingots/titanium"
 		},
 		"b":{
-			"item": "minecraft:bricks"
+			"tag": "forge:ingots/brick"
 		},
 		"s":{
 			"item": "assemblylinemachines:silt_brick"

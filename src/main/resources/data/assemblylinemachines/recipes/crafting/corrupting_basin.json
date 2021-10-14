@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"c":{
-			"item": "assemblylinemachines:chromium_plate"
+			"tag": "forge:plates/chromium"
 		},
 		"m":{
-			"item": "assemblylinemachines:rich_strange_matter"
+			"item": "assemblylinemachines:strange_matter"
 		}
 	},
 	"result":{

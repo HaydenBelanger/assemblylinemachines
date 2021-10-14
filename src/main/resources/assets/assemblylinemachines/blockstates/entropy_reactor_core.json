@@ -1,8 +1,7 @@
 {
 	"variants":{
-		"": {
-			"model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_core"
-		}
+		"critical=false": {"model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_core"},
+		"critical=true": {"model": "assemblylinemachines:block/entropy_reactor/entropy_reactor_core_critical"}
 	}
 	
 }

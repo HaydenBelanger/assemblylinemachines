@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:bone"
+		"tag": "forge:bones"
 	},
 	"output":{
 		"item": "minecraft:bone_meal",

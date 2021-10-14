@@ -1,95 +1,95 @@
 package me.haydenb.assemblylinemachines.block.fluid;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.*;
-import net.minecraft.state.StateContainer.Builder;
+import java.util.function.Supplier;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag.INamedTag;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.*;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 
 public class ALMFluid extends ForgeFlowingFluid{
 
-	public static final INamedTag<Fluid> OIL = FluidTags.makeWrapperTag("oil");
-	public static final INamedTag<Fluid> OIL_BYPRODUCT = FluidTags.makeWrapperTag("oil_byproduct");
-	public static final INamedTag<Fluid> LIQUID_EXPERIENCE = FluidTags.makeWrapperTag("liquid_experience");
-	public static final INamedTag<Fluid> CONDENSED_VOID = FluidTags.makeWrapperTag("condensed_void");
-	public static final INamedTag<Fluid> NAPHTHA = FluidTags.makeWrapperTag("naphtha");
-	
+	public static final Tag.Named<Fluid> OIL = FluidTags.bind("oil");
+	public static final Tag.Named<Fluid> OIL_BYPRODUCT = FluidTags.bind("oil_byproduct");
+	public static final Tag.Named<Fluid> LIQUID_EXPERIENCE = FluidTags.bind("liquid_experience");
+	public static final Tag.Named<Fluid> CONDENSED_VOID = FluidTags.bind("condensed_void");
+	public static final Tag.Named<Fluid> NAPHTHA = FluidTags.bind("naphtha");
+
 	protected final boolean source;
 	public ALMFluid(Properties properties, boolean source) {
 		super(properties);
-		
+
 		this.source = source;
-		
+
 		if(!source) {
-			setDefaultState(getStateContainer().getBaseState().with(LEVEL_1_8, 7));
+			this.registerDefaultState(this.defaultFluidState().setValue(LEVEL, 7));
 		}
 	}
-	
+
 	@Override
-	protected void fillStateContainer(Builder<Fluid, FluidState> builder) {
-		super.fillStateContainer(builder);
-		
+	protected void createFluidStateDefinition(Builder<Fluid, FluidState> builder) {
+		super.createFluidStateDefinition(builder);
+
 		if(!source) {
-			builder.add(LEVEL_1_8);
+			builder.add(LEVEL);
 		}
 	}
-	
+
 	@Override
 	public boolean isSource(FluidState state) {
 		return source;
 	}
+
 	@Override
-	public int getLevel(FluidState state) {
+	public int getAmount(FluidState state) {
 		if(!source) {
-			return state.get(LEVEL_1_8);
+			return state.getValue(LEVEL);
 		}else {
 			return 8;
 		}
 	}
-	
-	
-	public static class ALMFluidBlock extends FlowingFluidBlock {
 
-		private final INamedTag<Fluid> tag;
+	public static class ALMFluidBlock extends LiquidBlock {
+
+		private final Tag.Named<Fluid> tag;
 		private final double acceleration;
-		
-		public ALMFluidBlock(String name, INamedTag<Fluid> tag, Block.Properties properties) {
-			this(name, tag, properties, 0.014d);
+
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Block.Properties properties) {
+			this(fluid, tag, properties, 0.014d);
 		}
-		
-		public ALMFluidBlock(String name, INamedTag<Fluid> tag, Material material) {
-			this(name, tag, material, 0.014d);
+
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Material material) {
+			this(fluid, tag, material, 0.014d);
 		}
-		
-		public ALMFluidBlock(String name, INamedTag<Fluid> tag, Material material, double acceleration) {
-			this(name, tag, Block.Properties.create(material).hardnessAndResistance(100f).noDrops(), acceleration);
+
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Material material, double acceleration) {
+			this(fluid, tag, Block.Properties.of(material).strength(100f).noDrops(), acceleration);
 		}
-		
-		public ALMFluidBlock(String name, INamedTag<Fluid> tag, Block.Properties properties, double acceleration) {
-			super(() -> (FlowingFluid) Registry.getFluid(name), properties);
+
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Block.Properties properties, double acceleration) {
+			super(fluid, properties);
 			this.tag = tag;
 			this.acceleration = acceleration;
 		}
-		
-		
-		
-		
+
+
 		@Override
-		public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity e) {
-			
-			if(e instanceof LivingEntity) {
-				LivingEntity le = (LivingEntity) e;
-				le.handleFluidAcceleration(tag, acceleration);
+		public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity entity) {
+			if(entity instanceof LivingEntity) {
+				LivingEntity le = (LivingEntity) entity;
+				le.updateFluidHeightAndDoFluidPushing(tag, acceleration);
 			}
 		}
-		
+
 	}
-	
+
+
 }

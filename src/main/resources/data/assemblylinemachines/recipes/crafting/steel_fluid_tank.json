@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"r":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		},
 		"g":{
 			"tag": "forge:glass_panes"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_ingot"
+			"tag": "forge:ingots/steel"
 		},
 		"w":{
 			"item": "assemblylinemachines:wooden_fluid_tank"

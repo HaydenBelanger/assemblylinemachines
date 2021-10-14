@@ -1,75 +1,80 @@
 package me.haydenb.assemblylinemachines.block.machines.electric;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.*;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.*;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
+public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 
-	private static final VoxelShape SHAPE = Block.makeCuboidShape(2, 2, 2, 14, 14, 14);
+	private static final VoxelShape SHAPE = Block.box(2, 2, 2, 14, 14, 14);
 
 	public BlockQuarry() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "quarry", BlockQuarry.TEQuarry.class);
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "quarry", BlockQuarry.TEQuarry.class);
 
-		BlockState bs = this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.MACHINE_ACTIVE, false);
+		BlockState bs = this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false);
 		bs = BlockQuarryAddon.addToBlockState(bs);
-		this.setDefaultState(bs);
+		this.registerDefaultState(bs);
 	}
 	
+	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(HorizontalBlock.HORIZONTAL_FACING, StateProperties.MACHINE_ACTIVE);
+		builder.add(HorizontalDirectionalBlock.FACING, StateProperties.MACHINE_ACTIVE);
 		BlockQuarryAddon.addToBuilder(builder);
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
 		
 		VoxelShape vx = SHAPE;
 		
 		for(Direction d : Direction.values()) {
 			
-			if(state.get(BlockQuarryAddon.getAddonProperty(d))) {
-				vx = VoxelShapes.combineAndSimplify(vx, BlockQuarryAddon.getConnectionShape(d), IBooleanFunction.OR);
+			if(state.getValue(BlockQuarryAddon.getAddonProperty(d))) {
+				vx = Shapes.join(vx, BlockQuarryAddon.getConnectionShape(d), BooleanOp.OR);
 				
 			}
 			
@@ -79,20 +84,20 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos pos, BlockPos facingPos) {
-		if(world.getBlockState(pos.offset(facing)).getBlock() instanceof BlockQuarryAddon) {
-			return state.with(BlockQuarryAddon.getAddonProperty(facing), true);
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor world, BlockPos pos, BlockPos facingPos) {
+		if(world.getBlockState(pos.relative(facing)).getBlock() instanceof BlockQuarryAddon) {
+			return state.setValue(BlockQuarryAddon.getAddonProperty(facing), true);
 		}else {
-			return state.with(BlockQuarryAddon.getAddonProperty(facing), false);
+			return state.setValue(BlockQuarryAddon.getAddonProperty(facing), false);
 		}
 	}
 	
-	public static class TEQuarry extends ManagedSidedMachine<ContainerQuarry> implements ITickableTileEntity {
+	public static class TEQuarry extends ManagedSidedMachine<ContainerQuarry> implements ALMTicker<TEQuarry> {
 		
 		//OPERATION
 		private int[] min = null;
@@ -101,7 +106,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 		private ItemStack pending = ItemStack.EMPTY;
 		
 		//DATA
-		private ServerWorld serverWorld = null;
+		private ServerLevel serverLevel = null;
 		private IItemHandler handler = null;
 		
 		//SETUP
@@ -112,26 +117,32 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 		private String status = "";
 		private int timer = 0;
 		private int nTimer = 16;
+		private boolean firstStatusUpdate = false;
 
-		public TEQuarry(TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 0, new TranslationTextComponent(Registry.getBlock("quarry").getTranslationKey()), Registry.getContainerId("quarry"), ContainerQuarry.class, new EnergyProperties(true, false, 100000));
+		public TEQuarry(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 0, new TranslatableComponent(Registry.getBlock("quarry").getDescriptionId()), Registry.getContainerId("quarry"), ContainerQuarry.class, new EnergyProperties(true, false, 100000), pos, state);
 		}
 
-		public TEQuarry() {
-			this(Registry.getTileEntity("quarry"));
+		public TEQuarry(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("quarry"), pos, state);
 		}
 		
 		@Override
 		public void tick() {
 			
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
+				boolean sendUpdates = false;
 				if(min == null || max == null) {
 					status = "Status:\nWaiting for configuration...";
+					if(firstStatusUpdate == false) {
+						firstStatusUpdate = true;
+						sendUpdates = true;
+					}
 				}else {
 					if(timer++ == nTimer) {
 						timer = 0;
 						
-						boolean sendUpdates = false;
+						
 						boolean shutoff = false;
 						int cost = 600;
 						int upcount = getUpgradeBlockCount(Registry.getBlock("quarry_speed_addon"));
@@ -227,10 +238,10 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 										}
 										mpos = new BlockPos(current[0], current[1], current[2]);
 										
-										BlockState bsx = world.getBlockState(new BlockPos(current[0], current[1], current[2]));
+										BlockState bsx = this.getLevel().getBlockState(new BlockPos(current[0], current[1], current[2]));
 										
 										if(voidup != 0 || bsx.getBlock() != Blocks.DIRT) {
-											if(bsx.getBlock() != Blocks.AIR && bsx.getBlockHardness(world, mpos) < 51 && bsx.getBlockHardness(world, mpos) != -1) {
+											if(bsx.getBlock() != Blocks.AIR && bsx.getDestroySpeed(this.getLevel(), mpos) < 51 && bsx.getDestroySpeed(this.getLevel(), mpos) != -1) {
 												bs = bsx;
 											}
 										}
@@ -238,14 +249,14 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 									}
 									
 									
-									if(serverWorld == null) {
-										serverWorld = world.getServer().getWorld(world.func_234923_W_());
+									if(serverLevel == null) {
+										serverLevel = this.getLevel().getServer().getLevel(this.getLevel().dimension());
 									}
 									
 									ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
-									pick.addEnchantment(Enchantments.FORTUNE, fortune);
+									pick.enchant(Enchantments.BLOCK_FORTUNE, fortune);
 									
-									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.field_237457_g_, new Vector3d(mpos.getX(), mpos.getY(), mpos.getZ())));
+									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverLevel).withParameter(LootContextParams.TOOL, pick).withParameter(LootContextParams.ORIGIN, new Vec3(mpos.getX(), mpos.getY(), mpos.getZ())));
 									
 									for(ItemStack stack : stackList) {
 										pending = General.attemptDepositIntoAllSlots(stack, handler);
@@ -256,16 +267,16 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 									
 									
 									if(voidup != 0) {
-										world.setBlockState(mpos, Blocks.AIR.getDefaultState());
-										world.playSound(null, mpos, bs.getSoundType().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
+										this.getLevel().setBlockAndUpdate(mpos, Blocks.AIR.defaultBlockState());
+										this.getLevel().playSound(null, mpos, bs.getSoundType().getBreakSound(), SoundSource.BLOCKS, 1f, 1f);
 									}else {
-										world.setBlockState(mpos, Blocks.DIRT.getDefaultState());
-										world.playSound(null, mpos, bs.getSoundType().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
+										this.getLevel().setBlockAndUpdate(mpos, Blocks.DIRT.defaultBlockState());
+										this.getLevel().playSound(null, mpos, bs.getSoundType().getBreakSound(), SoundSource.BLOCKS, 1f, 1f);
 									}
 									status = "Status:\nWorking...\n\n@" + current[0] + ", " + current[1] + ", " + current[2];
 									
-									if(!getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-										world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+									if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+										this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 										
 									}
 									sendUpdates = true;
@@ -279,23 +290,25 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 						
 						
 						if(shutoff == true) {
-							if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+							if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 								sendUpdates = true;
 								
 							}
 						}
-						if(sendUpdates) {
-							sendUpdates();
-						}
+						
 					}
+				}
+				
+				if(sendUpdates) {
+					sendUpdates();
 				}
 			}
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			if(compound.contains("assemblylinemachines:min")) {
 				min = compound.getIntArray("assemblylinemachines:min");
@@ -306,7 +319,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 			}
 			
 			if(compound.contains("assemblylinemachines:pending")) {
-				pending = ItemStack.read(compound.getCompound("assemblylinemachines:pending"));
+				pending = ItemStack.of(compound.getCompound("assemblylinemachines:pending"));
 			}
 			if(compound.contains("assemblylinemachines:current")) {
 				current = compound.getIntArray("assemblylinemachines:current");
@@ -330,7 +343,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			
 			if(min != null) {
 				compound.putIntArray("assemblylinemachines:min", min);
@@ -345,22 +358,22 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 				compound.putIntArray("assemblylinemachines:current", current);
 			}
 			
-			CompoundNBT sub = new CompoundNBT();
+			CompoundTag sub = new CompoundTag();
 			
-			pending.write(sub);
+			pending.save(sub);
 			compound.put("assemblylinemachines:pending", sub);
 			compound.putInt("assemblylinemachines:range", range);
 			compound.putBoolean("assemblylinemachines:right", right);
 			compound.putString("assemblylinemachines:status", status);
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			
-			return super.write(compound);
+			return super.save(compound);
 		}
 
 		public int getUpgradeBlockCount(Block block) {
 			int i = 0;
 			for(Direction d : Direction.values()) {
-				if(world.getBlockState(pos.offset(d)).getBlock() == block) {
+				if(this.getLevel().getBlockState(this.getBlockPos().relative(d)).getBlock() == block) {
 					i++;
 				}
 			}
@@ -369,7 +382,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 		}
 		
 		private boolean getCapability() {
-			TileEntity te = world.getTileEntity(pos.offset(Direction.UP));
+			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
 				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
 						Direction.DOWN);
@@ -398,11 +411,11 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 	
 	public static class ContainerQuarry extends ContainerALMBase<TEQuarry>{
 		
-		public ContainerQuarry(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEQuarry.class));
+		public ContainerQuarry(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEQuarry.class));
 		}
 		
-		public ContainerQuarry(final int windowId, final PlayerInventory playerInventory, final TEQuarry tileEntity) {
+		public ContainerQuarry(final int windowId, final Inventory playerInventory, final TEQuarry tileEntity) {
 			super(Registry.getContainerType("quarry"), windowId, tileEntity, playerInventory, null, null, 0, 0);
 		}
 	}
@@ -410,10 +423,9 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 	@OnlyIn(Dist.CLIENT)
 	public static class ScreenQuarry extends ScreenALMEnergyBased<ContainerQuarry>{
 		TEQuarry tsfm;
-		private final ArrayList<SimpleButton> buttons = new ArrayList<>();
 		
-		public ScreenQuarry(ContainerQuarry screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenQuarry(ContainerQuarry screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 87), null, null, "quarry", false, new Pair<>(8, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 			renderInventoryText = false;
@@ -426,78 +438,28 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 			super.init();
 			
 			
-			int x = this.guiLeft;
-			int y = this.guiTop;
+			int x = this.leftPos;
+			int y = this.topPos;
 			
-			buttons.add(new QuarryButton(tsfm, x+145, y+46, "", (button) -> {
-				sendDirChange(tsfm.getPos());
-			}));
-			
-			buttons.add(new QuarryButton(tsfm, x+132, y+46, "Decrement Range", (button) -> {
-				sendChangeNum(tsfm.getPos(), false);
-			}));
-			
-			buttons.add(new QuarryButton(tsfm, x+158, y+46, "Increment Range", (button) -> {
-				sendChangeNum(tsfm.getPos(), true);
-			}));
-			
-			buttons.add(new QuarryButton(tsfm, x+145, y+57, "Initialize Quarry", (button) -> {
-				sendInitQuarry(tsfm.getPos());
-			}));
-			
-			for(SimpleButton b : buttons) {
-				this.addButton(b);
-			}
-		}
-		
-		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-			
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
-			
-			if(tsfm.min == null || tsfm.max == null) {
-				for(SimpleButton b : buttons) {
-					
-					if(mouseX >= b.getX() && mouseX <= b.getX() + 8 && mouseY >= b.getY() && mouseY <= b.getY() + 8) {
-						if(!b.getMessage().trim().equals("")) {
-							this.renderTooltip(b.getMessage(), mouseX - x, mouseY - y);
-						}else {
-							if(tsfm.right == true) {
-								this.renderTooltip("Change to Left-Oriented", mouseX - x, mouseY - y);
-							}else {
-								this.renderTooltip("Change to Right-Oriented", mouseX - x, mouseY - y);
-							}
-						}
-						
-					}
-				}
-			}
-			
+			this.addRenderableWidget(new QuarryButton(x+132, y+46, 8, 8, "Decrement Range", (b) -> sendChangeNum(tsfm.getBlockPos(), false), tsfm));
+			this.addRenderableWidget(new QuarryButton(x+158, y+46, 8, 8, "Increment Range", (b) -> sendChangeNum(tsfm.getBlockPos(), true), tsfm));
+			this.addRenderableWidget(new QuarryButton(x+145, y+57, 8, 8, "Initialize Quarry", (b) -> sendInitQuarry(tsfm.getBlockPos()), tsfm));
+			this.addRenderableWidget(new QuarryButton(x+145, y+46, 176, 52, 8, 8, new TrueFalseButtonSupplier("Change to Left-Oriented", "Change to Right-Oriented", () -> tsfm.right), (b) -> sendDirChange(tsfm.getBlockPos()), tsfm));
 		}
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
-			
-			if(tsfm.min == null || tsfm.max == null) {
-				this.blit(x+132, y+46, 176, 60, 34, 19);
-				
-				if(tsfm.right == true) {
-					this.blit(x+145, y+46, 176, 52, 8, 8);
-				}
-			}
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			
 			int i = 0;
 			int c = 0xffffff;
 			for(String s : tsfm.status.split("\n")) {
 				
-				float wsc = 92f / (float) this.font.getStringWidth(s);
+				float wsc = 92f / (float) this.font.width(s);
 				if(wsc > 1f) wsc = 1f;
 				if(s.equals("Error")) {
 					c = 0xff2626;
@@ -512,20 +474,49 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 		
 	}
 	
-	private static class QuarryButton extends SimpleButton{
+	private static class QuarryButton extends TrueFalseButton{
 
 		
 
 		private final TEQuarry te;
 		
-		public QuarryButton(TEQuarry te, int widthIn, int heightIn, String text, IPressable onPress) {
-			super(widthIn, heightIn, text, onPress);
+		public QuarryButton(int x, int y, int blitx, int blity, int widthIn, int heightIn, TrueFalseButtonSupplier tfbs, OnPress onPress, TEQuarry te) {
+			super(x, y, blitx, blity, widthIn, heightIn, tfbs, onPress);
+			this.te = te;
+		}
+		
+		public QuarryButton(int x, int y, int widthIn, int heightIn, String tooltip, OnPress onPress, TEQuarry te) {
+			super(x, y, widthIn, heightIn, tooltip, onPress);
 			this.te = te;
 		}
 		
 		@Override
-		protected boolean func_230987_a_(int p_230987_1_) {
+		protected boolean isValidClickButton(int p_230987_1_) {
 			return te.min == null || te.max == null;
+		}
+		
+		@Override
+		public void renderToolTip(PoseStack mx, int mouseX, int mouseY) {
+			if(te.min == null || te.max == null) {
+				super.renderToolTip(mx, mouseX, mouseY);
+			}
+		}
+		
+		@Override
+		public int[] getBlitData() {
+			if(te.min == null || te.max == null) {
+				return super.getBlitData();
+			}
+			
+			return new int[] {x, y, 131, 4, width, height};
+		}
+		
+		@Override
+		public boolean getSupplierOutput() {
+			if(te.min == null || te.max == null) {
+				return super.getSupplierOutput();
+			}
+			return true;
 		}
 		
 	}
@@ -533,7 +524,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 	public static void sendDirChange(BlockPos pos) {
 		
 		PacketData pd = new PacketData("quarry_gui");
-		pd.writeString("cat", "dir");
+		pd.writeUtf("cat", "dir");
 		pd.writeBlockPos("pos", pos);
 		
 		HashPacketImpl.INSTANCE.sendToServer(pd);
@@ -541,7 +532,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 	
 	public static void sendChangeNum(BlockPos pos, boolean incr) {
 		PacketData pd = new PacketData("quarry_gui");
-		pd.writeString("cat", "num");
+		pd.writeUtf("cat", "num");
 		pd.writeBlockPos("pos", pos);
 		pd.writeBoolean("incr", incr);
 		
@@ -550,16 +541,16 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 	
 	public static void sendInitQuarry(BlockPos pos) {
 		PacketData pd = new PacketData("quarry_gui");
-		pd.writeString("cat", "init");
+		pd.writeUtf("cat", "init");
 		pd.writeBlockPos("pos", pos);
 		
 		HashPacketImpl.INSTANCE.sendToServer(pd);
 	}
 	
-	public static void updateDataFromPacket(PacketData pd, World world) {
+	public static void updateDataFromPacket(PacketData pd, Level world) {
 		if(pd.getCategory().equals("quarry_gui")) {
 			BlockPos pos = pd.get("pos", BlockPos.class);
-			TileEntity tex = world.getTileEntity(pos);
+			BlockEntity tex = world.getBlockEntity(pos);
 			if(tex instanceof TEQuarry) {
 				TEQuarry te = (TEQuarry) tex;
 				
@@ -579,14 +570,14 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 						}
 					}
 				}else if(c.equals("init")) {
-					Direction offset = te.getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).getOpposite();
-					BlockPos posA = te.getPos().offset(offset, 2);
+					Direction offset = te.getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite();
+					BlockPos posA = te.getBlockPos().relative(offset, 2);
 					
 					BlockPos posB;
 					if(te.right) {
-						posB = posA.offset(offset, te.range).offset(offset.rotateY(), te.range);
+						posB = posA.relative(offset, te.range).relative(offset.getClockWise(), te.range);
 					}else {
-						posB = posA.offset(offset, te.range).offset(offset.rotateYCCW(), te.range);
+						posB = posA.relative(offset, te.range).relative(offset.getCounterClockWise(), te.range);
 					}
 					
 					int[] min = new int[3];

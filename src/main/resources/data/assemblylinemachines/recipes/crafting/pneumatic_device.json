@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		},
 		"c":{
-			"item": "assemblylinemachines:chromium_plate"
+			"tag": "forge:plates/chromium"
 		},
 		"p":{
 			"item": "minecraft:sticky_piston"

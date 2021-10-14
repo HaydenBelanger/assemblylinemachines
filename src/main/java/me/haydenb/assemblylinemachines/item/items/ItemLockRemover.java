@@ -2,73 +2,75 @@ package me.haydenb.assemblylinemachines.item.items;
 
 import java.util.List;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public class ItemLockRemover extends Item {
 	
 	public ItemLockRemover() {
-		super(new Item.Properties().group(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.creativeTab));
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		
 		
-		World world = context.getWorld();
-		PlayerEntity player = context.getPlayer();
-		if(!world.isRemote && player.isSneaking()) {
-			if(context.getWorld().getTileEntity(context.getPos()) instanceof AbstractMachine) {
-				AbstractMachine<?> abs = (AbstractMachine<?>) context.getWorld().getTileEntity(context.getPos());
+		Level world = context.getLevel();
+		Player player = context.getPlayer();
+		if(!world.isClientSide && player.isShiftKeyDown()) {
+			if(context.getLevel().getBlockEntity(context.getClickedPos()) instanceof AbstractMachine) {
+				AbstractMachine<?> abs = (AbstractMachine<?>) context.getLevel().getBlockEntity(context.getClickedPos());
 
 				
 				if(abs.isRandomLocked()) {
 					if(abs.removeRandomLock(player)) {
-						player.sendStatusMessage(new StringTextComponent("Removed Lock."), true);
+						player.displayClientMessage(new TextComponent("Removed Lock."), true);
 					}else {
-						player.sendStatusMessage(new StringTextComponent("Could not remove Lock."), true);
+						player.displayClientMessage(new TextComponent("Could not remove Lock."), true);
 					}
 					
 				}else {
-					player.sendStatusMessage(new StringTextComponent("Lock isn't set."), true);
+					player.displayClientMessage(new TextComponent("Lock isn't set."), true);
 				}
 				
 			}
 		}
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
 		
 		
 		
 	}
 	
 	@Override
-	public boolean onBlockStartBreak(ItemStack is, BlockPos pos, PlayerEntity player) {
+	public boolean onBlockStartBreak(ItemStack is, BlockPos pos, Player player) {
 		
-		World world = player.getEntityWorld();
-		if(!world.isRemote) {
+		Level world = player.getCommandSenderWorld();
+		if(!world.isClientSide) {
 			if(!is.hasTag() || !is.getTag().contains("assemblylinemachines:lockcode")){
 				
-				if(!world.isRemote && player.isSneaking()) {
-					if(world.getTileEntity(pos) instanceof AbstractMachine) {
-						AbstractMachine<?> abs = (AbstractMachine<?>) world.getTileEntity(pos);
+				if(!world.isClientSide && player.isShiftKeyDown()) {
+					if(world.getBlockEntity(pos) instanceof AbstractMachine) {
+						AbstractMachine<?> abs = (AbstractMachine<?>) world.getBlockEntity(pos);
 						
 						if(abs.isRandomLocked()) {
 							if(abs.removeRandomLock(player)) {
 								is.setTag(null);
-								player.sendStatusMessage(new StringTextComponent("Removed Lock."), true);
+								player.displayClientMessage(new TextComponent("Removed Lock."), true);
 							}else {
-								player.sendStatusMessage(new StringTextComponent("Could not remove Lock."), true);
+								player.displayClientMessage(new TextComponent("Could not remove Lock."), true);
 							}
 							
 						}else {
-							player.sendStatusMessage(new StringTextComponent("Lock isn't set."), true);
+							player.displayClientMessage(new TextComponent("Lock isn't set."), true);
 						}
 						
 					}
@@ -80,8 +82,8 @@ public class ItemLockRemover extends Item {
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		
-		tooltip.add(1, new StringTextComponent("SHIFT-RIGHT CLICK a machine you cut to remove the Lock.").func_230532_e_().func_240699_a_(TextFormatting.DARK_GRAY));
+		tooltip.add(1, new TextComponent("SHIFT-RIGHT CLICK a machine you cut to remove the Lock.").withStyle(ChatFormatting.DARK_GRAY));
 	}
 }

@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"a":{
-			"item": "assemblylinemachines:attuned_titanium_plate"
+			"tag": "forge:plates/attuned_titanium"
 		}
 	},
 	"result":{

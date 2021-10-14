@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"i":{
-			"item": "assemblylinemachines:iron_plate"
+			"tag": "forge:plates/iron"
 		},
 		"e":{
-			"item": "minecraft:chest"
+			"tag": "forge:chests"
 		},
 		"s":{
 			"item": "assemblylinemachines:crank_shaft"

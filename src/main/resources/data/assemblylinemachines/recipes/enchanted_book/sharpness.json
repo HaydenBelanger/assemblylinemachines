@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:quartz"
+		"tag": "forge:gems/quartz"
 	},
 	"amount": 2,
 	"enchantment": "minecraft:sharpness",

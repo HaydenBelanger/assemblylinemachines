@@ -1,27 +1,27 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemBasicFormattedName extends Item{
 
-	protected final TextFormatting[] formats;
-	public ItemBasicFormattedName(TextFormatting... formats) {
-		super(new Item.Properties().group(Registry.creativeTab));
+	protected final ChatFormatting[] formats;
+	public ItemBasicFormattedName(ChatFormatting... formats) {
+		super(new Item.Properties().tab(Registry.creativeTab));
 		this.formats = formats;
 	}
 	
-	public ItemBasicFormattedName(Properties properties, TextFormatting... formats) {
-		super(properties.group(Registry.creativeTab));
+	public ItemBasicFormattedName(Properties properties, ChatFormatting... formats) {
+		super(properties.tab(Registry.creativeTab));
 		this.formats = formats;
 	}
 
 	
 	@Override
-	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).func_230532_e_().func_240701_a_(formats);
+	public Component getName(ItemStack stack) {
+		return super.getName(stack).copy().withStyle(formats);
 	}
 }

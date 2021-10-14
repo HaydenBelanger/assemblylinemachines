@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_ingot"
+			"tag": "forge:ingots/steel"
 		},
 		"i":{
 			"tag": "forge:ingots/iron"
 		},
 		"r":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		},
 		"b":{
 			"item": "assemblylinemachines:fluid_bath"

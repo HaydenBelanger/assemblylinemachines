@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:stainless_steel_plate"
+			"tag": "forge:plates/stainless_steel"
 		},
 		"r":{
 			"item": "assemblylinemachines:steel_tank_component"
 		},
 		"g":{
-			"item": "minecraft:glass_pane"
+			"tag": "forge:glass_panes"
 		}
 	},
 	"result":{

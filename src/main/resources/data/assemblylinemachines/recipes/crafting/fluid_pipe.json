@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"i":{
-			"item": "assemblylinemachines:iron_plate"
+			"tag": "forge:plates/iron"
 		},
 		"q":{
 			"item": "assemblylinemachines:black_granite"
 		},
 		"w":{
-			"item": "minecraft:lapis_lazuli"
+			"tag": "forge:gems/lapis"
 		}
 	},
 	"result":{

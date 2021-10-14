@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"a":{
 			"item": "minecraft:bookshelf"

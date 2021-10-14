@@ -6,52 +6,50 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPurifier.TEElectricPurifier>{
+public class BlockElectricPurifier extends BlockScreenBlockEntity<BlockElectricPurifier.TEElectricPurifier>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(0, 0, 0, 16, 2, 16),
-			Block.makeCuboidShape(4, 2, 0, 5, 7, 1),
-			Block.makeCuboidShape(6, 2, 0, 7, 7, 1),
-			Block.makeCuboidShape(9, 2, 0, 10, 7, 1),
-			Block.makeCuboidShape(11, 2, 0, 12, 7, 1),
-			Block.makeCuboidShape(0, 7, 0, 16, 16, 16),
-			Block.makeCuboidShape(0, 2, 0, 2, 7, 16),
-			Block.makeCuboidShape(14, 2, 0, 16, 7, 16),
-			Block.makeCuboidShape(2, 2, 2, 14, 7, 16)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(0, 0, 0, 16, 2, 16),
+			Block.box(4, 2, 0, 5, 7, 1),
+			Block.box(6, 2, 0, 7, 7, 1),
+			Block.box(9, 2, 0, 10, 7, 1),
+			Block.box(11, 2, 0, 12, 7, 1),
+			Block.box(0, 7, 0, 16, 16, 16),
+			Block.box(0, 2, 0, 2, 7, 16),
+			Block.box(14, 2, 0, 16, 7, 16),
+			Block.box(2, 2, 2, 14, 7, 16)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
@@ -61,24 +59,23 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 	private static final EnumProperty<PurifierStates> PURIFIER_STATES = EnumProperty.create("active", PurifierStates.class);
 	
 	public BlockElectricPurifier() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "electric_purifier", BlockElectricPurifier.TEElectricPurifier.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(PURIFIER_STATES, PurifierStates.FALSE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "electric_purifier", BlockElectricPurifier.TEElectricPurifier.class);
+		this.registerDefaultState(this.stateDefinition.any().setValue(PURIFIER_STATES, PurifierStates.FALSE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(PURIFIER_STATES).add(HorizontalBlock.HORIZONTAL_FACING);
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(PURIFIER_STATES).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -90,17 +87,17 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		}
 	}
 	
-	public static enum PurifierStates implements IStringSerializable{
+	public static enum PurifierStates implements StringRepresentable{
 		FALSE, TRUE, ENHANCEDFALSE, ENHANCEDTRUE;
-
+		
 		@Override
-		public String func_176610_l() {
+		public String getSerializedName() {
 			return toString().toLowerCase();
 		}
 		
 		
 	}
-	public static class TEElectricPurifier extends ManagedSidedMachine<ContainerElectricPurifier> implements ITickableTileEntity{
+	public static class TEElectricPurifier extends ManagedSidedMachine<ContainerElectricPurifier> implements ALMTicker<TEElectricPurifier>{
 		
 		private int timer = 0;
 		private int nTimer = 20;
@@ -109,19 +106,19 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		private ItemStack output = null;
 		
 		
-		public TEElectricPurifier(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 7, new TranslationTextComponent(Registry.getBlock("electric_purifier").getTranslationKey()), Registry.getContainerId("electric_purifier"), ContainerElectricPurifier.class, new EnergyProperties(true, false, 20000));
+		public TEElectricPurifier(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 7, new TranslatableComponent(Registry.getBlock("electric_purifier").getDescriptionId()), Registry.getContainerId("electric_purifier"), ContainerElectricPurifier.class, new EnergyProperties(true, false, 20000), pos, state);
 		}
 		
-		public TEElectricPurifier() {
-			this(Registry.getTileEntity("electric_purifier"));
+		public TEElectricPurifier(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("electric_purifier"), pos, state);
 		}
 
 		@Override
 		public void tick() {
 			
 			
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				if(timer++ == nTimer) {
 					timer = 0;
 					boolean sendUpdates = false;
@@ -145,14 +142,14 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 					}
 					
 					if(output == null || output.isEmpty()) {
-						Optional<PurifierCrafting> rOpt = world.getRecipeManager().getRecipe(PurifierCrafting.PURIFIER_RECIPE, this, world);
+						Optional<PurifierCrafting> rOpt = this.getLevel().getRecipeManager().getRecipeFor(PurifierCrafting.PURIFIER_RECIPE, this, this.getLevel());
 						PurifierCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
 							
 							boolean reqUpgrade = recipe.requiresUpgrade();
 							
 							if(reqUpgrade == false || getUpgradeAmount(Upgrades.PURIFIER_EXPANDED) != 0) {
-								output = recipe.getRecipeOutput().copy();
+								output = recipe.getResultItem().copy();
 								cycles = ((float) recipe.getTime() / 10F);
 								
 								int conserve;
@@ -175,12 +172,12 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 								
 								
 								if(reqUpgrade) {
-									if(getBlockState().get(PURIFIER_STATES) != PurifierStates.ENHANCEDTRUE) {
-										world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.ENHANCEDTRUE));
+									if(getBlockState().getValue(PURIFIER_STATES) != PurifierStates.ENHANCEDTRUE) {
+										this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(PURIFIER_STATES, PurifierStates.ENHANCEDTRUE));
 									}
 								}else {
-									if(getBlockState().get(PURIFIER_STATES) != PurifierStates.TRUE) {
-										world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.TRUE));
+									if(getBlockState().getValue(PURIFIER_STATES) != PurifierStates.TRUE) {
+										this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(PURIFIER_STATES, PurifierStates.TRUE));
 									}
 								}
 								
@@ -188,10 +185,10 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 							
 						}else {
 							
-							if(getBlockState().get(PURIFIER_STATES) == PurifierStates.ENHANCEDTRUE) {
-								world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.ENHANCEDFALSE));
-							}else if(getBlockState().get(PURIFIER_STATES) == PurifierStates.TRUE) {
-								world.setBlockState(pos, getBlockState().with(PURIFIER_STATES, PurifierStates.FALSE));
+							if(getBlockState().getValue(PURIFIER_STATES) == PurifierStates.ENHANCEDTRUE) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(PURIFIER_STATES, PurifierStates.ENHANCEDFALSE));
+							}else if(getBlockState().getValue(PURIFIER_STATES) == PurifierStates.TRUE) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(PURIFIER_STATES, PurifierStates.FALSE));
 							}
 						}
 						
@@ -256,10 +253,10 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			if(compound.contains("assemblylinemachines:output")) {
-				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
 			if(compound.contains("assemblylinemachines:ntimer")) {
 				nTimer = compound.getInt("assemblylinemachines:ntimer");
@@ -270,18 +267,18 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			if(output != null) {
-				CompoundNBT sub = new CompoundNBT();
-				output.write(sub);
+				CompoundTag sub = new CompoundTag();
+				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 				
 			}
-			return super.write(compound);
+			return super.save(compound);
 		}
 	}
 	
@@ -290,11 +287,11 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerElectricPurifier(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEElectricPurifier.class));
+		public ContainerElectricPurifier(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEElectricPurifier.class));
 		}
 		
-		public ContainerElectricPurifier(final int windowId, final PlayerInventory playerInventory, final TEElectricPurifier tileEntity) {
+		public ContainerElectricPurifier(final int windowId, final Inventory playerInventory, final TEElectricPurifier tileEntity) {
 			super(Registry.getContainerType("electric_purifier"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
@@ -315,8 +312,8 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		private int f = 0;
 		private int t = 0;
 		
-		public ScreenElectricPurifier(ContainerElectricPurifier screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenElectricPurifier(ContainerElectricPurifier screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "electric_purifier", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -324,8 +321,8 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			if(t++ == 10) {
 				t = 0;

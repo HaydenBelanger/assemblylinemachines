@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"x":{
-			"item": "minecraft:quartz_block"
+			"tag": "forge:storage_blocks/quartz"
 		}
 	},
 	"result":{

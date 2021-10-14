@@ -5,18 +5,20 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.TEAlloySmelter;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.*;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class AlloyingCrafting implements IRecipe<IInventory>{
+public class AlloyingCrafting implements Recipe<Container>{
 
 	
-	public static final IRecipeType<AlloyingCrafting> ALLOYING_RECIPE = new TypeAlloyingCrafting();
+	public static final RecipeType<AlloyingCrafting> ALLOYING_RECIPE = new TypeAlloyingCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	
@@ -35,10 +37,10 @@ public class AlloyingCrafting implements IRecipe<IInventory>{
 		this.id = id;
 	}
 	@Override
-	public boolean matches(IInventory inv, World worldIn) {
+	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
 			if(inv instanceof TEAlloySmelter) {
-				if((parta.test(inv.getStackInSlot(1)) && partb.test(inv.getStackInSlot(2))) || (partb.test(inv.getStackInSlot(1)) && parta.test(inv.getStackInSlot(2)))) {
+				if((parta.test(inv.getItem(1)) && partb.test(inv.getItem(2))) || (partb.test(inv.getItem(1)) && parta.test(inv.getItem(2)))) {
 					return true;
 				}
 			}
@@ -50,17 +52,17 @@ public class AlloyingCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(IInventory inv) {
+	public ItemStack assemble(Container inv) {
 		return this.output.copy();
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return false;
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return output;
 	}
 
@@ -70,12 +72,12 @@ public class AlloyingCrafting implements IRecipe<IInventory>{
 	}
 
 	@Override
-	public IRecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public IRecipeType<?> getType() {
+	public RecipeType<?> getType() {
 		return ALLOYING_RECIPE;
 	}
 	
@@ -96,26 +98,26 @@ public class AlloyingCrafting implements IRecipe<IInventory>{
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(parta);
 		nnl.add(partb);
-		nnl.add(Ingredient.fromItems(Registry.getItem("alloy_smelter")));
+		nnl.add(Ingredient.of(Registry.getItem("alloy_smelter")));
 		
 		return nnl;
 	}
 	
 	@Override
-	public boolean isDynamic() {
+	public boolean isSpecial() {
 		return true;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<AlloyingCrafting>{
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AlloyingCrafting>{
 
 		@Override
-		public AlloyingCrafting read(ResourceLocation recipeId, JsonObject json) {
+		public AlloyingCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient ingredienta = Ingredient.deserialize(JSONUtils.getJsonObject(json, "part_a"));
-				final Ingredient ingredientb = Ingredient.deserialize(JSONUtils.getJsonObject(json, "part_b"));
+				final Ingredient ingredienta = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a"));
+				final Ingredient ingredientb = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b"));
 				
-				final ItemStack output = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "output"));
-				final int time = JSONUtils.getInt(json, "time");
+				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				final int time = GsonHelper.getAsInt(json, "time");
 				
 				return new AlloyingCrafting(recipeId, ingredienta, ingredientb, output, time);
 			}catch(Exception e) {
@@ -128,27 +130,27 @@ public class AlloyingCrafting implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public AlloyingCrafting read(ResourceLocation recipeId, PacketBuffer buffer) {
-			final Ingredient inputa = Ingredient.read(buffer);
-			final Ingredient inputb = Ingredient.read(buffer);
-			final ItemStack output = buffer.readItemStack();
+		public AlloyingCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+			final Ingredient inputa = Ingredient.fromNetwork(buffer);
+			final Ingredient inputb = Ingredient.fromNetwork(buffer);
+			final ItemStack output = buffer.readItem();
 			final int time = buffer.readInt();
 			
 			return new AlloyingCrafting(recipeId, inputa, inputb, output, time);
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, AlloyingCrafting recipe) {
-			recipe.parta.write(buffer);
-			recipe.partb.write(buffer);
-			buffer.writeItemStack(recipe.output);
+		public void toNetwork(FriendlyByteBuf buffer, AlloyingCrafting recipe) {
+			recipe.parta.toNetwork(buffer);
+			recipe.partb.toNetwork(buffer);
+			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.time);
 			
 		}
 		
 	}
 	
-	public static class TypeAlloyingCrafting implements IRecipeType<AlloyingCrafting>{
+	public static class TypeAlloyingCrafting implements RecipeType<AlloyingCrafting>{
 		
 		@Override
 		public String toString() {

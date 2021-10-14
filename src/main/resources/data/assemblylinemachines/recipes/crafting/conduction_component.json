@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"i":{
-			"item": "assemblylinemachines:iron_plate"
+			"tag": "forge:plates/iron"
 		},
 		"r":{
-			"item": "minecraft:redstone"
+			"tag": "forge:dusts/redstone"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_gear"
+			"tag": "forge:gears/steel"
 		}
 	},
 	"result":{

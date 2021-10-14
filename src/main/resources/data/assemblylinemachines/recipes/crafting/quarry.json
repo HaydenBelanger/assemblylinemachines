@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		},
 		"b":{
 			"item": "assemblylinemachines:enhanced_battery"

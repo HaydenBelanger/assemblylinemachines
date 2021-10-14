@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"r":{
-			"item": "minecraft:redstone"
+			"tag": "forge:dusts/redstone"
 		},
 		"e":{
-			"item": "assemblylinemachines:energized_gold_plate"
+			"tag": "forge:plates/energized_gold"
 		},
 		"x":{
 			"item": "assemblylinemachines:energy_harness"

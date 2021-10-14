@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "minecraft:lightning_rod"
+	},
+	"amount": 3,
+	"enchantment": "minecraft:channeling",
+	"cost": 230
+}

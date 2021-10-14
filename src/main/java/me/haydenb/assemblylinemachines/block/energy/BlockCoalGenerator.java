@@ -3,69 +3,75 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.plugins.other.PluginTOP.TOPProvider;
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.util.Formatting;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.*;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.*;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.ToolType;
 
-public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator.TECoalGenerator>{
+public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerator.TECoalGenerator>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(0, 9, 3, 2, 16, 13),
-			Block.makeCuboidShape(14, 9, 3, 16, 16, 13),
-			Block.makeCuboidShape(3, 9, 14, 13, 16, 16),
-			Block.makeCuboidShape(0, 0, 0, 16, 9, 16),
-			Block.makeCuboidShape(2, 9, 2, 14, 16, 14)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(0, 9, 3, 2, 16, 13),
+			Block.box(14, 9, 3, 16, 16, 13),
+			Block.box(3, 9, 14, 13, 16, 16),
+			Block.box(0, 0, 0, 16, 9, 16),
+			Block.box(2, 9, 2, 14, 16, 14)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	
 	public BlockCoalGenerator() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(3f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), 
+		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), 
 				"coal_generator", null, true, Direction.NORTH, TECoalGenerator.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+	
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
-	}
-	
-	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if(d == Direction.WEST) {
 			return SHAPE_W;
 		}else if(d == Direction.SOUTH) {
@@ -78,12 +84,12 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalBlock.HORIZONTAL_FACING);
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	
-	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ITickableTileEntity, TOPProvider{
+	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ALMTicker<TECoalGenerator>, TOPProvider{
 
 		
 		private int genper = 0;
@@ -91,28 +97,28 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		private int timer = 0;
 		private boolean naphthaActive = false;
 		
-		public TECoalGenerator(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 1, new TranslationTextComponent(Registry.getBlock("coal_generator").getTranslationKey()), Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000));
+		public TECoalGenerator(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 1, new TranslatableComponent(Registry.getBlock("coal_generator").getDescriptionId()), Registry.getContainerId("coal_generator"), ContainerCoalGenerator.class, new EnergyProperties(false, true, 20000), pos, state);
 		}
 		
-		public TECoalGenerator() {
-			this(Registry.getTileEntity("coal_generator"));
+		public TECoalGenerator(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("coal_generator"), pos, state);
 		}
 
 		@Override
-		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
+		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			if(genper == 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§cIdle")).text(new TextComponent("0 FE/t"));
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Math.round((float)genper / 2f) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§aGenerating...")).text(new TextComponent("§a+" + Math.round((float)genper / 2f) + " FE/t"));
 			}
 			
 			
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			genper = compound.getInt("assemblylinemachines:initgen");
 			timeremaining = compound.getInt("assemblylinemachines:remgen");
@@ -120,16 +126,16 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:initgen", genper);
 			compound.putInt("assemblylinemachines:remgen", timeremaining);
 			compound.putBoolean("assemblylinemachines:naphtha", naphthaActive);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
-			if(ForgeHooks.getBurnTime(stack) != 0) {
+			if(ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) != 0) {
 				return true;
 			}
 			return false;
@@ -146,14 +152,14 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 						if(contents.get(0) != ItemStack.EMPTY) {
 							
 							
-							if(world.getBlockState(pos.up()).getBlock() == Registry.getBlock("naphtha_turbine") && world.getBlockState(pos.offset(Direction.UP, 2)).getBlock() == Registry.getBlock("naphtha_fire")) {
-								world.removeBlock(pos.offset(Direction.UP, 2), false);
-								world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.25f, 1f);
+							if(getLevel().getBlockState(getBlockPos().above()).getBlock() == Registry.getBlock("naphtha_turbine") && getLevel().getBlockState(getBlockPos().relative(Direction.UP, 2)).getBlock() == Registry.getBlock("naphtha_fire")) {
+								getLevel().removeBlock(getBlockPos().relative(Direction.UP, 2), false);
+								getLevel().playSound(null, getBlockPos(), SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.25f, 1f);
 								naphthaActive = true;
 							}else {
 								naphthaActive = false;
 							}
-							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0)) * 2f);
+							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0), RecipeType.SMELTING) * 2f);
 							if(burnTime != 0) {
 								contents.get(0).shrink(1);
 								genper = Math.round((float)(burnTime * 3f) / 90f);
@@ -198,15 +204,15 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerCoalGenerator(final int windowId, final PlayerInventory playerInventory, final TECoalGenerator tileEntity) {
+		public ContainerCoalGenerator(final int windowId, final Inventory playerInventory, final TECoalGenerator tileEntity) {
 			super(Registry.getContainerType("coal_generator"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.getFirst(), UPGRADE_POS.getSecond(), tileEntity));
 		}
 		
 		
-		public ContainerCoalGenerator(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TECoalGenerator.class));
+		public ContainerCoalGenerator(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TECoalGenerator.class));
 		}
 	}
 	
@@ -215,40 +221,39 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		
 		TECoalGenerator tsfm;
 		
-		public ScreenCoalGenerator(ContainerCoalGenerator screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenCoalGenerator(ContainerCoalGenerator screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "coal_generator", false, new Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
 		
-		
 		@Override
-		protected void func_230457_a_(MatrixStack mx, ItemStack stack, int mouseX, int mouseY) {
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+		protected void renderTooltip(PoseStack mx, ItemStack stack, int mouseX, int mouseY) {
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
-				List<ITextComponent> tt = func_231151_a_(stack);
+				List<Component> tt = getTooltipFromItem(stack);
 				
-				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack) * 2f);
+				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) * 2f);
 				float mul;
 				if(tsfm.naphthaActive) {
 					mul = 240f;
 				}else {
 					mul = 60f;
 				}
-				tt.add(1, new StringTextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").func_230532_e_().func_240699_a_(TextFormatting.YELLOW));
-				tt.add(1, new StringTextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
-				super.func_243308_b(mx, tt, mouseX, mouseY);
+				tt.add(1, new TextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").withStyle(ChatFormatting.YELLOW));
+				tt.add(1, new TextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").withStyle(ChatFormatting.GREEN));
+				super.renderComponentTooltip(mx, tt, mouseX, mouseY);
 				return;
 			}
-			super.func_230457_a_(mx, stack, mouseX, mouseY);
+			super.renderTooltip(mx, stack, mouseX, mouseY);
 		}
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			if(tsfm.timeremaining != 0) {
 				int prog2;

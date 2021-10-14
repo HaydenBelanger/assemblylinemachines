@@ -4,106 +4,107 @@ import java.util.List;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBottomlessStorageUnit.TEBottomlessStorageUnit> {
+public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBottomlessStorageUnit.TEBottomlessStorageUnit> {
 
 	public BlockBottomlessStorageUnit() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "bottomless_storage_unit",
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "bottomless_storage_unit",
 				BlockBottomlessStorageUnit.TEBottomlessStorageUnit.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalBlock.HORIZONTAL_FACING);
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		
 		if(stack.hasTag()) {
 			
-			CompoundNBT nbt = stack.getTag();
+			CompoundTag nbt = stack.getTag();
 			
-			if(world.getTileEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored")) {
+			if(world.getBlockEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored")) {
 				
-				TEBottomlessStorageUnit te = (TEBottomlessStorageUnit) world.getTileEntity(pos);
+				TEBottomlessStorageUnit te = (TEBottomlessStorageUnit) world.getBlockEntity(pos);
 				te.internalStored = nbt.getLong("assemblylinemachines:stored");
 				te.storedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(nbt.getString("assemblylinemachines:storeditem")));
 				te.sendUpdates();
 			}
 		}
-		super.onBlockPlacedBy(world, pos, state, placer, stack);
+		super.setPlacedBy(world, pos, state, placer, stack);
 	}
 	
 	public static class BlockItemBottomlessStorageUnit extends BlockItem{
 
 		public BlockItemBottomlessStorageUnit(Block blockIn) {
-			super(blockIn, new Item.Properties().group(Registry.creativeTab));
+			super(blockIn, new Item.Properties().tab(Registry.creativeTab));
 		}
 		
 		@Override
-		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 			if(stack.hasTag()) {
 				
-				CompoundNBT nbt = stack.getTag();
+				CompoundTag nbt = stack.getTag();
 				if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem")) {
-					tooltip.add(1, new StringTextComponent("This BSU has items stored inside!").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+					tooltip.add(1, new TextComponent("This BSU has items stored inside!").withStyle(ChatFormatting.GREEN));
 				}
 				
 			}
-			super.addInformation(stack, worldIn, tooltip, flagIn);
+			super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		}
 		
 	}
 	
-	public static class TEBottomlessStorageUnit extends AbstractMachine<ContainerBottomlessStorageUnit> implements ITickableTileEntity {
+	public static class TEBottomlessStorageUnit extends AbstractMachine<ContainerBottomlessStorageUnit> implements ALMTicker<TEBottomlessStorageUnit> {
 
-		public TEBottomlessStorageUnit(TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, new TranslationTextComponent(Registry.getBlock("bottomless_storage_unit").getTranslationKey()),
-					Registry.getContainerId("bottomless_storage_unit"), ContainerBottomlessStorageUnit.class);
+		public TEBottomlessStorageUnit(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 2, new TranslatableComponent(Registry.getBlock("bottomless_storage_unit").getDescriptionId()),
+					Registry.getContainerId("bottomless_storage_unit"), ContainerBottomlessStorageUnit.class, pos, state);
 		}
 
-		public TEBottomlessStorageUnit() {
-			this(Registry.getTileEntity("bottomless_storage_unit"));
+		public TEBottomlessStorageUnit(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("bottomless_storage_unit"), pos, state);
 		}
 
 		private long internalStored = 0;
@@ -122,8 +123,8 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		}
 
 		@Override
-		public void remove() {
-			super.remove();
+		public void setRemoved() {
+			super.setRemoved();
 			if (itemHandler != null) {
 				itemHandler.invalidate();
 			}
@@ -131,7 +132,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 
 		private class InternalStoredExtractHandler extends InvWrapper {
 
-			InternalStoredExtractHandler(IInventory inv) {
+			InternalStoredExtractHandler(Container inv) {
 				super(inv);
 			}
 
@@ -205,7 +206,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 
 		@Override
 		public void tick() {
-			if (!world.isRemote) {
+			if (!level.isClientSide) {
 				boolean sendUpdates = false;
 
 				if (internalStored == 0) {
@@ -234,8 +235,8 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		}
 
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			if (compound.contains("assemblylinemachines:storeditem") && compound.contains("assemblylinemachines:stored")) {
 				storedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("assemblylinemachines:storeditem")));
 				internalStored = compound.getLong("assemblylinemachines:stored");
@@ -248,7 +249,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 
 			if (storedItem != null && internalStored != 0) {
 				compound.putString("assemblylinemachines:storeditem", storedItem.getRegistryName().toString());
@@ -256,7 +257,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 			}
 
 			
-			return super.write(compound);
+			return super.save(compound);
 		}
 	}
 
@@ -265,37 +266,37 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 
-		public ContainerBottomlessStorageUnit(final int windowId, final PlayerInventory playerInventory, final TEBottomlessStorageUnit tileEntity) {
+		public ContainerBottomlessStorageUnit(final int windowId, final Inventory playerInventory, final TEBottomlessStorageUnit tileEntity) {
 			super(Registry.getContainerType("bottomless_storage_unit"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0, 0);
 
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 17, 60, tileEntity, true));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 17, 10, tileEntity));
 		}
 
-		public ContainerBottomlessStorageUnit(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEBottomlessStorageUnit.class));
+		public ContainerBottomlessStorageUnit(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEBottomlessStorageUnit.class));
 		}
 
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			if (slotId == 36) {
 
 				if (tileEntity.internalStored != 0 && tileEntity.storedItem != null) {
-					if (clickTypeIn == ClickType.PICKUP && player.inventory.getItemStack().isEmpty()) {
+					if (clickTypeIn == ClickType.PICKUP && this.getCarried().isEmpty()) {
 						int max = tileEntity.storedItem.getDefaultInstance().getMaxStackSize();
 						if (max > tileEntity.internalStored) {
 							max = (int) tileEntity.internalStored;
 						}
 						if (dragType == 0) {
 
-							player.inventory.setItemStack(new ItemStack(tileEntity.storedItem, max));
+							this.setCarried(new ItemStack(tileEntity.storedItem, max));
 							reduceInternal(max);
 
 						} else if (dragType == 1) {
 
 							max = Math.round((float) max / 2f);
 
-							player.inventory.setItemStack(new ItemStack(tileEntity.storedItem, max));
+							this.setCarried(new ItemStack(tileEntity.storedItem, max));
 							reduceInternal(max);
 						}
 					} else if (clickTypeIn == ClickType.QUICK_MOVE && dragType == 0) {
@@ -306,16 +307,16 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 						}
 
 						ItemStack itemstack = new ItemStack(tileEntity.storedItem, max);
-						if (this.mergeItemStack(itemstack, 0, 36, false)) {
+						if (this.moveItemStackTo(itemstack, 0, 36, false)) {
 							max -= itemstack.getCount();
 							reduceInternal(max);
 						}
 					}
 
 				}
-				return ItemStack.EMPTY;
 			}
-			return super.slotClick(slotId, dragType, clickTypeIn, player);
+			
+			super.clicked(slotId, dragType, clickTypeIn, player);
 		}
 
 		private void reduceInternal(int amt) {
@@ -337,7 +338,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		TEBottomlessStorageUnit tsfm;
 		
 
-		public ScreenBottomlessStorageUnit(ContainerBottomlessStorageUnit screenContainer, PlayerInventory inv, ITextComponent titleIn) {
+		public ScreenBottomlessStorageUnit(ContainerBottomlessStorageUnit screenContainer, Inventory inv, Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "bottomless_storage_unit", false);
 			renderTitleText = false;
 			renderInventoryText = false;
@@ -350,17 +351,17 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
 			if(tsfm.storedItem != null){
-				String n = tsfm.storedItem.getName().func_230532_e_().getString();
+				String n = tsfm.storedItem.getDescription().getString();
 				
 				if(n.length() > 30) {
 					n = n.substring(0, 30) + "...";
 				}
-				float wsc = 110f / (float) this.font.getStringWidth(n);
+				float wsc = 110f / (float) this.font.width(n);
 				if(wsc > 3f) wsc = 3f;
 				MathHelper.renderScaledText(this.font, 52, 13, wsc, n, false, 0xd4d4d4);
 				
 				n = Formatting.GENERAL_FORMAT.format(tsfm.internalStored);
-				wsc = 110f / (float) this.font.getStringWidth(n);
+				wsc = 110f / (float) this.font.width(n);
 				if(wsc > 2f) wsc = 2f;
 				MathHelper.renderScaledText(this.font, 52, 54, wsc, n, false, 0xd4d4d4);
 			}
@@ -371,11 +372,11 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			if (tsfm.storedItem != null) {
 
-				this.field_230707_j_.renderItemIntoGUI(tsfm.storedItem.getDefaultInstance(), (x + 17), (y + 60));
+				this.itemRenderer.renderGuiItem(tsfm.storedItem.getDefaultInstance(), (x + 17), (y + 60));
 				if (tsfm.internalStored < 10000) {
 					
 					MathHelper.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, Formatting.GENERAL_FORMAT.format(tsfm.internalStored));

@@ -2,7 +2,7 @@
 	"type": "minecraft:crafting_shapeless",
 	"ingredients":[
 		{
-			"item": "assemblylinemachines:mystium_ingot"
+			"tag": "forge:ingots/mystium"
 		},
 		{
 			"tag": "assemblylinemachines:crafting/hammers"

@@ -3,31 +3,46 @@ package me.haydenb.assemblylinemachines.block;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.server.ServerWorld;
+import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag.Named;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 
-public class BlockMystiumFarmland extends FarmlandBlock {
+public class BlockMystiumFarmland extends FarmBlock implements IBlockWithHarvestableTags {
 
 	private static final IntegerProperty AGE = IntegerProperty.create("exhaustion", 0, 32);
 	
 	public BlockMystiumFarmland() {
-		super(AbstractBlock.Properties.create(Material.EARTH).hardnessAndResistance(0.6F).sound(SoundType.GROUND).tickRandomly());
-		this.setDefaultState(this.stateContainer.getBaseState().with(MOISTURE, 7).with(AGE, 0));
+		super(Block.Properties.of(Material.DIRT).strength(0.6F).sound(SoundType.GRAVEL).randomTicks());
+		this.registerDefaultState(this.stateDefinition.any().setValue(MOISTURE, 7).setValue(AGE, 0));
 		
 	}
 	
 	@Override
-	public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+	public Named<Block> getToolType() {
+		return BlockTags.MINEABLE_WITH_SHOVEL;
+	}
+
+
+	@Override
+	public Named<Block> getToolLevel() {
+		return BlockTags.NEEDS_STONE_TOOL;
+	}
+	
+	@Override
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
 		
-		int age = state.get(AGE);
+		int age = state.getValue(AGE);
 	
 		if(age != 32) {
 			int rnx = 1;
@@ -39,17 +54,17 @@ public class BlockMystiumFarmland extends FarmlandBlock {
 				rnx = 4;
 			}
 			if(random.nextInt(rnx) == 0) {
-				BlockState bs = world.getBlockState(pos.up());
-				if(bs.getBlock() instanceof IGrowable) {
-					IGrowable grbs = (IGrowable) bs.getBlock();
-					if(grbs.canGrow(world, pos.up(), bs, world.isRemote)) {
-						if(grbs.canUseBonemeal(world, random, pos.up(), bs)) {
-							grbs.grow(world, random, pos.up(), bs);
-							world.playEvent(2005, pos.up(), 0);
+				BlockState bs = world.getBlockState(pos.above());
+				if(bs.getBlock() instanceof BonemealableBlock) {
+					BonemealableBlock grbs = (BonemealableBlock) bs.getBlock();
+					if(grbs.isValidBonemealTarget(world, pos.above(), bs, world.isClientSide)) {
+						if(grbs.isBonemealSuccess(world, random, pos.above(), bs)) {
+							grbs.performBonemeal(world, random, pos.above(), bs);
+							world.levelEvent(2005, pos.above(), 0);
 							if(random.nextInt(2) == 0) {
 								
 								if(ConfigHolder.COMMON.mystiumFarmlandDeath.get()) {
-									world.setBlockState(pos, state.with(AGE, age + 1));
+									world.setBlockAndUpdate(pos, state.setValue(AGE, age + 1));
 								}
 								
 								
@@ -64,13 +79,13 @@ public class BlockMystiumFarmland extends FarmlandBlock {
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(AGE);
-		super.fillStateContainer(builder);
+		super.createBlockStateDefinition(builder);
 	}
 	
 	@Override
-	public boolean canSustainPlant(BlockState state, IBlockReader world, BlockPos pos, Direction facing, IPlantable plantable) {
+	public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
 		if(plantable.getPlantType(world, pos) == PlantType.CROP) {
 			return true;
 		}
@@ -79,7 +94,7 @@ public class BlockMystiumFarmland extends FarmlandBlock {
 	}
 	
 	@Override
-	public boolean isFertile(BlockState state, IBlockReader world, BlockPos pos) {
+	public boolean isFertile(BlockState state, BlockGetter world, BlockPos pos) {
 		return true;
 	}
 

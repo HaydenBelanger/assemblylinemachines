@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:smelting",
+	"ingredient":{
+		"item": "assemblylinemachines:ground_netherite"
+	},
+	"result": "minecraft:netherite_scrap",
+	"cookingtime": 200
+}

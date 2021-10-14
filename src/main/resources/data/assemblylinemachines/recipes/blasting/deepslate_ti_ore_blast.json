@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:deepslate_titanium_ore"
+	},
+	"result": "assemblylinemachines:titanium_ingot",
+	"experience": 1,
+	"cookingtime": 100
+}

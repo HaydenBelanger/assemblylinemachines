@@ -13,7 +13,7 @@
 			"item": "minecraft:furnace"
 		},
 		"l":{
-			"item": "minecraft:bricks"
+			"tag": "forge:ingots/brick"
 		},
 		"g":{
 			"tag": "assemblylinemachines:crafting/gears/industrial"

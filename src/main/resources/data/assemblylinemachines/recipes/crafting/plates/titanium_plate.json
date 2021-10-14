@@ -2,7 +2,7 @@
 	"type": "minecraft:crafting_shapeless",
 	"ingredients":[
 		{
-			"item": "assemblylinemachines:pure_titanium"
+			"tag": "forge:ingots/pure_titanium"
 		},
 		{
 			"tag": "assemblylinemachines:crafting/hammers"

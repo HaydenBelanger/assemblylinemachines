@@ -1,18 +1,31 @@
 package me.haydenb.assemblylinemachines.util;
 
-import java.util.Objects;
-import java.util.Random;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.World;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
@@ -21,34 +34,35 @@ import net.minecraftforge.items.IItemHandler;
 public class General {
 
 	public static final Random RAND = new Random();
+	private static Map<Block, Pair<Predicate<UseOnContext>, Consumer<UseOnContext>>> tillables = null;
 
 	public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
-		VoxelShape[] buffer = new VoxelShape[] { shape, VoxelShapes.empty() };
+		VoxelShape[] buffer = new VoxelShape[] { shape, Shapes.empty() };
 
-		int times = (to.getHorizontalIndex() - from.getHorizontalIndex() + 4) % 4;
+		int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
 		for (int i = 0; i < times; i++) {
-			buffer[0].forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = VoxelShapes.or(buffer[1],
-					VoxelShapes.create(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
+			buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = Shapes.or(buffer[1],
+					Shapes.create(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
 			buffer[0] = buffer[1];
-			buffer[1] = VoxelShapes.empty();
+			buffer[1] = Shapes.empty();
 		}
 
 		return buffer[0];
 	}
 
-	public static <T extends TileEntity> T getTileEntity(final PlayerInventory pInv, final PacketBuffer data,
+	public static <T extends BlockEntity> T getBlockEntity(final Inventory pInv, final FriendlyByteBuf data,
 			Class<T> clazz) {
 		Objects.requireNonNull(pInv, "This object cannot be null.");
 		Objects.requireNonNull(data, "This object cannot be null.");
 
-		TileEntity posEntity = pInv.player.world.getTileEntity(data.readBlockPos());
+		BlockEntity posEntity = pInv.player.getCommandSenderWorld().getBlockEntity(data.readBlockPos());
 
 		return clazz.cast(posEntity);
 	}
 
-	public static void spawnItem(ItemStack stack, BlockPos pos, World world) {
+	public static void spawnItem(ItemStack stack, BlockPos pos, Level world) {
 		ItemEntity ent = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-		world.addEntity(ent);
+		world.addFreshEntity(ent);
 	}
 	
 	/**
@@ -69,8 +83,8 @@ public class General {
 		public int getMaxPower();
 	}
 	
-	public static <H> H getCapabilityFromDirection(TileEntity pte, String fieldName, Direction dir, Capability<H> capType) {
-		TileEntity te = pte.getWorld().getTileEntity(pte.getPos().offset(dir));
+	public static <H> H getCapabilityFromDirection(BlockEntity pte, String fieldName, Direction dir, Capability<H> capType) {
+		BlockEntity te = pte.getLevel().getBlockEntity(pte.getBlockPos().relative(dir));
 		
 		if(te != null) {
 			LazyOptional<H> cap = te.getCapability(capType, dir.getOpposite());
@@ -95,4 +109,35 @@ public class General {
 		
 		return null;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static Map<Block, Pair<Predicate<UseOnContext>, Consumer<UseOnContext>>> getTillableMap(){
+		try {
+			if(tillables == null) {
+				Field map = HoeItem.class.getDeclaredField("TILLABLES");
+				map.setAccessible(true);
+				tillables = (Map<Block, Pair<Predicate<UseOnContext>, Consumer<UseOnContext>>>) map.get(null);
+			}
+			
+			return tillables;
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	
+	public static void setFluidField(Block instance, FlowingFluid fluid) throws Exception {
+		if(instance instanceof LiquidBlock) {
+			LiquidBlock liquidBlock = (LiquidBlock) instance;
+			liquidBlock.fluid = fluid;
+		}else {
+			throw new IllegalArgumentException("Block passed to LiquidBlock hack is not a LiquidBlock.");
+		}
+	}
+	
+	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Font pFont, Component pText, int pX, int pY, int pColor) {
+	      FormattedCharSequence formattedcharsequence = pText.getVisualOrderText();
+	      pFont.draw(pPoseStack, formattedcharsequence, (float)(pX - pFont.width(formattedcharsequence) / 2), (float)pY, pColor);
+	   }
 }

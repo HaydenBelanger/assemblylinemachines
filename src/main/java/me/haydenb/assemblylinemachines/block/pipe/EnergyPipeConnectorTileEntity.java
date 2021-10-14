@@ -1,28 +1,26 @@
 package me.haydenb.assemblylinemachines.block.pipe;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.*;
 
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
+import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
-import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements ITickableTileEntity {
+public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements ALMTicker<EnergyPipeConnectorTileEntity> {
 
 	public boolean outputMode = false;
 	private int timer = 0;
@@ -31,13 +29,14 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 	private IEnergyStorage output = null;
 	
 	private Integer transferRate = null;
+	
 
 	private final TreeSet<EnergyPipeConnectorTileEntity> targets = new TreeSet<>(
 			new Comparator<EnergyPipeConnectorTileEntity>() {
 
 				@Override
 				public int compare(EnergyPipeConnectorTileEntity o1, EnergyPipeConnectorTileEntity o2) {
-					if (pos.distanceSq(o1.pos) > pos.distanceSq(o2.pos)) {
+					if (getBlockPos().distSqr(o1.getBlockPos()) > getBlockPos().distSqr(o2.getBlockPos())) {
 						return -1;
 					} else {
 						return 1;
@@ -47,18 +46,18 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 			});
 	
 
-	public EnergyPipeConnectorTileEntity(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public EnergyPipeConnectorTileEntity(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 
 	}
 
-	public EnergyPipeConnectorTileEntity() {
-		this(Registry.getTileEntity("pipe_connector_energy"));
+	public EnergyPipeConnectorTileEntity(BlockPos pos, BlockState state) {
+		this(Registry.getBlockEntity("pipe_connector_energy"), pos, state);
 	}
 	
 	@Override
-	public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-		super.func_230337_a_(p_230337_1_, compound);
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		if (compound.contains("assemblylinemachines:output")) {
 			outputMode = compound.getBoolean("assemblylinemachines:output");
@@ -69,15 +68,15 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundTag save(CompoundTag compound) {
 		compound.putBoolean("assemblylinemachines:output", outputMode);
 		compound.putDouble("assemblylinemachines:pendingcooldown", pendingCooldown);
-		return super.write(compound);
+		return super.save(compound);
 	}
 
 	@Override
 	public void tick() {
-		if (!world.isRemote) {
+		if (!level.isClientSide) {
 			if (outputMode == true) {
 				if (timer++ == 2) {
 					if(transferRate == null) {
@@ -96,7 +95,7 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 						pendingCooldown = 0;
 						
 						targets.clear();
-						pathToNearestEnergy(world, pos, new ArrayList<>(), pos, targets);
+						pathToNearestEnergy(this.getLevel(), this.getBlockPos(), new ArrayList<>(), this.getBlockPos(), targets);
 
 						if (output == null && connectToOutput() == false) {
 							return;
@@ -106,7 +105,7 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 							if (tpc != null) {
 								int extracted = tpc.attemptAcceptPower(output.extractEnergy(transferRate, true));
 
-								waitTime += pos.distanceSq(tpc.pos);
+								waitTime += this.getBlockPos().distSqr(tpc.getBlockPos());
 
 								output.extractEnergy(extracted, false);
 							}
@@ -122,19 +121,19 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 
 	}
 	
-	public void pathToNearestEnergy(World world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<EnergyPipeConnectorTileEntity> targets) {
+	public void pathToNearestEnergy(Level world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<EnergyPipeConnectorTileEntity> targets) {
 		BlockState bs = world.getBlockState(curPos);
 		for (Direction k : Direction.values()) {
-			PipeConnOptions pco = bs.get(PipeProperties.DIRECTION_BOOL.get(k));
+			PipeConnOptions pco = bs.getValue(PipeProperties.DIRECTION_BOOL.get(k));
 			if(pco == PipeConnOptions.CONNECTOR && !initial.equals(curPos)) {
-				TileEntity te = world.getTileEntity(curPos);
+				BlockEntity te = world.getBlockEntity(curPos);
 				if(te != null && te instanceof EnergyPipeConnectorTileEntity) {
 					EnergyPipeConnectorTileEntity ipc = (EnergyPipeConnectorTileEntity) te;
 					targets.add(ipc);
 				}
 				
 			}else if (pco == PipeConnOptions.PIPE) {
-				BlockPos targPos = curPos.offset(k);
+				BlockPos targPos = curPos.relative(k);
 				if (!checked.contains(targPos)) {
 					checked.add(targPos);
 					if (world.getBlockState(targPos).getBlock() instanceof PipeBase) {
@@ -165,8 +164,8 @@ public class EnergyPipeConnectorTileEntity extends BasicTileEntity implements IT
 	private boolean connectToOutput() {
 
 		for (Direction d : Direction.values()) {
-			if (getBlockState().get(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
-				TileEntity te = world.getTileEntity(pos.offset(d));
+			if (getBlockState().getValue(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
+				BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(d));
 				if (te != null) {
 					LazyOptional<IEnergyStorage> cap = te.getCapability(CapabilityEnergy.ENERGY, d.getOpposite());
 					IEnergyStorage output = cap.orElse(null);

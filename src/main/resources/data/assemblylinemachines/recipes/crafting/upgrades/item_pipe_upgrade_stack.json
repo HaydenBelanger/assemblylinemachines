@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:titanium_plate"
+			"tag": "forge:plates/titanium"
 		},
 		"x":{
-			"item": "minecraft:chest"
+			"tag": "forge:chests"
 		}
 	},
 	"result":{

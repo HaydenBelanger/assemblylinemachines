@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"m":{
-			"item": "assemblylinemachines:mystium_plate"
+			"tag": "forge:plates/mystium"
 		},
 		"c":{
-			"item": "assemblylinemachines:stainless_steel_plate"
+			"tag": "forge:plates/stainless_steel"
 		},
 		"x":{
 			"item": "assemblylinemachines:compressed_crafting_table"

@@ -1,7 +1,6 @@
 {
     "pack": {
-        "description": "assemblylinemachines resources",
-        "pack_format": 5,
-        "_comment": "View mods.toml for more information."
+        "description": "assemblylinemachines",
+        "pack_format": 7
     }
 }

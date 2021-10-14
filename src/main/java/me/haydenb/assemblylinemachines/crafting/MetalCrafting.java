@@ -5,18 +5,20 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockMetalShaper.TEMetalShaper;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.*;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class MetalCrafting implements IRecipe<IInventory>{
+public class MetalCrafting implements Recipe<Container>{
 
 	
-	public static final IRecipeType<MetalCrafting> METAL_RECIPE = new TypeMetalCrafting();
+	public static final RecipeType<MetalCrafting> METAL_RECIPE = new TypeMetalCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	private final Ingredient input;
@@ -31,10 +33,10 @@ public class MetalCrafting implements IRecipe<IInventory>{
 		this.time = time;
 	}
 	@Override
-	public boolean matches(IInventory inv, World worldIn) {
+	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
 			if(inv instanceof TEMetalShaper) {
-				if(input.test(inv.getStackInSlot(1))) {
+				if(input.test(inv.getItem(1))) {
 					return true;
 				}
 			}
@@ -46,17 +48,17 @@ public class MetalCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(IInventory inv) {
+	public ItemStack assemble(Container inv) {
 		return this.outputa.copy();
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return false;
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return outputa;
 	}
 	
@@ -65,7 +67,7 @@ public class MetalCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public boolean isDynamic() {
+	public boolean isSpecial() {
 		return true;
 	}
 	
@@ -79,7 +81,7 @@ public class MetalCrafting implements IRecipe<IInventory>{
 	public NonNullList<Ingredient> getIngredientsJEIFormatted() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(input);
-		nnl.add(Ingredient.fromItems(Registry.getItem("metal_shaper")));
+		nnl.add(Ingredient.of(Registry.getItem("metal_shaper")));
 		return nnl;
 	}
 
@@ -89,24 +91,24 @@ public class MetalCrafting implements IRecipe<IInventory>{
 	}
 
 	@Override
-	public IRecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public IRecipeType<?> getType() {
+	public RecipeType<?> getType() {
 		return METAL_RECIPE;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<MetalCrafting>{
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<MetalCrafting>{
 
 		@Override
-		public MetalCrafting read(ResourceLocation recipeId, JsonObject json) {
+		public MetalCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient input = Ingredient.deserialize(JSONUtils.getJsonObject(json, "input"));
-				final ItemStack output = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "output"));
+				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				
-				final int time = JSONUtils.getInt(json, "time");
+				final int time = GsonHelper.getAsInt(json, "time");
 				
 				return new MetalCrafting(recipeId, input, output, time);
 			}catch(Exception e) {
@@ -119,25 +121,25 @@ public class MetalCrafting implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public MetalCrafting read(ResourceLocation recipeId, PacketBuffer buffer) {
-			final Ingredient input = Ingredient.read(buffer);
-			final ItemStack output = buffer.readItemStack();
+		public MetalCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+			final Ingredient input = Ingredient.fromNetwork(buffer);
+			final ItemStack output = buffer.readItem();
 			final int time = buffer.readInt();
 			
 			return new MetalCrafting(recipeId, input, output, time);
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, MetalCrafting recipe) {
-			recipe.input.write(buffer);
-			buffer.writeItemStack(recipe.outputa);
+		public void toNetwork(FriendlyByteBuf buffer, MetalCrafting recipe) {
+			recipe.input.toNetwork(buffer);
+			buffer.writeItem(recipe.outputa);
 			buffer.writeInt(recipe.time);
 			
 		}
 		
 	}
 	
-	public static class TypeMetalCrafting implements IRecipeType<MetalCrafting>{
+	public static class TypeMetalCrafting implements RecipeType<MetalCrafting>{
 		
 		@Override
 		public String toString() {

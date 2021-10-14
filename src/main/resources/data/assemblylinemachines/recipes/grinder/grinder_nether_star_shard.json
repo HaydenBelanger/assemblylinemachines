@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:nether_star"
+		"tag": "forge:nether_stars"
 	},
 	"output":{
 		"item": "assemblylinemachines:nether_star_shard",

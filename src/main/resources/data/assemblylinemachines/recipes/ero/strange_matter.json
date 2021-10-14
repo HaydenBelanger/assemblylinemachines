@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:entropy_reactor",
+	"output":{
+		"item": "assemblylinemachines:strange_matter"
+	},
+	"varietyReqd": 0.8,
+	"odds": 0.8,
+	"max": 3
+}

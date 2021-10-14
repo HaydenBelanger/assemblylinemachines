@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:diamond"
+		"tag": "forge:gems/diamond"
 	},
 	"amount": 3,
 	"enchantment": "minecraft:silk_touch",

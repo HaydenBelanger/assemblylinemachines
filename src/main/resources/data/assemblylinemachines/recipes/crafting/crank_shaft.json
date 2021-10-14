@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"g":{
-			"item": "assemblylinemachines:steel_ingot"
+			"tag": "forge:ingots/steel"
 		},
 		"s":{
 			"tag": "forge:rods/wooden"

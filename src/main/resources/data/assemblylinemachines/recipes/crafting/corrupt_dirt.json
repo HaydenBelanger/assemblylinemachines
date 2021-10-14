@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"a":{
-			"tag": "assemblylinemachines:crafting/strange_matters"
+			"tag": "assemblylinemachines:crafting/entropy_reactor_outputs"
 		},
 		"b":{
 			"item": "minecraft:dirt"

@@ -1,31 +1,27 @@
 package me.haydenb.assemblylinemachines.world;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.LivingEntity;
 
-public class EffectDeepBurn extends Effect {
+public class EffectDeepBurn extends MobEffect {
 
 	public EffectDeepBurn() {
-		super(EffectType.HARMFUL, 0xff4d00);
+		super(MobEffectCategory.HARMFUL, 0xff4d00);
 	}
 	
 	@Override
-	public void performEffect(LivingEntity livingEntity, int amplifier) {
-		
-		livingEntity.setFire(30);
-		
-		
-		
+	public void applyEffectTick(LivingEntity pLivingEntity, int pAmplifier) {
+		pLivingEntity.setSecondsOnFire(30);
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amplifier) {
-		return duration % 5 == 0;
+	public boolean isDurationEffectTick(int pDuration, int pAmplifier) {
+		return pDuration % 5 == 0;
 	}
-
+	
 	@Override
-	public boolean isInstant() {
+	public boolean isInstantenous() {
 		return false;
 	}
 	

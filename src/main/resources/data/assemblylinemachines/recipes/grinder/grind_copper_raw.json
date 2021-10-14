@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:raw_copper"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_copper"
+	},
+	"grinds": 3,
+	"bladetype": "TITANIUM"
+}

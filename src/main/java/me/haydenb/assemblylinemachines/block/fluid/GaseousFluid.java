@@ -1,25 +1,26 @@
 package me.haydenb.assemblylinemachines.block.fluid;
 
-import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
-import me.haydenb.assemblylinemachines.registry.FluidRegistration;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import me.haydenb.assemblylinemachines.registry.FluidRegistry;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 public class GaseousFluid extends ALMFluid{
 	
 	private final int color;
 	public GaseousFluid(String name, boolean source, int color) {
-		super(FluidRegistration.buildProperties(name, 0, true, false, false), source);
+		super(FluidRegistry.buildProperties(name, 0, true, false, false), source);
 		
 		this.color = color;
 		
+		/* PLUGIN DISABLED DUE TO NON UPDATE
 		if(source && PluginMekanism.get().isMekanismInstalled()) {
 			PluginMekanism.get().registerGas(this, name);
 		}
+		*/
 	}
 	
 	@Override
-	public Item getFilledBucket() {
+	public Item getBucket() {
 		return Items.BUCKET;
 	}
 	

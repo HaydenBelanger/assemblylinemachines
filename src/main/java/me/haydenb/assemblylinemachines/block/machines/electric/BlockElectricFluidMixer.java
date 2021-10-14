@@ -3,49 +3,49 @@ package me.haydenb.assemblylinemachines.block.machines.electric;
 import java.util.*;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.*;
@@ -54,19 +54,19 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectricFluidMixer.TEElectricFluidMixer>{
+public class BlockElectricFluidMixer extends BlockScreenBlockEntity<BlockElectricFluidMixer.TEElectricFluidMixer>{
 
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(0, 14, 0, 16, 16, 16),
-			Block.makeCuboidShape(0, 0, 0, 16, 2, 16),
-			Block.makeCuboidShape(0, 2, 1, 16, 14, 16),
-			Block.makeCuboidShape(0, 5, 0, 16, 14, 1),
-			Block.makeCuboidShape(0, 2, 0, 3, 5, 1),
-			Block.makeCuboidShape(13, 2, 0, 16, 5, 1),
-			Block.makeCuboidShape(9, 2, 0, 12, 5, 1),
-			Block.makeCuboidShape(4, 2, 0, 7, 5, 1),
-			Block.makeCuboidShape(7, 4, 0, 9, 5, 1)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(0, 14, 0, 16, 16, 16),
+			Block.box(0, 0, 0, 16, 2, 16),
+			Block.box(0, 2, 1, 16, 14, 16),
+			Block.box(0, 5, 0, 16, 14, 1),
+			Block.box(0, 2, 0, 3, 5, 1),
+			Block.box(13, 2, 0, 16, 5, 1),
+			Block.box(9, 2, 0, 12, 5, 1),
+			Block.box(4, 2, 0, 7, 5, 1),
+			Block.box(7, 4, 0, 9, 5, 1)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
@@ -75,36 +75,37 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 	private static final Random RAND = new Random();
 	
 	public BlockElectricFluidMixer() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "electric_fluid_mixer", BlockElectricFluidMixer.TEElectricFluidMixer.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.FLUID, BathCraftingFluids.NONE).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "electric_fluid_mixer", BlockElectricFluidMixer.TEElectricFluidMixer.class);
+		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+	
+	@Override
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.FLUID).add(HorizontalBlock.HORIZONTAL_FACING);
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
-	}
-	
-	@Override
-	public ActionResultType blockRightClickServer(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		ItemStack stack = player.getHeldItemMainhand();
-		if(stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null) != null && world.getTileEntity(pos) instanceof TEElectricFluidMixer) {
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		ItemStack stack = player.getMainHandItem();
+		if(stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null) != null && world.getBlockEntity(pos) instanceof TEElectricFluidMixer) {
 			
-			IFluidHandler handler = ((TEElectricFluidMixer) world.getTileEntity(pos)).fluids;
+			IFluidHandler handler = ((TEElectricFluidMixer) world.getBlockEntity(pos)).fluids;
 			FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
 			if(far.isSuccess()) {
 				if(stack.getCount() == 1) {
-					player.inventory.removeStackFromSlot(player.inventory.currentItem);
+					player.getInventory().removeItemNoUpdate(player.getInventory().selected);
 				}else {
 					stack.shrink(1);
 				}
 				ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-				return ActionResultType.CONSUME;
+				return InteractionResult.CONSUME;
 			}
 			
 			
@@ -113,8 +114,8 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -126,7 +127,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		}
 	}
 	
-	public static class TEElectricFluidMixer extends ManagedSidedMachine<ContainerElectricFluidMixer> implements ITickableTileEntity{
+	public static class TEElectricFluidMixer extends ManagedSidedMachine<ContainerElectricFluidMixer> implements ALMTicker<TEElectricFluidMixer>{
 		
 		
 		private int timer = 0;
@@ -143,12 +144,12 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		
 		protected LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> fluids);
 		
-		public TEElectricFluidMixer(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 6, new TranslationTextComponent(Registry.getBlock("electric_fluid_mixer").getTranslationKey()), Registry.getContainerId("electric_fluid_mixer"), ContainerElectricFluidMixer.class, new EnergyProperties(true, false, 20000));
+		public TEElectricFluidMixer(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 6, new TranslatableComponent(Registry.getBlock("electric_fluid_mixer").getDescriptionId()), Registry.getContainerId("electric_fluid_mixer"), ContainerElectricFluidMixer.class, new EnergyProperties(true, false, 20000), pos, state);
 		}
 		
-		public TEElectricFluidMixer() {
-			this(Registry.getTileEntity("electric_fluid_mixer"));
+		public TEElectricFluidMixer(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("electric_fluid_mixer"), pos, state);
 		}
 		
 		
@@ -170,7 +171,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		
 		@Override
 		public void tick() {
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				if(timer++ == nTimer) {
 					
 					boolean sendUpdates = false;
@@ -198,7 +199,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 					if(output == null || output.isEmpty()) {
 						
 						boolean doShutoff = true;
-						Optional<BathCrafting> rOpt = world.getRecipeManager().getRecipe(BathCrafting.BATH_RECIPE, this, world);
+						Optional<BathCrafting> rOpt = this.getLevel().getRecipeManager().getRecipeFor(BathCrafting.BATH_RECIPE, this, this.getLevel());
 						BathCrafting recipe = rOpt.orElse(null);
 						
 						if(recipe != null) {
@@ -222,7 +223,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 							}
 							
 							if(execute) {
-								output = recipe.getRecipeOutput().copy();
+								output = recipe.getResultItem().copy();
 								cycles = ((float) recipe.getStirs() * 3.6F);
 								
 								contents.get(1).shrink(1);
@@ -248,16 +249,16 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 								doShutoff = false;
 								
 								sendUpdates = true;
-								if(getBlockState().get(StateProperties.FLUID) != recipe.getFluid()) {
-									world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, recipe.getFluid()));
+								if(getBlockState().getValue(StateProperties.FLUID) != recipe.getFluid()) {
+									this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.FLUID, recipe.getFluid()));
 								}
 							}
 							
 							
 							
 						}
-						if(doShutoff && getBlockState().get(StateProperties.FLUID) != BathCraftingFluids.NONE) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.FLUID, BathCraftingFluids.NONE));
+						if(doShutoff && getBlockState().getValue(StateProperties.FLUID) != BathCraftingFluids.NONE) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.FLUID, BathCraftingFluids.NONE));
 							sendUpdates = true;
 						}
 						
@@ -303,11 +304,11 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			if(compound.contains("assemblylinemachines:output")) {
-				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
 			if(compound.contains("assemblylinemachines:fluid")) {
 				fluid = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:fluid"));
@@ -325,24 +326,24 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			compound.putString("assemblylinemachines:inprogress", inProgress.toString());
 			compound.putBoolean("assemblylinemachines:externaltank", externalTank);
 			if(output != null) {
-				CompoundNBT sub = new CompoundNBT();
-				output.write(sub);
+				CompoundTag sub = new CompoundTag();
+				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
 			
 			if(fluid != null) {
-				CompoundNBT sub = new CompoundNBT();
+				CompoundTag sub = new CompoundTag();
 				fluid.writeToNBT(sub);
 				compound.put("assemblylinemachines:fluid", sub);
 			}
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
@@ -442,7 +443,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerElectricFluidMixer(final int windowId, final PlayerInventory playerInventory, final TEElectricFluidMixer tileEntity) {
+		public ContainerElectricFluidMixer(final int windowId, final Inventory playerInventory, final TEElectricFluidMixer tileEntity) {
 			super(Registry.getContainerType("electric_fluid_mixer"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
@@ -453,8 +454,8 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 5, 149, 57, tileEntity));
 		}
 		
-		public ContainerElectricFluidMixer(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEElectricFluidMixer.class));
+		public ContainerElectricFluidMixer(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEElectricFluidMixer.class));
 		}
 	}
 	
@@ -463,10 +464,9 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		
 		HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
 		TEElectricFluidMixer tsfm;
-		private SimpleButton modeB;
 		
-		public ScreenElectricFluidMixer(ContainerElectricFluidMixer screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenElectricFluidMixer(ContainerElectricFluidMixer screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "electric_fluid_mixer", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -475,33 +475,30 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		protected void init() {
 			super.init();
 			
-			int x = guiLeft;
-			int y = guiTop;
+			int x = leftPos;
+			int y = topPos;
 			
-			modeB = new SimpleButton(x + 129, y + 57, 192, 41, 11, 11, "", (button) -> {
-				sendModeChange(tsfm.getPos());
-			});
-			
-			addButton(modeB);
+			this.addRenderableWidget(new TrueFalseButton(x+129, y+57, 192, 41, 11, 11, new TrueFalseButtonSupplier("Draw From External Tank", "Draw From Internal Tank", () -> tsfm.externalTank), (b) -> sendModeChange(tsfm.getBlockPos())));
 		}
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			if(!tsfm.fluid.isEmpty() && tsfm.fluid.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(tsfm.fluid.getFluid());
 				if(tas == null) {
-					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(tsfm.fluid.getFluid().getAttributes().getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(tsfm.fluid.getFluid().getAttributes().getStillTexture());
 					spriteMap.put(tsfm.fluid.getFluid(), tas);
 				}
 				
 				if(tsfm.fluid.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
-					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
+					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
 				
 				super.blit(x+41, y+23, 37, 37, 37, tas);
 			}
@@ -519,31 +516,24 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 				super.blit(x+95, y+34, tsfm.inProgress.getElectricBlitPiece().getFirst(), tsfm.inProgress.getElectricBlitPiece().getSecond(), prog, 16);
 			}
 			
-			if(tsfm.externalTank) {
-				super.blit(modeB.getX(), modeB.getY(), modeB.blitx, modeB.blity, modeB.sizex, modeB.sizey);
-			}
-			
-			
-			
-			
 		}
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 			
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			if (mouseX >= x + 41 && mouseY >= y + 23 && mouseX <= x + 48 && mouseY <= y + 59) {
 				ArrayList<String> str = new ArrayList<>();
 				BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(tsfm.fluid.getFluid());
 				if(ff == BathCraftingFluids.NONE) {
-					this.renderTooltip("None",
+					this.renderComponentTooltip("None",
 							mouseX - x, mouseY - y);
 				}else {
 					str.add(ff.getFriendlyName());
-					if(Screen.func_231173_s_()) {
+					if(Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(tsfm.fluid.getAmount()) + " mB");
 						
@@ -551,19 +541,11 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 						str.add(Formatting.FEPT_FORMAT.format((double) tsfm.fluid.getAmount() / 1000D) + " B");
 					}
 					
-					this.renderTooltip(str,
+					this.renderComponentTooltip(str,
 							mouseX - x, mouseY - y);
 				}
 				
 				
-			}
-			
-			if (mouseX >= modeB.getX() && mouseX <= modeB.getX() + modeB.sizex && mouseY >= modeB.getY() && mouseY <= modeB.getY() + modeB.sizey) {
-				if(tsfm.externalTank) {
-					this.renderTooltip("Draw From External Tank", mouseX - x, mouseY - y);
-				}else {
-					this.renderTooltip("Draw From Internal Tank", mouseX - x, mouseY - y);
-				}
 			}
 			
 		}
@@ -576,11 +558,11 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 		}
 	}
 	
-	public static void updateDataFromPacket(PacketData pd, World world) {
+	public static void updateDataFromPacket(PacketData pd, Level world) {
 		
 		if(pd.getCategory().equals("efm_gui")) {
 			BlockPos pos = pd.get("pos", BlockPos.class);
-			TileEntity tex = world.getTileEntity(pos);
+			BlockEntity tex = world.getBlockEntity(pos);
 			if(tex instanceof TEElectricFluidMixer) {
 				TEElectricFluidMixer te = (TEElectricFluidMixer) tex;
 				te.externalTank = !te.externalTank;

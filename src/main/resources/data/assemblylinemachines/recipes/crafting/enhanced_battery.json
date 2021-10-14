@@ -7,19 +7,19 @@
 	],
 	"key":{
 		"i":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		},
 		"r":{
-			"item": "minecraft:redstone_block"
+			"tag": "forge:storage_blocks/redstone"
 		},
 		"b":{
 			"item": "assemblylinemachines:basic_battery"
 		},
 		"c":{
-			"item": "assemblylinemachines:rubber_sheet"
+			"tag": "forge:sheets/rubber"
 		},
 		"m":{
-			"item": "assemblylinemachines:mystium_blend"
+			"tag": "forge:dusts/mystium"
 		}
 	},
 	"result":{

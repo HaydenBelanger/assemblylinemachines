@@ -10,7 +10,7 @@
 			"tag": "assemblylinemachines:crafting/gears/all"
 		},
 		"c":{
-			"item": "assemblylinemachines:iron_plate"
+			"tag": "forge:plates/iron"
 		},
 		"p":{
 			"item": "assemblylinemachines:empowered_coal"

@@ -3,57 +3,58 @@ package me.haydenb.assemblylinemachines.block.utility;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkHandler.QuantumLinkNetwork;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkStatus;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.*;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQuantumLink> {
+public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TEQuantumLink> {
 
 	public BlockQuantumLink() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "quantum_link", BlockQuantumLink.TEQuantumLink.class);
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "quantum_link", BlockQuantumLink.TEQuantumLink.class);
 	}
 
-	public static class TEQuantumLink extends ManagedSidedMachine<ContainerQuantumLink> implements ITickableTileEntity{
+	public static class TEQuantumLink extends ManagedSidedMachine<ContainerQuantumLink> implements ALMTicker<TEQuantumLink>{
 
 
 		QuantumLinkNetwork qln = null;
@@ -71,17 +72,17 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 		IFluidHandler handler = new QuantumLinkFluidHandler();
 		LazyOptional<IFluidHandler> lazy = LazyOptional.of(() -> handler);
 
-		public TEQuantumLink(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 3, new TranslationTextComponent(Registry.getBlock("quantum_link").getTranslationKey()), Registry.getContainerId("quantum_link"), ContainerQuantumLink.class, new EnergyProperties(true, true, 10000000));
+		public TEQuantumLink(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 3, new TranslatableComponent(Registry.getBlock("quantum_link").getDescriptionId()), Registry.getContainerId("quantum_link"), ContainerQuantumLink.class, new EnergyProperties(true, true, 10000000), pos, state);
 		}
 
-		public TEQuantumLink() {
-			this(Registry.getTileEntity("quantum_link"));
+		public TEQuantumLink(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("quantum_link"), pos, state);
 		}
 
 		@Override
 		public void tick() {
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				boolean sendupdates = false;
 				if(timer++ == 20) {
 					timer = 0;
@@ -102,7 +103,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 						}
 						if(configured == true) {
 
-							Pair<QuantumLinkStatus, Optional<QuantumLinkNetwork>> result = QuantumLinkManager.getInstance(world.getServer()).getHandler().getOrCreateQuantumLink(id, password);
+							Pair<QuantumLinkStatus, Optional<QuantumLinkNetwork>> result = QuantumLinkManager.getInstance(this.getLevel().getServer()).getHandler().getOrCreateQuantumLink(id, password);
 
 							if(result.getFirst() != QuantumLinkStatus.WRONG_PASSWORD) {
 								qln = result.getSecond().orElseThrow(() ->
@@ -155,14 +156,14 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 						}
 						if(pfi[2] == 1) {
 
-							if(!getStackInSlot(0).isEmpty()) {
-								setInventorySlotContents(0, qln.attemptInsertIntoNetwork(this, getStackInSlot(0)));
+							if(!getItem(0).isEmpty()) {
+								this.setItem(0, qln.attemptInsertIntoNetwork(this, getItem(0)));
 							}
-							if(!getStackInSlot(1).isEmpty()) {
-								setInventorySlotContents(1, qln.attemptInsertIntoNetwork(this, getStackInSlot(1)));
+							if(!getItem(1).isEmpty()) {
+								this.setItem(1, qln.attemptInsertIntoNetwork(this, getItem(1)));
 							}
-							if(!getStackInSlot(2).isEmpty()) {
-								setInventorySlotContents(2, qln.attemptInsertIntoNetwork(this, getStackInSlot(2)));
+							if(!getItem(2).isEmpty()) {
+								this.setItem(2, qln.attemptInsertIntoNetwork(this, getItem(2)));
 							}
 							
 							sendupdates = true;
@@ -197,8 +198,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 		}
 
 		@Override
-		public void remove() {
-			super.remove();
+		public void setRemoved() {
+			super.setRemoved();
 
 			if(qln != null) {
 				qln.removeFromNetwork(this);
@@ -209,7 +210,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 			return true;
 		}
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 
 			compound.putBoolean("assemblylinemachines:configured", configured);
 			compound.putIntArray("assemblylinemachines:pfi", pfi);
@@ -218,19 +219,19 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				compound.putInt("assemblylinemachines:networkpassword", password);
 			}
 
-			CompoundNBT sub = new CompoundNBT();
+			CompoundTag sub = new CompoundTag();
 			tank.writeToNBT(sub);
 			compound.put("assemblylinemachines:tank", sub);
 			compound.putString("assemblylinemachines:status", status);
 			compound.putBoolean("assemblylinemachines:connected", connected);
 			compound.putBoolean("assemblylinemachines:passwordconnection", passwordEnabled);
 
-			return super.write(compound);
+			return super.save(compound);
 		}
 
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 
 			configured = compound.getBoolean("assemblylinemachines:configured");
 			if(compound.contains("assemblylinemachines:pfi")) {
@@ -337,7 +338,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 
-		public ContainerQuantumLink(final int windowId, final PlayerInventory playerInventory, final TEQuantumLink tileEntity) {
+		public ContainerQuantumLink(final int windowId, final Inventory playerInventory, final TEQuantumLink tileEntity) {
 			super(Registry.getContainerType("quantum_link"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0, 0);
 
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 8, 59, tileEntity));
@@ -345,8 +346,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 2, 44, 59, tileEntity));
 		}
 
-		public ContainerQuantumLink(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEQuantumLink.class));
+		public ContainerQuantumLink(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEQuantumLink.class));
 		}
 
 	}
@@ -354,23 +355,18 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 	@OnlyIn(Dist.CLIENT)
 	public static class ScreenQuantumLink extends ScreenALMBase<ContainerQuantumLink>{
 		TEQuantumLink tsfm;
-		private TextFieldWidget idField;
-		private TextFieldWidget pinField;
+		private EditBox idField;
+		private EditBox pinField;
 		private String txtId = "";
-		private SimpleButton p;
-		private SimpleButton f;
-		private SimpleButton i;
-		private SimpleButton apply;
 		private HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
 		
-		@SuppressWarnings("deprecation")
-		private final TextureAtlasSprite netherPortal = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.NETHER_PORTAL.getDefaultState());
+		private final TextureAtlasSprite netherPortal;
 
-		public ScreenQuantumLink(ContainerQuantumLink screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenQuantumLink(ContainerQuantumLink screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), null, null, "quantum_link", false);
 			tsfm = screenContainer.tileEntity;
-
+			netherPortal = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getTexture(Blocks.NETHER_PORTAL.defaultBlockState(), tsfm.getLevel(), tsfm.getBlockPos());
 
 			renderTitleText = false;
 			renderInventoryText = false;
@@ -383,22 +379,22 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 			super.init();
 
-			int x = guiLeft;
-			int y = guiTop;
+			int x = leftPos;
+			int y = topPos;
 
-			this.field_230706_i_.keyboardListener.enableRepeatEvents(true);
+			this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-			idField = new TextFieldWidget(this.field_230712_o_, x + 138, y + 9, 20, 9, new StringTextComponent("ID"));
+			idField = new EditBox(this.font, x + 138, y + 9, 20, 9, new TextComponent("ID"));
 			idField.setCanLoseFocus(true);
-			idField.setEnableBackgroundDrawing(false);
-			idField.setMaxStringLength(3);
+			idField.setBordered(false);
+			idField.setMaxLength(3);
 			idField.setTextColor(0xffffff);
-			idField.setDisabledTextColour(0xffffff);
-			idField.setText(txtId);
+			idField.setTextColorUneditable(0xffffff);
+			idField.insertText(txtId);
 			idField.setResponder((string) ->{
 				txtId = string;
 			});
-			idField.setValidator((string) ->{
+			idField.setFilter((string) ->{
 				if(string.trim().isEmpty()) {
 					return true;
 				}
@@ -406,66 +402,115 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				return StringUtils.isNumeric(string);
 			});
 
-			pinField = new TextFieldWidget(this.field_230712_o_, x + 138, y + 24, 32, 9, new StringTextComponent("PIN"));
+			pinField = new EditBox(this.font, x + 138, y + 24, 32, 9, new TextComponent("PIN"));
 			pinField.setCanLoseFocus(true);
-			pinField.setEnableBackgroundDrawing(false);
-			pinField.setMaxStringLength(4);
+			pinField.setBordered(false);
+			pinField.setMaxLength(4);
 			pinField.setTextColor(0xffffff);
-			pinField.setDisabledTextColour(0xffffff);
-			pinField.setValidator((string) ->{
+			pinField.setTextColorUneditable(0xffffff);
+			pinField.setFilter((string) ->{
 
 				if(string.trim().isEmpty()) {
 					return true;
 				}
 				return StringUtils.isNumeric(string);
 			});
+			this.addRenderableWidget(idField);
+			this.addRenderableWidget(pinField);
 
-			this.field_230705_e_.add(idField);
-			this.field_230705_e_.add(pinField);
+			this.setFocused(idField);
 
-			this.setFocusedDefault(idField);
-
-			p = new SimpleButton(x+ 136, y+65, 0, 0, 11, 11, null, (button) ->{
-				pressButton(0, tsfm.getPos());
-			});
-
-			f = new SimpleButton(x+ 148, y+65, 0, 0, 11, 11, null, (button) ->{
-				pressButton(1, tsfm.getPos());
-			});
-
-			i = new SimpleButton(x+ 160, y+65, 0, 0, 11, 11, null, (button) ->{
-				pressButton(2, tsfm.getPos());
-			});
-
-			apply = new SimpleButton(x+ 160, y+5, 0, 0, 11, 11, null, (button) ->{
-				if(!idField.getText().trim().isEmpty()) {
-					if(pinField.getText().trim().isEmpty()) {
-						pressConnectButton(Integer.parseInt(txtId), null, tsfm.getPos());
+			this.addRenderableWidget(new QuantumChannelButton(x+136, y+65, 11, 11, (b) -> pressButton(0, tsfm.getBlockPos()), 0));
+			this.addRenderableWidget(new QuantumChannelButton(x+148, y+65, 11, 11, (b) -> pressButton(1, tsfm.getBlockPos()), 1));
+			this.addRenderableWidget(new QuantumChannelButton(x+160, y+65, 11, 11, (b) -> pressButton(2, tsfm.getBlockPos()), 2));
+			this.addRenderableWidget(new TrueFalseButton(x+160, y+5, 11, 11, "Activate Quantum Link", (b) -> {
+				if(!idField.getValue().trim().isEmpty()) {
+					if(pinField.getValue().trim().isEmpty()) {
+						pressConnectButton(Integer.parseInt(txtId), null, tsfm.getBlockPos());
 					}else {
-						pressConnectButton(Integer.parseInt(txtId), Integer.parseInt(pinField.getText()), tsfm.getPos());
+						pressConnectButton(Integer.parseInt(txtId), Integer.parseInt(pinField.getValue()), tsfm.getBlockPos());
 					}
 				}
-				
-
-			});
-
-			this.addButton(p);
-			this.addButton(f);
-			this.addButton(i);
-			this.addButton(apply);
+			}));
 		}
 
+		private class QuantumChannelButton extends TrueFalseButton{
+			
+			final int channel;
+			final String tooltip;
+			public QuantumChannelButton(int x, int y, int width, int height, OnPress onPress, int channel) {
+				super(x, y, width, height, null, onPress);
+				this.channel = channel;
+				switch(channel) {
+				case 0:
+					tooltip = "Power";
+					break;
+				case 1:
+					tooltip = "Fluids";
+					break;
+				case 2:
+					tooltip = "Items";
+					break;
+				default:
+					tooltip = null;
+				}
+			}
+			
+			@Override
+			public boolean getSupplierOutput() {
+				if(tsfm.pfi[channel] == 0) {
+					return false;
+				}
+				
+				return true;
+			}
+			
+			@Override
+			public int[] getBlitData() {
+				int xoffset = 12 * channel;
+				int yoffset = 0;
+				if(tsfm.pfi[channel] == 1) {
+					yoffset += 12;
+				}
+				
+				return new int[] {x, y, 176+xoffset, 74+yoffset, 11, 11};
+			}
+			
+			@Override
+			public void renderToolTip(PoseStack pMatrixStack, int pMouseX, int pMouseY) {
+				if(this.isHovered()) {
+					String a = "";
+					switch(tsfm.pfi[channel]) {
+					case 0:
+						a = tooltip + " Input Mode";
+						break;
+					case 1:
+						a = tooltip + " Output Mode";
+						break;
+					case 2:
+						a = tooltip + " Disabled";
+						break;
+					}
+					
+					renderComponentTooltip(a, pMouseX, pMouseY);
+				}
+			}
+		}
+		
+		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+			RenderSystem.setShader(GameRenderer::getPositionTexShader);
+			RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
 
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 
 			renderFluid(tsfm.tank, x+13, y+13);
 
-
+			super.blit(x+64, y+6, 69, 69, 69, netherPortal);
+			
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 
 			int prog = Math.round(((float) tsfm.amount / (float) tsfm.properties.getCapacity()) * 37F);
@@ -473,12 +518,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 			renderFluidOverlayBar(tsfm.tank, tsfm.handler.getTankCapacity(0), x + 13, y + 13);
 
-			renderCovering(x, y, 0);
-			renderCovering(x, y, 1);
-			renderCovering(x, y, 2);
-
 			if(!tsfm.status.isEmpty()) {
-				float wsc = 35f / (float) this.font.getStringWidth(tsfm.status);
+				float wsc = 35f / (float) this.font.width(tsfm.status);
 				MathHelper.renderScaledText(font, x + 136, y + 35, wsc, tsfm.status, false, 0xffffff);
 			}
 
@@ -489,13 +530,14 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				if(tsfm.passwordEnabled) {
 					super.blit(x+160, y+35, 176, 98, 11, 11);
 				}
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
-				super.blit(x + 64, y + 6, 69, 69, 69, netherPortal);
+				
 
+			}else {
+				super.blit(x+64, y+6, 187, 99, 69, 69);
 			}
 
-			this.idField.func_230431_b_(mx, mouseX, mouseY, partialTicks);
-			this.pinField.func_230431_b_(mx, mouseX, mouseY, partialTicks);
+			this.idField.renderButton(mx, mouseX, mouseY, partialTicks);
+			this.pinField.renderButton(mx, mouseX, mouseY, partialTicks);
 
 
 		}
@@ -504,73 +546,42 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 
 			if (mouseX >= x + 39 && mouseY >= y + 13 && mouseX <= x + 39 + 15 && mouseY <= y + 13 + 36) {
 
-				if(Screen.func_231173_s_()) {
+				if(Screen.hasShiftDown()) {
 					ArrayList<String> str = new ArrayList<>();
 					str.add(Formatting.GENERAL_FORMAT.format(tsfm.amount) + "/" + Formatting.GENERAL_FORMAT.format(tsfm.properties.getCapacity()) + "FE");
-					this.renderTooltip(str,
+					this.renderComponentTooltip(str,
 							mouseX - x, mouseY - y);
 				}else {
-					this.renderTooltip(Formatting.formatToSuffix(tsfm.amount) + "/" + Formatting.formatToSuffix(tsfm.properties.getCapacity()) + "FE",
+					this.renderComponentTooltip(Formatting.formatToSuffix(tsfm.amount) + "/" + Formatting.formatToSuffix(tsfm.properties.getCapacity()) + "FE",
 							mouseX - x, mouseY - y);
 				}
 
 			}
 			
 			if(tsfm.connected && tsfm.passwordEnabled && mouseX >= x + 160 && mouseY >= y + 35 && mouseX <= x + 160 + 11 && mouseY <= y + 35 + 11) {
-				this.renderTooltip("Secure connection!", mouseX - x, mouseY - y);
+				this.renderComponentTooltip("Secure connection!", mouseX - x, mouseY - y);
 			}
-
-			renderButtonTooltip(x, y, mouseX, mouseY, 0, p, "Power");
-			renderButtonTooltip(x, y, mouseX, mouseY, 1, f, "Fluids");
-			renderButtonTooltip(x, y, mouseX, mouseY, 2, i, "Items");
-			renderButtonTooltip(x, y, mouseX, mouseY, 3, apply, null);
 
 			renderFluidTooltip(tsfm.tank, mouseX, mouseY, x + 13, y + 13, x, y);
-		}
-
-		private void renderButtonTooltip(int x, int y, int mouseX, int mouseY, int id, SimpleButton bb, String text) {
-
-
-			if(mouseX >= bb.getX() && mouseX <= bb.getX() + 11 && mouseY >= bb.getY() && mouseY <= bb.getY() + 11) {
-				String a;
-
-				if(id == 3) {
-					a = "Activate Quantum Link";
-				}else {
-					if(tsfm.pfi[id] == 0) {
-						a = text + " Input Mode";
-					}else if(tsfm.pfi[id] == 1) {
-						a = text + " Output Mode";
-					}else{
-						a = text + " Disabled";
-					}
-				}
-
-
-				this.renderTooltip(a, mouseX - x, mouseY - y);
-			}
-
-
-
 		}
 
 		private void renderFluid(FluidStack fs, int xblit, int yblit) {
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(fs.getFluid().getAttributes().getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fs.getFluid().getAttributes().getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
 				if (fs.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
-					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
+					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				} else {
-					GL11.glColor4f(1f, 1f, 1f, 1f);
+					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 				}
 
 				super.blit(xblit, yblit, 37, 37, 37, tas);
@@ -588,8 +599,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				if (!fs.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(fs.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(fs.getDisplayName().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
@@ -597,31 +608,17 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
-					this.renderTooltip(str, mouseX - bx, mouseY - by);
+					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);
 				} else {
-					this.renderTooltip("Empty", mouseX - bx, mouseY - by);
+					this.renderComponentTooltip("Empty", mouseX - bx, mouseY - by);
 				}
 			}
 		}
-
-		private void renderCovering(int x, int y, int id) {
-
-			int mode = tsfm.pfi[id];
-			if(mode != 0) {
-
-				int xoffset = 12 * id;
-				int yoffset = 0;
-				if(mode == 1) {
-					yoffset = 12;
-				}
-
-				super.blit(x + 136 + xoffset, y + 65, 176 + xoffset, 74 + yoffset, 11, 11);
-			}
-		}
+		
 
 		public static void pressButton(int button, BlockPos pos) {
 			PacketData pd = new PacketData("quantum_link_gui");
-			pd.writeString("type", "io");
+			pd.writeUtf("type", "io");
 			pd.writeBlockPos("location", pos);
 			pd.writeInteger("button", button);
 
@@ -630,7 +627,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 		public static void pressConnectButton(int channel, Integer password, BlockPos pos) {
 			PacketData pd = new PacketData("quantum_link_gui");
-			pd.writeString("type", "enable");
+			pd.writeUtf("type", "enable");
 			pd.writeBlockPos("location", pos);
 			pd.writeInteger("channel", channel);
 			if(password != null) {
@@ -646,10 +643,10 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 	}
 
-	public static void receiveFromServer(PacketData pd, World world) {
+	public static void receiveFromServer(PacketData pd, Level world) {
 		if(pd.getCategory().equals("quantum_link_gui")) {
 			BlockPos pos = pd.get("location", BlockPos.class);
-			TileEntity tex = world.getTileEntity(pos);
+			BlockEntity tex = world.getBlockEntity(pos);
 			if(tex instanceof TEQuantumLink) {
 				TEQuantumLink te = (TEQuantumLink) tex;
 				String b = pd.get("type", String.class);

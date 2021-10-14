@@ -3,23 +3,21 @@ package me.haydenb.assemblylinemachines.crafting;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class FluidInGroundRecipe implements IRecipe<IInventory>{
+public class FluidInGroundRecipe implements Recipe<Container>{
 
 	
-	public static final IRecipeType<FluidInGroundRecipe> FIG_RECIPE = new TypeFluidInGroundRecipe();
+	public static final RecipeType<FluidInGroundRecipe> FIG_RECIPE = new TypeFluidInGroundRecipe();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	private final Fluid fluid;
@@ -41,23 +39,23 @@ public class FluidInGroundRecipe implements IRecipe<IInventory>{
 	
 	
 	@Override
-	public boolean matches(IInventory inv, World worldIn) {
+	public boolean matches(Container inv, Level worldIn) {
 		
 		return true;
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(IInventory inv) {
+	public ItemStack assemble(Container inv) {
 		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return false;
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return ItemStack.EMPTY;
 	}
 
@@ -67,17 +65,17 @@ public class FluidInGroundRecipe implements IRecipe<IInventory>{
 	}
 
 	@Override
-	public IRecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public IRecipeType<?> getType() {
+	public RecipeType<?> getType() {
 		return FIG_RECIPE;
 	}
 	
 	@Override
-	public boolean isDynamic() {
+	public boolean isSpecial() {
 		return true;
 	}
 	
@@ -101,23 +99,23 @@ public class FluidInGroundRecipe implements IRecipe<IInventory>{
 		return fluid;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<FluidInGroundRecipe>{
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<FluidInGroundRecipe>{
 
 		@Override
-		public FluidInGroundRecipe read(ResourceLocation recipeId, JsonObject json) {
+		public FluidInGroundRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				Fluid f = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(JSONUtils.getString(json, "fluid")));
+				Fluid f = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "fluid")));
 				if(f == null) {
 					throw new IllegalArgumentException("Could not find this fluid.");
 				}
 				
-				int odds = JSONUtils.getInt(json, "chance") - 1;
+				int odds = GsonHelper.getAsInt(json, "chance") - 1;
 				if(odds < 0 || odds > 99) {
 					throw new IllegalArgumentException("Chance must be more than 0 and less than 101.");
 				}
-				int min = JSONUtils.getInt(json, "min");
-				int max = JSONUtils.getInt(json, "max");
-				FluidInGroundCriteria figc = FluidInGroundCriteria.valueOf(JSONUtils.getString(json, "criteria_set").toUpperCase());
+				int min = GsonHelper.getAsInt(json, "min");
+				int max = GsonHelper.getAsInt(json, "max");
+				FluidInGroundCriteria figc = FluidInGroundCriteria.valueOf(GsonHelper.getAsString(json, "criteria_set").toUpperCase());
 				return new FluidInGroundRecipe(recipeId, f, odds, min, max, figc);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Fluid-In-Ground Recipe from JSON: " + e.getMessage());
@@ -129,28 +127,28 @@ public class FluidInGroundRecipe implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public FluidInGroundRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
+		public FluidInGroundRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
 			Fluid f = ForgeRegistries.FLUIDS.getValue(buffer.readResourceLocation());
 			int odds = buffer.readInt();
 			int min = buffer.readInt();
 			int max = buffer.readInt();
-			FluidInGroundCriteria figc = buffer.readEnumValue(FluidInGroundCriteria.class);
+			FluidInGroundCriteria figc = buffer.readEnum(FluidInGroundCriteria.class);
 			
 			return new FluidInGroundRecipe(recipeId, f, odds, min, max, figc);
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, FluidInGroundRecipe recipe) {
+		public void toNetwork(FriendlyByteBuf buffer, FluidInGroundRecipe recipe) {
 			buffer.writeResourceLocation(recipe.getFluid().getRegistryName());
 			buffer.writeInt(recipe.getChance());
 			buffer.writeInt(recipe.getMinimum());
 			buffer.writeInt(recipe.getMaximum());
-			buffer.writeEnumValue(recipe.getCriteria());
+			buffer.writeEnum(recipe.getCriteria());
 		}
 		
 	}
 	
-	public static class TypeFluidInGroundRecipe implements IRecipeType<FluidInGroundRecipe>{
+	public static class TypeFluidInGroundRecipe implements RecipeType<FluidInGroundRecipe>{
 		
 		@Override
 		public String toString() {

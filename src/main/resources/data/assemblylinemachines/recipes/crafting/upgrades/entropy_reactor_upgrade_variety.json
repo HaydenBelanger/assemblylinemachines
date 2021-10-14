@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		},
 		"x":{
-			"item": "assemblylinemachines:rich_strange_matter"
+			"item": "assemblylinemachines:strange_matter"
 		},
 		"y":{
-			"tag": "assemblylinemachines:crafting/strange_matters"
+			"tag": "assemblylinemachines:crafting/entropy_reactor_outputs"
 		}
 	},
 	"result":{

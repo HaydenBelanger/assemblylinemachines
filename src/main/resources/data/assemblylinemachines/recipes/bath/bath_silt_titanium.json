@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"item": "assemblylinemachines:ground_titanium"
+		"tag": "forge:dusts/titanium"
 	},
 	"input_b":{
 		"item": "assemblylinemachines:silt"

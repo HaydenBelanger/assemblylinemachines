@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "assemblylinemachines:ground_titanium"
+		"tag": "forge:dusts/titanium"
 	},
 	"amount": 1,
 	"enchantment": "minecraft:power",

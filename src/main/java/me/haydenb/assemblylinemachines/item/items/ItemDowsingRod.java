@@ -1,37 +1,37 @@
 package me.haydenb.assemblylinemachines.item.items;
 
-import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
 import me.haydenb.assemblylinemachines.item.categories.ItemBasicFormattedName;
 import me.haydenb.assemblylinemachines.util.Formatting;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import me.haydenb.assemblylinemachines.world.FluidLevelManager;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 
 public class ItemDowsingRod extends ItemBasicFormattedName {
 
 	
 	public ItemDowsingRod() {
-		super(TextFormatting.DARK_PURPLE);
+		super(ChatFormatting.DARK_PURPLE);
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		
 		
-		World world = context.getWorld();
-		if(!world.isRemote) {
-			FluidStack fs = FluidLevelManager.getOrCreateFluidStack(context.getPos(), world);
+		Level world = context.getLevel();
+		if(!world.isClientSide) {
+			FluidStack fs = FluidLevelManager.getOrCreateFluidStack(context.getClickedPos(), world);
 			if(fs != FluidStack.EMPTY && fs.getFluid() != Fluids.EMPTY) {
-				context.getPlayer().sendStatusMessage(new StringTextComponent("There is " + Formatting.GENERAL_FORMAT.format(fs.getAmount()) + " mB of " + fs.getDisplayName().func_230532_e_().getString() + " in this chunk.").func_230532_e_().func_240699_a_(TextFormatting.GOLD), true);
+				context.getPlayer().displayClientMessage(new TextComponent("There is " + Formatting.GENERAL_FORMAT.format(fs.getAmount()) + " mB of " + fs.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
 			}else {
-				context.getPlayer().sendStatusMessage(new StringTextComponent("There is no reservoir in this chunk."), true);
+				context.getPlayer().displayClientMessage(new TextComponent("There is no reservoir in this chunk."), true);
 			}
 		}
 		
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
 	}
 }

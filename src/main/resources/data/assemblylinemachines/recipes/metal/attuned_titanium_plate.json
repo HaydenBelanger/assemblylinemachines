@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:metal",
 	"input":{
-		"item": "assemblylinemachines:attuned_titanium_ingot"
+		"tag": "forge:ingots/attuned_titanium"
 	},
 	"output":{
 		"item": "assemblylinemachines:attuned_titanium_plate"

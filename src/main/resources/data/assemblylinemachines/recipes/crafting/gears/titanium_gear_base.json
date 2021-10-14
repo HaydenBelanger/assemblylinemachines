@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"x":{
-			"item": "assemblylinemachines:titanium_plate"
+			"tag": "forge:plates/titanium"
 		},
 		"y":{
 			"tag": "forge:rods/wooden"

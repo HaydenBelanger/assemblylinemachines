@@ -10,7 +10,7 @@
 			"tag": "forge:rods/wooden"
 		},
 		"m":{
-			"item": "assemblylinemachines:steel_ingot"
+			"tag": "forge:ingots/steel"
 		},
 		"o":{
 			"item": "assemblylinemachines:crank_shaft"

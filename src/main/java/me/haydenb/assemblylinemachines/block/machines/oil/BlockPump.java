@@ -2,27 +2,25 @@ package me.haydenb.assemblylinemachines.block.machines.oil;
 
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
-import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity;
+import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import me.haydenb.assemblylinemachines.world.FluidLevelManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -35,14 +33,14 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 public class BlockPump extends BlockTileEntity {
 
 	private static final VoxelShape PUMP_N = Stream
-			.of(Block.makeCuboidShape(4, 8, 7, 6, 10, 9), Block.makeCuboidShape(10, 8, 7, 12, 10, 9), Block.makeCuboidShape(7, 8, 4, 9, 10, 6),
-					Block.makeCuboidShape(2, 5, 7, 4, 10, 9), Block.makeCuboidShape(12, 5, 7, 14, 10, 9), Block.makeCuboidShape(7, 5, 2, 9, 10, 4),
-					Block.makeCuboidShape(1, 6, 6, 5, 7, 10), Block.makeCuboidShape(11, 6, 6, 15, 7, 10), Block.makeCuboidShape(6, 6, 1, 10, 7, 5),
-					Block.makeCuboidShape(5, 7, 6, 6, 11, 10), Block.makeCuboidShape(10, 7, 6, 11, 11, 10), Block.makeCuboidShape(6, 7, 5, 10, 11, 6),
-					Block.makeCuboidShape(6, 5, 6, 10, 13, 10), Block.makeCuboidShape(3, 13, 3, 13, 16, 13), Block.makeCuboidShape(3, 12, 13, 8, 13, 16),
-					Block.makeCuboidShape(8, 12, 13, 13, 13, 16), Block.makeCuboidShape(3, 5, 13, 13, 12, 16), Block.makeCuboidShape(0, 0, 0, 16, 5, 16))
+			.of(Block.box(4, 8, 7, 6, 10, 9), Block.box(10, 8, 7, 12, 10, 9), Block.box(7, 8, 4, 9, 10, 6),
+					Block.box(2, 5, 7, 4, 10, 9), Block.box(12, 5, 7, 14, 10, 9), Block.box(7, 5, 2, 9, 10, 4),
+					Block.box(1, 6, 6, 5, 7, 10), Block.box(11, 6, 6, 15, 7, 10), Block.box(6, 6, 1, 10, 7, 5),
+					Block.box(5, 7, 6, 6, 11, 10), Block.box(10, 7, 6, 11, 11, 10), Block.box(6, 7, 5, 10, 11, 6),
+					Block.box(6, 5, 6, 10, 13, 10), Block.box(3, 13, 3, 13, 16, 13), Block.box(3, 12, 13, 8, 13, 16),
+					Block.box(8, 12, 13, 13, 13, 16), Block.box(3, 5, 13, 13, 12, 16), Block.box(0, 0, 0, 16, 5, 16))
 			.reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
+				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
 	private static final VoxelShape PUMP_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, PUMP_N);
@@ -50,21 +48,33 @@ public class BlockPump extends BlockTileEntity {
 	private static final VoxelShape PUMP_E = General.rotateShape(Direction.NORTH, Direction.EAST, PUMP_N);
 
 	public BlockPump() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "pump");
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "pump");
 
-		this.setDefaultState(this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+
+	@Override
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+
+		builder.add(HorizontalDirectionalBlock.FACING);
+	}
+	
+	@Override
+	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
+		return bteDefaultReturnBlockEntity(pPos, pState);
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-
-		builder.add(HorizontalBlock.HORIZONTAL_FACING);
+	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+		return bteDefaultReturnTicker(level, state, blockEntityType);
 	}
-
+	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return PUMP_W;
 		} else if (d == Direction.SOUTH) {
@@ -77,27 +87,27 @@ public class BlockPump extends BlockTileEntity {
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 
 	
 	@Override
-	public ActionResultType blockRightClickServer(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		if (world.getTileEntity(pos) instanceof TEPump) {
-			TEPump pump = (TEPump) world.getTileEntity(pos);
-			player.sendStatusMessage(new StringTextComponent(pump.prevStatusMessage), true);
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if (world.getBlockEntity(pos) instanceof TEPump) {
+			TEPump pump = (TEPump) world.getBlockEntity(pos);
+			player.displayClientMessage(new TextComponent(pump.prevStatusMessage), true);
 		}
 		
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
 	}
 	
 	@Override
-	public ActionResultType blockRightClickClient(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		return ActionResultType.CONSUME;
+	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
+		return InteractionResult.CONSUME;
 	}
 
-	public static class TEPump extends BasicTileEntity implements ITickableTileEntity {
+	public static class TEPump extends BasicTileEntity implements ALMTicker<TEPump> {
 
 		private int timer = 0;
 		public IFluidHandler handler = null;
@@ -149,31 +159,31 @@ public class BlockPump extends BlockTileEntity {
 		};
 		protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
 
-		public TEPump(TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn);
+		public TEPump(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, pos, state);
 		}
 
-		public TEPump() {
-			this(Registry.getTileEntity("pump"));
+		public TEPump(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("pump"), pos, state);
 		}
 
 		@Override
 		public void tick() {
-			if (!world.isRemote) {
+			if (!level.isClientSide) {
 				if (timer++ == 20) {
 					timer = 0;
 
 					if(handler == null) {
 						handler = General.getCapabilityFromDirection(this, "handler", Direction.UP, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 					}
-					if (world.getBlockState(pos.down()).getBlock() != Registry.getBlock("pumpshaft")) {
+					if (this.getLevel().getBlockState(this.getBlockPos().below()).getBlock() != Registry.getBlock("pumpshaft")) {
 						prevStatusMessage = "Not connected to Pumpshaft.";
 						forceState(false);
 					} else {
 						if (extracted.isEmpty()) {
 							
 							if (amount - 1800 >= 0) {
-								FluidStack xfs = FluidLevelManager.drain(pos, world, 2000);
+								FluidStack xfs = FluidLevelManager.drain(this.getBlockPos(), this.getLevel(), 2000);
 								if (!xfs.isEmpty() && xfs.getAmount() != 0) {
 
 									amount = amount - 1800;
@@ -217,7 +227,7 @@ public class BlockPump extends BlockTileEntity {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (side == getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
+			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
 				return energyHandler.cast();
 			}
 
@@ -230,8 +240,8 @@ public class BlockPump extends BlockTileEntity {
 		}
 		
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			if (compound.contains("assemblylinemachines:fluid")) {
 				extracted = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:fluid"));
@@ -241,24 +251,24 @@ public class BlockPump extends BlockTileEntity {
 		}
 
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			if (!extracted.isEmpty()) {
-				CompoundNBT sub = new CompoundNBT();
+				CompoundTag sub = new CompoundTag();
 				extracted.writeToNBT(sub);
 				compound.put("assemblylinemachines:fluid", sub);
 			}
 
 			compound.putInt("assemblylinemachines:amount", amount);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		private void forceState(boolean status) {
 			
-			BlockState bs = world.getBlockState(pos.down());
-			if(bs.func_235901_b_(StateProperties.MACHINE_ACTIVE)) {
+			BlockState bs = this.getLevel().getBlockState(this.getBlockPos().below());
+			if(bs.hasProperty(StateProperties.MACHINE_ACTIVE)) {
 				
-				if(bs.get(StateProperties.MACHINE_ACTIVE) != status) {
-					world.setBlockState(pos.down(), bs.with(StateProperties.MACHINE_ACTIVE, status));
+				if(bs.getValue(StateProperties.MACHINE_ACTIVE) != status) {
+					this.getLevel().setBlockAndUpdate(this.getBlockPos().below(), bs.setValue(StateProperties.MACHINE_ACTIVE, status));
 				}
 			}
 		}

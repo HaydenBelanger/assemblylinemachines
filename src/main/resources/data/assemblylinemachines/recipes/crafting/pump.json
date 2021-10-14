@@ -13,10 +13,10 @@
 			"item": "assemblylinemachines:pneumatic_device"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"c":{
-			"item": "assemblylinemachines:chromium_plate"
+			"tag": "forge:plates/chromium"
 		}
 		
 	},

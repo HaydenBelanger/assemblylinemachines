@@ -1,104 +1,146 @@
 package me.haydenb.assemblylinemachines.world;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.registry.SoundRegistry;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import net.minecraft.client.model.ZombieModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.*;
-import net.minecraft.client.renderer.entity.model.AbstractZombieModel;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
-public class EntityCorruptShell extends ZombieEntity{
+public class EntityCorruptShell extends Zombie{
 
-	public static final EntityType<EntityCorruptShell> CORRUPT_SHELL = EntityType.Builder.create(EntityCorruptShell::new, EntityClassification.MONSTER).build(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell").toString());
+	public static final EntityType<EntityCorruptShell> CORRUPT_SHELL = EntityType.Builder.of(EntityCorruptShell::new, MobCategory.MONSTER).build(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell").toString());
 	
-	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, World worldIn) {
+	private SoundEvent ambient = null;
+	private SoundEvent hurt = null;
+	private SoundEvent death = null;
+	private SoundEvent step = null;
+
+	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, Level worldIn) {
 		super(type, worldIn);
 	}
 
-	public static AttributeModifierMap.MutableAttribute registerAttributeMap(){
-		return MonsterEntity.func_234295_eP_().func_233815_a_(Attributes.field_233818_a_, 32d).func_233815_a_(Attributes.field_233819_b_, 40d).func_233815_a_(Attributes.field_233821_d_, 0.38d).func_233815_a_(Attributes.field_233823_f_, 4.5d).func_233815_a_(Attributes.field_233829_l_, 1d);
+	public static AttributeSupplier.Builder registerAttributeMap(){
+		return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 32d).add(Attributes.FOLLOW_RANGE, 40d).add(Attributes.MOVEMENT_SPEED, 0.38d).add(Attributes.ATTACK_DAMAGE, 4.5d).add(Attributes.SPAWN_REINFORCEMENTS_CHANCE, 1d);
 	}
-	
+
 	@Override
 	protected SoundEvent getAmbientSound() {
-		return SoundEvents.ENTITY_HUSK_AMBIENT;
+		validateSoundEvents();
+		return ambient;
 	}
-	
+
 	@Override
 	protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-		return SoundEvents.ENTITY_HUSK_HURT;
+		validateSoundEvents();
+		return hurt;
 	}
-	
+
 	@Override
 	protected SoundEvent getDeathSound() {
-		return SoundEvents.ENTITY_HUSK_DEATH;
+		validateSoundEvents();
+		return death;
+	}
+
+	private void validateSoundEvents() {
+		if(ambient == null || hurt == null || death == null) {
+			if(ConfigHolder.COMMON.coolDudeMode.get()) {
+				ambient = SoundRegistry.SHADOW_AMBIENT.get();
+				hurt = SoundRegistry.SHADOW_HURT.get();
+				death = SoundRegistry.SHADOW_DEATH.get();
+				step = SoundRegistry.SHADOW_STEP.get();
+			}else {
+				ambient = SoundEvents.HUSK_AMBIENT;
+				hurt = SoundEvents.HUSK_HURT;
+				death = SoundEvents.HUSK_DEATH;
+				step = SoundEvents.HUSK_STEP;
+			}
+		}
 	}
 	
 	@Override
-	protected boolean shouldBurnInDay() {
+	protected SoundEvent getStepSound() {
+		validateSoundEvents();
+		return step;
+	}
+	
+	@Override
+	protected boolean isSunSensitive() {
 		return false;
 	}
-	
-	@Override
-	public void onCollideWithPlayer(PlayerEntity entity) {
-		super.onCollideWithPlayer(entity);
-		
-		if(!entity.isCreative()) {
-			entity.addPotionEffect(new EffectInstance(Effects.WEAKNESS, 140));
-			entity.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 140));
-			entity.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 140));
-		}
-		
-	}
-	
-	public static class EntityCorruptShellRender extends LivingRenderer<EntityCorruptShell, EntityCorruptShellModel>{
 
-		public EntityCorruptShellRender(EntityRendererManager rendererManager, EntityCorruptShellModel entityModelIn, float shadowSizeIn) {
+	@Override
+	public void playerTouch(Player entity) {
+		super.playerTouch(entity);
+
+		if(!entity.isCreative()) {
+			entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 140));
+			entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 140));
+			entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 140));
+		}
+	}
+
+	public static class EntityCorruptShellRender extends LivingEntityRenderer<EntityCorruptShell, EntityCorruptShellModel>{
+
+
+		public EntityCorruptShellRender(Context rendererManager, EntityCorruptShellModel entityModelIn, float shadowSizeIn) {
 			super(rendererManager, entityModelIn, shadowSizeIn);
 		}
 
 		@Override
-		public ResourceLocation getEntityTexture(EntityCorruptShell entity) {
-			return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/corrupt_shell.png");
-		}
-
-		public static class EntityCorruptShellRenderFactory implements IRenderFactory<EntityCorruptShell>{
-
-			@Override
-			public EntityRenderer<? super EntityCorruptShell> createRenderFor(EntityRendererManager manager) {
-				return new EntityCorruptShellRender(manager, new EntityCorruptShellModel(), 0.1f);
+		public ResourceLocation getTextureLocation(EntityCorruptShell entity) {
+			if(ConfigHolder.COMMON.coolDudeMode.get()) {
+				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/shadow.png");
+			}else {
+				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/corrupt_shell.png");
 			}
 			
 		}
-		
+
 		@Override
-		protected boolean canRenderName(EntityCorruptShell entity) {
+		protected boolean shouldShowName(EntityCorruptShell pEntity) {
 			return false;
 		}
-		
-	}
-	
-	public static class EntityCorruptShellModel extends AbstractZombieModel<EntityCorruptShell>{
 
-		protected EntityCorruptShellModel() {
+	}
+
+	public static class EntityCorruptShellRenderFactory implements EntityRendererProvider<EntityCorruptShell>{
+
+		@Override
+		public EntityRenderer<EntityCorruptShell> create(Context context) {
+			return new EntityCorruptShellRender(context, new EntityCorruptShellModel(context), 0.1f);
+		}
+
+	}
+
+	public static class EntityCorruptShellModel extends ZombieModel<EntityCorruptShell>{
+
+
+		protected EntityCorruptShellModel(Context context) {
+			super(context.bakeLayer(ModelLayers.ZOMBIE));
 			
-			super(1f, 0f, 64, 64);
+			//this(context, ModelLayers.ZOMBIE, ModelLayers.ZOMBIE_INNER_ARMOR, ModelLayers.ZOMBIE_OUTER_ARMOR);
 		}
 
 		@Override
-		public boolean isAggressive(EntityCorruptShell entity) {
-			return entity.isAggressive();
+		public boolean isAggressive(EntityCorruptShell pEntity) {
+			return pEntity.isAggressive();
 		}
 
-		
 	}
 }

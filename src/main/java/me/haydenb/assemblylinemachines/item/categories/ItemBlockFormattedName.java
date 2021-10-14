@@ -1,29 +1,27 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 
 public class ItemBlockFormattedName extends BlockItem{
 
-	protected final TextFormatting[] formats;
-	public ItemBlockFormattedName(Block block, TextFormatting... formats) {
-		super(block, new Item.Properties().group(Registry.creativeTab));
+	protected final ChatFormatting[] formats;
+	public ItemBlockFormattedName(Block block, ChatFormatting... formats) {
+		super(block, new Item.Properties().tab(Registry.creativeTab));
 		this.formats = formats;
 	}
 	
-	public ItemBlockFormattedName(Block block, Properties properties, TextFormatting... formats) {
-		super(block, properties.group(Registry.creativeTab));
+	public ItemBlockFormattedName(Block block, Properties properties, ChatFormatting... formats) {
+		super(block, properties.tab(Registry.creativeTab));
 		this.formats = formats;
 	}
 
 	
 	@Override
-	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).func_230532_e_().func_240701_a_(formats);
+	public Component getName(ItemStack stack) {
+		return super.getName(stack).copy().withStyle(formats);
 	}
 }

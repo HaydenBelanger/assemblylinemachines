@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:iron_plate"
+			"tag": "forge:ingots/iron"
 		},
 		"a":{
 			"item": "assemblylinemachines:steel_shovel"

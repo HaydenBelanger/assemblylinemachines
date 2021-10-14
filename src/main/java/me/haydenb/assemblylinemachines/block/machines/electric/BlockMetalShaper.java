@@ -5,80 +5,79 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.crafting.MetalCrafting;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEMetalShaper>{
+public class BlockMetalShaper extends BlockScreenBlockEntity<BlockMetalShaper.TEMetalShaper>{
 	
 	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.makeCuboidShape(0, 14, 0, 16, 16, 16),
-			Block.makeCuboidShape(0, 0, 0, 16, 3, 16),
-			Block.makeCuboidShape(1, 3, 2, 15, 14, 16),
-			Block.makeCuboidShape(1, 6, 0, 15, 14, 1),
-			Block.makeCuboidShape(0, 3, 0, 3, 6, 1),
-			Block.makeCuboidShape(0, 3, 1, 1, 6, 16),
-			Block.makeCuboidShape(15, 3, 1, 16, 6, 16),
-			Block.makeCuboidShape(15, 10, 0, 16, 14, 16),
-			Block.makeCuboidShape(0, 10, 0, 1, 14, 16),
-			Block.makeCuboidShape(13, 3, 0, 16, 6, 1),
-			Block.makeCuboidShape(9, 3, 0, 12, 6, 1),
-			Block.makeCuboidShape(4, 3, 0, 7, 6, 1),
-			Block.makeCuboidShape(3, 3, 1, 13, 6, 2),
-			Block.makeCuboidShape(1, 6, 1, 15, 12, 2)
-			).reduce((v1, v2) -> {return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);}).get();
+			Block.box(0, 14, 0, 16, 16, 16),
+			Block.box(0, 0, 0, 16, 3, 16),
+			Block.box(1, 3, 2, 15, 14, 16),
+			Block.box(1, 6, 0, 15, 14, 1),
+			Block.box(0, 3, 0, 3, 6, 1),
+			Block.box(0, 3, 1, 1, 6, 16),
+			Block.box(15, 3, 1, 16, 6, 16),
+			Block.box(15, 10, 0, 16, 14, 16),
+			Block.box(0, 10, 0, 1, 14, 16),
+			Block.box(13, 3, 0, 16, 6, 1),
+			Block.box(9, 3, 0, 12, 6, 1),
+			Block.box(4, 3, 0, 7, 6, 1),
+			Block.box(3, 3, 1, 13, 6, 2),
+			Block.box(1, 6, 1, 15, 12, 2)
+			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockMetalShaper() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "metal_shaper", BlockMetalShaper.TEMetalShaper.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "metal_shaper", BlockMetalShaper.TEMetalShaper.class);
+		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+	
+	@Override
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
-	}
-	
-	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -90,7 +89,7 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		}
 	}
 	
-	public static class TEMetalShaper extends ManagedSidedMachine<ContainerMetalShaper> implements ITickableTileEntity{
+	public static class TEMetalShaper extends ManagedSidedMachine<ContainerMetalShaper> implements ALMTicker<TEMetalShaper>{
 		
 		private int timer = 0;
 		private int nTimer = 20;
@@ -98,17 +97,17 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		private float cycles = 0;
 		private ItemStack output = null;
 		
-		public TEMetalShaper(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 5, new TranslationTextComponent(Registry.getBlock("metal_shaper").getTranslationKey()), Registry.getContainerId("metal_shaper"), ContainerMetalShaper.class, new EnergyProperties(true, false, 20000));
+		public TEMetalShaper(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 5, new TranslatableComponent(Registry.getBlock("metal_shaper").getDescriptionId()), Registry.getContainerId("metal_shaper"), ContainerMetalShaper.class, new EnergyProperties(true, false, 20000), pos, state);
 		}
 		
-		public TEMetalShaper() {
-			this(Registry.getTileEntity("metal_shaper"));
+		public TEMetalShaper(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("metal_shaper"), pos, state);
 		}
 
 		@Override
 		public void tick() {
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				if(timer++ == nTimer) {
 					
 					boolean sendUpdates = false;
@@ -135,20 +134,20 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 					
 					if(output == null || output.isEmpty()) {
 						
-						Optional<MetalCrafting> rOpt = world.getRecipeManager().getRecipe(MetalCrafting.METAL_RECIPE, this, world);
+						Optional<MetalCrafting> rOpt = this.getLevel().getRecipeManager().getRecipeFor(MetalCrafting.METAL_RECIPE, this, this.getLevel());
 						MetalCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
-							output = recipe.getRecipeOutput().copy();
+							output = recipe.getResultItem().copy();
 							cycles = recipe.getTime();
 							
 							contents.get(1).shrink(1);
 							sendUpdates = true;
-							if(!getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+							if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 							}
 						}else {
-							if(getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-								world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+							if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 								sendUpdates = true;
 							}
 						}
@@ -192,11 +191,11 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			if(compound.contains("assemblylinemachines:output")) {
-				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
 			if(compound.contains("assemblylinemachines:ntimer")) {
 				nTimer = compound.getInt("assemblylinemachines:ntimer");
@@ -207,16 +206,16 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			if(output != null) {
-				CompoundNBT sub = new CompoundNBT();
-				output.write(sub);
+				CompoundTag sub = new CompoundTag();
+				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
@@ -248,7 +247,7 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerMetalShaper(final int windowId, final PlayerInventory playerInventory, final TEMetalShaper tileEntity) {
+		public ContainerMetalShaper(final int windowId, final Inventory playerInventory, final TEMetalShaper tileEntity) {
 			super(Registry.getContainerType("metal_shaper"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 1, 3);
 			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 119, 34, tileEntity, true));
@@ -258,8 +257,8 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 4, 149, 57, tileEntity));
 		}
 		
-		public ContainerMetalShaper(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEMetalShaper.class));
+		public ContainerMetalShaper(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEMetalShaper.class));
 		}
 		
 	}
@@ -269,8 +268,8 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		
 		TEMetalShaper tsfm;
 		
-		public ScreenMetalShaper(ContainerMetalShaper screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenMetalShaper(ContainerMetalShaper screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "metal_shaper", false, new Pair<>(14, 17), screenContainer.tileEntity, true);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -278,8 +277,8 @@ public class BlockMetalShaper extends BlockScreenTileEntity<BlockMetalShaper.TEM
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 19f);
 			super.blit(x+92, y+37, 176, 52, prog, 10);

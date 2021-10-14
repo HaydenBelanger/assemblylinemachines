@@ -5,26 +5,22 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class GrinderCrafting implements IRecipe<IInventory>{
+public class GrinderCrafting implements Recipe<Container>{
 
 	
-	public static final IRecipeType<GrinderCrafting> GRINDER_RECIPE = new TypeGrinderCrafting();
+	public static final RecipeType<GrinderCrafting> GRINDER_RECIPE = new TypeGrinderCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	private final Ingredient input;
@@ -43,18 +39,18 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 		this.machineReqd = machineReqd;
 	}
 	@Override
-	public boolean matches(IInventory inv, World worldIn) {
+	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
-			if(inv instanceof PlayerInventory) {
+			if(inv instanceof Inventory) {
 				if(machineReqd == true) {
 					return false;
 				}
-				PlayerInventory pinv = (PlayerInventory) inv;
-				if(input.test(pinv.getStackInSlot(pinv.currentItem))) {
+				Inventory pinv = (Inventory) inv;
+				if(input.test(pinv.getItem(pinv.selected))) {
 					return true;
 				}
 			}else {
-				if(input.test(inv.getStackInSlot(1))) {
+				if(input.test(inv.getItem(1))) {
 					return true;
 				}
 			}
@@ -69,22 +65,22 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(IInventory inv) {
+	public ItemStack assemble(Container inv) {
 		return this.output.copy();
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return false;
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return output;
 	}
 	
 	@Override
-	public boolean isDynamic() {
+	public boolean isSpecial() {
 		return true;
 	}
 	
@@ -101,9 +97,9 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 		Item grinderHandler = Registry.getItem("simple_grinder");
 		Item electricGrinder = Registry.getItem("electric_grinder");
 		if(this.machineReqd) {
-			nnl.add(Ingredient.fromItems(grinderHandler, electricGrinder));
+			nnl.add(Ingredient.of(grinderHandler, electricGrinder));
 		}else {
-			nnl.add(Ingredient.fromItems(grinderHandler, electricGrinder, Registry.getItem("hand_grinder")));
+			nnl.add(Ingredient.of(grinderHandler, electricGrinder, Registry.getItem("hand_grinder")));
 		}
 		nnl.add(Blades.getAllBladesAtMinTier(getBlade().tier));
 		return nnl;
@@ -115,12 +111,12 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 	}
 
 	@Override
-	public IRecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public IRecipeType<?> getType() {
+	public RecipeType<?> getType() {
 		return GRINDER_RECIPE;
 	}
 	
@@ -132,22 +128,22 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 		return grinds;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<GrinderCrafting>{
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GrinderCrafting>{
 
 		@Override
-		public GrinderCrafting read(ResourceLocation recipeId, JsonObject json) {
+		public GrinderCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient input = Ingredient.deserialize(JSONUtils.getJsonObject(json, "input"));
-				final ItemStack output = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "output"));
-				final int grinds = JSONUtils.getInt(json, "grinds");
-				final Blades tier = Blades.valueOf(JSONUtils.getString(json, "bladetype"));
+				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				final int grinds = GsonHelper.getAsInt(json, "grinds");
+				final Blades tier = Blades.valueOf(Blades.class, GsonHelper.getAsString(json, "bladetype"));
 				
 				if(tier == Blades.NONE) {
 					AssemblyLineMachines.LOGGER.error("Error deserializing Grinder Crafting Recipe from JSON: Cannot use 'none' as bladetype.");
 					return null;
 				}
 				final boolean machineReqd;
-				if(JSONUtils.hasField(json, "machine_required") && JSONUtils.getBoolean(json, "machine_required")) {
+				if(GsonHelper.isValidNode(json, "machine_required") && GsonHelper.getAsBoolean(json, "machine_required")) {
 					machineReqd = true;
 				}else {
 					machineReqd = false;
@@ -164,29 +160,29 @@ public class GrinderCrafting implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public GrinderCrafting read(ResourceLocation recipeId, PacketBuffer buffer) {
-			final Ingredient input = Ingredient.read(buffer);
-			final ItemStack output = buffer.readItemStack();
+		public GrinderCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+			final Ingredient input = Ingredient.fromNetwork(buffer);
+			final ItemStack output = buffer.readItem();
 			final int grinds = buffer.readInt();
-			final Blades tier = buffer.readEnumValue(Blades.class);
+			final Blades tier = buffer.readEnum(Blades.class);
 			final boolean machineReqd = buffer.readBoolean();
 			
 			return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd);
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, GrinderCrafting recipe) {
-			recipe.input.write(buffer);
-			buffer.writeItemStack(recipe.output);
+		public void toNetwork(FriendlyByteBuf buffer, GrinderCrafting recipe) {
+			recipe.input.toNetwork(buffer);
+			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.grinds);
-			buffer.writeEnumValue(recipe.tier);
+			buffer.writeEnum(recipe.tier);
 			buffer.writeBoolean(recipe.machineReqd);
 			
 		}
 		
 	}
 	
-	public static class TypeGrinderCrafting implements IRecipeType<GrinderCrafting>{
+	public static class TypeGrinderCrafting implements RecipeType<GrinderCrafting>{
 		
 		@Override
 		public String toString() {

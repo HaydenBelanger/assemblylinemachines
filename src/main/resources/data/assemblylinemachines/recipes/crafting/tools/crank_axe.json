@@ -10,7 +10,7 @@
 			"tag": "assemblylinemachines:crafting/gears/precious"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		}
 	},
 	"result":{

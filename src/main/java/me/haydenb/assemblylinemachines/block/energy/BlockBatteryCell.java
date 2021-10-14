@@ -5,84 +5,98 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine;
-import me.haydenb.assemblylinemachines.helpers.ManagedSidedMachine.ManagedDirection;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
+import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag.Named;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEBatteryCell> {
+public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TEBatteryCell> implements IBlockWithHarvestableTags {
 
-	private static final VoxelShape SHAPE_N = Stream.of(Block.makeCuboidShape(10, 3, 0, 12, 13, 2),
-			Block.makeCuboidShape(4, 3, 0, 6, 13, 2), Block.makeCuboidShape(2, 5, 3, 2, 11, 13),
-			Block.makeCuboidShape(14, 5, 3, 14, 11, 13), Block.makeCuboidShape(4, 2, 1, 6, 3, 2),
-			Block.makeCuboidShape(10, 2, 1, 12, 3, 2), Block.makeCuboidShape(10, 13, 1, 12, 14, 2),
-			Block.makeCuboidShape(4, 13, 1, 6, 14, 2), Block.makeCuboidShape(2, 2, 2, 14, 14, 2),
-			Block.makeCuboidShape(7, 2, 0, 9, 14, 2), Block.makeCuboidShape(12, 7, 1, 13, 9, 2),
-			Block.makeCuboidShape(9, 7, 1, 10, 9, 2), Block.makeCuboidShape(6, 7, 1, 7, 9, 2),
-			Block.makeCuboidShape(3, 7, 1, 4, 9, 2), Block.makeCuboidShape(0, 0, 13, 16, 16, 16),
-			Block.makeCuboidShape(0, 0, 0, 16, 2, 13), Block.makeCuboidShape(0, 14, 0, 16, 16, 13),
-			Block.makeCuboidShape(0, 2, 3, 2, 5, 13), Block.makeCuboidShape(14, 2, 3, 16, 5, 13),
-			Block.makeCuboidShape(0, 11, 3, 2, 14, 13), Block.makeCuboidShape(14, 11, 3, 16, 14, 13),
-			Block.makeCuboidShape(0, 2, 0, 3, 14, 3), Block.makeCuboidShape(13, 2, 0, 16, 14, 3),
-			Block.makeCuboidShape(14, 5, 4, 15, 11, 5), Block.makeCuboidShape(14, 5, 6, 15, 11, 7),
-			Block.makeCuboidShape(14, 5, 9, 15, 11, 10), Block.makeCuboidShape(14, 5, 11, 15, 11, 12),
-			Block.makeCuboidShape(1, 5, 6, 2, 11, 7), Block.makeCuboidShape(1, 5, 4, 2, 11, 5),
-			Block.makeCuboidShape(1, 5, 9, 2, 11, 10), Block.makeCuboidShape(1, 5, 11, 2, 11, 12)).reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
+	private static final VoxelShape SHAPE_N = Stream.of(Block.box(10, 3, 0, 12, 13, 2),
+			Block.box(4, 3, 0, 6, 13, 2), Block.box(2, 5, 3, 2, 11, 13),
+			Block.box(14, 5, 3, 14, 11, 13), Block.box(4, 2, 1, 6, 3, 2),
+			Block.box(10, 2, 1, 12, 3, 2), Block.box(10, 13, 1, 12, 14, 2),
+			Block.box(4, 13, 1, 6, 14, 2), Block.box(2, 2, 2, 14, 14, 2),
+			Block.box(7, 2, 0, 9, 14, 2), Block.box(12, 7, 1, 13, 9, 2),
+			Block.box(9, 7, 1, 10, 9, 2), Block.box(6, 7, 1, 7, 9, 2),
+			Block.box(3, 7, 1, 4, 9, 2), Block.box(0, 0, 13, 16, 16, 16),
+			Block.box(0, 0, 0, 16, 2, 13), Block.box(0, 14, 0, 16, 16, 13),
+			Block.box(0, 2, 3, 2, 5, 13), Block.box(14, 2, 3, 16, 5, 13),
+			Block.box(0, 11, 3, 2, 14, 13), Block.box(14, 11, 3, 16, 14, 13),
+			Block.box(0, 2, 0, 3, 14, 3), Block.box(13, 2, 0, 16, 14, 3),
+			Block.box(14, 5, 4, 15, 11, 5), Block.box(14, 5, 6, 15, 11, 7),
+			Block.box(14, 5, 9, 15, 11, 10), Block.box(14, 5, 11, 15, 11, 12),
+			Block.box(1, 5, 6, 2, 11, 7), Block.box(1, 5, 4, 2, 11, 5),
+			Block.box(1, 5, 9, 2, 11, 10), Block.box(1, 5, 11, 2, 11, 12)).reduce((v1, v2) -> {
+				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 
 	public BlockBatteryCell(BatteryCellTiers tier) {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(3f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), tier.teName, null, true,
+		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), tier.teName, null, true,
 				Direction.NORTH, tier.clazz);
-		this.setDefaultState(
-				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(StateProperties.BATTERY_PERCENT_STATE, 0));
+		this.registerDefaultState(
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.BATTERY_PERCENT_STATE, 0));
 	}
 
+	@Override
+	public Named<Block> getToolType() {
+		return BlockTags.MINEABLE_WITH_PICKAXE;
+	}
+
+
+	@Override
+	public Named<Block> getToolLevel() {
+		return BlockTags.NEEDS_IRON_TOOL;
+	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING,
-				context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING,
+				context.getHorizontalDirection().getOpposite());
 	}
-
+	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
-		Direction d = state.get(HorizontalBlock.HORIZONTAL_FACING);
+		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
 		if (d == Direction.WEST) {
 			return SHAPE_W;
 		} else if (d == Direction.SOUTH) {
@@ -95,8 +109,8 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalBlock.HORIZONTAL_FACING).add(StateProperties.BATTERY_PERCENT_STATE);
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.BATTERY_PERCENT_STATE);
 	}
 	
 	public static enum BatteryCellTiers{
@@ -114,41 +128,41 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 	}
 
 	public static class TEBasicBatteryCell extends TEBatteryCell{
-		public TEBasicBatteryCell(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, new TranslationTextComponent(Registry.getBlock("basic_battery_cell").getTranslationKey()), 2500000, 2000, 200);
+		public TEBasicBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, new TranslatableComponent(Registry.getBlock("basic_battery_cell").getDescriptionId()), 2500000, 2000, 200, pos, state);
 		}
 
-		public TEBasicBatteryCell() {
-			this(Registry.getTileEntity("basic_battery_cell"));
+		public TEBasicBatteryCell(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("basic_battery_cell"), pos, state);
 		}
 	}
 	
 	public static class TEAdvancedBatteryCell extends TEBatteryCell{
-		public TEAdvancedBatteryCell(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, new TranslationTextComponent(Registry.getBlock("advanced_battery_cell").getTranslationKey()), 50000000, 25000, 5000);
+		public TEAdvancedBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, new TranslatableComponent(Registry.getBlock("advanced_battery_cell").getDescriptionId()), 50000000, 25000, 5000, pos, state);
 		}
 
-		public TEAdvancedBatteryCell() {
-			this(Registry.getTileEntity("advanced_battery_cell"));
+		public TEAdvancedBatteryCell(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("advanced_battery_cell"), pos, state);
 		}
 	}
 	
-	public static abstract class TEBatteryCell extends ManagedSidedMachine<ContainerBatteryCell> implements ITickableTileEntity {
+	public static abstract class TEBatteryCell extends ManagedSidedMachine<ContainerBatteryCell> implements ALMTicker<TEBatteryCell> {
 
 		private int fept;
 		private boolean autoIn = true;
 		private int timer = 0;
 		private final int mx;
-		public TEBatteryCell(final TileEntityType<?> tileEntityTypeIn, TranslationTextComponent ttc, int ep, int mx, int fept) {
+		public TEBatteryCell(final BlockEntityType<?> tileEntityTypeIn, TranslatableComponent ttc, int ep, int mx, int fept, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, 0, ttc, Registry.getContainerId("battery_cell"),
-					ContainerBatteryCell.class, new EnergyProperties(true, true, ep));
+					ContainerBatteryCell.class, new EnergyProperties(true, true, ep), pos, state);
 			this.mx = mx;
 			this.fept = fept;
 		}
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap != CapabilityEnergy.ENERGY || side == getBlockState().get(HorizontalBlock.HORIZONTAL_FACING)) {
+			if(cap != CapabilityEnergy.ENERGY || side == getBlockState().getValue(HorizontalDirectionalBlock.FACING)) {
 				return LazyOptional.empty();
 			}
 			
@@ -158,9 +172,9 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 		private HashMap<Direction, IEnergyStorage> caps = new HashMap<>();
 		
 		@Override
-		public Container createMenu(int id, PlayerInventory player) {
+		public AbstractContainerMenu createMenu(int id, Inventory player) {
 			try {
-				return clazz.getConstructor(int.class, PlayerInventory.class, TEBatteryCell.class).newInstance(id, player, this);
+				return clazz.getConstructor(int.class, Inventory.class, TEBatteryCell.class).newInstance(id, player, this);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
@@ -168,8 +182,8 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			if(compound.contains("assemblylinemachines:fptout")) {
 				fept = compound.getInt("assemblylinemachines:fptout");
 			}
@@ -179,22 +193,22 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:fptout", fept);
 			compound.putBoolean("assemblylinemachines:in", autoIn);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
 		public void tick() {
-			if(!world.isRemote) {
+			if(!level.isClientSide) {
 				if(timer++ == 5) {
 					timer = 0;
 					for(Direction d : Direction.values()) {
 						IEnergyStorage storage = caps.get(d);
 						if(storage == null) {
-							TileEntity te = world.getTileEntity(pos.offset(d));
+							BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(d));
 							if(te != null) {
 								LazyOptional<IEnergyStorage> lazy = te.getCapability(CapabilityEnergy.ENERGY, d.getOpposite());
 								storage = lazy.orElse(null);
@@ -244,10 +258,10 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 			
 		}
 		
-		public static void updateDataFromPacket(PacketData pd, World world) {
+		public static void updateDataFromPacket(PacketData pd, Level world) {
 			if (pd.getCategory().equals("battery_cell_gui")) {
 				BlockPos pos = pd.get("location", BlockPos.class);
-				TileEntity te = world.getTileEntity(pos);
+				BlockEntity te = world.getBlockEntity(pos);
 				if (te != null && te instanceof TEBatteryCell) {
 					TEBatteryCell tebbc = (TEBatteryCell) te;
 
@@ -313,7 +327,7 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 					}
 					
 					tebbc.sendUpdates();
-					tebbc.getWorld().notifyNeighborsOfStateChange(pos, tebbc.getBlockState().getBlock());
+					tebbc.getLevel().updateNeighborsAt(pos, tebbc.getBlockState().getBlock());
 				}
 			}
 		}
@@ -325,15 +339,15 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 
-		public ContainerBatteryCell(final int windowId, final PlayerInventory playerInventory,
+		public ContainerBatteryCell(final int windowId, final Inventory playerInventory,
 				final TEBatteryCell tileEntity) {
 			super(Registry.getContainerType("battery_cell"), windowId, tileEntity, playerInventory,
 					PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 		}
 
-		public ContainerBatteryCell(final int windowId, final PlayerInventory playerInventory,
-				final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TEBatteryCell.class));
+		public ContainerBatteryCell(final int windowId, final Inventory playerInventory,
+				final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEBatteryCell.class));
 		}
 	}
 
@@ -341,14 +355,12 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 	public static class ScreenBatteryCell extends ScreenALMEnergyBased<ContainerBatteryCell> {
 
 		TEBatteryCell tsfm;
-		private final HashMap<String, Pair<SimpleButton, SupplierWrapper>> b;
 
-		public ScreenBatteryCell(ContainerBatteryCell screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenBatteryCell(ContainerBatteryCell screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73),
 					"battery_cell", false, new Pair<>(75, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
-			b = new HashMap<>();
 		}
 
 		
@@ -356,99 +368,38 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 		protected void init() {
 			super.init();
 			
-			int x = this.guiLeft;
-			int y = this.guiTop;
+			int x = this.leftPos;
+			int y = this.topPos;
 			
-			b.put("up", new Pair<>(new SimpleButton(x+51, y+28, 177, 83, null, (button) -> {
-
-				sendCellUpdatePacket(tsfm.getPos(), "up");
-			}), new SupplierWrapper("Top Face Enabled", "Top Face Disabled",
-					() -> tsfm.getDirectionEnabled(ManagedDirection.TOP))));
-			b.put("down", new Pair<>(new SimpleButton(x + 51, y + 50, 177, 73, null, (button) -> {
-
-				sendCellUpdatePacket(tsfm.getPos(), "down");
-			}), new SupplierWrapper("Bottom Face Enabled", "Bottom Face Disabled",
-					() -> tsfm.getDirectionEnabled(ManagedDirection.BOTTOM))));
-			b.put("left", new Pair<>(new SimpleButton(x + 40, y + 39, 177, 103, null, (button) -> {
-
-				sendCellUpdatePacket(tsfm.getPos(), "left");
-			}), new SupplierWrapper("Left Face Enabled", "Left Face Disabled",
-					() -> tsfm.getDirectionEnabled(ManagedDirection.LEFT))));
-			b.put("right", new Pair<>(new SimpleButton(x + 62, y + 39, 177, 93, null, (button) -> {
-
-				sendCellUpdatePacket(tsfm.getPos(), "right");
-			}), new SupplierWrapper("Right Face Enabled", "Right Face Disabled",
-					() -> tsfm.getDirectionEnabled(ManagedDirection.RIGHT))));
-			b.put("back", new Pair<>(new SimpleButton(x + 51, y + 39, 177, 63, null, (button) -> {
-
-				sendCellUpdatePacket(tsfm.getPos(), "back");
-			}), new SupplierWrapper("Back Face Enabled", "Back Face Disabled",
-					() -> tsfm.getDirectionEnabled(ManagedDirection.BACK))));
-			b.put("automode", new Pair<>(new SimpleButton(x + 95, y + 16, 177, 53, null, (button) -> {
-
-				sendCellUpdatePacket(tsfm.getPos(), "automode");
-			}), new SupplierWrapper("Auto-Input Enabled", "Auto-Output Enabled",
-					() -> tsfm.autoIn)));
-			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, "Decrease Automatic Throughput", (button) -> {
-				Screen.func_231172_r_();
-				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.func_231173_s_(), Screen.func_231172_r_());
-
-			}), null));
-			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, "Increase Automatic Throughput", (button) -> {
-				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.func_231173_s_(), Screen.func_231172_r_());
-
-			}), null));
-			
-			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				this.addButton(bb.getFirst());
-			}
-		}
-
-		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
-
-			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (mouseX >= bb.getFirst().getX() && mouseX <= bb.getFirst().getX() + 8 && mouseY >= bb.getFirst().getY() && mouseY <= bb.getFirst().getY() + 8) {
-					if (bb.getSecond() != null) {
-						this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
-					} else {
-						this.renderTooltip(bb.getFirst().func_230458_i_().getString(), mouseX - x, mouseY - y);
-					}
-
-					break;
-				}
-			}
+			this.addRenderableWidget(new TrueFalseButton(x+51, y+28, 177, 83, 8, 8, new TrueFalseButtonSupplier("Top Face Enabled", "Top Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.TOP)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "up")));
+			this.addRenderableWidget(new TrueFalseButton(x+51, y+50, 177, 73, 8, 8, new TrueFalseButtonSupplier("Bottom Face Enabled", "Bottom Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.BOTTOM)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "down")));
+			this.addRenderableWidget(new TrueFalseButton(x+40, y+39, 177, 103, 8, 8, new TrueFalseButtonSupplier("Left Face Enabled", "Left Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.LEFT)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "left")));
+			this.addRenderableWidget(new TrueFalseButton(x+62, y+39, 177, 93, 8, 8, new TrueFalseButtonSupplier("Right Face Enabled", "Right Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.RIGHT)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "right")));
+			this.addRenderableWidget(new TrueFalseButton(x+51, y+39, 177, 63, 8, 8, new TrueFalseButtonSupplier("Back Face Enabled", "Back Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.BACK)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "back")));
+			this.addRenderableWidget(new TrueFalseButton(x+95, y+16, 177, 53, 8, 8, new TrueFalseButtonSupplier("Auto-Input Enabled", "Auto-Input Disabled", () -> tsfm.autoIn), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "automode")));
+			this.addRenderableWidget(new TrueFalseButton(x+95, y+38, 8, 8, "Decrease Automatic Throughput", (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "feptdown", Screen.hasShiftDown(), Screen.hasControlDown())));
+			this.addRenderableWidget(new TrueFalseButton(x+143, y+38, 8, 8, "Increase Automatic Throughput", (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "feptup", Screen.hasShiftDown(), Screen.hasControlDown())));
 		}
 
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			
-			for (Pair<SimpleButton, SupplierWrapper> bb : b.values()) {
-				if (bb.getSecond() != null && bb.getSecond().supplier.get()) {
-					super.blit(bb.getFirst().getX(), bb.getFirst().getY(), bb.getFirst().blitx, bb.getFirst().blity, 8, 8);
-				}
-
-			}
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			this.drawCenteredString(this.font, Formatting.GENERAL_FORMAT.format(tsfm.fept), x + 122, y + 38, 0xffffff);
 		}
 
 		public static void sendCellUpdatePacket(BlockPos pos, String button) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
-			pd.writeString("button", button);
+			pd.writeUtf("button", button);
 			HashPacketImpl.INSTANCE.sendToServer(pd);
 		}
 		
 		public static void sendCellUpdatePacket(BlockPos pos, String button, Boolean shifting, Boolean ctrling) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
-			pd.writeString("button", button);
+			pd.writeUtf("button", button);
 			pd.writeBoolean("shifting", shifting);
 			pd.writeBoolean("ctrling", ctrling);
 			HashPacketImpl.INSTANCE.sendToServer(pd);

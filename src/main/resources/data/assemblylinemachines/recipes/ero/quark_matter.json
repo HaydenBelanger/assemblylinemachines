@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:entropy_reactor",
+	"output":{
+		"item": "assemblylinemachines:quark_matter"
+	},
+	"varietyReqd": 0.2,
+	"odds": 0.5,
+	"max": 6
+}

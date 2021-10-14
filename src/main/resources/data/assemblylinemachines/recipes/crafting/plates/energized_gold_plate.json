@@ -2,7 +2,7 @@
 	"type": "minecraft:crafting_shapeless",
 	"ingredients":[
 		{
-			"item": "assemblylinemachines:energized_gold_ingot"
+			"tag": "forge:ingots/energized_gold"
 		},
 		{
 			"tag": "assemblylinemachines:crafting/hammers"

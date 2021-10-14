@@ -2,81 +2,83 @@ package me.haydenb.assemblylinemachines.block.fluid;
 
 import java.util.Iterator;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
-import me.haydenb.assemblylinemachines.registry.FluidRegistration;
+import me.haydenb.assemblylinemachines.registry.FluidRegistry;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.*;
+import net.minecraft.world.phys.Vec3;
 
 public class FluidCondensedVoid extends ALMFluid {
 
 	public FluidCondensedVoid(boolean source) {
-		super(FluidRegistration.buildProperties("condensed_void", -200, false, true, true), source);
+		super(FluidRegistry.buildProperties("condensed_void", -200, false, true, true), source);
 	}
 
 	@Override
-	protected int getLevelDecreasePerBlock(IWorldReader worldIn) {
+	protected int getDropOff(LevelReader worldIn) {
 		return 2;
 	}
 	
 	@Override
-	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
-		Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.up().north().east(), pos.down().south().west()).iterator();
+	protected void randomTick(Level world, BlockPos pos, FluidState state, Random randomom) {
+		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
 		while(iter.hasNext()) {
 			BlockPos cor = iter.next();
-			if(random.nextInt(2) == 0) {
+			if(randomom.nextInt(2) == 0) {
 				Block block = world.getBlockState(cor).getBlock();
 				if(block.getTags().contains(new ResourceLocation("minecraft", "leaves")) || block.getTags().contains(new ResourceLocation("minecraft", "logs"))
 						|| block.getTags().contains(new ResourceLocation("minecraft", "flowers")) || block.getTags().contains(new ResourceLocation("minecraft", "planks"))
 						|| block.getTags().contains(new ResourceLocation("minecraft", "wool"))
 						|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
-						|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.GRASS_PATH) {
+						|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
 					world.destroyBlock(cor, false);
-				}else if(block.getDefaultState().getMaterial() == Material.ROCK) {
-					world.setBlockState(cor, Blocks.GRAVEL.getDefaultState());
+				}else if(block.defaultBlockState().getMaterial() == Material.STONE) {
+					world.setBlockAndUpdate(cor, Blocks.GRAVEL.defaultBlockState());
 				}else if(block == Blocks.WATER) {
-					world.setBlockState(cor, Blocks.PACKED_ICE.getDefaultState());
+					world.setBlockAndUpdate(cor, Blocks.PACKED_ICE.defaultBlockState());
 				}else if(block == Blocks.LAVA) {
-					world.setBlockState(cor, Blocks.OBSIDIAN.getDefaultState());
+					world.setBlockAndUpdate(cor, Blocks.OBSIDIAN.defaultBlockState());
 				}
 			}
 				
 		}
 		
-		super.randomTick(world, pos, state, random);
+		super.randomTick(world, pos, state, randomom);
 	}
 	
 	@Override
-	protected boolean ticksRandomly() {
+	protected boolean isRandomlyTicking() {
 		return true;
 	}
-
+	
 	@Override
-	public int getTickRate(IWorldReader world) {
+	public int getTickDelay(LevelReader world) {
 		return 5;
 	}
 
 	public static class FluidCondensedVoidBlock extends ALMFluidBlock {
 
-		public FluidCondensedVoidBlock() {
-			super("condensed_void", ALMFluid.CONDENSED_VOID, Material.WATER);
+		public FluidCondensedVoidBlock(Supplier<? extends FlowingFluid> fluid) {
+			super(fluid, ALMFluid.CONDENSED_VOID, Material.WATER);
 		}
 
 		@Override
-		public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
+		public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entity) {
 			
 			if(entity instanceof ItemEntity) {
 				
@@ -85,16 +87,16 @@ public class FluidCondensedVoid extends ALMFluid {
 				if(stack.getItem() != Registry.getItem("corrupted_shard")) {
 					itemEntity.setItem(ItemCorruptedShard.corruptItem(stack));
 				}else {
-					itemEntity.setPositionAndUpdate(itemEntity.lastTickPosX + ((worldIn.rand.nextDouble() * 2D) - 1D), itemEntity.lastTickPosY + ((worldIn.rand.nextDouble() * 4D) - 2D), itemEntity.lastTickPosZ + ((worldIn.rand.nextDouble() * 2D) - 1D));
+					itemEntity.setPos(itemEntity.xOld + ((worldIn.random.nextDouble() * 2D) - 1D), itemEntity.yOld + ((worldIn.random.nextDouble() * 4D) - 2D), itemEntity.zOld + ((worldIn.random.nextDouble() * 2D) - 1D));
 				}
 			}else if (entity instanceof LivingEntity) {
 				LivingEntity player = (LivingEntity) entity;
-				player.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100));
-				player.addPotionEffect(new EffectInstance(Effects.WITHER, 40, 6));
+				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100));
+				player.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 6));
 				
-				entity.setMotionMultiplier(state, new Vector3d(0.02D, 0.02D, 0.02D));
+				entity.makeStuckInBlock(state, new Vec3(0.02D, 0.02D, 0.02D));
 			}
-			super.onEntityCollision(state, worldIn, pos, entity);
+			super.entityInside(state, worldIn, pos, entity);
 		}
 	}
 

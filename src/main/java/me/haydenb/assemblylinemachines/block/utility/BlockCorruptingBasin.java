@@ -4,65 +4,65 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
+import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
+import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
-import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
-public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingBasin.TECorruptingBasin>{
+public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorruptingBasin.TECorruptingBasin>{
 
 	
-	private static final VoxelShape SHAPE = Stream.of(Block.makeCuboidShape(1, 0, 1, 15, 16, 2),
-			Block.makeCuboidShape(1, 0, 14, 15, 16, 15), Block.makeCuboidShape(1, 0, 2, 2, 16, 14),
-			Block.makeCuboidShape(14, 0, 2, 15, 16, 14), Block.makeCuboidShape(2, 0, 2, 14, 1, 14)).reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
+	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
+			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
+			Block.box(14, 0, 2, 15, 16, 14), Block.box(2, 0, 2, 14, 1, 14)).reduce((v1, v2) -> {
+				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 	
 	public BlockCorruptingBasin() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "corrupting_basin", BlockCorruptingBasin.TECorruptingBasin.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false));
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "corrupting_basin", BlockCorruptingBasin.TECorruptingBasin.class);
+		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false));
 	}
 	
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(StateProperties.MACHINE_ACTIVE);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
 	
 	
-	public static class TECorruptingBasin extends SimpleMachine<ContainerCorruptingBasin> implements ITickableTileEntity{
+	public static class TECorruptingBasin extends SimpleMachine<ContainerCorruptingBasin> implements ALMTicker<TECorruptingBasin>{
 		
 		public IFluidHandler handler;
 		public int timer;
@@ -70,19 +70,19 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 		public int counts;
 		
 		
-		public TECorruptingBasin(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 1, new TranslationTextComponent(Registry.getBlock("corrupting_basin").getTranslationKey()), Registry.getContainerId("corrupting_basin"), ContainerCorruptingBasin.class, true);
+		public TECorruptingBasin(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 1, new TranslatableComponent(Registry.getBlock("corrupting_basin").getDescriptionId()), Registry.getContainerId("corrupting_basin"), ContainerCorruptingBasin.class, true, pos, state);
 		}
 		
-		public TECorruptingBasin() {
-			this(Registry.getTileEntity("corrupting_basin"));
+		public TECorruptingBasin(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("corrupting_basin"), pos, state);
 		}
 		
 		@Override
 		public void tick() {
 			if(timer++ == 20) {
 				timer = 0;
-				if(!world.isRemote) {
+				if(!level.isClientSide) {
 					boolean sendUpdates = false;
 					if(handler == null) {
 						handler = General.getCapabilityFromDirection(this, "handler", Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
@@ -91,19 +91,19 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 					if(handler != null) {
 						
 						FluidStack stackInTank = handler.getFluidInTank(0);
-						if(stackInTank.getFluid() == Registry.getFluid("condensed_void") && !getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+						if(stackInTank.getFluid() == Registry.getFluid("condensed_void") && !getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 							sendUpdates = true;
 						}
 						
-						if(stackInTank.getFluid() != Registry.getFluid("condensed_void") && getBlockState().get(StateProperties.MACHINE_ACTIVE)) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+						if(stackInTank.getFluid() != Registry.getFluid("condensed_void") && getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 							sendUpdates = true;
 						}
 						
-						if(getStackInSlot(0).getItem() != Registry.getItem("corrupted_shard")) {
-							if(getStackInSlot(0).getCount() != reqCounts) {
-								reqCounts = getStackInSlot(0).getCount();
+						if(getItem(0).getItem() != Registry.getItem("corrupted_shard")) {
+							if(getItem(0).getCount() != reqCounts) {
+								reqCounts = getItem(0).getCount();
 								sendUpdates = true;
 							}
 							
@@ -114,7 +114,7 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 							
 							if(reqCounts != 0) {
 								if(counts >= reqCounts) {
-									setInventorySlotContents(0, ItemCorruptedShard.corruptItem(getStackInSlot(0)));
+									this.setItem(0, ItemCorruptedShard.corruptItem(getItem(0)));
 									counts = 0;
 									reqCounts = 0;
 									sendUpdates = true;
@@ -130,8 +130,8 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 						}
 						
 						
-					}else if(getBlockState().get(StateProperties.MACHINE_ACTIVE)){
-						world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+					}else if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)){
+						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						sendUpdates = true;
 					}
 					
@@ -149,15 +149,15 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:reqcounts", reqCounts);
 			compound.putInt("assemblylinemachines:counts", counts);
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			counts = compound.getInt("assemblylinemachines:counts");
 			reqCounts = compound.getInt("assemblylinemachines:reqcounts");
@@ -175,14 +175,14 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerCorruptingBasin(final int windowId, final PlayerInventory playerInventory, final TECorruptingBasin tileEntity) {
+		public ContainerCorruptingBasin(final int windowId, final Inventory playerInventory, final TECorruptingBasin tileEntity) {
 			super(Registry.getContainerType("corrupting_basin"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 			
 			this.addSlot(new Slot(this.tileEntity, 0, 80, 26));
 		}
 		
-		public ContainerCorruptingBasin(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TECorruptingBasin.class));
+		public ContainerCorruptingBasin(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TECorruptingBasin.class));
 		}
 	}
 	
@@ -194,8 +194,8 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 		private int cxc;
 		private int cxcr;
 		
-		public ScreenCorruptingBasin(ContainerCorruptingBasin screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenCorruptingBasin(ContainerCorruptingBasin screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "corrupting_basin", false);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -205,8 +205,8 @@ public class BlockCorruptingBasin extends BlockScreenTileEntity<BlockCorruptingB
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			
 			if(tsfm.reqCounts != 0) {
-				int x = (this.width - this.xSize) / 2;
-				int y = (this.height - this.ySize) / 2;
+				int x = (this.width - this.imageWidth) / 2;
+				int y = (this.height - this.imageHeight) / 2;
 				if(cxc++ == 20) {
 					cxc = 0;
 					if(cxcr++ == 4) {

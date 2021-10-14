@@ -13,7 +13,7 @@
 			"item": "assemblylinemachines:empowered_convection_component"
 		},
 		"d":{
-			"item": "assemblylinemachines:mystium_plate"
+			"tag": "forge:plates/mystium"
 		},
 		"b":{
 			"item": "assemblylinemachines:basic_battery_cell"
@@ -22,7 +22,7 @@
 			"item": "assemblylinemachines:enhanced_battery"
 		},
 		"s":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		}
 	},
 	"result":{

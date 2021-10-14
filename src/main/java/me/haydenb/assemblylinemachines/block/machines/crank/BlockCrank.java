@@ -3,106 +3,98 @@ package me.haydenb.assemblylinemachines.block.machines.crank;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.*;
 
 public class BlockCrank extends Block {
 
 	private static final Random RAND = new Random();
 	private static final VoxelShape SHAPE = Stream
-			.of(Block.makeCuboidShape(0, 0, 0, 4, 16, 16), Block.makeCuboidShape(4, 7, 7, 8, 9, 9),
-					Block.makeCuboidShape(8, 7, 7, 10, 16, 9), Block.makeCuboidShape(10, 14, 7, 14, 16, 9))
+			.of(Block.box(0, 0, 0, 4, 16, 16), Block.box(4, 7, 7, 8, 9, 9),
+					Block.box(8, 7, 7, 10, 16, 9), Block.box(10, 14, 7, 14, 16, 9))
 			.reduce((v1, v2) -> {
-				return VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR);
+				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
 	public BlockCrank() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(1f, 2f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL));
-		this.setDefaultState(
-				this.stateContainer.getBaseState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		super(Block.Properties.of(Material.METAL).strength(1f, 2f).sound(SoundType.METAL));
+		this.registerDefaultState(
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+	}
+	
+	
+
+	@Override
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+
+		builder.add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
-		builder.add(HorizontalBlock.HORIZONTAL_FACING);
+		return General.rotateShape(Direction.EAST, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE);
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-
-		return General.rotateShape(Direction.EAST, state.get(HorizontalBlock.HORIZONTAL_FACING), SHAPE);
-	}
-
-	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-		if(!world.isRemote) {
-			if(handIn.equals(Hand.MAIN_HAND)) {
-				TileEntity te = world.getTileEntity(pos.offset(state.get(HorizontalBlock.HORIZONTAL_FACING).getOpposite()));
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+			InteractionHand handIn, BlockHitResult hit) {
+		if(!world.isClientSide) {
+			if(handIn.equals(InteractionHand.MAIN_HAND)) {
+				BlockEntity te = world.getBlockEntity(pos.relative(state.getValue(HorizontalDirectionalBlock.FACING).getOpposite()));
 				if(te != null && te instanceof ICrankableMachine) {
 					ICrankableMachine crankable = (ICrankableMachine) te;
 					if(crankable.perform()) {
-						world.playSound(null, pos, SoundEvents.BLOCK_WOOD_STEP, SoundCategory.BLOCKS, 0.7f, 1f + getPitchNext());
+						world.playSound(null, pos, SoundEvents.WOOD_STEP, SoundSource.BLOCKS, 0.7f, 1f + getPitchNext());
 					}else {
 						int chance = ConfigHolder.COMMON.crankSnapChance.get();
 						if(chance != -1 && RAND.nextInt(chance) == 0) {
-							world.playSound(null, pos, SoundEvents.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 1f, 1f);
-							world.setBlockState(pos, Blocks.AIR.getDefaultState());
+							world.playSound(null, pos, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.BLOCKS, 1f, 1f);
+							world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 							General.spawnItem(new ItemStack(Items.STICK, 5), pos, world);
 							General.spawnItem(new ItemStack(Registry.getItem("steel_nugget"), 27), pos, world);
 						}else {
-							world.playSound(null, pos, SoundEvents.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 0.7f, 1f);
+							world.playSound(null, pos, SoundEvents.SHULKER_BOX_CLOSE, SoundSource.BLOCKS, 0.7f, 1f);
 						}
 					}
 				}
 			}
 		}
 		
-		if(world.isRemote) {	
+		if(world.isClientSide) {	
 			world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(), pos.getY() + getPartNext(), pos.getZ() + getPartNext(), 0, 0, 0);
 		}
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
 
 	}
 
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn,
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn,
 			BlockPos currentPos, BlockPos facingPos) {
-		if (!worldIn.isRemote()) {
-			if (facing == stateIn.get(HorizontalBlock.HORIZONTAL_FACING).getOpposite()) {
-				if (worldIn.getBlockState(currentPos.offset(facing)).getBlock() == Blocks.AIR) {
-					return Blocks.AIR.getDefaultState();
+		if (!worldIn.isClientSide()) {
+			if (facing == stateIn.getValue(HorizontalDirectionalBlock.FACING).getOpposite()) {
+				if (worldIn.getBlockState(currentPos.relative(facing)).getBlock() == Blocks.AIR) {
+					return Blocks.AIR.defaultBlockState();
 				}
 			}
 		}

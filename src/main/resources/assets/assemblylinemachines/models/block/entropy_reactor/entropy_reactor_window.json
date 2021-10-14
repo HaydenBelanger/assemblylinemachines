@@ -1,0 +1,54 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "assemblylinemachines:block/entropy_reactor/entropy_reactor_window",
+		"1": "assemblylinemachines:block/entropy_reactor/entropy_reactor_wall",
+		"particle": "assemblylinemachines:block/entropy_reactor/entropy_reactor_block"
+	},
+	"elements": [
+		{
+			"name": "Front",
+			"from": [0, 16, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}, 
+		{
+			"from": [0, 0, 2],
+			"to": [2, 16, 16],
+			"faces": {
+				"east": {"uv": [0, 0, 14, 16], "texture": "#1"}
+			}
+		}, 
+		{
+			"from": [2, 0, 14],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 14, 16], "texture": "#1"}
+			}
+		}, 
+		{
+			"from": [0, 0, 0],
+			"to": [14, 16, 2],
+			"faces": {
+				"south": {"uv": [0, 0, 14, 16], "texture": "#1"}
+			}
+		}, 
+		{
+			"from": [14, 0, 0],
+			"to": [16, 16, 14],
+			"faces": {
+				"west": {"uv": [0, 0, 14, 16], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4]
+		}
+	]
+}

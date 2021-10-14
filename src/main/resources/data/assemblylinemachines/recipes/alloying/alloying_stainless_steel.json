@@ -1,10 +1,10 @@
 {
 	"type": "assemblylinemachines:alloying",
 	"part_a":{
-		"item": "assemblylinemachines:chromium_plate"
+		"tag": "forge:plates/chromium"
 	},
 	"part_b":{
-		"item": "assemblylinemachines:steel_plate"
+		"tag": "forge:plates/steel"
 	},
 	"output":{
 		"item": "assemblylinemachines:stainless_steel_plate"

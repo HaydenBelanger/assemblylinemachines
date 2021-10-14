@@ -1,10 +1,10 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"item": "minecraft:sand"
+		"tag": "minecraft:sand"
 	},
 	"input_b":{
-		"item": "minecraft:gravel"
+		"tag": "forge:gravel"
 	},
 	"output":{
 		"item": "assemblylinemachines:silt"

@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"p":{
-			"item": "assemblylinemachines:plastic_sheet"
+			"tag": "forge:sheets/plastic"
 		},
 		"e":{
-			"item": "assemblylinemachines:energized_gold_plate"
+			"tag": "forge:plates/energized_gold"
 		},
 		"a":{
-			"item": "assemblylinemachines:attuned_titanium_plate"
+			"tag": "forge:plates/attuned_titanium"
 		},
 		"b":{
 			"item": "assemblylinemachines:enhanced_battery"

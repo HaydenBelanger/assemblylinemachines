@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:raw_chromium"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_chromium"
+	},
+	"grinds": 3,
+	"bladetype": "TITANIUM",
+	"machine_required": true
+}

@@ -7,10 +7,10 @@ import org.apache.commons.lang3.text.WordUtils;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.state.*;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 @SuppressWarnings("deprecation")
 public class StateProperties {
@@ -20,7 +20,7 @@ public class StateProperties {
 	
 	public static final EnumProperty<BathCraftingFluids> FLUID = EnumProperty.create("fluid", BathCraftingFluids.class);
 	
-	public static enum BathCraftingFluids implements IStringSerializable {
+	public static enum BathCraftingFluids implements StringRepresentable {
 		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52), new Pair<>(87, 197)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68), new Pair<>(87, 213)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153), new Pair<>(102, 229)), 
 		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), new Pair<>(102, 213)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), new Pair<>(102, 197));
 
@@ -58,7 +58,7 @@ public class StateProperties {
 		}
 		
 		@Override
-		public String func_176610_l() {
+		public String getSerializedName() {
 			return toString().toLowerCase();
 		}
 		

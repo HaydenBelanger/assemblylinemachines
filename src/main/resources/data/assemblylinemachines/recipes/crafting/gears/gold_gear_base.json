@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"x":{
-			"item": "assemblylinemachines:gold_plate"
+			"tag": "forge:plates/gold"
 		},
 		"y":{
 			"tag": "forge:rods/wooden"

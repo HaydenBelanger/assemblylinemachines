@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"m":{
 			"item": "assemblylinemachines:crank_shaft"
@@ -19,7 +19,7 @@
 			"tag": "forge:ingots/iron"
 		},
 		"b":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		}
 	},
 	"result":{

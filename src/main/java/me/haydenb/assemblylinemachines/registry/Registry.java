@@ -2,6 +2,7 @@ package me.haydenb.assemblylinemachines.registry;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.*;
@@ -12,11 +13,6 @@ import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.*;
-import me.haydenb.assemblylinemachines.block.fluid.*;
-import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct.FluidOilProductBlock;
 import me.haydenb.assemblylinemachines.block.machines.crank.*;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.*;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleCrankCharger.TESimpleCrankCharger;
@@ -68,61 +64,60 @@ import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.rendering.*;
+import me.haydenb.assemblylinemachines.registry.datagen.BasicHarvestableTaggedBlock;
+import me.haydenb.assemblylinemachines.registry.datagen.MineableBlockProvider;
 import me.haydenb.assemblylinemachines.world.*;
-import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRender.EntityCorruptShellRenderFactory;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.IHasContainer;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.ScreenManager.IScreenFactory;
-import net.minecraft.client.gui.screen.Screen;
+import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
+import me.haydenb.assemblylinemachines.world.rendering.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntitySpawnPlacementRegistry.PlacementType;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.*;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.potion.Effect;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag.Named;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.common.ToolType;
+import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.network.IContainerFactory;
+import net.minecraftforge.fmllegacy.network.IContainerFactory;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -138,13 +133,13 @@ public class Registry {
 			return o1.compareTo(o2);
 		}
 	});
-	static final HashMap<String, Block> blockRegistry = new HashMap<>();
 	
-	private static final HashMap<String, TileEntityType<?>> teRegistry = new HashMap<>();
-	private static final HashMap<String, ContainerType<?>> containerRegistry = new HashMap<>();
-	private static final HashMap<ContainerType<?>, Integer> containerIdRegistry = new HashMap<>();
-	private static final HashMap<String, Effect> effectRegistry = new HashMap<>();
-	static final HashMap<String, ForgeFlowingFluid> fluidRegistry = new HashMap<>();
+	public static final HashMap<String, Block> blockRegistry = new HashMap<>();
+	
+	private static final HashMap<String, BlockEntityType<?>> teRegistry = new HashMap<>();
+	private static final HashMap<String, MenuType<?>> containerRegistry = new HashMap<>();
+	private static final HashMap<MenuType<?>, Integer> containerIdRegistry = new HashMap<>();
+	private static final HashMap<String, MobEffect> effectRegistry = new HashMap<>();
 	
 	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
 	
@@ -152,10 +147,12 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
-		createItem("guidebook", new ItemGuidebook());
+		//DISABLED DUE TO PATCHOULI PLUGIN NON-UPDATE - createItem("guidebook", new ItemGuidebook());
 		
 		createItem("titanium_ingot");
 		createItem("titanium_nugget");
+		createItem("raw_titanium");
+		
 		createItem("titanium_blade_piece");
 		createItem("titanium_blade", new ItemGrindingBlade(Blades.TITANIUM));
 		createItem("pure_gold_blade_piece");
@@ -168,6 +165,7 @@ public class Registry {
 		createItem("ground_titanium");
 		createItem("ground_coal");
 		createItem("ground_charcoal");
+		createItem("ground_copper");
 		
 		createItem("sludge");
 		
@@ -178,6 +176,7 @@ public class Registry {
 		createItem("pure_gold");
 		createItem("pure_titanium");
 		createItem("pure_steel");
+		createItem("pure_copper");
 		
 		createItem("steel_rod");
 		
@@ -186,12 +185,14 @@ public class Registry {
 		createItem("iron_plate");
 		createItem("gold_plate");
 		createItem("titanium_plate");
-		createItem("mystium_plate", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
+		createItem("copper_plate");
+		createItem("mystium_plate", new ItemBasicFormattedName(ChatFormatting.LIGHT_PURPLE));
 		
 		createItem("gold_gear");
 		createItem("steel_gear");
 		createItem("iron_gear");
 		createItem("titanium_gear");
+		createItem("copper_gear");
 		
 		createItem("empowered_coal", new ItemGearboxBasicFuel(3200));
 		createItem("empowered_fuel", new ItemGearboxBasicFuel(6400));
@@ -222,46 +223,49 @@ public class Registry {
 		createItem("mystium_dowsing_rod", new ItemDowsingRod());
 		
 		createItem("ground_lapis_lazuli");
-		createItem("mystium_blend", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
-		createItem("mystium_ingot", new ItemBasicFormattedName(TextFormatting.LIGHT_PURPLE));
+		createItem("mystium_blend", new ItemBasicFormattedName(ChatFormatting.LIGHT_PURPLE));
+		createItem("mystium_ingot", new ItemBasicFormattedName(ChatFormatting.LIGHT_PURPLE));
 		createItem("corrupted_shard", new ItemCorruptedShard());
 		
-		createItem("titanium_sword", new SwordItem(ToolTiers.TITANIUM, 2, -1.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_axe", new AxeItem(ToolTiers.TITANIUM, 4, -3.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_pickaxe", new PickaxeItem(ToolTiers.TITANIUM, 0, -1.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_shovel", new ShovelItem(ToolTiers.TITANIUM, 0, -1.3f, new Item.Properties().group(creativeTab)));
+		createItem("titanium_sword", new SwordItem(ToolTiers.TITANIUM, 2, -1.5f, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_axe", new AxeItem(ToolTiers.TITANIUM, 3, -3.5f, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_pickaxe", new PickaxeItem(ToolTiers.TITANIUM, 0, -1.5f, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_shovel", new ShovelItem(ToolTiers.TITANIUM, 0, -1.3f, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_hoe", new HoeItem(ToolTiers.TITANIUM, 0, -0.5f, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_hammer", new ItemHammer(ToolTiers.TITANIUM, 8, -3.2f, new Item.Properties().tab(creativeTab)));
 		
-		createItem("titanium_hoe", new ItemPublicHoe(ToolTiers.TITANIUM, -0.5f, new Item.Properties().group(creativeTab)));
-		createItem("titanium_helmet", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
-		createItem("titanium_chestplate", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
-		createItem("titanium_leggings", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
-		createItem("titanium_boots", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
-		createItem("titanium_hammer", new ItemHammer(ToolTiers.TITANIUM, 8, -3.2f, new Item.Properties().group(creativeTab)));
+		int crankcapacity = ConfigHolder.COMMON.crankToolMaxCranks.get();
+		createItem("crank_sword", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 2, -1.5f, new Item.Properties().tab(creativeTab), crankcapacity, SwordItem.class));
+		createItem("crank_axe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 3, -3.5f, new Item.Properties().tab(creativeTab), crankcapacity, AxeItem.class));
+		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 0, -1.5f, new Item.Properties().tab(creativeTab), crankcapacity, PickaxeItem.class));
+		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 0, -1.3f, new Item.Properties().tab(creativeTab), crankcapacity, ShovelItem.class));
+		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 0, -0.5f, new Item.Properties().tab(creativeTab), crankcapacity, HoeItem.class));
+		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 8, -3.2f, new Item.Properties().tab(creativeTab), crankcapacity, ItemHammer.class));
 		
-		createItem("crank_sword", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, null, 3, -1.2f, new Item.Properties().group(creativeTab), 600, SwordItem.class));
-		createItem("crank_axe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 750, AxeItem.class));
-		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 800, PickaxeItem.class));
-		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 650, ShovelItem.class));
-		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, null, -999, -0.5f, new Item.Properties().group(creativeTab), 900, ItemPublicHoe.class));
-		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, null, 11, -3.5f, new Item.Properties().group(creativeTab), 2600, ItemHammer.class));
+		int fecapacity = ConfigHolder.COMMON.mystiumToolMaxFE.get();
+		createItem("mystium_sword", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 2, -1.5f, new Item.Properties().tab(creativeTab), fecapacity, SwordItem.class));
+		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 3, -3.5f, new Item.Properties().tab(creativeTab), fecapacity, AxeItem.class));
+		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 0, -1.5f, new Item.Properties().tab(creativeTab), fecapacity, PickaxeItem.class));
+		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 0, -1.3f, new Item.Properties().tab(creativeTab), fecapacity, ShovelItem.class));
+		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 0, -0.5f, new Item.Properties().tab(creativeTab), fecapacity, HoeItem.class));
+		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 8, -3.2f, new Item.Properties().tab(creativeTab), fecapacity, ItemHammer.class));
 		
-		createItem("mystium_sword", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, null, 3, -1.2f, new Item.Properties().group(creativeTab), 250000, SwordItem.class));
-		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, ToolType.AXE, 5, -3.2f, new Item.Properties().group(creativeTab), 250000, AxeItem.class));
-		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, ToolType.PICKAXE, 0, -1.5f, new Item.Properties().group(creativeTab), 250000, PickaxeItem.class));
-		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, ToolType.SHOVEL, 0, -1.3f, new Item.Properties().group(creativeTab), 250000, ShovelItem.class));
-		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, null, -999, -0.5f, new Item.Properties().group(creativeTab), 250000, ItemPublicHoe.class));
-		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, null, 11, -3.5f, new Item.Properties().group(creativeTab), 250000, ItemHammer.class));
+		createItem("steel_sword", new SwordItem(ToolTiers.STEEL, 2, -1.5f, new Item.Properties().tab(creativeTab)));
+		createItem("steel_axe", new AxeItem(ToolTiers.STEEL, 3, -3.5f, new Item.Properties().tab(creativeTab)));
+		createItem("steel_pickaxe", new PickaxeItem(ToolTiers.STEEL, 0, -1.5f, new Item.Properties().tab(creativeTab)));
+		createItem("steel_shovel", new ShovelItem(ToolTiers.STEEL, 0, -1.3f, new Item.Properties().tab(creativeTab)));
+		createItem("steel_hoe", new HoeItem(ToolTiers.STEEL, 0, -0.5f, new Item.Properties().tab(creativeTab)));
+		createItem("steel_hammer", new ItemHammer(ToolTiers.STEEL, 8, -3.2f, new Item.Properties().tab(creativeTab)));
 		
-		createItem("steel_hammer", new ItemHammer(ToolTiers.STEEL, 8, -3.5f, new Item.Properties().group(creativeTab)));
-		createItem("steel_sword", new SwordItem(ToolTiers.STEEL, 2, -1.9f, new Item.Properties().group(creativeTab)));
-		createItem("steel_axe", new AxeItem(ToolTiers.STEEL, 4, -3.9f, new Item.Properties().group(creativeTab)));
-		createItem("steel_pickaxe", new PickaxeItem(ToolTiers.STEEL, 0, -1.9f, new Item.Properties().group(creativeTab)));
-		createItem("steel_shovel", new ShovelItem(ToolTiers.STEEL, 0, -1.7f, new Item.Properties().group(creativeTab)));
-		createItem("steel_helmet", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.HEAD, new Item.Properties().group(creativeTab)));
-		createItem("steel_chestplate", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.CHEST, new Item.Properties().group(creativeTab)));
-		createItem("steel_leggings", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.LEGS, new Item.Properties().group(creativeTab)));
-		createItem("steel_boots", new ArmorItem(ArmorTiers.STEEL, EquipmentSlotType.FEET, new Item.Properties().group(creativeTab)));
-		createItem("steel_hoe", new ItemPublicHoe(ToolTiers.STEEL, -0.5f, new Item.Properties().group(creativeTab)));
+		createItem("steel_helmet", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.HEAD, new Item.Properties().tab(creativeTab)));
+		createItem("steel_chestplate", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.CHEST, new Item.Properties().tab(creativeTab)));
+		createItem("steel_leggings", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.LEGS, new Item.Properties().tab(creativeTab)));
+		createItem("steel_boots", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.FEET, new Item.Properties().tab(creativeTab)));
+		
+		createItem("titanium_helmet", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.HEAD, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_chestplate", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.CHEST, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_leggings", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.LEGS, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_boots", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.FEET, new Item.Properties().tab(creativeTab)));
 		
 		createItem("crank_shaft");
 		createItem("convection_component");
@@ -277,6 +281,7 @@ public class Registry {
 		createItem("chromium_ingot");
 		createItem("chromium_nugget");
 		createItem("chromium_plate");
+		createItem("raw_chromium");
 		
 		createItem("stainless_steel_plate");
 		createItem("energized_gold_ingot");
@@ -299,8 +304,8 @@ public class Registry {
 		createItem("warped_sawdust");
 		createItem("crimson_sawdust");
 		
-		createItem("miniature_black_hole", new ItemBasicFormattedName(TextFormatting.AQUA));
-		createItem("singularity", new ItemBasicFormattedName(TextFormatting.DARK_AQUA));
+		createItem("miniature_black_hole", new ItemBasicFormattedName(ChatFormatting.AQUA));
+		createItem("singularity", new ItemBasicFormattedName(ChatFormatting.DARK_AQUA));
 		createItem("empowered_convection_component");
 		
 		createItem("fertilizer", new ItemFertilizer(1));
@@ -312,23 +317,29 @@ public class Registry {
 		
 		createItem("ground_chromium");
 		
-		createItem("attuned_titanium_ingot", new ItemBasicFormattedName(TextFormatting.BLUE));
-		createItem("attuned_titanium_plate", new ItemBasicFormattedName(TextFormatting.BLUE));
+		createItem("attuned_titanium_ingot", new ItemBasicFormattedName(ChatFormatting.BLUE));
+		createItem("attuned_titanium_plate", new ItemBasicFormattedName(ChatFormatting.BLUE));
 		createItem("purifier_upgrade_enhanced", new ItemUpgrade(false, "Purifier can process more recipes.", "Increases power consumption."));
 		
-		createItem("nether_star_shard", new ItemBasicFormattedName(TextFormatting.GOLD));
+		createItem("nether_star_shard", new ItemBasicFormattedName(ChatFormatting.GOLD));
 		
 		createItem("entropy_reactor_upgrade_capacity", new ItemUpgrade(true, "Entropy Reactor has a higher capacity."));
 		createItem("entropy_reactor_upgrade_cycle_delayer", new ItemUpgrade(true, "Entropy Reactor waits longer to clear capacity."));
 		createItem("entropy_reactor_upgrade_variety", new ItemUpgrade(false, "Higher Variety has greater performance.", "Lower Variety has worsened performance."));
 		
-		createItem("poor_strange_matter");
-		createItem("strange_matter");
-		createItem("rich_strange_matter");
+		createItem("semi_dense_neutron_matter", new ItemReactorOutput("§7Low-Quality"));
+		createItem("quark_matter", new ItemReactorOutput("§9Medium-Quality"));
+		createItem("strange_matter", new ItemReactorOutput("§aHigh-Quality"));
 		
-		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().group(creativeTab)));
+		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(creativeTab)));
 		createItem("galactic_flesh");
 		createItem("reality_crystal");
+		
+		createItem("electrified_netherite_blend");
+		createItem("ground_netherite");
+		
+		//1.17.1 CHANGE: Fluid registration is segmented due to build issues. See FluidRegistry.class.
+		FluidRegistry.registerBuckets();
 		
 		for(String i : itemRegistry.keySet()) {
 			event.getRegistry().register(itemRegistry.get(i));
@@ -338,208 +349,230 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
 		
-		createBlock("titanium_ore", Material.ROCK, 3f, 15f, 4, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("titanium_block", Material.IRON, 5f, 20f, 4, ToolType.PICKAXE, SoundType.METAL);
+		createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
-		createBlock("hand_grinder", new BlockHandGrinder());
-		createBlock("fluid_bath", new BlockFluidBath());
+		createBlock("titanium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
-		createBlock("crank", new BlockCrank());
-		createBlock("gearbox", new BlockGearbox());
+		createBlock("hand_grinder", new BlockHandGrinder(), true);
+		createBlock("fluid_bath", new BlockFluidBath(), true);
 		
-		createBlock("simple_crank_charger", new BlockSimpleCrankCharger());
-		createBlock("simple_fluid_mixer", new BlockSimpleFluidMixer());
-		createBlock("simple_grinder", new BlockSimpleGrinder());
+		createBlock("crank", new BlockCrank(), true);
+		createBlock("gearbox", new BlockGearbox(), true);
 		
-		createBlock("item_pipe", new PipeBase<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Type.ITEM));
-		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.BASIC_FLUID));
-		createBlock("advanced_fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.ADVANCED_FLUID));
-		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.BASIC_POWER));
+		createBlock("simple_crank_charger", new BlockSimpleCrankCharger(), true);
+		createBlock("simple_fluid_mixer", new BlockSimpleFluidMixer(), true);
+		createBlock("simple_grinder", new BlockSimpleGrinder(), true);
 		
+		createBlock("item_pipe", new PipeBase<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Type.ITEM), true);
+		createBlock("fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.BASIC_FLUID), true);
+		createBlock("advanced_fluid_pipe", new PipeBase<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Type.ADVANCED_FLUID), true);
+		createBlock("energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.BASIC_POWER), true);
 		
-		createBlockNoItem("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT));
+		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT), false);
 		createItem("steel_fluid_tank", new BlockItemFluidTank(Registry.getBlock("steel_fluid_tank")));
-		createBlockNoItem("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD));
+		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD), false);
 		createItem("wooden_fluid_tank", new BlockItemFluidTank(Registry.getBlock("wooden_fluid_tank")));
 		
-		createBlock("silt", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
-		createBlock("silt_brick", Material.ROCK, 4f, 12f, 0, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("slab_silt_brick", new SlabBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(4f, 12f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
-		createBlock("stair_silt_brick", new StairsBlock(() -> Registry.getBlock("smooth_black_granite").getDefaultState(), Block.Properties.create(Material.ROCK).hardnessAndResistance(4f, 12f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("silt", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("slab_silt_brick", new SlabBlock(Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
+		createBlock("stair_silt_brick", new StairBlock(new Supplier<BlockState>() {
+
+			@Override
+			public BlockState get() {
+				return Registry.getBlock("silt_brick").defaultBlockState();
+			}
+			
+		}, Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
 		
-		createBlock("steel_block", Material.IRON, 7f, 30f, 3, ToolType.PICKAXE, SoundType.METAL);
+		createBlock("steel_block", Material.METAL, 7f, 30f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
-		createBlock("black_granite", new BlockBlackGranite());
-		createBlock("smooth_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("brick_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("chiselled_black_granite", Material.ROCK, 3f, 9f, 0, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("pillar_black_granite", new RotatedPillarBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestLevel(0).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
-		createBlock("slab_black_granite", new SlabBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
-		createBlock("stair_black_granite", new StairsBlock(() -> Registry.getBlock("smooth_black_granite").getDefaultState(), Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 9f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("black_granite", new BlockBlackGranite(), true);
+		createBlock("smooth_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("brick_black_granite", Material.STONE, 3f, 9f,  SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("chiselled_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("pillar_black_granite", new RotatedPillarBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
+		createBlock("slab_black_granite", new SlabBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
+		createBlock("stair_black_granite", new StairBlock(new Supplier<BlockState>() {
+
+			@Override
+			public BlockState get() {
+				return Registry.getBlock("smooth_black_granite").defaultBlockState();
+			}
+			
+		}, Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		
-		createBlock("silt_iron", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
-		createBlock("silt_gold", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
-		createBlock("silt_titanium", Material.CLAY, 1f, 2f, 0, ToolType.SHOVEL, SoundType.GROUND);
+		createBlock("silt_iron", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("silt_gold", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("silt_titanium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("silt_copper", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
 		
-		createBlock("basic_battery_cell", new BlockBatteryCell(BatteryCellTiers.BASIC));
-		createBlock("advanced_battery_cell", new BlockBatteryCell(BatteryCellTiers.ADVANCED));
-		createBlock("coal_generator", new BlockCoalGenerator());
-		createBlock("crankmill", new BlockCrankmill());
+		createBlock("basic_battery_cell", new BlockBatteryCell(BatteryCellTiers.BASIC), true);
+		createBlock("advanced_battery_cell", new BlockBatteryCell(BatteryCellTiers.ADVANCED), true);
+		createBlock("coal_generator", new BlockCoalGenerator(), true);
+		createBlock("crankmill", new BlockCrankmill(), true);
 		
-		createBlock("chromium_ore", Material.ROCK, 3f, 15f, 3, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("chromium_block", Material.IRON, 5f, 20f, 3, ToolType.PICKAXE, SoundType.METAL);
+		createBlock("chromium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, MineableBlockProvider.NEEDS_NETHERITE_TOOL, true);
+		createBlock("chromium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
-		createBlock("electric_furnace", new BlockElectricFurnace());
-		createBlock("electric_purifier", new BlockElectricPurifier());
-		createBlock("electric_grinder", new BlockElectricGrinder());
-		createBlock("electric_fluid_mixer", new BlockElectricFluidMixer());
-		createBlock("alloy_smelter", new BlockAlloySmelter());
+		createBlock("electric_furnace", new BlockElectricFurnace(), true);
+		createBlock("electric_purifier", new BlockElectricPurifier(), true);
+		createBlock("electric_grinder", new BlockElectricGrinder(), true);
+		createBlock("electric_fluid_mixer", new BlockElectricFluidMixer(), true);
+		createBlock("alloy_smelter", new BlockAlloySmelter(), true);
 		
-		createBlock("autocrafting_table", new BlockAutocraftingTable());
+		createBlock("autocrafting_table", new BlockAutocraftingTable(), true);
 		
-		createBlockNoItem("naphtha_fire", new BlockNaphthaFire());
+		createBlock("naphtha_fire", new BlockNaphthaFire(), false);
 		
-		createBlock("pump", new BlockPump());
-		createBlock("pumpshaft", new BlockPumpshaft());
+		createBlock("pump", new BlockPump(), true);
+		createBlock("pumpshaft", new BlockPumpshaft(), true);
 		
-		createBlockNoItem("mystium_block", Material.IRON, 11f, 80f, 3, ToolType.PICKAXE, SoundType.METAL);
-		createItem("mystium_block", new ItemBlockFormattedName(Registry.getBlock("mystium_block"), TextFormatting.LIGHT_PURPLE));
+		createBlock("mystium_block", Material.METAL, 11f, 80f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, false);
+		createItem("mystium_block", new ItemBlockFormattedName(Registry.getBlock("mystium_block"), ChatFormatting.LIGHT_PURPLE));
 		
-		createBlockNoItem("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT));
+		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT), false);
 		createItem("mystium_fluid_tank", new BlockItemFluidTank(Registry.getBlock("mystium_fluid_tank")));
 		
-		createBlock("tool_charger", new BlockToolCharger());
+		createBlock("tool_charger", new BlockToolCharger(), true);
 		
-		createBlock("adv_energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.ADVANCED_POWER));
-		createBlock("smoldering_stone", Material.ROCK, 30f, 300f, 3, ToolType.PICKAXE, SoundType.STONE);
-		createBlock("naphtha_turbine", new BlockNaphthaTurbine());
+		createBlock("adv_energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.ADVANCED_POWER), true);
+		createBlock("smoldering_stone", Material.STONE, 30f, 300f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("naphtha_turbine", new BlockNaphthaTurbine(), true);
 		
-		createBlock("compressed_crafting_table", Material.WOOD, 2f, 10f, 0, ToolType.AXE, SoundType.WOOD);
+		createBlock("compressed_crafting_table", Material.WOOD, 2f, 10f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_STONE_TOOL, true);
 		
-		createBlock("refinery", new BlockRefinery());
-		createBlock("refinery_attachment_separation", new BlockSeparationAddon());
-		createBlock("refinery_attachment_addition", new BlockAdditionAddon());
-		createBlock("refinery_attachment_halogen", new BlockHalogenAddon());
-		createBlock("refinery_attachment_cracking", new BlockCrackingAddon());
+		createBlock("refinery", new BlockRefinery(), true);
+		createBlock("refinery_attachment_separation", new BlockSeparationAddon(), true);
+		createBlock("refinery_attachment_addition", new BlockAdditionAddon(), true);
+		createBlock("refinery_attachment_halogen", new BlockHalogenAddon(), true);
+		createBlock("refinery_attachment_cracking", new BlockCrackingAddon(), true);
 		
-		createBlock("fluid_router", new BlockFluidRouter());
-		createBlock("interactor", new BlockInteractor());
-		createBlock("vacuum_hopper", new BlockVacuumHopper());
+		createBlock("fluid_router", new BlockFluidRouter(), true);
+		createBlock("interactor", new BlockInteractor(), true);
+		createBlock("vacuum_hopper", new BlockVacuumHopper(), true);
 		
-		createBlockNoItem("bottomless_storage_unit", new BlockBottomlessStorageUnit());
+		createBlock("bottomless_storage_unit", new BlockBottomlessStorageUnit(), false);
 		createItem("bottomless_storage_unit", new BlockItemBottomlessStorageUnit(Registry.getBlock("bottomless_storage_unit")));
 		
-		createBlock("combustion_generator", new BlockFluidGenerator(FluidGeneratorTypes.COMBUSTION));
-		createBlock("geothermal_generator", new BlockFluidGenerator(FluidGeneratorTypes.GEOTHERMAL));
+		createBlock("combustion_generator", new BlockFluidGenerator(FluidGeneratorTypes.COMBUSTION), true);
+		createBlock("geothermal_generator", new BlockFluidGenerator(FluidGeneratorTypes.GEOTHERMAL), true);
 		
-		createBlock("experience_hopper", new BlockExperienceHopper());
-		createBlock("powered_spawner", new BlockPoweredSpawner());
-		createBlock("experience_mill", new BlockExperienceMill());
+		createBlock("experience_hopper", new BlockExperienceHopper(), true);
+		createBlock("powered_spawner", new BlockPoweredSpawner(), true);
+		createBlock("experience_mill", new BlockExperienceMill(), true);
 		
-		createBlock("quarry", new BlockQuarry());
-		createBlock("quarry_speed_addon", new BlockSpeedQuarryAddon());
-		createBlock("quarry_fortune_addon", new BlockFortuneVoidQuarryAddon());
-		createBlock("quarry_void_addon", new BlockFortuneVoidQuarryAddon());
+		createBlock("quarry", new BlockQuarry(), true);
+		createBlock("quarry_speed_addon", new BlockSpeedQuarryAddon(), true);
+		createBlock("quarry_fortune_addon", new BlockFortuneVoidQuarryAddon(), true);
+		createBlock("quarry_void_addon", new BlockFortuneVoidQuarryAddon(), true);
 		
-		createBlockNoItem("mystium_farmland", new BlockMystiumFarmland());
+		createBlock("mystium_farmland", new BlockMystiumFarmland(), false);
 		
-		createBlock("lumber_mill", new BlockLumberMill());
+		createBlock("lumber_mill", new BlockLumberMill(), true);
 		
-		createBlock("quantum_link", new BlockQuantumLink());
-		createBlock("metal_shaper", new BlockMetalShaper());
+		createBlock("quantum_link", new BlockQuantumLink(), true);
+		createBlock("metal_shaper", new BlockMetalShaper(), true);
 		
-		createBlock("entropy_reactor_block", new BlockEntropyReactor());
-		createBlock("entropy_reactor_core", Material.IRON, 3f, 15f, 0, ToolType.PICKAXE, SoundType.METAL);
+		createBlock("entropy_reactor_block", new BlockEntropyReactor(), true);
+		createBlock("entropy_reactor_core", new BlockEntropyReactorCore(), true);
 		
-		createBlock("corrupt_dirt", new CorruptBlock(AbstractBlock.Properties.create(Material.EARTH).harvestTool(ToolType.SHOVEL).sound(SoundType.GROUND)));
-		createBlock("corrupt_grass", new CorruptGrassBlock());
-		createBlock("corrupt_sand", new CorruptSandBlock());
-		createBlock("corrupt_stone", new CorruptBlock(AbstractBlock.Properties.create(Material.ROCK).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("corrupt_dirt", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_grass", new CorruptGrassBlock(), true);
+		createBlock("corrupt_sand", new CorruptSandBlock(), true);
+		createBlock("corrupt_stone", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		
-		createBlock("corrupting_basin", new BlockCorruptingBasin());
+		createBlock("corrupting_basin", new BlockCorruptingBasin(), true);
 		
-		//FLUIDS
-		FluidRegistration.buildAndRegister("oil", new FluidOil(true), new FluidOil(false), true, new FluidOilBlock());
-		FluidRegistration.buildAndRegister("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), true, new FluidCondensedVoidBlock());
-		FluidRegistration.buildAndRegister("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), true, new FluidNaphthaBlock());
-		FluidRegistration.buildAndRegister("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), true, new FluidOilProductBlock("gasoline"));
-		FluidRegistration.buildAndRegister("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), true, new FluidOilProductBlock("diesel"));
-		FluidRegistration.buildAndRegister("liquid_experience", 35, false, true, ALMFluid.LIQUID_EXPERIENCE, Material.WATER);
-		
-		FluidRegistration.buildAndRegister("ethane", new GaseousFluid("ethane", true, 0x135f0f), null, false, null);
-		FluidRegistration.buildAndRegister("ethylene", new GaseousFluid("ethylene", true, 0xb3aac3), null, false, null);
-		FluidRegistration.buildAndRegister("propane", new GaseousFluid("propane", true, 0x5f0f1c), null, false, null);
-		FluidRegistration.buildAndRegister("propylene", new GaseousFluid("propylene", true, 0x290d55), null, false, null);
+		//1.17.1 CHANGE: Fluid registration is segmented due to build issues. See FluidRegistry.class.
+		FluidRegistry.registerFluidBlocks();
 		
 		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
 	}
 	
+	/*
+	1.17.1 CHANGE: Due to issues related to building fluids, fluid registration is handled through a DeferredRegister in FluidRegistry.class.
 	@SubscribeEvent
 	public static void registerFluids(RegistryEvent.Register<Fluid> event) {
 		
+		//FLUIDS - COPIED FROM BOTTOM OF #registerBlocks()
+		//FluidRegistration.buildAndRegister("oil", new FluidOil(true), new FluidOil(false), true, new FluidOilBlock(new FluidOil(true)));
+		//FluidRegistration.buildAndRegister("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), true, new FluidCondensedVoidBlock(new FluidCondensedVoid(true)));
+		//FluidRegistration.buildAndRegister("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), true, new FluidNaphthaBlock(new FluidNaphtha(true)));
+		//FluidRegistration.buildAndRegister("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), true, new FluidOilProductBlock(new FluidOilProduct("gasoline", true)));
+		//FluidRegistration.bildAndRegister("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), true, new FluidOilProductBlock(new FluidOilProduct("diesel", true)));
+		//FluidRegistration.buildAndRegister("liquid_experience", 35, false, true, ALMFluid.LIQUID_EXPERIENCE, Material.WATER);
+		
+		//FluidRegistration.buildAndRegister("ethane", new GaseousFluid("ethane", true, 0x135f0f), null, false, null);
+		//FluidRegistration.buildAndRegister("ethylene", new GaseousFluid("ethylene", true, 0xb3aac3), null, false, null);
+		//FluidRegistration.buildAndRegister("propane", new GaseousFluid("propane", true, 0x5f0f1c), null, false, null);
+		//FluidRegistration.buildAndRegister("propylene", new GaseousFluid("propylene", true, 0x290d55), null, false, null);
+		 * 
 		//All Fluids are handled at bottom of registerBlocks, to handle the _block and _bucket versions of fluids.
 		event.getRegistry().registerAll(fluidRegistry.values().toArray(new Fluid[fluidRegistry.size()]));
 	}
+	*/
 	
 	@SubscribeEvent
-	public static void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
-		createTileEntity("hand_grinder", TEHandGrinder.class);
-		createTileEntity("fluid_bath", TEFluidBath.class);
+	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) {
+		createBlockEntity("hand_grinder", TEHandGrinder.class);
+		createBlockEntity("fluid_bath", TEFluidBath.class);
 		
-		createTileEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
-		createTileEntity("simple_grinder", TESimpleGrinder.class);
-		createTileEntity("simple_crank_charger", TESimpleCrankCharger.class);
+		createBlockEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
+		createBlockEntity("simple_grinder", TESimpleGrinder.class);
+		createBlockEntity("simple_crank_charger", TESimpleCrankCharger.class);
 		
-		createTileEntity("gearbox", TEGearbox.class);
+		createBlockEntity("gearbox", TEGearbox.class);
 		
-		createTileEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"), blockRegistry.get("mystium_fluid_tank"));
+		createBlockEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"), blockRegistry.get("mystium_fluid_tank"));
 		
-		createTileEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
-		createTileEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"), blockRegistry.get("advanced_fluid_pipe"));
-		createTileEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"), blockRegistry.get("adv_energy_pipe"));
+		createBlockEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
+		createBlockEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"), blockRegistry.get("advanced_fluid_pipe"));
+		createBlockEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"), blockRegistry.get("adv_energy_pipe"));
 		
-		createTileEntity("basic_battery_cell", TEBasicBatteryCell.class);
-		createTileEntity("advanced_battery_cell", TEAdvancedBatteryCell.class);
+		createBlockEntity("basic_battery_cell", TEBasicBatteryCell.class);
+		createBlockEntity("advanced_battery_cell", TEAdvancedBatteryCell.class);
 		
-		createTileEntity("coal_generator", TECoalGenerator.class);
-		createTileEntity("crankmill", TECrankmill.class);
+		createBlockEntity("coal_generator", TECoalGenerator.class);
+		createBlockEntity("crankmill", TECrankmill.class);
 		
-		createTileEntity("electric_furnace", TEElectricFurnace.class);
-		createTileEntity("electric_purifier", TEElectricPurifier.class);
-		createTileEntity("electric_grinder", TEElectricGrinder.class);
-		createTileEntity("electric_fluid_mixer", TEElectricFluidMixer.class);
-		createTileEntity("alloy_smelter", TEAlloySmelter.class);
+		createBlockEntity("electric_furnace", TEElectricFurnace.class);
+		createBlockEntity("electric_purifier", TEElectricPurifier.class);
+		createBlockEntity("electric_grinder", TEElectricGrinder.class);
+		createBlockEntity("electric_fluid_mixer", TEElectricFluidMixer.class);
+		createBlockEntity("alloy_smelter", TEAlloySmelter.class);
 		
-		createTileEntity("autocrafting_table", TEAutocraftingTable.class);
-		createTileEntity("pump", TEPump.class);
-		createTileEntity("tool_charger", TEToolCharger.class);
-		createTileEntity("refinery", TERefinery.class);
-		createTileEntity("fluid_router", TEFluidRouter.class);
-		createTileEntity("interactor", TEInteractor.class);
-		createTileEntity("vacuum_hopper", TEVacuumHopper.class);
-		createTileEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
-		createTileEntity("fluid_generator", TEFluidGenerator.class, blockRegistry.get("geothermal_generator"), blockRegistry.get("combustion_generator"));
-		createTileEntity("experience_hopper", TEExperienceHopper.class);
+		createBlockEntity("autocrafting_table", TEAutocraftingTable.class);
+		createBlockEntity("pump", TEPump.class);
+		createBlockEntity("tool_charger", TEToolCharger.class);
+		createBlockEntity("refinery", TERefinery.class);
+		createBlockEntity("fluid_router", TEFluidRouter.class);
+		createBlockEntity("interactor", TEInteractor.class);
+		createBlockEntity("vacuum_hopper", TEVacuumHopper.class);
+		createBlockEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
+		createBlockEntity("fluid_generator", TEFluidGenerator.class, blockRegistry.get("geothermal_generator"), blockRegistry.get("combustion_generator"));
+		createBlockEntity("experience_hopper", TEExperienceHopper.class);
 		
-		createTileEntity("powered_spawner", TEPoweredSpawner.class);
-		createTileEntity("experience_mill", TEExperienceMill.class);
-		createTileEntity("quarry", TEQuarry.class);
-		createTileEntity("lumber_mill", TELumberMill.class);
+		createBlockEntity("powered_spawner", TEPoweredSpawner.class);
+		createBlockEntity("experience_mill", TEExperienceMill.class);
+		createBlockEntity("quarry", TEQuarry.class);
+		createBlockEntity("lumber_mill", TELumberMill.class);
 		
-		createTileEntity("quantum_link", TEQuantumLink.class);
+		createBlockEntity("quantum_link", TEQuantumLink.class);
 		
-		createTileEntity("metal_shaper", TEMetalShaper.class);
+		createBlockEntity("metal_shaper", TEMetalShaper.class);
 		
-		createTileEntity("entropy_reactor", TEEntropyReactor.class, blockRegistry.get("entropy_reactor_block"));
-		createTileEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, blockRegistry.get("entropy_reactor_block"));
+		createBlockEntity("entropy_reactor", TEEntropyReactor.class, blockRegistry.get("entropy_reactor_block"));
+		createBlockEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, blockRegistry.get("entropy_reactor_block"));
 		
-		createTileEntity("corrupting_basin", TECorruptingBasin.class);
+		createBlockEntity("corrupting_basin", TECorruptingBasin.class);
 		
-		event.getRegistry().registerAll(teRegistry.values().toArray(new TileEntityType<?>[teRegistry.size()]));
+		event.getRegistry().registerAll(teRegistry.values().toArray(new BlockEntityType<?>[teRegistry.size()]));
 	}
 	
 	@SubscribeEvent
-	public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
+	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
 		createContainer("simple_fluid_mixer", 1050, ContainerSimpleFluidMixer.class);
 		createContainer("simple_grinder", 1051, ContainerSimpleGrinder.class);
 		createContainer("gearbox", 1052, ContainerGearbox.class);
@@ -574,7 +607,7 @@ public class Registry {
 		
 		createContainer("corrupting_basin", 1075, ContainerCorruptingBasin.class);
 		
-		event.getRegistry().registerAll(containerRegistry.values().toArray(new ContainerType<?>[containerRegistry.size()]));
+		event.getRegistry().registerAll(containerRegistry.values().toArray(new MenuType<?>[containerRegistry.size()]));
 		
 	}
 	
@@ -582,43 +615,50 @@ public class Registry {
 	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
 		
 		event.getRegistry().register(EntityCorruptShell.CORRUPT_SHELL.setRegistryName("corrupt_shell"));
-		EntitySpawnPlacementRegistry.register(EntityCorruptShell.CORRUPT_SHELL, PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::canSpawnOn);
-		GlobalEntityTypeAttributes.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().func_233813_a_());
+		SpawnPlacements.register(EntityCorruptShell.CORRUPT_SHELL, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMobSpawnRules);
 	}
 	
 	@SubscribeEvent
-	public static void registerPotions(RegistryEvent.Register<Effect> event) {
+	public static void registerEntAttributes(EntityAttributeCreationEvent event) {
+		
+		event.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().build());
+	}
+	
+	@SubscribeEvent
+	public static void registerPotions(RegistryEvent.Register<MobEffect> event) {
 		
 		createEffect("entropy_poisoning", new EffectEntropyPoisoning());
 		createEffect("deep_burn", new EffectDeepBurn());
 		
-		event.getRegistry().registerAll(effectRegistry.values().toArray(new Effect[effectRegistry.size()]));
+		event.getRegistry().registerAll(effectRegistry.values().toArray(new MobEffect[effectRegistry.size()]));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
-		RenderTypeLookup.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(getBlock("autocrafting_table"), RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(getBlock("geothermal_generator"), RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(getBlock("naphtha_fire"), RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(getBlock("powered_spawner"), RenderType.getCutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("autocrafting_table"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("geothermal_generator"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("naphtha_fire"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("powered_spawner"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("entropy_reactor_block"), RenderType.cutout());
 		
-		RenderTypeLookup.setRenderLayer(getFluid("naphtha"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("naphtha_flowing"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("diesel"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("diesel_flowing"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("gasoline"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("gasoline_flowing"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("liquid_experience"), RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(getFluid("liquid_experience_flowing"), RenderType.getTranslucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("gasoline"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("gasoline_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_experience"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_experience_flowing"), RenderType.translucent());
 		
-		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEFluidTank>)getTileEntity("fluid_tank"), TankTER::new);
-		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEPoweredSpawner>)getTileEntity("powered_spawner"), PoweredSpawnerTER::new);
-		ClientRegistry.bindTileEntityRenderer((TileEntityType<TEQuantumLink>)getTileEntity("quantum_link"), QuantumLinkTER::new);
+		
+		BlockEntityRenderers.register((BlockEntityType<TEFluidTank>)getBlockEntity("fluid_tank"), new TankTER());
+		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
+		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());
 		
 		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
 		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
@@ -661,38 +701,45 @@ public class Registry {
 		((ItemMystiumTool<?>) Registry.getItem("mystium_shovel")).connectItemProperties();
 		((ItemMystiumTool<?>) Registry.getItem("mystium_hoe")).connectItemProperties();
 		((ItemMystiumTool<?>) Registry.getItem("mystium_hammer")).connectItemProperties();
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
 	
 	@SubscribeEvent
-	public static void registerCrafting(RegistryEvent.Register<IRecipeSerializer<?>> event) {
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(GrinderCrafting.GRINDER_RECIPE.toString()), GrinderCrafting.GRINDER_RECIPE);
+	@OnlyIn(Dist.CLIENT)
+	public static void registerEntityRenderers(RegisterRenderers event) {
+		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
+	}
+	
+	@SubscribeEvent
+	public static void registerCrafting(RegistryEvent.Register<RecipeSerializer<?>> event) {
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(GrinderCrafting.GRINDER_RECIPE.toString()), GrinderCrafting.GRINDER_RECIPE);
 		event.getRegistry().register(GrinderCrafting.SERIALIZER.setRegistryName("grinder"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
 		event.getRegistry().register(BathCrafting.SERIALIZER.setRegistryName("bath"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(PurifierCrafting.PURIFIER_RECIPE.toString()), PurifierCrafting.PURIFIER_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(PurifierCrafting.PURIFIER_RECIPE.toString()), PurifierCrafting.PURIFIER_RECIPE);
 		event.getRegistry().register(PurifierCrafting.SERIALIZER.setRegistryName("purifier"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(AlloyingCrafting.ALLOYING_RECIPE.toString()), AlloyingCrafting.ALLOYING_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(AlloyingCrafting.ALLOYING_RECIPE.toString()), AlloyingCrafting.ALLOYING_RECIPE);
 		event.getRegistry().register(AlloyingCrafting.SERIALIZER.setRegistryName("alloying"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(FluidInGroundRecipe.FIG_RECIPE.toString()), FluidInGroundRecipe.FIG_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(FluidInGroundRecipe.FIG_RECIPE.toString()), FluidInGroundRecipe.FIG_RECIPE);
 		event.getRegistry().register(FluidInGroundRecipe.SERIALIZER.setRegistryName("fluid_in_ground"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(RefiningCrafting.REFINING_RECIPE.toString()), RefiningCrafting.REFINING_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(RefiningCrafting.REFINING_RECIPE.toString()), RefiningCrafting.REFINING_RECIPE);
 		event.getRegistry().register(RefiningCrafting.SERIALIZER.setRegistryName("refining"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE.toString()), EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE.toString()), EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE);
 		event.getRegistry().register(EnchantmentBookCrafting.SERIALIZER.setRegistryName("enchantment_book"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(LumberCrafting.LUMBER_RECIPE.toString()), LumberCrafting.LUMBER_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(LumberCrafting.LUMBER_RECIPE.toString()), LumberCrafting.LUMBER_RECIPE);
 		event.getRegistry().register(LumberCrafting.SERIALIZER.setRegistryName("lumber"));
 		
-		net.minecraft.util.registry.Registry.register(net.minecraft.util.registry.Registry.RECIPE_TYPE, new ResourceLocation(MetalCrafting.METAL_RECIPE.toString()), MetalCrafting.METAL_RECIPE);
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(MetalCrafting.METAL_RECIPE.toString()), MetalCrafting.METAL_RECIPE);
 		event.getRegistry().register(MetalCrafting.SERIALIZER.setRegistryName("metal"));
+		
+		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(EntropyReactorCrafting.ERO_RECIPE.toString()), EntropyReactorCrafting.ERO_RECIPE);
+		event.getRegistry().register(EntropyReactorCrafting.SERIALIZER.setRegistryName("entropy_reactor"));
 		
 	}
 	
@@ -701,13 +748,13 @@ public class Registry {
 	public static void registerBlockColorHandlers(ColorHandlerEvent.Block event) {
 		
 		
-		event.getBlockColors().register(new IBlockColor() {
+		event.getBlockColors().register(new BlockColor() {
 
 			@Override
-			public int getColor(BlockState state, IBlockDisplayReader reader, BlockPos pos, int tint) {
-				if(reader != null && pos != null && reader.getTileEntity(pos) instanceof TEFluidBath) {
+			public int getColor(BlockState state, BlockAndTintGetter reader, BlockPos pos, int tint) {
+				if(reader != null && pos != null && reader.getBlockEntity(pos) instanceof TEFluidBath) {
 					
-					TEFluidBath te = (TEFluidBath) reader.getTileEntity(pos);
+					TEFluidBath te = (TEFluidBath) reader.getBlockEntity(pos);
 					
 					return te.getFluidColor(reader, pos);
 					
@@ -722,7 +769,7 @@ public class Registry {
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void registerItemColorHandlers(ColorHandlerEvent.Item event) {
-		event.getItemColors().register(new IItemColor() {
+		event.getItemColors().register(new ItemColor() {
 			
 			@Override
 			public int getColor(ItemStack stack, int index) {
@@ -756,27 +803,27 @@ public class Registry {
 	//===============================================
 	
 	//EFFECTS
-	private static void createEffect(String name, Effect effect) {
+	private static void createEffect(String name, MobEffect effect) {
 		effect.setRegistryName(name);
 		effectRegistry.put(name, effect);
 	}
 	
-	public static Effect getEffect(String name) {
+	public static MobEffect getEffect(String name) {
 		return effectRegistry.get(name);
 	}
 	
 	//ITEMS
 	private static void createItem(String name) {
 		
-		Item.Properties properties = new Item.Properties().group(creativeTab);
+		Item.Properties properties = new Item.Properties().tab(creativeTab);
 		createItem(name, properties);
 	}
-	private static void createItem(String name, Item.Properties properties) {
+	static void createItem(String name, Item.Properties properties) {
 		Item i = new Item(properties);
 		createItem(name, i);
 	}
 	
-	private static void createItem(String name, Item item) {
+	static void createItem(String name, Item item) {
 		item.setRegistryName(name);
 		itemRegistry.put(name, item);
 	}
@@ -787,37 +834,32 @@ public class Registry {
 	
 	
 	//BLOCKS
-	private static void createBlock(String name, Material material, float hardness, float resistance, int harvestLevel, ToolType toolType, SoundType sound) {
-		Block.Properties properties = Block.Properties.create(material).hardnessAndResistance(hardness, resistance).harvestLevel(harvestLevel).harvestTool(toolType).sound(sound);
-		createBlock(name, properties);
+	private static void createBlock(String name, Material material, float hardness, float resistance, SoundType sound, boolean requireToolToDrop, Named<Block> type, Named<Block> level, boolean item) {
+		Block.Properties properties = Block.Properties.of(material).strength(hardness, resistance).sound(sound);
+		if(requireToolToDrop) {
+			properties = properties.requiresCorrectToolForDrops();
+		}
+		createBlock(name, properties, type, level, item);
 		
 	}
 	
-	private static void createBlock(String name, Block.Properties properties) {
-		Block b = new Block(properties);
-		createBlock(name, b);
+	private static void createBlock(String name, Block.Properties properties, Named<Block> type, Named<Block> level, boolean item) {
+		Block b;
+		if(type != null && level != null) {
+			b = new BasicHarvestableTaggedBlock(properties, type, level);
+		}else {
+			b = new Block(properties);
+		}
+		createBlock(name, b, item);
 	}
 	
-	private static void createBlock(String name, Block block) {
+	static void createBlock(String name, Block block, boolean item) {
 		block.setRegistryName(name);
 		blockRegistry.put(name, block);
-		createItem(name, new BlockItem(block, new Item.Properties().group(creativeTab)));
-	}
-	
-	private static void createBlockNoItem(String name, Material material, float hardness, float resistance, int harvestLevel, ToolType toolType, SoundType sound) {
-		Block.Properties properties = Block.Properties.create(material).hardnessAndResistance(hardness, resistance).harvestLevel(harvestLevel).harvestTool(toolType).sound(sound);
-		createBlockNoItem(name, properties);
+		if(item) {
+			createItem(name, new BlockItem(block, new Item.Properties().tab(creativeTab)));
+		}
 		
-	}
-	
-	private static void createBlockNoItem(String name, Block.Properties properties) {
-		Block b = new Block(properties);
-		createBlockNoItem(name, b);
-	}
-	
-	private static void createBlockNoItem(String name, Block block) {
-		block.setRegistryName(name);
-		blockRegistry.put(name, block);
 	}
 	
 	public static Block getBlock(String name) {
@@ -828,24 +870,21 @@ public class Registry {
 	//FLUIDS
 	//Fluid Registration is handled in a separate class.
 	public static Fluid getFluid(String name) {
-		return fluidRegistry.get(name);
-	}
-	
-	public static Collection<ForgeFlowingFluid> getFluids(){
-		return fluidRegistry.values();
+		return ForgeRegistries.FLUIDS.getValue(new ResourceLocation("assemblylinemachines", name));
 	}
 	
 	//TILE ENTITIES
-	public static TileEntityType<?> getTileEntity(String name){
+	public static BlockEntityType<?> getBlockEntity(String name){
 		return teRegistry.get(name);
 	}
 	
-	public static <T extends TileEntity> void createTileEntity(String name, Class<T> clazz, Block... blocks){
-		teRegistry.put(name, TileEntityType.Builder.create(() -> {
+	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz, Block... blocks){
+		teRegistry.put(name, BlockEntityType.Builder.of((pos, state) -> {
+
 			T inst;
 			try {
-				inst = clazz.newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
+				inst = clazz.getConstructor(BlockPos.class, BlockState.class).newInstance(pos, state);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				inst = null;
 				e.printStackTrace();
 			}
@@ -854,12 +893,12 @@ public class Registry {
 	
 	}
 	
-	public static <T extends TileEntity> void createTileEntity(String name, Class<T> clazz) {
-		createTileEntity(name, clazz, Registry.getBlock(name));
+	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz) {
+		createBlockEntity(name, clazz, Registry.getBlock(name));
 	}
 	
 	//CONTAINERS, CONTAINER IDS, SCREENS
-	public static ContainerType<?> getContainerType(String name){
+	public static MenuType<?> getContainerType(String name){
 		return containerRegistry.get(name);
 	}
 	
@@ -867,13 +906,13 @@ public class Registry {
 		return containerIdRegistry.get(containerRegistry.get(name));
 	}
 	
-	public static <T extends Container> void createContainer(String name, int id, Class<T> clazz) {
+	public static <T extends AbstractContainerMenu> void createContainer(String name, int id, Class<T> clazz) {
 		containerRegistry.put(name, IForgeContainerType.create(new IContainerFactory<T>() {
 
 			@Override
-			public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
+			public T create(int windowId, Inventory inv, FriendlyByteBuf data) {
 				try {
-					return clazz.getConstructor(int.class, PlayerInventory.class, PacketBuffer.class).newInstance(windowId, inv, data);
+					return clazz.getConstructor(int.class, Inventory.class, FriendlyByteBuf.class).newInstance(windowId, inv, data);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					e.printStackTrace();
@@ -887,13 +926,13 @@ public class Registry {
 	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
 	//Use carefully! Unchecked
-	public static <T extends Container, X extends Screen & IHasContainer<T>> void registerScreen(String name, Class<T> ctc, Class<X> scc) {
-		ScreenManager.registerFactory((ContainerType<T>) getContainerType(name), new IScreenFactory<T, X>() {
+	public static <T extends AbstractContainerMenu, X extends Screen & MenuAccess<T>> void registerScreen(String name, Class<T> ctc, Class<X> scc) {
+		MenuScreens.register((MenuType<T>) getContainerType(name), new MenuScreens.ScreenConstructor<T, X>() {
 
 			@Override
-			public X create(T p_create_1_, PlayerInventory p_create_2_, ITextComponent p_create_3_) {
+			public X create(T p_create_1_, Inventory p_create_2_, Component p_create_3_) {
 				try {
-					return scc.getConstructor(ctc, PlayerInventory.class, ITextComponent.class).newInstance(p_create_1_, p_create_2_, p_create_3_);
+					return scc.getConstructor(ctc, Inventory.class, Component.class).newInstance(p_create_1_, p_create_2_, p_create_3_);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					e.printStackTrace();

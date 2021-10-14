@@ -4,6 +4,6 @@
 		"item": "minecraft:popped_chorus_fruit"
 	},
 	"amount": 6,
-	"enchantment": "minecraft:protection",
+	"enchantment": "minecraft:unbreaking",
 	"cost": 100
 }

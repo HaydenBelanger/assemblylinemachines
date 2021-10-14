@@ -22,7 +22,7 @@
 			"tag": "assemblylinemachines:crafting/gears/precious"
 		},
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		}
 	},
 	"result":{

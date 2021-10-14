@@ -2,51 +2,45 @@ package me.haydenb.assemblylinemachines.block.machines.crank;
 
 import com.mojang.datafixers.util.Pair;
 
+import me.haydenb.assemblylinemachines.block.helpers.*;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
+import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> implements ICrankableBlock{
+public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> implements ICrankableBlock{
 	
 
 	public BlockSimpleGrinder() {
-		super(Block.Properties.create(Material.IRON).hardnessAndResistance(4f, 15f).harvestLevel(0)
-				.harvestTool(ToolType.PICKAXE).sound(SoundType.METAL), "simple_grinder", TESimpleGrinder.class);
-		this.setDefaultState(this.stateContainer.getBaseState().with(StateProperties.MACHINE_ACTIVE, false).with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH));
+		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_grinder", TESimpleGrinder.class);
+		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -55,14 +49,14 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalBlock.HORIZONTAL_FACING);
+		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
@@ -70,7 +64,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		return false;
 	}
 	
-	public static class TESimpleGrinder extends SimpleMachine<ContainerSimpleGrinder> implements ITickableTileEntity, ICrankableMachine{
+	public static class TESimpleGrinder extends SimpleMachine<ContainerSimpleGrinder> implements ALMTicker<TESimpleGrinder>, ICrankableMachine{
 		
 		public int timer;
 		public int cranks;
@@ -83,12 +77,12 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		public ItemStack isb = null;
 		
 		
-		public TESimpleGrinder(final TileEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn, 2, new TranslationTextComponent(Registry.getBlock("simple_grinder").getTranslationKey()), Registry.getContainerId("simple_grinder"), ContainerSimpleGrinder.class);
+		public TESimpleGrinder(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 2, new TranslatableComponent(Registry.getBlock("simple_grinder").getDescriptionId()), Registry.getContainerId("simple_grinder"), ContainerSimpleGrinder.class, pos, state);
 		}
 		
-		public TESimpleGrinder() {
-			this(Registry.getTileEntity("simple_grinder"));
+		public TESimpleGrinder(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("simple_grinder"), pos, state);
 		}
 
 		@Override
@@ -109,14 +103,14 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		public void tick() {
 			
 			if(timer++ == 20) {
-				if(!world.isRemote) {
+				if(!level.isClientSide) {
 					timer = 0;
 					if(output != null) {
 						boolean sendupdate = false;
 						boolean end = false;
 						if(pendingOutput) {
-							Direction opdr = getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).rotateYCCW();
-							TileEntity te = world.getTileEntity(pos.offset(opdr));
+							Direction opdr = getBlockState().getValue(HorizontalDirectionalBlock.FACING).getCounterClockWise();
+							BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(opdr));
 							if(te != null) {
 								LazyOptional<IItemHandler> h = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opdr.getOpposite());
 								IItemHandler handler = h.orElse(null);
@@ -130,7 +124,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 											pendingOutput = false;
 											sendupdate = true;
 											end = true;
-											world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, false));
+											this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 											break;
 										}
 									}
@@ -144,12 +138,12 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 									sendupdate = true;
 								}
 								ItemStack isa = contents.get(0);
-								if(isa.isDamageable() && isa.getItem() instanceof ItemGrindingBlade) {
+								if(isa.isDamageableItem() && isa.getItem() instanceof ItemGrindingBlade) {
 									
 									if(General.RAND.nextInt(3) == 0) {
-										isa.setDamage(isa.getDamage() + 1);
+										isa.setDamageValue(isa.getDamageValue() + 1);
 									}
-									if(isa.getDamage() >= isa.getMaxDamage()) {
+									if(isa.getDamageValue() >= isa.getMaxDamage()) {
 										contents.set(0, ItemStack.EMPTY);
 									}
 									progress++;
@@ -158,8 +152,8 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 							}
 						}
 						
-						if(end == false && getBlockState().get(StateProperties.MACHINE_ACTIVE) == false) {
-							world.setBlockState(pos, getBlockState().with(StateProperties.MACHINE_ACTIVE, true));
+						if(end == false && getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 							sendupdate = true;
 						}
 						if(sendupdate) {
@@ -174,13 +168,13 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 							isb = contents.get(1);
 							if(isa.getItem() instanceof ItemGrindingBlade) {
 								ItemGrindingBlade igb = (ItemGrindingBlade) isa.getItem();
-								GrinderCrafting crafting = world.getRecipeManager().getRecipe(GrinderCrafting.GRINDER_RECIPE, this, world).orElse(null);
+								GrinderCrafting crafting = this.getLevel().getRecipeManager().getRecipeFor(GrinderCrafting.GRINDER_RECIPE, this, this.getLevel()).orElse(null);
 								if(crafting != null) {
 									if(igb.blade.tier >= crafting.getBlade().tier) {
 										isb.shrink(1);
 										isb = null;
 										isa = null;
-										output = crafting.getRecipeOutput().copy();
+										output = crafting.getResultItem().copy();
 										cycles = crafting.getGrinds() * 2;
 										progress = 0;
 										pendingOutput = false;
@@ -198,21 +192,21 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
+		public CompoundTag save(CompoundTag compound) {
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			compound.putBoolean("assemblylinemachines:pendingoutput", pendingOutput);
 			if(output != null) {
-				CompoundNBT sub = new CompoundNBT();
-				output.write(sub);
+				CompoundTag sub = new CompoundTag();
+				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.write(compound);
+			return super.save(compound);
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			if(compound.contains("assemblylinemachines:cycles")) {
 				cycles = compound.getFloat("assemblylinemachines:cycles");
 			}
@@ -223,7 +217,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 				pendingOutput = compound.getBoolean("assemblylinemachines:pendingoutput");
 			}
 			if(compound.contains("assemblylinemachines:output")) {
-				output = ItemStack.read(compound.getCompound("assemblylinemachines:output"));
+				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
 
 		}
@@ -247,7 +241,7 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
-		public ContainerSimpleGrinder(final int windowId, final PlayerInventory playerInventory, final TESimpleGrinder tileEntity) {
+		public ContainerSimpleGrinder(final int windowId, final Inventory playerInventory, final TESimpleGrinder tileEntity) {
 			super(Registry.getContainerType("simple_grinder"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0);
 			
 			
@@ -256,8 +250,8 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		}
 		
 		
-		public ContainerSimpleGrinder(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
-			this(windowId, playerInventory, General.getTileEntity(playerInventory, data, TESimpleGrinder.class));
+		public ContainerSimpleGrinder(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
+			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TESimpleGrinder.class));
 		}
 		
 		
@@ -269,8 +263,8 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		
 		TESimpleGrinder tsfm;
 		
-		public ScreenSimpleGrinder(ContainerSimpleGrinder screenContainer, PlayerInventory inv,
-				ITextComponent titleIn) {
+		public ScreenSimpleGrinder(ContainerSimpleGrinder screenContainer, Inventory inv,
+				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "simple_grinder", true);
 			tsfm = screenContainer.tileEntity;
 		}
@@ -278,8 +272,8 @@ public class BlockSimpleGrinder extends BlockScreenTileEntity<TESimpleGrinder> i
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			int x = (this.width - this.xSize) / 2;
-			int y = (this.height - this.ySize) / 2;
+			int x = (this.width - this.imageWidth) / 2;
+			int y = (this.height - this.imageHeight) / 2;
 			int prog = Math.round((tsfm.progress/tsfm.cycles) * 24f);
 			super.blit(x+73, y+19 + (24 - prog), 176, (24 - prog), 20, prog);
 		}

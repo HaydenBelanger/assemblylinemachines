@@ -4,12 +4,14 @@ import java.util.HashMap;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemMobCrystal extends Item{
@@ -38,8 +40,7 @@ public class ItemMobCrystal extends Item{
 		MOB_COLORS.put(EntityType.SKELETON_HORSE, 0xbfbfbf);
 		MOB_COLORS.put(EntityType.SNOW_GOLEM, 0xffb114);
 		MOB_COLORS.put(EntityType.SQUID, 0x555361);
-		//STRIDER
-		MOB_COLORS.put(EntityType.field_233589_aE_, 0x5c2525);
+		MOB_COLORS.put(EntityType.STRIDER, 0x5c2525);
 		MOB_COLORS.put(EntityType.TROPICAL_FISH, 0x00c6c9);
 		MOB_COLORS.put(EntityType.TURTLE, 0x0b6b1a);
 		MOB_COLORS.put(EntityType.VILLAGER, 0xa37c5f);
@@ -53,11 +54,10 @@ public class ItemMobCrystal extends Item{
 		MOB_COLORS.put(EntityType.WOLF, 0xb5b5b5);
 		MOB_COLORS.put(EntityType.CAVE_SPIDER, 0x8583a8);
 		MOB_COLORS.put(EntityType.ENDERMAN, 0x000000);
-		//PIGLIN
-		MOB_COLORS.put(EntityType.field_233591_ai_, 0x755769);
+		MOB_COLORS.put(EntityType.PIGLIN, 0x755769);
+		MOB_COLORS.put(EntityType.PIGLIN_BRUTE, 0x5c4553);
 		MOB_COLORS.put(EntityType.SPIDER, 0x524948);
-		//ZOMBIFIED PIGLIN
-		MOB_COLORS.put(EntityType.field_233592_ba_, 0x5d695f);
+		MOB_COLORS.put(EntityType.ZOMBIFIED_PIGLIN, 0x5d695f);
 		MOB_COLORS.put(EntityType.BLAZE, 0xd9a352);
 		MOB_COLORS.put(EntityType.CREEPER, 0x37ff00);
 		MOB_COLORS.put(EntityType.DROWNED, 0x768a94);
@@ -66,8 +66,7 @@ public class ItemMobCrystal extends Item{
 		MOB_COLORS.put(EntityType.EVOKER, 0x666666);
 		MOB_COLORS.put(EntityType.GHAST, 0xd9d9d9);
 		MOB_COLORS.put(EntityType.GUARDIAN, 0x8ca398);
-		//HOGLIN
-		MOB_COLORS.put(EntityType.field_233588_G_, 0x9e8373);
+		MOB_COLORS.put(EntityType.HOGLIN, 0x9e8373);
 		MOB_COLORS.put(EntityType.HUSK, 0x9e928b);
 		MOB_COLORS.put(EntityType.MAGMA_CUBE, 0x574545);
 		MOB_COLORS.put(EntityType.PHANTOM, 0x34526e);
@@ -82,41 +81,45 @@ public class ItemMobCrystal extends Item{
 		MOB_COLORS.put(EntityType.VINDICATOR, 0x666666);
 		MOB_COLORS.put(EntityType.WITCH, 0x4f3861);
 		MOB_COLORS.put(EntityType.WITHER_SKELETON, 0x3b3b3b);
-		//ZOGLIN
-		MOB_COLORS.put(EntityType.field_233590_aW_, 0x444a40);
+		MOB_COLORS.put(EntityType.ZOGLIN, 0x444a40);
 		MOB_COLORS.put(EntityType.ZOMBIE, 0x5b7848);
 		MOB_COLORS.put(EntityType.ZOMBIE_VILLAGER, 0x5b7848);
 		MOB_COLORS.put(EntityType.ENDER_DRAGON, 0x9500b3);
 		MOB_COLORS.put(EntityType.WITHER, 0x282529);
+		MOB_COLORS.put(EntityType.GLOW_SQUID, 0x16979c);
+		MOB_COLORS.put(EntityType.AXOLOTL, 0xb2d5d6);
+		MOB_COLORS.put(EntityType.GOAT, 0xe8ebeb);
+		//MOB_COLORS.put(EntityType.WARDEN, null);
 		
 	}
 	
-	private static final String TRANSLATION_TAG = Util.makeTranslationKey("item", new ResourceLocation(AssemblyLineMachines.MODID, "mob_crystal_tuned"));
+	private static final String TRANSLATION_TAG = Util.makeDescriptionId("item", new ResourceLocation(AssemblyLineMachines.MODID, "mob_crystal_tuned"));
+	
 	public ItemMobCrystal() {
-		super(new Item.Properties().group(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.creativeTab));
 		
 		
 	}
 	
 	@Override
-	public ITextComponent getDisplayName(ItemStack stack) {
+	public Component getName(ItemStack stack) {
 		
 		if(stack.hasTag()) {
 			
 			EntityType<?> entity = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(stack.getTag().getString("assemblylinemachines:mob")));
 			if(entity != null) {
-				return new TranslationTextComponent(TRANSLATION_TAG, entity.getName().func_230532_e_().func_240699_a_(TextFormatting.AQUA));
+				return new TranslatableComponent(TRANSLATION_TAG, entity.getDescription().copy().withStyle(ChatFormatting.AQUA));
 			}
 			
 		}
-		return super.getDisplayName(stack);
+		return super.getName(stack);
 	}
 	
 	@Override
-	public boolean hasEffect(ItemStack stack) {
+	public boolean isFoil(ItemStack stack) {
 		if(stack.hasTag()) {
 			return true;
 		}
-		return super.hasEffect(stack);
+		return super.isFoil(stack);
 	}
 }

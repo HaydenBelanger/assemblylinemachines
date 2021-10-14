@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"s":{
-			"item": "assemblylinemachines:steel_plate"
+			"tag": "forge:plates/steel"
 		},
 		"r":{
-			"item": "assemblylinemachines:steel_rod"
+			"tag": "forge:rods/steel"
 		},
 		"g":{
-			"item": "minecraft:glass_pane"
+			"tag": "forge:glass_panes"
 		}
 	},
 	"result":{

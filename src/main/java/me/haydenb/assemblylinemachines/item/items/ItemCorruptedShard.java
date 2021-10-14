@@ -3,45 +3,46 @@ package me.haydenb.assemblylinemachines.item.items;
 import me.haydenb.assemblylinemachines.item.categories.IGearboxFuel;
 import me.haydenb.assemblylinemachines.item.categories.ItemBasicFormattedName;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public class ItemCorruptedShard extends ItemBasicFormattedName implements IGearboxFuel{
 
 	public ItemCorruptedShard() {
-		super(TextFormatting.OBFUSCATED);
+		super(ChatFormatting.OBFUSCATED);
 	}
 	
 	
 	@Override
-	public ITextComponent getDisplayName(ItemStack stack) {
+	public Component getName(ItemStack stack) {
 		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:internalitem")) {
-			ItemStack intStack = ItemStack.read(stack.getTag().getCompound("assemblylinemachines:internalitem"));
-			return intStack.getDisplayName().func_230532_e_().func_240701_a_(formats);
+			ItemStack intStack = ItemStack.of(stack.getTag().getCompound("assemblylinemachines:internalitem"));
+			return intStack.getDisplayName().copy().withStyle(formats);
 		}else {
-			return super.getDisplayName(stack);
+			return super.getName(stack);
 		}
 	}
 	
 	@Override
-	public int getBurnTime(ItemStack itemStack) {
+	public int getBurnTime(ItemStack itemStack, RecipeType<?> type) {
 		return 9600;
 	}
 
 
 	@Override
 	public int getGearboxBurnTime(ItemStack stack) {
-		return this.getBurnTime(stack);
+		return this.getBurnTime(stack, null);
 	}
 	
 	public static ItemStack corruptItem(ItemStack orig) {
 		if(orig.getItem() != Registry.getItem("corrupted_shard")) {
-			CompoundNBT main = new CompoundNBT();
-			CompoundNBT sub = new CompoundNBT();
+			CompoundTag main = new CompoundTag();
+			CompoundTag sub = new CompoundTag();
 			
-			new ItemStack(orig.getItem(), 1).write(sub);
+			new ItemStack(orig.getItem(), 1).save(sub);
 			main.put("assemblylinemachines:internalitem", sub);
 			
 			orig = new ItemStack(Registry.getItem("corrupted_shard"), orig.getCount());

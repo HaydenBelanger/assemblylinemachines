@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"r":{
-			"item": "assemblylinemachines:mystium_plate"
+			"tag": "forge:plates/mystium"
 		},
 		"g":{
 			"tag": "forge:glass_panes"

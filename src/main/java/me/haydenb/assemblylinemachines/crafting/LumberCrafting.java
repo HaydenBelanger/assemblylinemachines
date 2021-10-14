@@ -5,18 +5,20 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockLumberMill.TELumberMill;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.*;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class LumberCrafting implements IRecipe<IInventory>{
+public class LumberCrafting implements Recipe<Container>{
 
 	
-	public static final IRecipeType<LumberCrafting> LUMBER_RECIPE = new TypeLumberCrafting();
+	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new TypeLumberCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	private final Ingredient input;
@@ -35,10 +37,10 @@ public class LumberCrafting implements IRecipe<IInventory>{
 		this.time = time;
 	}
 	@Override
-	public boolean matches(IInventory inv, World worldIn) {
+	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
 			if(inv instanceof TELumberMill) {
-				if(input.test(inv.getStackInSlot(2))) {
+				if(input.test(inv.getItem(2))) {
 					return true;
 				}
 			}
@@ -50,17 +52,17 @@ public class LumberCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(IInventory inv) {
+	public ItemStack assemble(Container inv) {
 		return this.outputa.copy();
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return false;
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return outputa;
 	}
 	
@@ -77,7 +79,7 @@ public class LumberCrafting implements IRecipe<IInventory>{
 	}
 	
 	@Override
-	public boolean isDynamic() {
+	public boolean isSpecial() {
 		return true;
 	}
 	
@@ -91,7 +93,7 @@ public class LumberCrafting implements IRecipe<IInventory>{
 	public NonNullList<Ingredient> getIngredientsJEIFormatted() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(input);
-		nnl.add(Ingredient.fromItems(Registry.getItem("lumber_mill")));
+		nnl.add(Ingredient.of(Registry.getItem("lumber_mill")));
 		return nnl;
 	}
 
@@ -101,29 +103,29 @@ public class LumberCrafting implements IRecipe<IInventory>{
 	}
 
 	@Override
-	public IRecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public IRecipeType<?> getType() {
+	public RecipeType<?> getType() {
 		return LUMBER_RECIPE;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<LumberCrafting>{
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<LumberCrafting>{
 
 		@Override
-		public LumberCrafting read(ResourceLocation recipeId, JsonObject json) {
+		public LumberCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient input = Ingredient.deserialize(JSONUtils.getJsonObject(json, "input"));
-				final ItemStack output = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "output"));
+				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				ItemStack outputb = ItemStack.EMPTY;
 				float opbchance = 0f;
-				if(JSONUtils.hasField(json, "secondaryoutput")) {
-					outputb = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "secondaryoutput"));
-					opbchance = JSONUtils.getFloat(json, "opbchance");
+				if(GsonHelper.isValidNode(json, "secondaryoutput")) {
+					outputb = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "secondaryoutput"));
+					opbchance = GsonHelper.getAsFloat(json, "opbchance");
 				}
-				final int time = JSONUtils.getInt(json, "time");
+				final int time = GsonHelper.getAsInt(json, "time");
 				
 				return new LumberCrafting(recipeId, input, output, outputb, opbchance, time);
 			}catch(Exception e) {
@@ -136,10 +138,10 @@ public class LumberCrafting implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public LumberCrafting read(ResourceLocation recipeId, PacketBuffer buffer) {
-			final Ingredient input = Ingredient.read(buffer);
-			final ItemStack output = buffer.readItemStack();
-			final ItemStack opb = buffer.readItemStack();
+		public LumberCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+			final Ingredient input = Ingredient.fromNetwork(buffer);
+			final ItemStack output = buffer.readItem();
+			final ItemStack opb = buffer.readItem();
 			final float opbc = buffer.readFloat();
 			final int time = buffer.readInt();
 			
@@ -147,10 +149,10 @@ public class LumberCrafting implements IRecipe<IInventory>{
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, LumberCrafting recipe) {
-			recipe.input.write(buffer);
-			buffer.writeItemStack(recipe.outputa);
-			buffer.writeItemStack(recipe.outputb);
+		public void toNetwork(FriendlyByteBuf buffer, LumberCrafting recipe) {
+			recipe.input.toNetwork(buffer);
+			buffer.writeItem(recipe.outputa);
+			buffer.writeItem(recipe.outputb);
 			buffer.writeFloat(recipe.opbchance);
 			buffer.writeInt(recipe.time);
 			
@@ -158,7 +160,7 @@ public class LumberCrafting implements IRecipe<IInventory>{
 		
 	}
 	
-	public static class TypeLumberCrafting implements IRecipeType<LumberCrafting>{
+	public static class TypeLumberCrafting implements RecipeType<LumberCrafting>{
 		
 		@Override
 		public String toString() {

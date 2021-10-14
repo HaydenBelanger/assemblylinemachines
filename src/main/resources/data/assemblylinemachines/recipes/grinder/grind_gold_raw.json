@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:raw_gold"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_gold"
+	},
+	"grinds": 3,
+	"bladetype": "TITANIUM"
+}
