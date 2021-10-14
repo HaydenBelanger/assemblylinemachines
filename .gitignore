@@ -16,8 +16,8 @@ out
 # gradle
 build
 .gradle
-src/generated/resources/.cache
-src/test
+/src/generated/resources/.cache
+/src/test
 
 # other
 eclipse
