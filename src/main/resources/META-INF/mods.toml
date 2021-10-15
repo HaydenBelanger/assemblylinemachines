@@ -8,7 +8,7 @@ license="AGPL-3.0 License"
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[31,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+loaderVersion="[36.2.0,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 # A URL to refer people to when problems occur with this mod
 #issueTrackerURL="http://my.issue.tracker/" #optional
 # A list of mods - how many allowed here is determined by the individual mod loader
@@ -16,19 +16,19 @@ loaderVersion="[31,)" #mandatory This is typically bumped every Minecraft versio
 # The modid of the mod
 modId="assemblylinemachines" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="1.16.4-1.1.1" #mandatory
+version="1.16.5-1.1.2" #mandatory
  # A display name for the mod
 displayName="Assembly Line Machines" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
-#updateJSONURL="http://myurl.me/" #optional
+updateJSONURL="https://raw.githubusercontent.com/HaydenBelanger/assembly_line_machines/1.17.1-dev/updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
-displayURL="https://github.com/HaydenBelanger/assembly_line_machines" #optional
+#displayURL="https://github.com/HaydenBelanger/assembly_line_machines" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="logo.png" #optional
 # A text field displayed in the mod UI
-credits="Huge thanks to NinjaKittens, also known as Dax Flame, for texturing and modelling." #optional
+#credits="Huge thanks to NinjaKittens, also known as Dax Flame, for texturing and modelling." #optional
 # A text field displayed in the mod UI
-authors="Haydenman2" #optional
+authors="Haydenman2 (Hayden) & NinjaKittens (Dax Flame)" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
 This mod adds many machines to the game, many of which centered around creating and operating a factory.

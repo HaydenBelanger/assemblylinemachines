@@ -117,8 +117,8 @@ public class BlockExperienceHopper extends BlockTileEntity {
 		}
 		
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void read(BlockState p_230337_1_, CompoundNBT compound) {
+			super.read(p_230337_1_, compound);
 			
 			internalStoredXp = compound.getInt("assemblylinemachines:internalxp");
 		}
@@ -166,7 +166,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 						
 						for(ExperienceOrbEntity entity : el) {
 							internalStoredXp += (entity.getXpValue() * 15);
-							spawnTeleparticles(entity.getPosX(), entity.getPosY(), entity.getPosZ(), world.getChunkAt(entity.func_233580_cy_()));
+							spawnTeleparticles(entity.getPosX(), entity.getPosY(), entity.getPosZ(), world.getChunkAt(entity.getPosition()));
 							sendUpdates = true;
 							entity.remove();
 							if(internalStoredXp > 1000) {

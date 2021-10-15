@@ -168,7 +168,7 @@ public abstract class AbstractSidedMachine<A extends Container> extends EnergyMa
 		
 		private void recalcBattery(){
 			
-			if(sided.getBlockState().func_235901_b_(StateProperties.BATTERY_PERCENT_STATE)) {
+			if(sided.getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
 				int fx = (int) Math.floor(((double) sided.amount / (double) sided.properties.getCapacity()) * 4d);
 				if(sided.getBlockState().get(StateProperties.BATTERY_PERCENT_STATE) != fx) {
 					sided.world.setBlockState(sided.pos, sided.getBlockState().with(StateProperties.BATTERY_PERCENT_STATE, fx));

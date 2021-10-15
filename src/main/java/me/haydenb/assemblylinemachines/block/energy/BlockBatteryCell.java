@@ -390,12 +390,12 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 			}), new SupplierWrapper("Auto-Input Enabled", "Auto-Output Enabled",
 					() -> tsfm.autoIn)));
 			b.put("prioritydown", new Pair<>(new SimpleButton(x + 95, y + 38, "Decrease Automatic Throughput", (button) -> {
-				Screen.func_231172_r_();
-				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.func_231173_s_(), Screen.func_231172_r_());
+				Screen.hasControlDown();
+				sendCellUpdatePacket(tsfm.getPos(), "feptdown", Screen.hasShiftDown(), Screen.hasControlDown());
 
 			}), null));
 			b.put("priorityup", new Pair<>(new SimpleButton(x + 143, y + 38, "Increase Automatic Throughput", (button) -> {
-				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.func_231173_s_(), Screen.func_231172_r_());
+				sendCellUpdatePacket(tsfm.getPos(), "feptup", Screen.hasShiftDown(), Screen.hasControlDown());
 
 			}), null));
 			
@@ -415,7 +415,7 @@ public class BlockBatteryCell extends BlockScreenTileEntity<BlockBatteryCell.TEB
 					if (bb.getSecond() != null) {
 						this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 					} else {
-						this.renderTooltip(bb.getFirst().func_230458_i_().getString(), mouseX - x, mouseY - y);
+						this.renderTooltip(bb.getFirst().getMessage().toString(), mouseX - x, mouseY - y);
 					}
 
 					break;

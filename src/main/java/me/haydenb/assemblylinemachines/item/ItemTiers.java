@@ -9,10 +9,7 @@ import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.IItemTier;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.LazyValue;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 
 
 public enum ItemTiers {
@@ -59,7 +56,7 @@ public enum ItemTiers {
 		}
 
 		@Override
-		public float func_230304_f_() {
+		public float getKnockbackResistance() {
 			return baseTier.armorKnockbackResistance;
 		}
 

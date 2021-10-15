@@ -25,7 +25,7 @@ public class EntityCorruptShell extends ZombieEntity{
 	}
 
 	public static AttributeModifierMap.MutableAttribute registerAttributeMap(){
-		return MonsterEntity.func_234295_eP_().func_233815_a_(Attributes.field_233818_a_, 32d).func_233815_a_(Attributes.field_233819_b_, 40d).func_233815_a_(Attributes.field_233821_d_, 0.38d).func_233815_a_(Attributes.field_233823_f_, 4.5d).func_233815_a_(Attributes.field_233829_l_, 1d);
+		return MonsterEntity.func_234295_eP_().createMutableAttribute(Attributes.MAX_HEALTH, 32d).createMutableAttribute(Attributes.FOLLOW_RANGE, 40d).createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.38d).createMutableAttribute(Attributes.ATTACK_DAMAGE, 4.5d).createMutableAttribute(Attributes.ZOMBIE_SPAWN_REINFORCEMENTS, 1d);
 	}
 	
 	@Override

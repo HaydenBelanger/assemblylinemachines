@@ -26,7 +26,7 @@ public class FluidLevelManager {
 
 	public static void readData(ChunkPos pos, IWorld world, CompoundNBT nbt) {
 
-		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), pos.x, pos.z);
+		ChunkCoords cc = new ChunkCoords(world.getDimensionType().getLogicalHeight(), pos.x, pos.z);
 
 		if (nbt.contains("assemblylinemachines:chunkfluid")) {
 
@@ -35,7 +35,7 @@ public class FluidLevelManager {
 	}
 
 	public static void writeData(IChunk chunk, IWorld world, CompoundNBT nbt) {
-		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), chunk.getPos().x, chunk.getPos().z);
+		ChunkCoords cc = new ChunkCoords(world.getDimensionType().getLogicalHeight(), chunk.getPos().x, chunk.getPos().z);
 		if (CHUNK_FLUIDS.containsKey(cc)) {
 
 			CompoundNBT sub = new CompoundNBT();
@@ -46,27 +46,27 @@ public class FluidLevelManager {
 	}
 
 	public static void clearData(IWorld world, ChunkPos pos) {
-		int dimid = world.func_230315_m_().func_241513_m_();
+		int dimid = world.getDimensionType().getLogicalHeight();
 		CHUNK_FLUIDS.remove(new ChunkCoords(dimid, pos.x, pos.z));
 	}
 
 	public static FluidStack getOrCreateFluidStack(BlockPos pos, World world) {
 
 		ChunkPos chunkpos = world.getChunk(pos).getPos();
-		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), chunkpos.x, chunkpos.z);
+		ChunkCoords cc = new ChunkCoords(world.getDimensionType().getLogicalHeight(), chunkpos.x, chunkpos.z);
 		FluidStack fs = CHUNK_FLUIDS.get(cc);
 		if (fs == null) {
 
 			List<FluidInGroundRecipe> recipes = world.getRecipeManager().getRecipes(FluidInGroundRecipe.FIG_RECIPE, null, world);
 			
 			float tc = world.getBiome(pos).getTemperature(pos);
-			DimensionType dc = world.func_230315_m_();
+			DimensionType dc = world.getDimensionType();
 			for (FluidInGroundRecipe recipe : recipes) {
 
 				int chance = recipe.getChance();
 				boolean half = false;
 
-				if (dc.func_242725_p().equals(DimensionType.field_242710_a)) {
+				if (dc.effects.equals(DimensionType.OVERWORLD_ID)) {
 
 					if (recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ANY && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYCOLD
 							&& recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYHOT && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_PREFCOLD
@@ -82,11 +82,11 @@ public class FluidLevelManager {
 						chance = Math.round((float) chance / 2f);
 						half = true;
 					}
-				}else if(dc.func_242725_p().equals(DimensionType.field_242711_b)) {
+				}else if(dc.effects.equals(DimensionType.THE_NETHER_ID)) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.NETHER) {
 						chance = -1;
 					}
-				}else if(dc.func_242725_p().equals(DimensionType.field_242712_c)) {
+				}else if(dc.effects.equals(DimensionType.THE_END_ID)) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.END) {
 						chance = -1;
 					}
@@ -146,7 +146,7 @@ public class FluidLevelManager {
 		}
 
 		ChunkPos chunkpos = world.getChunk(pos).getPos();
-		ChunkCoords cc = new ChunkCoords(world.func_230315_m_().func_241513_m_(), chunkpos.x, chunkpos.z);
+		ChunkCoords cc = new ChunkCoords(world.getDimensionType().getLogicalHeight(), chunkpos.x, chunkpos.z);
 
 		Fluid f = fs.getFluid();
 		if (fs.getAmount() <= amt) {

@@ -69,7 +69,7 @@ public class FluidNaphtha extends ALMFluid {
 	public static class FluidNaphthaBlock extends ALMFluidBlock {
 
 		public FluidNaphthaBlock() {
-			super("naphtha", ALMFluid.NAPHTHA, Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).func_235838_a_((state) -> 11).noDrops());
+			super("naphtha", ALMFluid.NAPHTHA, Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).setLightLevel((state) -> 11).noDrops());
 		}
 		
 		@Override

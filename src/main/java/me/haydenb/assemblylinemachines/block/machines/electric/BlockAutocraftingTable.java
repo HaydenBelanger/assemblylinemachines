@@ -727,7 +727,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 			}
 			
 			@Override
-			protected boolean func_230987_a_(int p_230987_1_) {
+			protected boolean isValidClickButton(int p_230987_1_) {
 				return isEnabledSlot();
 			}
 			
@@ -763,7 +763,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
 				if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
 
-					if(Screen.func_231173_s_()) {
+					if(Screen.hasShiftDown()) {
 						ArrayList<String> str = new ArrayList<>();
 						str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.getCapacity()) + "FE");
 						if(usesfept) {
@@ -789,7 +789,7 @@ public class BlockAutocraftingTable extends BlockScreenTileEntity<BlockAutocraft
 						if (bb.getSecond() != null) {
 							this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 						} else {
-							this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);
+							this.renderTooltip(bb.getFirst().getMessage().toString(), mouseX - x, mouseY - y);
 						}
 					}
 					

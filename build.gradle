@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.4-1.1.1'
+version = '1.16.5-1.1.2'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -22,10 +22,13 @@ compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'snapshot', version: '20200514-1.16'
+accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    mappings channel: 'snapshot', version: '20210309-1.16.5'
     runs {
         client {
             workingDirectory project.file('run')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -81,7 +84,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.1.11'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.0'
     
 	repositories{
         maven {
@@ -116,8 +119,8 @@ dependencies {
  	runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44")
  	
  	//PATCHOULI
- 	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-48")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-48")
+ 	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
     
 	//MEKANISM
 	compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")

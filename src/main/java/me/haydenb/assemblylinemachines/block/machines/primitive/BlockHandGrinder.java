@@ -8,31 +8,20 @@ import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -212,8 +201,8 @@ public class BlockHandGrinder extends Block {
 		}
 		
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void read(BlockState p_230337_1_, CompoundNBT compound) {
+			super.read(p_230337_1_, compound);
 			
 			if(compound.contains("assemblylinemachines:blade")) {
 				blade = ItemStack.read(compound.getCompound("assemblylinemachines:blade"));
@@ -264,7 +253,7 @@ public class BlockHandGrinder extends Block {
 		}
 
 		@Override
-		public String func_176610_l() {
+		public String getString() {
 			return toString().toLowerCase();
 		}
 	}

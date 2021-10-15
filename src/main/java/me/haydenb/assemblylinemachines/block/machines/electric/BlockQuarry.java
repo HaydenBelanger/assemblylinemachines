@@ -239,13 +239,13 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 									
 									
 									if(serverWorld == null) {
-										serverWorld = world.getServer().getWorld(world.func_234923_W_());
+										serverWorld = world.getServer().getWorld(world.getDimensionKey());
 									}
 									
 									ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
 									pick.addEnchantment(Enchantments.FORTUNE, fortune);
 									
-									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.field_237457_g_, new Vector3d(mpos.getX(), mpos.getY(), mpos.getZ())));
+									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.ORIGIN, new Vector3d(mpos.getX(), mpos.getY(), mpos.getZ())));
 									
 									for(ItemStack stack : stackList) {
 										pending = General.attemptDepositIntoAllSlots(stack, handler);
@@ -461,8 +461,8 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 				for(SimpleButton b : buttons) {
 					
 					if(mouseX >= b.getX() && mouseX <= b.getX() + 8 && mouseY >= b.getY() && mouseY <= b.getY() + 8) {
-						if(!b.getMessage().trim().equals("")) {
-							this.renderTooltip(b.getMessage(), mouseX - x, mouseY - y);
+						if(!b.getMessage().toString().trim().equals("")) {
+							this.renderTooltip(b.getMessage().toString(), mouseX - x, mouseY - y);
 						}else {
 							if(tsfm.right == true) {
 								this.renderTooltip("Change to Left-Oriented", mouseX - x, mouseY - y);
@@ -524,7 +524,7 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 		}
 		
 		@Override
-		protected boolean func_230987_a_(int p_230987_1_) {
+		protected boolean isValidClickButton(int p_230987_1_) {
 			return te.min == null || te.max == null;
 		}
 		

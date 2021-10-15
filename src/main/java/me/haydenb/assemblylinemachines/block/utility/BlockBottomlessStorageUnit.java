@@ -86,7 +86,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 				
 				CompoundNBT nbt = stack.getTag();
 				if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem")) {
-					tooltip.add(1, new StringTextComponent("This BSU has items stored inside!").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+					tooltip.add(1, new StringTextComponent("This BSU has items stored inside!").deepCopy().mergeStyle(TextFormatting.GREEN));
 				}
 				
 			}
@@ -350,7 +350,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
 			if(tsfm.storedItem != null){
-				String n = tsfm.storedItem.getName().func_230532_e_().getString();
+				String n = tsfm.storedItem.getName().deepCopy().getString();
 				
 				if(n.length() > 30) {
 					n = n.substring(0, 30) + "...";
@@ -375,7 +375,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 			int y = (this.height - this.ySize) / 2;
 			if (tsfm.storedItem != null) {
 
-				this.field_230707_j_.renderItemIntoGUI(tsfm.storedItem.getDefaultInstance(), (x + 17), (y + 60));
+				this.itemRenderer.renderItemIntoGUI(tsfm.storedItem.getDefaultInstance(), (x + 17), (y + 60));
 				if (tsfm.internalStored < 10000) {
 					
 					MathHelper.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, Formatting.GENERAL_FORMAT.format(tsfm.internalStored));

@@ -58,7 +58,7 @@ public class StateProperties {
 		}
 		
 		@Override
-		public String func_176610_l() {
+		public String getString() {
 			return toString().toLowerCase();
 		}
 		

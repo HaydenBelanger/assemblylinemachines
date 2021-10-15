@@ -85,7 +85,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	//Called from Registry
 	@OnlyIn(Dist.CLIENT)
 	public void connectItemProperties() {
-		ItemModelsProperties.func_239418_a_(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
+		ItemModelsProperties.registerProperty(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
 			
 			@Override
 			public float call(ItemStack stack, ClientWorld cliWorld, LivingEntity entity) {
@@ -166,7 +166,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				
 				ServerWorld sw = null;
 				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.func_234923_W_());
+					sw = world.getServer().getWorld(world.getDimensionKey());
 				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
@@ -204,7 +204,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				int cost = 0;
 				ServerWorld sw = null;
 				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.func_234923_W_());
+					sw = world.getServer().getWorld(world.getDimensionKey());
 				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
@@ -248,7 +248,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	private void performDrops(BlockState bs, BlockPos pos, LivingEntity player, ServerWorld sw) {
-		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.field_237457_g_, new Vector3d(pos.getX(), pos.getY(), pos.getZ())));
+		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.ORIGIN, new Vector3d(pos.getX(), pos.getY(), pos.getZ())));
 		InventoryHelper.dropItems(sw.getWorld(), pos, NonNullList.from(ItemStack.EMPTY, drops.toArray(new ItemStack[drops.size()])));
 	}
 	
@@ -305,7 +305,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE);
+		return super.getDisplayName(stack).deepCopy().mergeStyle(TextFormatting.DARK_PURPLE);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -447,10 +447,10 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 			if (nbt.contains("assemblylinemachines:secondarystyle")) {
 				nbt.remove("assemblylinemachines:secondarystyle");
-				player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
+				player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").deepCopy().mergeStyle(TextFormatting.RED), true);
 			} else {
 				nbt.putBoolean("assemblylinemachines:secondarystyle", true);
-				player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").func_230532_e_().func_240699_a_(TextFormatting.AQUA), true);
+				player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").deepCopy().mergeStyle(TextFormatting.AQUA), true);
 			}
 
 			stack.setTag(nbt);
@@ -468,18 +468,18 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			if (compound.contains("assemblylinemachines:fe")) {
 				tooltip.add(new StringTextComponent(
 						Formatting.GENERAL_FORMAT.format(compound.getInt("assemblylinemachines:fe")) + "/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE")
-						.func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE));
+						.deepCopy().mergeStyle(TextFormatting.DARK_PURPLE));
 			} else {
-				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
+				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").deepCopy().mergeStyle(TextFormatting.DARK_RED));
 			}
 
 			if (compound.contains("assemblylinemachines:secondarystyle")) {
-				tooltip.add(new StringTextComponent("Secondary Ability Enabled").func_230532_e_().func_240699_a_(TextFormatting.AQUA));
+				tooltip.add(new StringTextComponent("Secondary Ability Enabled").deepCopy().mergeStyle(TextFormatting.AQUA));
 			}
 			return;
 		}
 
-		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").deepCopy().mergeStyle(TextFormatting.DARK_RED));
 
 	}
 	

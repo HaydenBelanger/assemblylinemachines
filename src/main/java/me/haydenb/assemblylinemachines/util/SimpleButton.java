@@ -30,19 +30,14 @@ public class SimpleButton extends Button {
 	}
 
 	public int getX() {
-		return super.field_230690_l_;
+		return super.x;
 	}
 	
 	public int getY() {
-		return super.field_230691_m_;
+		return super.y;
 	}
 	
 	@Override
-	public void func_230430_a_(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
-	}
-
-	//Wrapper methods to prevent func in other class
-	public String getMessage() {
-		return func_230458_i_().getString();
+	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
 	}
 }

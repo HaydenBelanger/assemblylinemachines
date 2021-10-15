@@ -386,9 +386,9 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 			int x = guiLeft;
 			int y = guiTop;
 
-			this.field_230706_i_.keyboardListener.enableRepeatEvents(true);
+			this.minecraft.keyboardListener.enableRepeatEvents(true);
 
-			idField = new TextFieldWidget(this.field_230712_o_, x + 138, y + 9, 20, 9, new StringTextComponent("ID"));
+			idField = new TextFieldWidget(this.font, x + 138, y + 9, 20, 9, new StringTextComponent("ID"));
 			idField.setCanLoseFocus(true);
 			idField.setEnableBackgroundDrawing(false);
 			idField.setMaxStringLength(3);
@@ -406,7 +406,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				return StringUtils.isNumeric(string);
 			});
 
-			pinField = new TextFieldWidget(this.field_230712_o_, x + 138, y + 24, 32, 9, new StringTextComponent("PIN"));
+			pinField = new TextFieldWidget(this.font, x + 138, y + 24, 32, 9, new StringTextComponent("PIN"));
 			pinField.setCanLoseFocus(true);
 			pinField.setEnableBackgroundDrawing(false);
 			pinField.setMaxStringLength(4);
@@ -420,8 +420,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				return StringUtils.isNumeric(string);
 			});
 
-			this.field_230705_e_.add(idField);
-			this.field_230705_e_.add(pinField);
+			this.children.add(idField);
+			this.children.add(pinField);
 
 			this.setFocusedDefault(idField);
 
@@ -458,7 +458,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+			minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
@@ -489,13 +489,13 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				if(tsfm.passwordEnabled) {
 					super.blit(x+160, y+35, 176, 98, 11, 11);
 				}
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 				super.blit(x + 64, y + 6, 69, 69, 69, netherPortal);
 
 			}
 
-			this.idField.func_230431_b_(mx, mouseX, mouseY, partialTicks);
-			this.pinField.func_230431_b_(mx, mouseX, mouseY, partialTicks);
+			this.idField.renderWidget(mx, mouseX, mouseY, partialTicks);
+			this.pinField.renderWidget(mx, mouseX, mouseY, partialTicks);
 
 
 		}
@@ -509,7 +509,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 			if (mouseX >= x + 39 && mouseY >= y + 13 && mouseX <= x + 39 + 15 && mouseY <= y + 13 + 36) {
 
-				if(Screen.func_231173_s_()) {
+				if(Screen.hasShiftDown()) {
 					ArrayList<String> str = new ArrayList<>();
 					str.add(Formatting.GENERAL_FORMAT.format(tsfm.amount) + "/" + Formatting.GENERAL_FORMAT.format(tsfm.properties.getCapacity()) + "FE");
 					this.renderTooltip(str,
@@ -588,8 +588,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				if (!fs.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(fs.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(fs.getDisplayName().deepCopy().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 

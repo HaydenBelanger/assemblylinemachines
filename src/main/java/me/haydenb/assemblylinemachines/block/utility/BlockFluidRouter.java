@@ -332,7 +332,7 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 				
 				super.blit(x+84, y+15, 57, 57, 57, tas);
 			}
@@ -343,7 +343,7 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 			int fprog = Math.round(((float)tsfm.tank.getAmount()/(float)tsfm.handlerX.getTankCapacity(0)) * 57f);
 			super.blit(x+84, y+15, 176, 0, 8, 57 - fprog);
 			
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+			minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 			renderFluidIcon(x+62, y+35, tsfm.fluidL);
 			renderFluidIcon(x+98, y+35, tsfm.fluidR);
 		}
@@ -358,7 +358,7 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 			this.addButton(new SimpleButton(x + 84, y + 15, 0, 0, 8, 57, "", (button) -> {
 				
 				
-				if(Screen.func_231173_s_()) {
+				if(Screen.hasShiftDown()) {
 					sendSetFilter(tsfm.getPos(), false);
 				}else {
 					sendSetFilter(tsfm.getPos(), true);
@@ -386,7 +386,7 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			this.font.func_243248_b(mx, new StringTextComponent("Hotbar"), invTextLoc.getFirst(),
+			this.font.drawText(mx, new StringTextComponent("Hotbar"), invTextLoc.getFirst(),
 					invTextLoc.getSecond(), 4210752);
 			
 			int x = (this.width - this.xSize) / 2;
@@ -396,8 +396,8 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 				if (!tsfm.tank.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(tsfm.tank.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(tsfm.tank.getDisplayName().deepCopy().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					} else {
@@ -422,7 +422,7 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 			if (mouseX >= mminx && mouseY >= mminy && mouseX <= mminx + 17 && mouseY <= mminy + 17) {
 				
 				if(fluid != Fluids.EMPTY) {
-					this.renderTooltip(fluid.getAttributes().getDisplayName(FluidStack.EMPTY).func_230532_e_().getString(), mouseX - x, mouseY - y);
+					this.renderTooltip(fluid.getAttributes().getDisplayName(FluidStack.EMPTY).deepCopy().getString(), mouseX - x, mouseY - y);
 				}
 			}
 		}

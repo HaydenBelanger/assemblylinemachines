@@ -2,9 +2,7 @@ package me.haydenb.assemblylinemachines.item.categories;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -24,6 +22,6 @@ public class ItemBlockFormattedName extends BlockItem{
 	
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).func_230532_e_().func_240701_a_(formats);
+		return super.getDisplayName(stack).deepCopy().mergeStyle(formats);
 	}
 }

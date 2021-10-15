@@ -12,7 +12,7 @@ public class PipeProperties {
 	
 	static {
 		for(Direction d : Direction.values()) {
-			DIRECTION_BOOL.put(d, EnumProperty.create(d.func_176610_l(), PipeConnOptions.class));
+			DIRECTION_BOOL.put(d, EnumProperty.create(d.getString(), PipeConnOptions.class));
 		}
 	}
 	
@@ -21,7 +21,7 @@ public class PipeProperties {
 		NONE, PIPE, CONNECTOR;
 
 		@Override
-		public String func_176610_l() {
+		public String getString() {
 			return toString().toLowerCase();
 		}
 

@@ -4,23 +4,17 @@ import java.util.Random;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
+import me.haydenb.assemblylinemachines.helpers.*;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity.BlockScreenTileEntity;
-import me.haydenb.assemblylinemachines.helpers.ICrankableMachine;
-import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.item.categories.IGearboxFuel;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -28,13 +22,8 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.tileentity.*;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -111,6 +100,7 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 				nTimer = compound.getInt("assemblylinemachines:prevtimer");
 			}
 		}
+		@SuppressWarnings("deprecation")
 		@Override
 		public void tick() {
 			
@@ -202,6 +192,7 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 			
 		}
 		
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(slot == 0) {

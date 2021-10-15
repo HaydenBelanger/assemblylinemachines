@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import net.minecraft.item.*;
 import net.minecraft.util.NonNullList;

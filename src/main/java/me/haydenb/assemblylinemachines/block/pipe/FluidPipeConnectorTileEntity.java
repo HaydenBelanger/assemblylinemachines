@@ -1,8 +1,6 @@
 package me.haydenb.assemblylinemachines.block.pipe;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.*;
 
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
@@ -11,9 +9,7 @@ import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -55,8 +51,8 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 	}
 	
 	@Override
-	public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-		super.func_230337_a_(p_230337_1_, compound);
+	public void read(BlockState p_230337_1_, CompoundNBT compound) {
+		super.read(p_230337_1_, compound);
 		
 		if(compound.contains("assemblylinemachines:output")) {
 			outputMode = compound.getBoolean("assemblylinemachines:output");

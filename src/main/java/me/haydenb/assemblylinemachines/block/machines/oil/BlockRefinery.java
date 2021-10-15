@@ -90,7 +90,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 
 		BlockState bs = context.getWorld().getBlockState(context.getPos().up());
-		if (bs.getBlock() instanceof BlockRefineryAddon && bs.func_235901_b_(HorizontalBlock.HORIZONTAL_FACING)) {
+		if (bs.getBlock() instanceof BlockRefineryAddon && bs.hasProperty(HorizontalBlock.HORIZONTAL_FACING)) {
 			return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, bs.get(HorizontalBlock.HORIZONTAL_FACING));
 		} else {
 			return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
@@ -722,7 +722,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+			minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 
@@ -799,8 +799,8 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 				if (!fs.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(fs.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(fs.getDisplayName().deepCopy().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 

@@ -43,7 +43,7 @@ public class QuantumLinkManager extends WorldSavedData{
 		
 		
 		if(manager == null) {
-			csw = server.getWorld(ServerWorld.field_234918_g_);
+			csw = server.getWorld(ServerWorld.OVERWORLD);
 			DimensionSavedDataManager dsdm = csw.getSavedData();
 			manager = dsdm.getOrCreate(QuantumLinkManager::new, DATA_PATH);
 			

@@ -1,9 +1,7 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 
 public class ItemHammer extends SwordItem {

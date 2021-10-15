@@ -175,7 +175,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 					
 					if(fp == null) {
 						if(origPlayerUUID != null) {
-							fp = FakePlayerFactory.get(world.getServer().getWorld(world.func_234923_W_()), world.getServer().getPlayerProfileCache().getProfileByUUID(origPlayerUUID));
+							fp = FakePlayerFactory.get(world.getServer().getWorld(world.getDimensionKey()), world.getServer().getPlayerProfileCache().getProfileByUUID(origPlayerUUID));
 						}
 					}
 					if(fp != null && stack != null) {
@@ -275,7 +275,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 										float amt = 0.5f;
 										
 										if(!stack.isEmpty()) {
-											for(AttributeModifier am : stack.getAttributeModifiers(EquipmentSlotType.MAINHAND).get(Attributes.field_233823_f_)) {
+											for(AttributeModifier am : stack.getAttributeModifiers(EquipmentSlotType.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
 												amt += am.getAmount();
 											}
 										}

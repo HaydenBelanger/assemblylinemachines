@@ -127,6 +127,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			compound.putBoolean("assemblylinemachines:naphtha", naphthaActive);
 			return super.write(compound);
 		}
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(ForgeHooks.getBurnTime(stack) != 0) {
@@ -153,6 +154,7 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 							}else {
 								naphthaActive = false;
 							}
+							@SuppressWarnings("deprecation")
 							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0)) * 2f);
 							if(burnTime != 0) {
 								contents.get(0).shrink(1);
@@ -223,12 +225,13 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		
 		
 		@Override
-		protected void func_230457_a_(MatrixStack mx, ItemStack stack, int mouseX, int mouseY) {
+		protected void renderTooltip(MatrixStack mx, ItemStack stack, int mouseX, int mouseY) {
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
-				List<ITextComponent> tt = func_231151_a_(stack);
+				List<ITextComponent> tt = getTooltipFromItem(stack);
 				
+				@SuppressWarnings("deprecation")
 				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack) * 2f);
 				float mul;
 				if(tsfm.naphthaActive) {
@@ -236,12 +239,12 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 				}else {
 					mul = 60f;
 				}
-				tt.add(1, new StringTextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").func_230532_e_().func_240699_a_(TextFormatting.YELLOW));
-				tt.add(1, new StringTextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+				tt.add(1, new StringTextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").deepCopy().mergeStyle(TextFormatting.YELLOW));
+				tt.add(1, new StringTextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").deepCopy().mergeStyle(TextFormatting.GREEN));
 				super.func_243308_b(mx, tt, mouseX, mouseY);
 				return;
 			}
-			super.func_230457_a_(mx, stack, mouseX, mouseY);
+			super.renderTooltip(mx, stack, mouseX, mouseY);
 		}
 		
 		@Override

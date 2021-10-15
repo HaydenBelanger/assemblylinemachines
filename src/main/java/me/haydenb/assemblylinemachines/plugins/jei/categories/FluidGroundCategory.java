@@ -116,25 +116,25 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 				
 				ArrayList<ITextComponent> arr = new ArrayList<>();
 				
-				arr.add(ingredient.getDisplayName().func_230532_e_());
+				arr.add(ingredient.getDisplayName().deepCopy());
 				if(recipe.getCriteria() == FluidInGroundCriteria.END) {
-					arr.add(new StringTextComponent("Found in The End.").func_230532_e_().func_240699_a_(TextFormatting.DARK_PURPLE));
+					arr.add(new StringTextComponent("Found in The End.").deepCopy().mergeStyle(TextFormatting.DARK_PURPLE));
 				}else if(recipe.getCriteria() == FluidInGroundCriteria.NETHER) {
-					arr.add(new StringTextComponent("Found in The Nether.").func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
+					arr.add(new StringTextComponent("Found in The Nether.").deepCopy().mergeStyle(TextFormatting.DARK_RED));
 				}else {
-					arr.add(new StringTextComponent("Found in The Overworld.").func_230532_e_().func_240699_a_(TextFormatting.DARK_GREEN));
+					arr.add(new StringTextComponent("Found in The Overworld.").deepCopy().mergeStyle(TextFormatting.DARK_GREEN));
 					if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD) {
-						arr.add(new StringTextComponent("Only in very cold biomes.").func_230532_e_().func_240699_a_(TextFormatting.BLUE));
+						arr.add(new StringTextComponent("Only in very cold biomes.").deepCopy().mergeStyle(TextFormatting.BLUE));
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD) {
-						arr.add(new StringTextComponent("Favors very cold biomes.").func_230532_e_().func_240699_a_(TextFormatting.BLUE));
+						arr.add(new StringTextComponent("Favors very cold biomes.").deepCopy().mergeStyle(TextFormatting.BLUE));
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT) {
-						arr.add(new StringTextComponent("Favors very hot biomes.").func_230532_e_().func_240699_a_(TextFormatting.RED));
+						arr.add(new StringTextComponent("Favors very hot biomes.").deepCopy().mergeStyle(TextFormatting.RED));
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYHOT) {
-						arr.add(new StringTextComponent("Only in very hot biomes.").func_230532_e_().func_240699_a_(TextFormatting.RED));
+						arr.add(new StringTextComponent("Only in very hot biomes.").deepCopy().mergeStyle(TextFormatting.RED));
 					}
 				}
 				
-				arr.add(new StringTextComponent(recipe.getChance() + "% chance to generate.").func_230532_e_().func_240699_a_(TextFormatting.YELLOW));
+				arr.add(new StringTextComponent(recipe.getChance() + "% chance to generate.").deepCopy().mergeStyle(TextFormatting.YELLOW));
 				
 				return arr;
 			}

@@ -14,7 +14,6 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.feature.template.BlockMatchRuleTest;
@@ -22,7 +21,6 @@ import net.minecraft.world.gen.feature.template.RuleTest;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
@@ -37,22 +35,22 @@ public class Generation {
 		Block black_granite = Registry.getBlock("black_granite");
 		Block chromium = Registry.getBlock("chromium_ore");
 		
-		register(black_granite.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.field_241883_b, black_granite.getDefaultState().with(BlockBlackGranite.NATURAL_GRANITE, true), 37)).func_242733_d(126).func_242728_a().func_242731_b(7));
-		register(titanium.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.field_241882_a, titanium.getDefaultState(), 8)).func_242733_d(16).func_242728_a().func_242731_b(3));
-		register(chromium.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(END_RULE_TEST, chromium.getDefaultState(), 10)).func_242733_d(255).func_242728_a());
+		register(black_granite.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_NETHER, black_granite.getDefaultState().with(BlockBlackGranite.NATURAL_GRANITE, true), 37)).range(126).square().count(7));
+		register(titanium.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, titanium.getDefaultState(), 8)).range(16).square().count(3));
+		register(chromium.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(END_RULE_TEST, chromium.getDefaultState(), 10)).range(255).square());
 	}
 	
 	@SuppressWarnings("deprecation")
 	private static void register(ResourceLocation rl, ConfiguredFeature<?, ?> feature) {
-		net.minecraft.util.registry.Registry.register(WorldGenRegistries.field_243653_e, rl.toString(), feature);
+		net.minecraft.util.registry.Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, rl.toString(), feature);
 
-		for (Map.Entry<RegistryKey<Biome>, Biome> biome : WorldGenRegistries.field_243657_i.func_239659_c_()) {
-			addFeatureToBiome(biome.getValue(), GenerationStage.Decoration.UNDERGROUND_ORES, WorldGenRegistries.field_243653_e.getOrDefault(rl));
+		for (Map.Entry<RegistryKey<Biome>, Biome> biome : WorldGenRegistries.BIOME.getEntries()) {
+			addFeatureToBiome(biome.getValue(), GenerationStage.Decoration.UNDERGROUND_ORES, WorldGenRegistries.CONFIGURED_FEATURE.getOrDefault(rl));
 		}
 	}
 
 	public static void addFeatureToBiome(Biome biome, GenerationStage.Decoration decoration, ConfiguredFeature<?, ?> configuredFeature) {
-		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = new ArrayList<>(biome.func_242440_e().func_242498_c());
+		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = new ArrayList<>(biome.getGenerationSettings().getFeatures());
 
 		while (biomeFeatures.size() <= decoration.ordinal()) {
 			biomeFeatures.add(Lists.newArrayList());
@@ -62,6 +60,7 @@ public class Generation {
 		features.add(() -> configuredFeature);
 		biomeFeatures.set(decoration.ordinal(), features);
 
-		ObfuscationReflectionHelper.setPrivateValue(BiomeGenerationSettings.class, biome.func_242440_e(), biomeFeatures, "field_242484_f");
+		//Mapping change requires use of accesstransformer.
+		biome.getGenerationSettings().features = biomeFeatures;
 	}
 }

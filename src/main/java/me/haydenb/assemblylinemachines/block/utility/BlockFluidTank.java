@@ -108,7 +108,7 @@ public class BlockFluidTank extends Block {
 			if(stack.hasTag()) {
 				CompoundNBT nbt = stack.getTag();
 				if(nbt.contains("assemblylinemachines:fluidstack")) {
-					tooltip.add(1, new StringTextComponent("This Tank has a fluid stored!").func_230532_e_().func_240699_a_(TextFormatting.GREEN));
+					tooltip.add(1, new StringTextComponent("This Tank has a fluid stored!").deepCopy().mergeStyle(TextFormatting.GREEN));
 				}
 			}
 			super.addInformation(stack, worldIn, tooltip, flagIn);
@@ -130,7 +130,7 @@ public class BlockFluidTank extends Block {
 								player.sendStatusMessage(new StringTextComponent("This tank is empty."), true);
 							} else {
 								player.sendStatusMessage(new StringTextComponent(FORMAT.format(f.getAmount()) + "/" + FORMAT.format(handler.getTankCapacity(0)) + " mB "
-										+ f.getFluid().getAttributes().getDisplayName(f).func_230532_e_().getString()), true);
+										+ f.getFluid().getAttributes().getDisplayName(f).deepCopy().getString()), true);
 							}
 						} else {
 							ItemStack stack = player.getHeldItemMainhand();
@@ -187,8 +187,8 @@ public class BlockFluidTank extends Block {
 		}
 
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void read(BlockState p_230337_1_, CompoundNBT compound) {
+			super.read(p_230337_1_, compound);
 			
 			if (compound.contains("assemblylinemachines:capacity")) {
 				capacity = compound.getInt("assemblylinemachines:capacity");

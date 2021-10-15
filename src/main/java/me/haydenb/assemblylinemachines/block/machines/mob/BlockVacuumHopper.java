@@ -100,7 +100,7 @@ public class BlockVacuumHopper extends HopperBlock {
 						double z = entity.getPosZ();
 						if (captureItem(this, entity)) {
 							markDirty();
-							spawnTeleparticles(x, y, z, world.getChunkAt(entity.func_233580_cy_()));
+							spawnTeleparticles(x, y, z, world.getChunkAt(entity.getPosition()));
 							break;
 						}
 

@@ -245,7 +245,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 					name = new TranslationTextComponent(world.getBlockState(pos).getBlock().getTranslationKey());
 					return name;
 				}catch(NullPointerException e) {
-					return ITextComponent.func_244388_a("Generator");
+					return ITextComponent.getTextComponentOrEmpty("Generator");
 				}
 			}
 			
@@ -498,7 +498,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+			minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			
@@ -509,7 +509,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 			
 			if(rl != null) {
 				GL11.glColor4f(1f, 1f, 1f, 1f);
-				this.field_230706_i_.getTextureManager().bindTexture(rl);
+				this.minecraft.getTextureManager().bindTexture(rl);
 				this.blit(x, y, 0, 0, this.xSize, this.ySize);
 			}
 			
@@ -585,8 +585,8 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 				if (!fs.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(fs.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(fs.getDisplayName().deepCopy().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 

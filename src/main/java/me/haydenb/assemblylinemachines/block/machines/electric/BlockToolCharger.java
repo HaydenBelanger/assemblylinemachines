@@ -5,29 +5,19 @@ import java.util.stream.Stream;
 import me.haydenb.assemblylinemachines.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.helpers.BlockTileEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import me.haydenb.assemblylinemachines.util.*;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -183,8 +173,8 @@ public class BlockToolCharger extends BlockTileEntity{
 		}
 		
 		@Override
-		public void func_230337_a_(BlockState p_230337_1_, CompoundNBT compound) {
-			super.func_230337_a_(p_230337_1_, compound);
+		public void read(BlockState p_230337_1_, CompoundNBT compound) {
+			super.read(p_230337_1_, compound);
 			
 			amount = compound.getInt("assemblylinemachines:amount");
 		}

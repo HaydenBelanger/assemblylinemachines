@@ -629,7 +629,7 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 				
 				super.blit(x+13, y+13, 57, 57, 57, tas);
 			}
@@ -665,8 +665,8 @@ public class BlockExperienceMill extends BlockScreenTileEntity<BlockExperienceMi
 				if (!tsfm.tank.isEmpty()) {
 					ArrayList<String> str = new ArrayList<>();
 
-					str.add(tsfm.tank.getDisplayName().func_230532_e_().getString());
-					if (Screen.func_231173_s_()) {
+					str.add(tsfm.tank.getDisplayName().deepCopy().getString());
+					if (Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					} else {

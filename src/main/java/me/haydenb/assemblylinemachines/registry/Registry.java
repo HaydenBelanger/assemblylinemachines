@@ -83,9 +83,9 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntitySpawnPlacementRegistry.PlacementType;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -578,12 +578,13 @@ public class Registry {
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
 		
 		event.getRegistry().register(EntityCorruptShell.CORRUPT_SHELL.setRegistryName("corrupt_shell"));
 		EntitySpawnPlacementRegistry.register(EntityCorruptShell.CORRUPT_SHELL, PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::canSpawnOn);
-		GlobalEntityTypeAttributes.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().func_233813_a_());
+		GlobalEntityTypeAttributes.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().create());
 	}
 	
 	@SubscribeEvent

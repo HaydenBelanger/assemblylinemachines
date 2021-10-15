@@ -39,6 +39,8 @@ public class ConfigHandler {
 		public final BooleanValue interactorInteractMode;
 		public final EnumValue<DebugOptions> interactorInteractDebug;
 		
+		public final BooleanValue updateChecker;
+		
 		public final ConfigValue<Integer> crankSnapChance;
 		
 		public final BooleanValue mystiumFarmlandDeath;
@@ -72,6 +74,7 @@ public class ConfigHandler {
 			builder.push("Miscellaneous");
 			coolDudeMode = builder.comment("Are you cool?").define("coolDudeMode", false);
 			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
+			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
 			builder.pop();
 			
 			

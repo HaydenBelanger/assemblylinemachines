@@ -181,8 +181,8 @@ public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting>
 		@Override
 		public List<ITextComponent> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
 			List<ITextComponent> tooltip = new ArrayList<>();
-			tooltip.add(ingredient.getDisplayName().func_230532_e_());
-			tooltip.add(new StringTextComponent(Formatting.GENERAL_FORMAT.format(ingredient.getAmount()) + " mB").func_230532_e_().func_240699_a_(TextFormatting.AQUA));
+			tooltip.add(ingredient.getDisplayName().deepCopy());
+			tooltip.add(new StringTextComponent(Formatting.GENERAL_FORMAT.format(ingredient.getAmount()) + " mB").deepCopy().mergeStyle(TextFormatting.AQUA));
 			
 			
 			return tooltip;

@@ -129,6 +129,7 @@ public class BlockCrankmill extends BlockScreenTileEntity<BlockCrankmill.TECrank
 			
 		}
 		
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if (ForgeHooks.getBurnTime(stack) != 0) {

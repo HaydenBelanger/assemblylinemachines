@@ -52,7 +52,7 @@ public class CorruptGrassBlock extends Block{
 	private static boolean checkIfDead(BlockState p_220257_0_, IWorldReader p_220257_1_, BlockPos p_220257_2_) {
 	      BlockPos blockpos = p_220257_2_.up();
 	      BlockState blockstate = p_220257_1_.getBlockState(blockpos);
-	      if (blockstate.isIn(Blocks.SNOW) && blockstate.get(SnowBlock.LAYERS) == 1) {
+	      if (blockstate.matchesBlock(Blocks.SNOW) && blockstate.get(SnowBlock.LAYERS) == 1) {
 	         return true;
 	      } else if (blockstate.getFluidState().getLevel() == 8) {
 	         return false;

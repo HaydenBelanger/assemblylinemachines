@@ -6,9 +6,11 @@ import me.haydenb.assemblylinemachines.fluid.FluidLevelManager;
 import me.haydenb.assemblylinemachines.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.item.items.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.plugins.other.PluginPatchouli;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.block.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -16,13 +18,22 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.ClickEvent.Action;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.VersionChecker;
+import net.minecraftforge.fml.VersionChecker.CheckResult;
+import net.minecraftforge.fml.VersionChecker.Status;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class Events {
@@ -167,6 +178,20 @@ public class Events {
 	@SubscribeEvent
 	public static void joinGiveBook(PlayerLoggedInEvent event) {
 		
+		PlayerEntity player = event.getPlayer();
+		if(!player.getEntityWorld().isRemote() && ConfigHolder.COMMON.updateChecker.get()) {
+			ModContainer mc = AssemblyLineMachines.getModContainer();
+			if(mc != null) {
+				IModInfo imi = mc.getModInfo();
+				CheckResult result = VersionChecker.getResult(imi);
+				
+				if(result.status == Status.BETA_OUTDATED || result.status == Status.OUTDATED) {
+					TextComponent tc = new StringTextComponent("[§aAssemblyLineMachines§f] Update available, version §e" + result.target.getCanonical() + ",§f you're using §e" + imi.getVersion().toString() + ". §2Click to Update!");
+					tc.setStyle(tc.getStyle().setClickEvent(new ClickEvent(Action.OPEN_URL, result.url)));
+					player.sendMessage(tc, null);
+				}
+			}
+		}
 		
 		CompoundNBT nbt = event.getPlayer().getPersistentData();
 		if(!nbt.contains("assemblylinemachines:book") || nbt.getBoolean("assemblylinemachines:book") == false) {

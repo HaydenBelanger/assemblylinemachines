@@ -21,7 +21,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 public class BlockNaphthaFire extends AbstractFireBlock {
 	public BlockNaphthaFire() {
 		super(Block.Properties.create(Material.FIRE, MaterialColor.TNT).doesNotBlockMovement().tickRandomly()
-				.hardnessAndResistance(0f).func_235838_a_((state) -> 15).sound(SoundType.CLOTH).noDrops(), 1f);
+				.hardnessAndResistance(0f).setLightLevel((state) -> 15).sound(SoundType.CLOTH).noDrops(), 1f);
 		this.setDefaultState(this.stateContainer.getBaseState().with(FireBlock.AGE, 0));
 	}
 

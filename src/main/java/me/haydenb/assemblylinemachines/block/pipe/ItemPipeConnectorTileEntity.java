@@ -1,9 +1,6 @@
 package me.haydenb.assemblylinemachines.block.pipe;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import com.mojang.datafixers.util.Pair;
 
@@ -11,16 +8,13 @@ import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity.It
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.SimpleButton;
-import me.haydenb.assemblylinemachines.util.SupplierWrapper;
+import me.haydenb.assemblylinemachines.util.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -29,9 +23,7 @@ import net.minecraft.inventory.container.ClickType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -399,7 +391,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		return false;
 	}
 
-	public static class ItemPipeConnectorContainer extends ContainerALMBase<ItemPipeConnectorTileEntity> {
+	public static class ItemPipeConnectorContainer extends me.haydenb.assemblylinemachines.helpers.AbstractMachine.ContainerALMBase<ItemPipeConnectorTileEntity> {
 
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
@@ -542,7 +534,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 						if (bb.getSecond() != null) {
 							this.renderTooltip(bb.getSecond().getTextFromSupplier(), mouseX - x, mouseY - y);
 						} else {
-							this.renderTooltip(bb.getFirst().getMessage(), mouseX - x, mouseY - y);
+							this.renderTooltip(bb.getFirst().getMessage().toString(), mouseX - x, mouseY - y);
 						}
 
 						break;
@@ -600,7 +592,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		}
 		
 		@Override
-		protected boolean func_230987_a_(int p_230987_1_) {
+		protected boolean isValidClickButton(int p_230987_1_) {
 			return isRedstoneControlEnabled();
 		}
 

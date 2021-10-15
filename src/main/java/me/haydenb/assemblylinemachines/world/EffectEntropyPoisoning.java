@@ -38,9 +38,9 @@ public class EffectEntropyPoisoning extends Effect {
 				int ix = 1;
 				
 				while(General.RAND.nextInt(ix) == 0) {
-					rand = rand.offset(Direction.func_239631_a_(General.RAND), General.RAND.nextInt(6));
-					rand = rand.offset(Direction.func_239631_a_(General.RAND), General.RAND.nextInt(6));
-					rand = rand.offset(Direction.func_239631_a_(General.RAND), General.RAND.nextInt(6));
+					rand = rand.offset(Direction.getRandomDirection(General.RAND), General.RAND.nextInt(6));
+					rand = rand.offset(Direction.getRandomDirection(General.RAND), General.RAND.nextInt(6));
+					rand = rand.offset(Direction.getRandomDirection(General.RAND), General.RAND.nextInt(6));
 					
 					ix++;
 				}

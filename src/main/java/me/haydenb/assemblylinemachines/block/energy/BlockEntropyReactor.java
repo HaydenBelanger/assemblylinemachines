@@ -106,10 +106,10 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 
 
 						if(i != 14 && !world.getBlockState(checkPos).getBlock().equals(Registry.getBlock("entropy_reactor_block"))) {
-							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Block.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
+							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Block.").deepCopy().mergeStyle(TextFormatting.RED), true);
 							return ActionResultType.CONSUME;
 						}else if(i == 14 && !world.getBlockState(checkPos).getBlock().equals(Registry.getBlock("entropy_reactor_core"))) {
-							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Core.").func_230532_e_().func_240699_a_(TextFormatting.RED), true);
+							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Core.").deepCopy().mergeStyle(TextFormatting.RED), true);
 							return ActionResultType.CONSUME;
 						}
 
@@ -438,14 +438,14 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 		}
 
 		@Override
-		public void func_230337_a_(BlockState state, CompoundNBT compound) {
+		public void read(BlockState state, CompoundNBT compound) {
 
 			assigned = compound.getBoolean("assemblylinemachines:assigned");
 			master_x = compound.getInt("assemblylinemachines:master_x");
 			master_y = compound.getInt("assemblylinemachines:master_y");
 			master_z = compound.getInt("assemblylinemachines:master_z");
 
-			super.func_230337_a_(state, compound);
+			super.read(state, compound);
 		}
 
 		private void connectMaster(TEEntropyReactor reactor) {
@@ -809,7 +809,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 				if((General.RAND.nextFloat() * 0.5f) < entropy) {
 					
 					if(sw == null) {
-						sw = world.getServer().getWorld(world.func_234923_W_());
+						sw = world.getServer().getWorld(world.getDimensionKey());
 					}
 					
 					int count = Math.round(entropy * 4f);
@@ -824,7 +824,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 						EntityType<?> type = EntityCorruptShell.CORRUPT_SHELL;
 						for(int j = 0; j < 10; j++) {
 							
-							if(world.hasNoCollisions(type.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(type, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
+							if(world.hasNoCollisions(type.getBoundingBoxWithSizeApplied(d0, d1, d2)) && EntitySpawnPlacementRegistry.canSpawnEntity(type, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
 								Entity entity = type.create(world);
 								entity.setLocationAndAngles(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
 								
@@ -1162,9 +1162,10 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 
 
 		@Override
-		public String func_176610_l() {
+		public String getString() {
 			return this.toString().toLowerCase();
 		}
+		
 
 
 

@@ -501,7 +501,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 					GL11.glColor4f(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 				
-				field_230706_i_.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+				minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 				
 				super.blit(x+41, y+23, 37, 37, 37, tas);
 			}
@@ -543,7 +543,7 @@ public class BlockElectricFluidMixer extends BlockScreenTileEntity<BlockElectric
 							mouseX - x, mouseY - y);
 				}else {
 					str.add(ff.getFriendlyName());
-					if(Screen.func_231173_s_()) {
+					if(Screen.hasShiftDown()) {
 
 						str.add(Formatting.FEPT_FORMAT.format(tsfm.fluid.getAmount()) + " mB");
 						

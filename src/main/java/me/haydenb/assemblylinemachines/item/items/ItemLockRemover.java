@@ -82,6 +82,6 @@ public class ItemLockRemover extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		
-		tooltip.add(1, new StringTextComponent("SHIFT-RIGHT CLICK a machine you cut to remove the Lock.").func_230532_e_().func_240699_a_(TextFormatting.DARK_GRAY));
+		tooltip.add(1, new StringTextComponent("SHIFT-RIGHT CLICK a machine you cut to remove the Lock.").deepCopy().mergeStyle(TextFormatting.DARK_GRAY));
 	}
 }

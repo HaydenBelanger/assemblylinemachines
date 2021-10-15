@@ -18,17 +18,11 @@ import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.TieredItem;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
@@ -140,12 +134,12 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 			CompoundNBT compound = stack.getTag();
 			
 			if(compound.contains("assemblylinemachines:cranks")) {
-				tooltip.add(new StringTextComponent("Cranks: " + compound.getInt("assemblylinemachines:cranks") + "/" + getMaxCranks()).func_230532_e_().func_240699_a_(TextFormatting.DARK_GREEN));
+				tooltip.add(new StringTextComponent("Cranks: " + compound.getInt("assemblylinemachines:cranks") + "/" + getMaxCranks()).deepCopy().mergeStyle(TextFormatting.DARK_GREEN));
 				return;
 			}
 		}
 		
-		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).func_230532_e_().func_240699_a_(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).deepCopy().mergeStyle(TextFormatting.DARK_RED));
 	}
 	/**
 	 * Returns a CrankTool version of A.
