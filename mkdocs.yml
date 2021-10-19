@@ -1,0 +1,32 @@
+site_name: Assembly Line Machines Docs
+site_url: https://assemblylinemachines.haydenb.me/
+site_author: Haydenman2 & NinjaKittens
+site_description: Documentation for Minecraft mod Assembly Line Machines.
+repo_url: https://github.com/HaydenBelanger/assemblylinemachines
+
+nav:
+  - About: index.md
+  - Test: test.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: cyan
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Dark Mode
+    - scheme: slate
+      primary: teal
+      accent: light_blue
+      toggle:
+        icon: material/toggle-switch
+        name: Light Mode
+
+docs_dir: docs
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
