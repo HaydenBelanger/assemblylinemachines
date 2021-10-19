@@ -8,7 +8,7 @@ repo_url: https://github.com/HaydenBelanger/assemblylinemachines
 edit_uri: edit/1.17.1-dev/docs/
 
 nav:
-  - About: index.md
+  - About: about.md
   - Test: test.md
 
 theme:
