@@ -1,5 +1,5 @@
 site_name: Assembly Line Machines Docs
-site_url: https://assemblylinemachines.haydenb.me/
+site_url: https://assemblylinemachines.haydenb.me/index/
 site_author: Haydenman2 & NinjaKittens
 site_description: Documentation for Minecraft mod Assembly Line Machines.
 repo_url: https://github.com/HaydenBelanger/assemblylinemachines
@@ -8,7 +8,7 @@ repo_url: https://github.com/HaydenBelanger/assemblylinemachines
 edit_uri: edit/1.17.1-dev/docs/
 
 nav:
-  - About: about.md
+  - About: index.md
   - Test: test.md
 
 theme:
