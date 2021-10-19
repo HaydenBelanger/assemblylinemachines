@@ -4,6 +4,9 @@ site_author: Haydenman2 & NinjaKittens
 site_description: Documentation for Minecraft mod Assembly Line Machines.
 repo_url: https://github.com/HaydenBelanger/assemblylinemachines
 
+#edit_uri must be updated every time default branch is changed!
+edit_uri: edit/1.17.1-dev/docs/
+
 nav:
   - About: index.md
   - Test: test.md
