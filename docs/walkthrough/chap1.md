@@ -29,7 +29,7 @@ The next step once you have a valid recipe in the fluid bath is to make a stirri
 Once you have a stirring stick or two created, simply hold RIGHT-CLICK on the fluid bath with the stick in your main hand to start creating the recipe. After a few seconds a portion of the fluid inside the bath will be consumed and it will spit out the desired item!
 
 !!! warning "Be careful!"
-    If an ivalid recipe is loaded into the fluid bath and processed, it will produce sludge instead of the desired product, so be careful when putting in your recipes!
+    If an invalid recipe is loaded into the fluid bath and processed, it will produce sludge instead of the desired product, so be careful when putting in your recipes!
 
 The first recipe you will need to make using the fluid bath is Silt which is made using gravel and sand in the fluid bath with water (if you mess up, simply SHIFT+RIGHT-CLICK to clear the recipe), which you can then craft into silt bricks for the next step! 
 
