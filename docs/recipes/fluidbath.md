@@ -24,6 +24,9 @@ Recipe namespace: `assemblylinemachines:bath`.
 - `fluid`: String, required  
 *The fluid that is required to process the recipe. Options include `water`, `lava`, `oil`, `condensed_void`, or `naphtha`.*
 
+!!! tip
+	The fluid used in an Electric Fluid Mixer is impacted by the Machine Conservation upgrade. Depending on the number of upgrades, the amount of fluid consumed will be reduced by 25%, 50%, or 75%.
+
 !!! warning
     If the fluid is not `water` or `lava`, the only machine allowed for the recipe will be the Electric Fluid Mixer, as the other two early-game machines do not work with anything else.
 

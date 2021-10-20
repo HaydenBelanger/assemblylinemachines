@@ -16,8 +16,8 @@ Recipe namespace: `assemblylinemachines:enchantment_book`
 ??? note "Enchantment Level Calculations"
     Depending on the number of Exp. Mill Level Upgrades there are inside of the machine, the level of the enchantment applied to the book will be directly impacted.  
     Running the recipe with **0 upgrades** will result in a Level 1 enchantment every time.  
-    Running the recipe with **1 upgrade** will result in an enchantment 33% of the maximum level available for that enchantment, rounded up to the next nearest level. For example, `minecraft:sharpness` would produce a Sharpness II book, but `minecraft:fortune` would still only produce Fortune I.  
-    Running the recipe with **2 upgrades** will result in an enchantment 66% of the maximum level available for that enchantment, rounded up to the next nearest level.  
+    Running the recipe with **1 upgrade** will result in an enchantment one-third of the maximum level available for that enchantment, rounded up to the next nearest level. For example, `minecraft:sharpness` would produce a Sharpness II book, but `minecraft:fortune` would still only produce Fortune I.  
+    Running the recipe with **2 upgrades** will result in an enchantment two-thirds of the maximum level available for that enchantment, rounded up to the next nearest level.  
     Running the recipe with **3 upgrades** will result in the maximum level enchantment available.
 
 
