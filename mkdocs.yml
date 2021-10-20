@@ -14,6 +14,20 @@ nav:
     - Chapter 2 - Kinetic Energy: walkthrough/chap2.md
     - Chapter 3 - Electricity: walkthrough/chap3.md
     - Chapter 4 - Future Tech: walkthrough/chap4.md
+  - Developers:
+    - Recipes:
+      - Alloying: recipes/alloying.md
+      - Fluid Mixing: recipes/fluidbath.md
+      - Experience Mill Book: recipes/experiencemill.md
+      - Entropy Reactor Waste: recipes/entropyreactor.md
+      - Fluid-In-Ground: recipes/fluidinground.md
+      - Grinding: recipes/grinding.md
+      - Milling: recipes/milling.md
+      - Shaping: recipes/shaping.md
+      - Purifying: recipes/purifying.md
+      - Refining: recipes/refining.md
+    - Tags: miscdev/tags.md
+
 
 theme:
   name: material
