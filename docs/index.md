@@ -1,17 +1,16 @@
-# Welcome to MkDocs
+# Assembly Line Machines
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+This is Assembly Line Machines, a complete reemagining of Minecraft's technological side.
+This mod features new features and an entirely new progression system, built from the ground up to give much more depth
+to Minecraft.
 
-## Commands
+## Downloads
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+This mod is currently available for Minecraft 1.17.1, used with the Forge Mod Loader, and can be downloaded from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/assemblylinemachines). Please note that these two locations are the only two officially available versions of this mod at this time, and thus any redistribution websites shall not be considered official, and therefore will not receive support.
 
-## Project layout
+## Wiki
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+This Wiki will provide continuously updated documentation, both for pack developers and players. This will feature in-depth guides on specific blocks and items, as well as a general walkthrough for the mod to help push in the correct direction.
+
+!!! warning
+    This wiki will upgrade and change with every major version, so accuracy of the Wiki will only be guaranteed for the latest available downloadable version, and features may not be applicable or available for versions older than.

@@ -8,8 +8,12 @@ repo_url: https://github.com/HaydenBelanger/assemblylinemachines
 edit_uri: edit/1.17.1-dev/docs/
 
 nav:
-  - About: index.md
-  - Test: test.md
+  - Home: index.md
+  - Chapters:
+    - Chapter 1 - Primitive: walkthrough/chap1.md
+    - Chapter 2 - Kinetic Energy: walkthrough/chap2.md
+    - Chapter 3 - Electricity: walkthrough/chap3.md
+    - Chapter 4 - Future Tech: walkthrough/chap4.md
 
 theme:
   name: material
