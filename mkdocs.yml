@@ -15,6 +15,7 @@ nav:
     - Chapter 3 - Electricity: walkthrough/chap3.md
     - Chapter 4 - Future Tech: walkthrough/chap4.md
   - Developers:
+    - Data Types: miscdev/datatypes.md
     - Recipes:
       - Alloying: recipes/alloying.md
       - Fluid Mixing: recipes/fluidbath.md
