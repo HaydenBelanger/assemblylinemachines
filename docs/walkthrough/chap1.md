@@ -6,13 +6,13 @@ Welcome to Assembly Line Machines!
 The first thing you're going to want to do is take a Pickaxe of mining level Diamond or higher (e.g. Iron Pickaxe) and venture into the earth to look for Titanium Ore (Found between Y8 and Y16), which can smelted into bars for later use.
 
 
-![Titanium and it's Deepslate variant](../media/titanium.png)
+![Titanium and its Deepslate variant](../media/titanium.png)
 
-*(Titanium and it's Deepslate variant)*
+*(Titanium and its Deepslate variant)*
 
 ![Titanium Bars](../media/titanium_smelt.png)
 
-# Fluid Bath
+## Fluid Bath
 
 Your first recipes will be made in the fluid bath.
 
@@ -37,7 +37,7 @@ The first recipe you will need to make using the fluid bath is Silt which is mad
 
 ![Silt Bricks](../media/silt_bricks.png)
 
-# Manual Grindstone
+## Manual Grindstone
 
 With silt bricks now aquired, you're ready to craft the Manual Grindstone for the next set of processing!
 
@@ -63,7 +63,7 @@ Now with your grindstone you are able to grind down bars and other materials int
 
     Grinding down raw ores on the manual grindstone will yield twice the output as opposed to normal smelting!
 
-# Finishing off the Primitive Age
+## Finishing off the Primitive Age
 
 With both the fluid bath and manual grindstone aquired you are ready for the final piece of progression in this age! What you will need is a fair amount of ground iron and ground gold (aquired from either bars or raw ore in the manual grindstone), once aquired you can combine the ground iron & ground gold with silt and water in the fluid bath to yield Gold Silt and Iron Silt. Simply smelt the Ore Silts to aquire their pure variants, you will need many pure bars for future progression!
 
