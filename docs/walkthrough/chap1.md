@@ -2,6 +2,7 @@
 
 Welcome to Assembly Line Machines! 
 
+This mod is a complete overhaul to base MC with emphasis on automation and automated processing. This guide will completely walk you through everything from the early game, to the complex late game systems!
 
 The first thing you're going to want to do is take a Pickaxe of mining level Diamond or higher (e.g. Iron Pickaxe) and venture into the earth to look for Titanium Ore (Found between Y8 and Y16), which can smelted into bars for later use.
 
@@ -45,9 +46,11 @@ With silt bricks now aquired, you're ready to craft the Manual Grindstone for th
 
 Once crafted, the manual grindstone also requires various blades for functioning. Blades, like stirring sticks, also have a durability associated with them that will decrease as you grind (your first one will be made out of titanium, though stronger ones will be avialable later on in progression).
 
-![Titanium Blade Piece](../media/titanium_blade_piece.png)
+??? note inline end
 
-*(Blade Pieces use nuggets for their creation)*
+    Blade pieces require nuggets for the recipe
+
+![Titanium Blade Piece](../media/titanium_blade_piece.png)
 
 ![Titanium Blade](../media/titanium_blade.png)
 
@@ -55,15 +58,13 @@ Once you've crafted the blade, simply RIGHT-CLICK on the manual grindstone with 
 
 ![Manual Grindstone w/ Titanium Blade](../media/manual_grindstone.png)
 
-*(Manual Grindstone w/ a Titanium Blade attached)*
-
-Now with your grindstone you are able to grind down bars and other materials into dusts for further use, simply hold RIGHT-CLICK with the item you wish to grind in your main hand and after a couple of seconds it will be turned into the ground version of itself!
-
-??? tip
+??? tip inline end
 
     Grinding down raw ores on the manual grindstone will yield twice the output as opposed to normal smelting!
 
-## Finishing off the Primitive Age
+Now with your grindstone you are able to grind down bars and other materials into dusts for further use, simply hold RIGHT-CLICK with the item you wish to grind in your main hand and after a couple of seconds it will be turned into the ground version of itself!
+
+## Producing Your First Steel
 
 With both the fluid bath and manual grindstone aquired you are ready for the final piece of progression in this age! What you will need is a fair amount of ground iron and ground gold (aquired from either bars or raw ore in the manual grindstone), once aquired you can combine the ground iron & ground gold with silt and water in the fluid bath to yield Gold Silt and Iron Silt. Simply smelt the Ore Silts to aquire their pure variants, you will need many pure bars for future progression!
 
@@ -75,15 +76,17 @@ With both the fluid bath and manual grindstone aquired you are ready for the fin
 
 ![Pure Ingots](../media/pure_ingots.png)
 
-The next two things you'll want to make are upgrades to your stirring stick and grindstone blade.
-
-??? tip
+??? tip inline end
 
     The following section will require a lot of lava for use in the fluid bath, you may want to keep a bit a of a stockpile on hand!
 
-![Pure Iron Stirring Stick](../media/iron_stick.png)
+The next two things you'll want to make are upgrades to your stirring stick and grindstone blade.
 
-*(Pure Iron Stirring Stick recipe)*
+!!! note inline end
+
+    This recipe uses pure iron.
+
+![Pure Iron Stirring Stick](../media/iron_stick.png)
 
 For the Pure Gold-Dipped Blade, you will first want to combine a titanium blade piece and a pure gold ingot with lava in a fluid bath.
 
@@ -100,11 +103,11 @@ Once you have the pure gold-dipped blade, you will be able to start making steel
 
     Grinding down coal or charcoal **requires** a pure gold-dipped blade to be attached to the manual grindstone.
 
-![Ground Coal](../media/ground_coal.png)
-
-??? info
+??? info inline end
 
     Ground charcoal is made in the exact same way, and may be used interchangeably with it's regular counterpart
+
+![Ground Coal](../media/ground_coal.png)
 
 The final step involves combining your ground coal and ground iron with lava in a fluid bath, this will yield your first ingot of steel as well as your advancement to the Crank-Age!
 
