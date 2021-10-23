@@ -154,7 +154,7 @@ Crank-Powered Tools as their name suggests, uses cranks to break blocks and deal
 
 ![Crank Charger Multiblock](../media/crank_charger_multiblock.png)
 
-Simply put your crank tools in the inventory above the crank charger and supply crank power to the charger itself (either through a crank or a gearbox like in the photo) and it will start to store cranks within the tool, starting from first on the left ending at the last to the right, top to bottom.
+Simply put your crank tools in the inventory above the crank charger and supply crank power to the charger itself (only through a gearbox) and it will start to store cranks within the tool, starting from first on the left ending at the last to the right, top to bottom.
 
 ![Crank Charger Chargin a Tool](../media/crank_tool_charging.png)
 
