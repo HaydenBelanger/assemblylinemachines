@@ -37,7 +37,7 @@ Recipe namespace: `assemblylinemachines:bath`.
 *The type of machine that can perform this recipe. Options include `MIXER_ONLY` or `BASIN_ONLY`. If unset, all machines will allow processing.*
 
 - `drain_percent`: String, *optional*  
-*The amount of fluid that will be drained from the machine when an operation is concluded, in increments of full buckets/1000 mB. Options include `FULL`, `HALF`, or `QUARTER`. If unset, `FULL` will be used.
+*The amount of fluid that will be drained from the machine when an operation is concluded, in increments of full buckets/1000 mB. Options include `FULL`, `HALF`, or `QUARTER`. If unset, `FULL` will be used.*
 
 ## Examples
 

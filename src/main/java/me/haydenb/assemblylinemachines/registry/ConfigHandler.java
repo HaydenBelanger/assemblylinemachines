@@ -46,6 +46,7 @@ public class ConfigHandler {
 		public final BooleanValue updateChecker;
 		//public final BooleanValue guideBook;
 		public final BooleanValue mystiumFarmlandDeath;
+		public final BooleanValue gasolineExplosions;
 		
 		//TITANIUM TOOLS
 		public final ConfigValue<Double> titaniumToolAttack;
@@ -162,6 +163,7 @@ public class ConfigHandler {
 			builder.push("World");
 			mystiumFarmlandDeath = builder.comment("Should Mystium Farmland get exhausted over time and stop performing grow operations?").define("mystiumFarmlandDeath", true);
 			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
+			gasolineExplosions = builder.comment("Should Gasoline and Diesel explode when placed next to a flammable block?").define("gasolineExplosions", true);
 			//guideBook = builder.comment("Should new players be given the guide book when joining the world (as long as Patchouli is installed?) NOTE: For v1.2, this toggle is not functional as Patchouli hasn't been updated.").define("guideBook", true);
 			
 			builder.push("Titanium Generation");

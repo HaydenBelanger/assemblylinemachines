@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:alloying",
 	"part_a":{
-		"tag": "forge:ingots/mystium"
+		"tag": "forge:dusts/redstone"
 	},
 	"part_b":{
 		"tag": "forge:plates/gold"

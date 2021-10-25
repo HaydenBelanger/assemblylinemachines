@@ -14,6 +14,8 @@ nav:
     - Chapter 2 - Kinetic Energy: walkthrough/chap2.md
     - Chapter 3 - Electricity: walkthrough/chap3.md
     - Chapter 4 - Future Tech: walkthrough/chap4.md
+  - Items:
+    - Mystium Tools: items/mystiumtools.md
   - Developers:
     - Data Types: miscdev/datatypes.md
     - Recipes:
