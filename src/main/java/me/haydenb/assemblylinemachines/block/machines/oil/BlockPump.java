@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.world.FluidLevelManager;
+import me.haydenb.assemblylinemachines.world.generation.FluidLevelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

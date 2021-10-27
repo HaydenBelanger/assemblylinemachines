@@ -1,0 +1,14 @@
+{
+  "config": {
+    "top_material": {
+      "Name": "assemblylinemachines:corrupt_grass"
+    },
+    "under_material": {
+      "Name": "assemblylinemachines:corrupt_dirt"
+    },
+    "underwater_material": {
+      "Name": "assemblylinemachines:corrupt_dirt"
+    }
+  },
+  "type": "minecraft:default"
+}

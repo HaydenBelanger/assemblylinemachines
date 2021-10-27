@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
     }
 }
@@ -21,8 +21,7 @@ group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini
 archivesBaseName = 'assemblylinemachines'
 
 // Mojang ships Java 16 to end users in 1.17+ instead of Java 8 in 1.16 or lower, so your mod should target Java 16.
-sourceCompatibility = targetCompatibility = '16'
-compileJava.sourceCompatibility = compileJava.targetCompatibility = '16'
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
@@ -60,7 +59,7 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
-
+            
             mods {
                 examplemod {
                     source sourceSets.main
@@ -82,7 +81,7 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
-
+            
             mods {
                 examplemod {
                     source sourceSets.main
@@ -139,14 +138,16 @@ repositories{
     //}
 	maven {
 		name = "Cursemaven - The One Probe"
-        url "https://cursemaven.com"
+        url = "https://cursemaven.com"
         //url "https://maven.tterrag.com/"
     }
 }
 
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.82'
+jar.finalizedBy('reobfJar')
 
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.103'
+    
     //FTB GUI LIBRARY - Not yet updated to 1.17.1.
 	//compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	//runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
@@ -167,5 +168,3 @@ dependencies {
     compileOnly fg.deobf("curse.maven:theoneprobe-245211:3430022")
     runtimeOnly fg.deobf("curse.maven:theoneprobe-245211:3430022")
 }
-
-jar.finalizedBy('reobfJar')

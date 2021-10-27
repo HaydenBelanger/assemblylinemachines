@@ -4,11 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.FluidRegistry;
+import me.haydenb.assemblylinemachines.registry.SoundRegistry;
 import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.*;
 import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP;
-import me.haydenb.assemblylinemachines.registry.FluidRegistry;
-import me.haydenb.assemblylinemachines.registry.SoundRegistry;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;

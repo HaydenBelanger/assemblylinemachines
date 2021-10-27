@@ -2,7 +2,7 @@ package me.haydenb.assemblylinemachines.item.items;
 
 import me.haydenb.assemblylinemachines.item.categories.ItemBasicFormattedName;
 import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.world.FluidLevelManager;
+import me.haydenb.assemblylinemachines.world.generation.FluidLevelManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionResult;

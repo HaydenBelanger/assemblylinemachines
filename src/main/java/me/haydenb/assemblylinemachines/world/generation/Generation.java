@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.world;
+package me.haydenb.assemblylinemachines.world.generation;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.BlockBlackGranite;
@@ -30,7 +30,7 @@ public class Generation {
 	private static final RangeDecoratorConfiguration FULL_HEIGHT = new RangeDecoratorConfiguration(UniformHeight.of(VerticalAnchor.bottom(), VerticalAnchor.top()));
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
-	public static void generateOres(BiomeLoadingEvent event) {
+	public static void biomeLoadingEvent(BiomeLoadingEvent event) {
 		
 		ASMConfig cfg = ConfigHolder.COMMON;
 		
@@ -68,6 +68,6 @@ public class Generation {
 			ConfiguredFeature<?, ?> cf = Feature.ORE.configured(new OreConfiguration(END_RULE_TEST, Registry.getBlock("chromium_ore").defaultBlockState(), chrSize)).range(FULL_HEIGHT).squared().count(chrFreq);
 			event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, cf);
 		}
-		
 	}
+	
 }

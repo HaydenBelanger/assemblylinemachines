@@ -10,17 +10,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 public class FluidRegistry {
 
 	public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS, AssemblyLineMachines.MODID);
@@ -71,9 +66,7 @@ public class FluidRegistry {
 		
 	}
 	
-	//Event implemented in order to get around Forge bug related to buckets of fluid not updating properly when using Supplier constructors on LiquidBlock.
-	@SubscribeEvent
-	public static void updateInternalStoredFluids(FMLCommonSetupEvent event) throws Exception{
+	public static void updateInternalStoredFluids() throws Exception{
 		
 		AssemblyLineMachines.LOGGER.info("Patching LiquidBlocks from Assembly Line Machines...");
 		

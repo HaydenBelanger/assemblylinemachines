@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.world;
+package me.haydenb.assemblylinemachines.world.generation;
 
 import java.util.List;
 import java.util.Random;
@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.world.ChunkCoords;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

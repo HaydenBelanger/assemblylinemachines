@@ -1,0 +1,52 @@
+{
+  "type": "assemblylinemachines:chaos_plane",
+  "generator": {
+    "biome_source": {
+	  "type": "minecraft:multi_noise",
+      "humidity_noise": {
+        "firstOctave": -9,
+        "amplitudes": [
+          1.0,
+          1.0
+        ]
+      },
+      "altitude_noise": {
+        "firstOctave": -9,
+        "amplitudes": [
+          2.8,
+          1.0
+        ]
+      },
+      "weirdness_noise": {
+        "firstOctave": -5,
+        "amplitudes": [
+          1.0,
+          1.0
+        ]
+      },
+	  "temperature_noise": {
+        "firstOctave": -9,
+        "amplitudes": [
+          1.0,
+          1.0
+        ]
+      },
+      "seed": 0,
+      "biomes": [
+        {
+          "parameters": {
+            "altitude": 0.3,
+            "weirdness": 0.15,
+            "offset": 0.0,
+            "temperature": 0.1,
+            "humidity": 0.1
+          },
+          "biome": "assemblylinemachines:corrupt_plains"
+        }
+      ]
+    },
+    "seed": 0,
+    "settings": "assemblylinemachines:chaos_plane",
+    "type": "minecraft:noise"
+  }
+}

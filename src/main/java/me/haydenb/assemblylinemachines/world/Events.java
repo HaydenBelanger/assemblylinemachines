@@ -7,6 +7,7 @@ import me.haydenb.assemblylinemachines.item.items.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.world.generation.FluidLevelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

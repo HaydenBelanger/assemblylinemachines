@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.world;
+package me.haydenb.assemblylinemachines.world.effect;
 
 import me.haydenb.assemblylinemachines.util.General;
 import net.minecraft.core.BlockPos;

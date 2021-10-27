@@ -66,8 +66,11 @@ import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.datagen.BasicHarvestableTaggedBlock;
 import me.haydenb.assemblylinemachines.registry.datagen.MineableBlockProvider;
-import me.haydenb.assemblylinemachines.world.*;
+import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
+import me.haydenb.assemblylinemachines.world.effect.EffectDeepBurn;
+import me.haydenb.assemblylinemachines.world.effect.EffectEntropyPoisoning;
+import me.haydenb.assemblylinemachines.world.generation.ChaosPlaneCarver;
 import me.haydenb.assemblylinemachines.world.rendering.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.color.block.BlockColor;
@@ -98,6 +101,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.carver.CaveCarverConfiguration;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
@@ -133,7 +138,7 @@ public class Registry {
 			return o1.compareTo(o2);
 		}
 	});
-	
+		
 	public static final HashMap<String, Block> blockRegistry = new HashMap<>();
 	
 	private static final HashMap<String, BlockEntityType<?>> teRegistry = new HashMap<>();
@@ -144,6 +149,7 @@ public class Registry {
 	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
 	
 	//EVENTS
+	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
@@ -704,12 +710,6 @@ public class Registry {
 	}
 	
 	@SubscribeEvent
-	@OnlyIn(Dist.CLIENT)
-	public static void registerEntityRenderers(RegisterRenderers event) {
-		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
-	}
-	
-	@SubscribeEvent
 	public static void registerCrafting(RegistryEvent.Register<RecipeSerializer<?>> event) {
 		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(GrinderCrafting.GRINDER_RECIPE.toString()), GrinderCrafting.GRINDER_RECIPE);
 		event.getRegistry().register(GrinderCrafting.SERIALIZER.setRegistryName("grinder"));
@@ -740,6 +740,12 @@ public class Registry {
 		
 		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(EntropyReactorCrafting.ERO_RECIPE.toString()), EntropyReactorCrafting.ERO_RECIPE);
 		event.getRegistry().register(EntropyReactorCrafting.SERIALIZER.setRegistryName("entropy_reactor"));
+		
+	}
+	
+	@SubscribeEvent
+	public static void registerCarvers(RegistryEvent.Register<WorldCarver<?>> event) {
+		event.getRegistry().register(new ChaosPlaneCarver(CaveCarverConfiguration.CODEC).setRegistryName("chaos_plane_cave"));
 		
 	}
 	
@@ -788,6 +794,11 @@ public class Registry {
 		}, getItem("mob_crystal"));
 	}
 	
+	@SubscribeEvent
+	@OnlyIn(Dist.CLIENT)
+	public static void registerEntityRenderers(RegisterRenderers event) {
+		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
+	}
 	
 	@SubscribeEvent
 	public static void configEvent(ModConfigEvent event) {
