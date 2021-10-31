@@ -14,7 +14,8 @@ out
 .idea
 
 # gradle
-build
+build/*
+
 .gradle
 /src/generated/resources/.cache
 /src/test
@@ -24,7 +25,7 @@ eclipse
 run
 
 #FG5 Mixin Hack
-!build/createMcpToSrg/output.tsrg
+!build/createMcpToSrg
 
 # Files from Forge MDK
 README.txt
