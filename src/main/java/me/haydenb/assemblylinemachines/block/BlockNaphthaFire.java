@@ -4,12 +4,10 @@ import java.util.Iterator;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,22 +19,11 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.event.ForgeEventFactory;
 
-public class BlockNaphthaFire extends BaseFireBlock implements IBlockWithHarvestableTags {
+public class BlockNaphthaFire extends BaseFireBlock {
 	public BlockNaphthaFire() {
 		super(Block.Properties.of(Material.FIRE, MaterialColor.FIRE).noCollission().randomTicks()
 				.strength(0f).lightLevel((state) -> 15).sound(SoundType.WOOL).noDrops(), 1f);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FireBlock.AGE, 0));
-	}
-	
-	@Override
-	public Named<Block> getToolType() {
-		return null;
-	}
-
-
-	@Override
-	public Named<Block> getToolLevel() {
-		return null;
 	}
 
 

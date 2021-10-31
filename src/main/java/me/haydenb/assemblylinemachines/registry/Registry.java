@@ -7,6 +7,9 @@ import java.util.function.Supplier;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.*;
 import me.haydenb.assemblylinemachines.block.corrupt.*;
+import me.haydenb.assemblylinemachines.block.corrupt.ChaosbarkLeavesBlock.ChaosbarkSaplingBlock;
+import me.haydenb.assemblylinemachines.block.corrupt.CorruptTallGrassBlock.CorruptDoubleTallGrassBlock;
+import me.haydenb.assemblylinemachines.block.corrupt.CorruptTallGrassBlock.CorruptFlowerBlock;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
@@ -88,6 +91,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Inventory;
@@ -358,7 +362,7 @@ public class Registry {
 		createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
-		createBlock("titanium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("titanium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
 		
 		createBlock("hand_grinder", new BlockHandGrinder(), true);
 		createBlock("fluid_bath", new BlockFluidBath(), true);
@@ -380,8 +384,8 @@ public class Registry {
 		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD), false);
 		createItem("wooden_fluid_tank", new BlockItemFluidTank(Registry.getBlock("wooden_fluid_tank")));
 		
-		createBlock("silt", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
-		createBlock("silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("silt", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
+		createBlock("silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
 		createBlock("slab_silt_brick", new SlabBlock(Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
 		createBlock("stair_silt_brick", new StairBlock(new Supplier<BlockState>() {
 
@@ -392,12 +396,12 @@ public class Registry {
 			
 		}, Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
 		
-		createBlock("steel_block", Material.METAL, 7f, 30f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("steel_block", Material.METAL, 7f, 30f, SoundType.METAL, false, true);
 		
 		createBlock("black_granite", new BlockBlackGranite(), true);
-		createBlock("smooth_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
-		createBlock("brick_black_granite", Material.STONE, 3f, 9f,  SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
-		createBlock("chiselled_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("smooth_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("brick_black_granite", Material.STONE, 3f, 9f,  SoundType.STONE, false, true);
+		createBlock("chiselled_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("pillar_black_granite", new RotatedPillarBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		createBlock("slab_black_granite", new SlabBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		createBlock("stair_black_granite", new StairBlock(new Supplier<BlockState>() {
@@ -409,10 +413,10 @@ public class Registry {
 			
 		}, Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		
-		createBlock("silt_iron", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
-		createBlock("silt_gold", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
-		createBlock("silt_titanium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
-		createBlock("silt_copper", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("silt_iron", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
+		createBlock("silt_gold", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
+		createBlock("silt_titanium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
+		createBlock("silt_copper", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		
 		createBlock("basic_battery_cell", new BlockBatteryCell(BatteryCellTiers.BASIC), true);
 		createBlock("advanced_battery_cell", new BlockBatteryCell(BatteryCellTiers.ADVANCED), true);
@@ -420,7 +424,7 @@ public class Registry {
 		createBlock("crankmill", new BlockCrankmill(), true);
 		
 		createBlock("chromium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, MineableBlockProvider.NEEDS_NETHERITE_TOOL, true);
-		createBlock("chromium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("chromium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
 		
 		createBlock("electric_furnace", new BlockElectricFurnace(), true);
 		createBlock("electric_purifier", new BlockElectricPurifier(), true);
@@ -435,7 +439,7 @@ public class Registry {
 		createBlock("pump", new BlockPump(), true);
 		createBlock("pumpshaft", new BlockPumpshaft(), true);
 		
-		createBlock("mystium_block", Material.METAL, 11f, 80f, SoundType.METAL, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, false);
+		createBlock("mystium_block", Material.METAL, 11f, 80f, SoundType.METAL, false, false);
 		createItem("mystium_block", new ItemBlockFormattedName(Registry.getBlock("mystium_block"), ChatFormatting.LIGHT_PURPLE));
 		
 		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT), false);
@@ -444,10 +448,10 @@ public class Registry {
 		createBlock("tool_charger", new BlockToolCharger(), true);
 		
 		createBlock("adv_energy_pipe", new PipeBase<IEnergyStorage>(() -> CapabilityEnergy.ENERGY, Type.ADVANCED_POWER), true);
-		createBlock("smoldering_stone", Material.STONE, 30f, 300f, SoundType.STONE, false, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("smoldering_stone", Material.STONE, 30f, 300f, SoundType.STONE, false, true);
 		createBlock("naphtha_turbine", new BlockNaphthaTurbine(), true);
 		
-		createBlock("compressed_crafting_table", Material.WOOD, 2f, 10f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_STONE_TOOL, true);
+		createBlock("compressed_crafting_table", Material.WOOD, 2f, 10f, SoundType.WOOD, false, true);
 		
 		createBlock("refinery", new BlockRefinery(), true);
 		createBlock("refinery_attachment_separation", new BlockSeparationAddon(), true);
@@ -483,13 +487,25 @@ public class Registry {
 		
 		createBlock("entropy_reactor_block", new BlockEntropyReactor(), true);
 		createBlock("entropy_reactor_core", new BlockEntropyReactorCore(), true);
+		createBlock("corrupting_basin", new BlockCorruptingBasin(), true);
 		
 		createBlock("corrupt_dirt", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		createBlock("corrupt_grass", new CorruptGrassBlock(), true);
-		createBlock("corrupt_sand", new CorruptSandBlock(), true);
+		createBlock("corrupt_sand", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.SAND)), true);
 		createBlock("corrupt_stone", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_gravel", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL)), true);
+		createBlock("chaosbark_log", new ChaosbarkLogBlock(), true);
+		createBlock("stripped_chaosbark_log", new ChaosbarkLogBlock(), true);
+		createBlock("chaosbark_sapling", new ChaosbarkSaplingBlock(), true);
+		createBlock("chaosbark_leaves", new ChaosbarkLeavesBlock(), true);
+		createBlock("chaosbark_planks", Material.WOOD, 2f, 10f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
-		createBlock("corrupting_basin", new BlockCorruptingBasin(), true);
+		createBlock("chaosweed", new CorruptTallGrassBlock(), true);
+		createBlock("blooming_chaosweed", new CorruptTallGrassBlock(), true);
+		createBlock("tall_chaosweed", new CorruptDoubleTallGrassBlock(), true);
+		createBlock("tall_blooming_chaosweed", new CorruptDoubleTallGrassBlock(), true);
+		createBlock("mandelbloom", new CorruptFlowerBlock(MobEffects.CONFUSION, 15), true);
+		createBlock("prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 30), true);
 		
 		//1.17.1 CHANGE: Fluid registration is segmented due to build issues. See FluidRegistry.class.
 		FluidRegistry.registerFluidBlocks();
@@ -651,6 +667,14 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getBlock("naphtha_fire"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("powered_spawner"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("entropy_reactor_block"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_leaves"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_sapling"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("blooming_chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_blooming_chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("mandelbloom"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_rose"), RenderType.cutout());
 		
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());
@@ -854,13 +878,21 @@ public class Registry {
 		
 	}
 	
-	private static void createBlock(String name, Block.Properties properties, Named<Block> type, Named<Block> level, boolean item) {
-		Block b;
-		if(type != null && level != null) {
-			b = new BasicHarvestableTaggedBlock(properties, type, level);
-		}else {
-			b = new Block(properties);
+	private static void createBlock(String name, Material material, float hardness, float resistance, SoundType sound, boolean requireToolToDrop, boolean item) {
+		Block.Properties properties = Block.Properties.of(material).strength(hardness, resistance).sound(sound);
+		if(requireToolToDrop) {
+			properties = properties.requiresCorrectToolForDrops();
 		}
+		createBlock(name, properties, item);
+	}
+	
+	private static void createBlock(String name, Block.Properties properties, Named<Block> type, Named<Block> level, boolean item) {
+		Block b = new BasicHarvestableTaggedBlock(properties, type, level);
+		createBlock(name, b, item);
+	}
+	
+	private static void createBlock(String name, Block.Properties properties, boolean item) {
+		Block b = new Block(properties);
 		createBlock(name, b, item);
 	}
 	

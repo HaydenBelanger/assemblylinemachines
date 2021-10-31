@@ -10,6 +10,9 @@ public class BasicHarvestableTaggedBlock extends Block implements IBlockWithHarv
 	
 	public BasicHarvestableTaggedBlock(Properties p_49795_, Named<Block> toolType, Named<Block> toolLevel) {
 		super(p_49795_);
+		if(toolType == null || toolLevel == null) {
+			throw new NullPointerException("type and level cannot be null!");
+		}
 		this.toolType = toolType;
 		this.toolLevel = toolLevel;
 	}

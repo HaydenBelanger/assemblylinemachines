@@ -1,0 +1,14 @@
+{
+  "config": {
+    "top_material": {
+      "Name": "assemblylinemachines:corrupt_sand"
+    },
+    "under_material": {
+      "Name": "assemblylinemachines:corrupt_sand"
+    },
+    "underwater_material": {
+      "Name": "assemblylinemachines:corrupt_gravel"
+    }
+  },
+  "type": "minecraft:default"
+}

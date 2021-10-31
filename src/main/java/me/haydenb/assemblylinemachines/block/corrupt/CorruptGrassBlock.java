@@ -2,21 +2,25 @@ package me.haydenb.assemblylinemachines.block.corrupt;
 
 import java.util.Random;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag.Named;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.lighting.LayerLightEngine;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeTagHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class CorruptGrassBlock extends Block implements IBlockWithHarvestableTags{
 
@@ -73,6 +77,10 @@ public class CorruptGrassBlock extends Block implements IBlockWithHarvestableTag
 			int i = LayerLightEngine.getLightBlockInto(p_220257_1_, p_220257_0_, p_220257_2_, blockstate, blockpos, Direction.UP, blockstate.getLightBlock(p_220257_1_, blockpos));
 			return i < p_220257_1_.getMaxLightLevel();
 		}
+	}
+	
+	static boolean allowPlaceOn(BlockState state) {
+		return state.is(ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "world/chaosbark_plantable")));
 	}
 
 

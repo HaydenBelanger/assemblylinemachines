@@ -51,7 +51,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 	private final TemperatureResistance _tempres;
 
 	public BlockFluidTank(int capacity, TemperatureResistance resist) {
-		super(Block.Properties.of(Material.GLASS).noOcclusion().strength(4f, 15f).sound(SoundType.GLASS)
+		super(Block.Properties.of(Material.METAL).noOcclusion().strength(4f, 15f).sound(SoundType.GLASS)
 				.dynamicShape());
 		_capacity = capacity;
 		_tempres = resist;

@@ -1,5 +1,5 @@
 {
-  "scale": 0.4,
+  "scale": 0.20,
   "effects": {
     "mood_sound": {
       "sound": "minecraft:ambient.cave",
@@ -7,10 +7,10 @@
       "block_search_extent": 8,
       "offset": 2.0
     },
-    "sky_color": 8037887,
-    "fog_color": 12638463,
-    "water_color": 4159204,
-    "water_fog_color": 329011
+    "sky_color": 12522422,
+    "fog_color": 7209832,
+    "water_color": 7602849,
+    "water_fog_color": 12930293
   },
   "surface_builder": "assemblylinemachines:chaos_plane_surface",
   "carvers": {
@@ -53,5 +53,5 @@
   "temperature": 0.5,
   "downfall": 0.0,
   "category": "none",
-  "depth": 0.2
+  "depth": 1
 }

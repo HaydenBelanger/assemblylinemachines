@@ -1,0 +1,7 @@
+{
+	"replace": false,
+	"values":[
+		"assemblylinemachines:corrupt_dirt",
+		"assemblylinemachines:corrupt_grass"
+	]
+}

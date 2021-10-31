@@ -7,19 +7,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag.Named;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class CorruptSandBlock extends SandBlock implements IBlockWithHarvestableTags {
+public class CorruptFallingBlock extends FallingBlock implements IBlockWithHarvestableTags {
 
 	
-	public CorruptSandBlock() {
-		super(0x4287f5, Block.Properties.of(Material.SAND).strength(13f, 30f).sound(SoundType.SAND));
-		
+	private final int dustColor;
+	
+	public CorruptFallingBlock(int dustColor, Properties properties) {
+		super(properties.strength(13f, 30f));
+		this.dustColor = dustColor;
 	}
 	
 	@Override
@@ -50,4 +53,8 @@ public class CorruptSandBlock extends SandBlock implements IBlockWithHarvestable
 		CorruptBlock.animate(stateIn, worldIn, pos, rand);
 	}
 	
+	@Override
+	public int getDustColor(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+		return this.dustColor;
+	}
 }

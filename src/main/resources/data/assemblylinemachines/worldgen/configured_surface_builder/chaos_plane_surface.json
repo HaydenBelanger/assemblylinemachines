@@ -7,7 +7,7 @@
       "Name": "assemblylinemachines:corrupt_dirt"
     },
     "underwater_material": {
-      "Name": "assemblylinemachines:corrupt_dirt"
+      "Name": "assemblylinemachines:corrupt_gravel"
     }
   },
   "type": "minecraft:default"

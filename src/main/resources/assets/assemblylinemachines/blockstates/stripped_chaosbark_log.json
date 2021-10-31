@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "axis=y":  { "model": "assemblylinemachines:block/corrupt/stripped_chaosbark_log" },
+        "axis=z":   { "model": "assemblylinemachines:block/corrupt/stripped_chaosbark_log", "x": 90 },
+        "axis=x":   { "model": "assemblylinemachines:block/corrupt/stripped_chaosbark_log", "x": 90, "y": 90 }
+    }
+}

@@ -3,12 +3,9 @@ package me.haydenb.assemblylinemachines.block;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,7 +15,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 
-public class BlockMystiumFarmland extends FarmBlock implements IBlockWithHarvestableTags {
+public class BlockMystiumFarmland extends FarmBlock {
 
 	private static final IntegerProperty AGE = IntegerProperty.create("exhaustion", 0, 32);
 	
@@ -26,17 +23,6 @@ public class BlockMystiumFarmland extends FarmBlock implements IBlockWithHarvest
 		super(Block.Properties.of(Material.DIRT).strength(0.6F).sound(SoundType.GRAVEL).randomTicks());
 		this.registerDefaultState(this.stateDefinition.any().setValue(MOISTURE, 7).setValue(AGE, 0));
 		
-	}
-	
-	@Override
-	public Named<Block> getToolType() {
-		return BlockTags.MINEABLE_WITH_SHOVEL;
-	}
-
-
-	@Override
-	public Named<Block> getToolLevel() {
-		return BlockTags.NEEDS_STONE_TOOL;
 	}
 	
 	@Override

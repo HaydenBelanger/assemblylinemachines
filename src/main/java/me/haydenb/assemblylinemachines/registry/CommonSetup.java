@@ -1,6 +1,8 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.corrupt.ChaosbarkLogBlock;
+import me.haydenb.assemblylinemachines.block.corrupt.ChaosbarkLogBlock.ChaosbarkTreeGrower;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -13,5 +15,8 @@ public class CommonSetup {
 	public static void commonSetup(FMLCommonSetupEvent event) throws Exception{
 		
 		FluidRegistry.updateInternalStoredFluids();
+		
+		ChaosbarkLogBlock.patchStrippables();
+		ChaosbarkTreeGrower.registerTreeGen();
 	}
 }

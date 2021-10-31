@@ -1,13 +1,10 @@
 package me.haydenb.assemblylinemachines.block;
 
 import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
 import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP.TOPProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -19,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Material;
 
-public class BlockBlackGranite extends Block implements IBlockWithHarvestableTags, TOPProvider{
+public class BlockBlackGranite extends Block implements TOPProvider{
 
 	public static final BooleanProperty NATURAL_GRANITE = BooleanProperty.create("natural");
 	public BlockBlackGranite() {
@@ -30,16 +27,6 @@ public class BlockBlackGranite extends Block implements IBlockWithHarvestableTag
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(NATURAL_GRANITE);
-	}
-	
-	@Override
-	public Named<Block> getToolType() {
-		return BlockTags.MINEABLE_WITH_PICKAXE;
-	}
-	
-	@Override
-	public Named<Block> getToolLevel() {
-		return BlockTags.NEEDS_STONE_TOOL;
 	}
 	
 	@SuppressWarnings("deprecation")

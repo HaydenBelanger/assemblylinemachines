@@ -1,7 +1,9 @@
 {
   "replace": false,
   "values": [
+    "assemblylinemachines:chaosbark_log",
     "assemblylinemachines:fluid_bath",
+    "assemblylinemachines:stripped_chaosbark_log",
     "assemblylinemachines:compressed_crafting_table"
   ]
 }

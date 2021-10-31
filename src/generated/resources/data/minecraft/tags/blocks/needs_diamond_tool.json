@@ -1,14 +1,13 @@
 {
   "replace": false,
   "values": [
+    "assemblylinemachines:chaosbark_log",
     "assemblylinemachines:deepslate_titanium_ore",
-    "assemblylinemachines:titanium_block",
     "assemblylinemachines:corrupt_stone",
-    "assemblylinemachines:steel_block",
-    "assemblylinemachines:mystium_block",
+    "assemblylinemachines:corrupt_gravel",
+    "assemblylinemachines:stripped_chaosbark_log",
     "assemblylinemachines:corrupt_grass",
     "assemblylinemachines:titanium_ore",
-    "assemblylinemachines:chromium_block",
     "assemblylinemachines:corrupt_sand",
     "assemblylinemachines:corrupt_dirt"
   ]

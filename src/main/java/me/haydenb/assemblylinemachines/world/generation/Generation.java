@@ -29,6 +29,7 @@ public class Generation {
 	private static final RuleTest END_RULE_TEST = new BlockMatchTest(Blocks.END_STONE);
 	private static final RangeDecoratorConfiguration FULL_HEIGHT = new RangeDecoratorConfiguration(UniformHeight.of(VerticalAnchor.bottom(), VerticalAnchor.top()));
 	
+	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void biomeLoadingEvent(BiomeLoadingEvent event) {
 		
@@ -68,6 +69,9 @@ public class Generation {
 			ConfiguredFeature<?, ?> cf = Feature.ORE.configured(new OreConfiguration(END_RULE_TEST, Registry.getBlock("chromium_ore").defaultBlockState(), chrSize)).range(FULL_HEIGHT).squared().count(chrFreq);
 			event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, cf);
 		}
+		
+		//Generates featurs of the Chaos Plane.
+		DimensionChaosPlane.addFeaturesToBiome(event);
 	}
 	
 }

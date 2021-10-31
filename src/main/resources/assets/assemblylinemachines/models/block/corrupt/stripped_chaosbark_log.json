@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_column",
+    "textures": {
+        "end": "assemblylinemachines:block/corrupt/stripped_chaosbark_log_top",
+        "side": "assemblylinemachines:block/corrupt/stripped_chaosbark_log_side"
+    }
+}

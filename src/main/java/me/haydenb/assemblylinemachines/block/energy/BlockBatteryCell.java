@@ -6,13 +6,12 @@ import java.util.stream.Stream;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
-import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
 import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
 import me.haydenb.assemblylinemachines.util.*;
@@ -23,8 +22,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -45,7 +42,7 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TEBatteryCell> implements IBlockWithHarvestableTags {
+public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TEBatteryCell> {
 
 	private static final VoxelShape SHAPE_N = Stream.of(Block.box(10, 3, 0, 12, 13, 2),
 			Block.box(4, 3, 0, 6, 13, 2), Block.box(2, 5, 3, 2, 11, 13),
@@ -74,17 +71,6 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 				Direction.NORTH, tier.clazz);
 		this.registerDefaultState(
 				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.BATTERY_PERCENT_STATE, 0));
-	}
-
-	@Override
-	public Named<Block> getToolType() {
-		return BlockTags.MINEABLE_WITH_PICKAXE;
-	}
-
-
-	@Override
-	public Named<Block> getToolLevel() {
-		return BlockTags.NEEDS_IRON_TOOL;
 	}
 	
 	@Override

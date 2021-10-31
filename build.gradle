@@ -8,6 +8,7 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
+        classpath files("gradle/plugins/mixingradle-0.7-FG5BUILD.jar")
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -15,6 +16,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'org.spongepowered.mixin'
 
 version = '1.17.1-1.2.2'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -146,6 +148,8 @@ repositories{
 jar.finalizedBy('reobfJar')
 
 dependencies {
+	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+	
     minecraft 'net.minecraftforge:forge:1.17.1-37.0.103'
     
     //FTB GUI LIBRARY - Not yet updated to 1.17.1.

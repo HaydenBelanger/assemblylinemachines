@@ -8,7 +8,6 @@ import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
 import me.haydenb.assemblylinemachines.util.StateProperties;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.client.renderer.BiomeColors;
@@ -19,8 +18,6 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -36,7 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockFluidBath extends Block implements EntityBlock, IBlockWithHarvestableTags {
+public class BlockFluidBath extends Block implements EntityBlock {
 	
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
@@ -51,17 +48,6 @@ public class BlockFluidBath extends Block implements EntityBlock, IBlockWithHarv
 	public BlockFluidBath() {
 		super(Block.Properties.of(Material.WOOD).strength(4f, 15f).sound(SoundType.WOOD));
 		this.registerDefaultState(this.getStateDefinition().any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
-	}
-	
-	@Override
-	public Named<Block> getToolType() {
-		return BlockTags.MINEABLE_WITH_AXE;
-	}
-
-
-	@Override
-	public Named<Block> getToolLevel() {
-		return BlockTags.NEEDS_IRON_TOOL;
 	}
 
 	@Override

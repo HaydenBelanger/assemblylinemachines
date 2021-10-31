@@ -23,8 +23,13 @@ build
 eclipse
 run
 
+#FG5 Mixin Hack
+!build/createMcpToSrg/output.tsrg
+
 # Files from Forge MDK
 README.txt
 LICENSE.txt
 CREDITS.txt
 changelog.txt
+/.apt_generated/
+/.apt_generated_tests/
