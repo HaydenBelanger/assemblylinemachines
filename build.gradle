@@ -25,6 +25,7 @@ archivesBaseName = 'assemblylinemachines'
 // Mojang ships Java 16 to end users in 1.17+ instead of Java 8 in 1.16 or lower, so your mod should target Java 16.
 java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
+
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
 
@@ -56,6 +57,7 @@ minecraft {
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
+            arg "-mixin.config=mixins.assemblylinemachines.json"
 
             // Recommended logging level for the console
             // You can set various levels here.
@@ -78,6 +80,7 @@ minecraft {
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
+            arg "-mixin.config=mixins.assemblylinemachines.json"
 
             // Recommended logging level for the console
             // You can set various levels here.
@@ -143,13 +146,24 @@ repositories{
         url = "https://cursemaven.com"
         //url "https://maven.tterrag.com/"
     }
+    
+    maven{
+    	name = "Spongepowered"
+    	url = "https://repo.spongepowered.org/maven"
+    }
 }
 
 jar.finalizedBy('reobfJar')
 
+jar{
+	manifest{
+		attributes([
+			"MixinConfigs": "mixins.assemblylinemachines.json"
+		])
+	}
+}
+
 dependencies {
-	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
-	
     minecraft 'net.minecraftforge:forge:1.17.1-37.0.103'
     
     //FTB GUI LIBRARY - Not yet updated to 1.17.1.
@@ -171,4 +185,12 @@ dependencies {
     //The One Probe - Via Cursemaven as tterrag's maven is not updated yet.
     compileOnly fg.deobf("curse.maven:theoneprobe-245211:3430022")
     runtimeOnly fg.deobf("curse.maven:theoneprobe-245211:3430022")
+    
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+}
+
+//Mixin workaround stuff.
+mixin {
+	add sourceSets.main, 'mixins.assemblylinemachines.refmap.json'
+	
 }
