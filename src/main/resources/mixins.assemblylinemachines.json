@@ -3,6 +3,7 @@
 	"package": "me.haydenb.assemblylinemachines.mixins",
 	"refmap": "mixins.assemblylinemachines.refmap.json",
 	"client": [
+		"client.MixinExperimentalWorldStifler"
 	],
 	"injectors": {
 		"defaultRequire": 1

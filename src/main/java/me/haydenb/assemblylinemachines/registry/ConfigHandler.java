@@ -47,6 +47,7 @@ public class ConfigHandler {
 		//public final BooleanValue guideBook;
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
+		public final BooleanValue experimentalWorldScreenDisable;
 		
 		//TITANIUM TOOLS
 		public final ConfigValue<Double> titaniumToolAttack;
@@ -159,11 +160,11 @@ public class ConfigHandler {
 			builder.pop();
 			
 			builder.pop();
-			
 			builder.push("World");
 			mystiumFarmlandDeath = builder.comment("Should Mystium Farmland get exhausted over time and stop performing grow operations?").define("mystiumFarmlandDeath", true);
 			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
 			gasolineExplosions = builder.comment("Should Gasoline and Diesel explode when placed next to a flammable block?").define("gasolineExplosions", true);
+			
 			//guideBook = builder.comment("Should new players be given the guide book when joining the world (as long as Patchouli is installed?) NOTE: For v1.2, this toggle is not functional as Patchouli hasn't been updated.").define("guideBook", true);
 			
 			builder.push("Titanium Generation");
@@ -188,6 +189,7 @@ public class ConfigHandler {
 			builder.pop();
 			
 			builder.push("Client-Side-Only Options");
+			experimentalWorldScreenDisable = builder.comment("Should Assembly Line Machines silence the World Experimental Settings screen?").define("experimentalWorldScreenDisable", true);
 			coolDudeMode = builder.comment("Do you want to enable 'Cool Dude Mode', enabling easter-egg/meme effects?").define("coolDudeMode", false);
 			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
 			builder.pop();

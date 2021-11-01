@@ -30,7 +30,7 @@ public class DimensionChaosPlane {
 		CORRUPT_BIOMES.add(CORRUPT_FOREST.location());
 	}
 	
-	private static final RangeDecoratorConfiguration CHAOSBARK_RANGE = new RangeDecoratorConfiguration(UniformHeight.of(VerticalAnchor.aboveBottom(64), VerticalAnchor.aboveBottom(170)));
+	private static final RangeDecoratorConfiguration RANGE = new RangeDecoratorConfiguration(UniformHeight.of(VerticalAnchor.aboveBottom(64), VerticalAnchor.aboveBottom(170)));
 	
 	private static <T> ResourceKey<T> create(ResourceKey<Registry<T>> registry, String name){
 		return ResourceKey.create(registry, new ResourceLocation(AssemblyLineMachines.MODID, name));
@@ -39,16 +39,22 @@ public class DimensionChaosPlane {
 	public static void addFeaturesToBiome(BiomeLoadingEvent event) {
 		if(CORRUPT_BIOMES.contains(event.getName())) {
 			int treeCount = 0;
+			int plantCount = 0;
 			if(event.getName().equals(CORRUPT_PLAINS.location())) {
 				treeCount = 4;
+				plantCount = 9;
 			}else if(event.getName().equals(CORRUPT_FOREST.location())) {
 				treeCount = 120;
+				plantCount = 4;
 			}else if(event.getName().equals(CORRUPT_CLIFFS.location())) {
 				treeCount = 8;
+				plantCount = 2;
 			}
 			
 			if(treeCount != 0) {
-				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosbarkTreeGrower.chaosbarkTree.range(CHAOSBARK_RANGE).squared().count(treeCount));
+				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosbarkTreeGrower.chaosbarkTree.range(RANGE).squared().count(treeCount));
+				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.chaosPlaneGrass.range(RANGE).squared().count(plantCount * 7));
+				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.chaosPlaneFlowers.range(RANGE).squared().count(plantCount));
 			}
 			
 		}

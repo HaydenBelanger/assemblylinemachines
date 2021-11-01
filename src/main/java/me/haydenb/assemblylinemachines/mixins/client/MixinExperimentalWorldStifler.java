@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.serialization.Lifecycle;
 
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 
 @Mixin(PrimaryLevelData.class)
@@ -14,6 +15,12 @@ public class MixinExperimentalWorldStifler {
 
 	@Inject(method = "worldGenSettingsLifecycle", at = @At("HEAD"), cancellable = true)
 	public void injectStableLifecycle(CallbackInfoReturnable<Lifecycle> cir) {
-		cir.setReturnValue(Lifecycle.stable());
+		Lifecycle lf;
+		if(ConfigHolder.COMMON.experimentalWorldScreenDisable.get()) {
+			lf = Lifecycle.stable();
+		}else {
+			lf = ((PrimaryLevelData)(Object) this).worldGenSettingsLifecycle;
+		}
+		cir.setReturnValue(lf);
 	}
 }

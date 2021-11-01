@@ -5,6 +5,7 @@ bin
 .metadata
 .classpath
 .project
+.factorypath
 
 # idea
 out
@@ -14,7 +15,7 @@ out
 .idea
 
 # gradle
-build/*
+build
 
 .gradle
 /src/generated/resources/.cache
@@ -32,3 +33,4 @@ changelog.txt
 /.apt_generated/
 /.apt_generated_tests/
 /build/
+/Users/
