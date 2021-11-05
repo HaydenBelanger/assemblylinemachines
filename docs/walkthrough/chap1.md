@@ -44,7 +44,7 @@ With silt bricks now aquired, you're ready to craft the Manual Grindstone for th
 
 ![Manual Grindstone](../media/manual_grindstone_recipe.png)
 
-Once crafted, the manual grindstone also requires various blades for functioning. Blades, like stirring sticks, also have a durability associated with them that will decrease as you grind (your first one will be made out of titanium, though stronger ones will be avialable later on in progression).
+Once crafted, the manual grindstone also requires various blades for functioning. Blades, like stirring sticks, also have a durability associated with them that will decrease as you grind (your first one will be made out of titanium, though stronger ones will be available later on in progression).
 
 ??? note inline end
 

@@ -166,13 +166,9 @@ Next we'll run over the GUI.
 
 Now with vastly superior FE storage you can upgrade your power generation. The most effective way to do this is by either throwing a speed upgrade into your gearbox (this will increase the FE output of the crankmill to 66FE/t) or by creating a coal generator.
 
-??? note inline end
-
-    Coal generators, despite their name **only** use empowered coal for FE generation much like the gearbox.
-
 ![Coal Generator](../media/coal_generator.png)
 
-Coal genertors are very simple to use, only featuring one input slot and an energy buffer. To use them just throw in some empowered coal and they'll generate a steady stream of 107 FE/t (about 12,800FE total per piece of empowered coal) while they have fuel making for a decent early power gen.
+Coal genertors are very simple to use, only featuring one input slot and an energy buffer and accepting any fuel a regular furnace can. To use them just throw in a fuel like some empowered coal and they'll generate a steady stream of FE while they have fuel making for a decent early power gen.
 
 Now with both FE storage and generation handled you're ready for the next set of upgrades!
 
