@@ -126,7 +126,7 @@ The gearbox GUI is a little more complex as it is your first machine that can ac
 
 !!! note inline end
 
-    The gearbox will **ONLY** comsume empowered coal and it's upgrades as a valid fuel source. Coal and Charcoal will not work inside without a Fuel Compatibility upgrade.
+    The gearbox will **ONLY** consume empowered coal and it's upgrades as a valid fuel source. Coal and Charcoal will not work inside without a Fuel Compatibility upgrade.
 
 1.  Fuel slot
 
