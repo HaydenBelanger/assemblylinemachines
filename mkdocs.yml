@@ -12,6 +12,7 @@ nav:
   - Chapters:
     - Chapter 1 - Primitive: walkthrough/chap1.md
     - Chapter 2 - Kinetic Energy: walkthrough/chap2.md
+    - Chapter 3a - Logistics and Machines: walkthrough/chap3.md
   - Developers:
     - Data Types: miscdev/datatypes.md
     - Recipes:
