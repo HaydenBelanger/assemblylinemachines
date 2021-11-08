@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "forge:ores/redstone"
+	},
+	"output":{
+		"item": "minecraft:redstone",
+		"count": 10
+	},
+	"grinds": 4,
+	"bladetype": "TITANIUM"
+}

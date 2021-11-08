@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.block.utility.BlockFluidTank.TEFluidTank.FluidTankHandler;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -96,7 +96,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 	}
 	public static class BlockItemFluidTank extends BlockItem{
 		public BlockItemFluidTank(Block block) {
-			super(block, new Item.Properties().tab(Registry.creativeTab));
+			super(block, new Item.Properties().tab(Registry.CREATIVE_TAB));
 		}
 		
 		@Override

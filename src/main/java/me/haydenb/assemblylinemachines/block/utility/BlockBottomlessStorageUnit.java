@@ -10,7 +10,9 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -78,7 +80,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 	public static class BlockItemBottomlessStorageUnit extends BlockItem{
 
 		public BlockItemBottomlessStorageUnit(Block blockIn) {
-			super(blockIn, new Item.Properties().tab(Registry.creativeTab));
+			super(blockIn, new Item.Properties().tab(Registry.CREATIVE_TAB));
 		}
 		
 		@Override
@@ -274,7 +276,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		}
 
 		public ContainerBottomlessStorageUnit(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEBottomlessStorageUnit.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEBottomlessStorageUnit.class));
 		}
 
 		@Override

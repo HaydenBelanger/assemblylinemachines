@@ -11,10 +11,10 @@ import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP.TOPProvider;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,9 +51,9 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 			Block.box(2, 9, 2, 14, 16, 14)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	
 	public BlockCoalGenerator() {
 		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), 
@@ -212,7 +212,7 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 		
 		
 		public ContainerCoalGenerator(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TECoalGenerator.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TECoalGenerator.class));
 		}
 	}
 	

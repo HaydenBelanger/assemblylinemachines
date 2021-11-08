@@ -1,6 +1,6 @@
 package me.haydenb.assemblylinemachines.world.effect;
 
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.damagesource.DamageSource;
@@ -26,7 +26,7 @@ public class EffectEntropyPoisoning extends MobEffect {
 		
 		
 		
-		if(livingEntity instanceof Player && General.RAND.nextInt(3) == 0) {
+		if(livingEntity instanceof Player && Utils.RAND.nextInt(3) == 0) {
 			
 			BlockPos pos = new BlockPos(livingEntity.position());
 			Level world = livingEntity.getCommandSenderWorld();
@@ -37,10 +37,10 @@ public class EffectEntropyPoisoning extends MobEffect {
 				
 				int ix = 1;
 				
-				while(General.RAND.nextInt(ix) == 0) {
-					rand = rand.relative(Direction.getRandom(General.RAND), General.RAND.nextInt(6));
-					rand = rand.relative(Direction.getRandom(General.RAND), General.RAND.nextInt(6));
-					rand = rand.relative(Direction.getRandom(General.RAND), General.RAND.nextInt(6));
+				while(Utils.RAND.nextInt(ix) == 0) {
+					rand = rand.relative(Direction.getRandom(Utils.RAND), Utils.RAND.nextInt(6));
+					rand = rand.relative(Direction.getRandom(Utils.RAND), Utils.RAND.nextInt(6));
+					rand = rand.relative(Direction.getRandom(Utils.RAND), Utils.RAND.nextInt(6));
 					
 					ix++;
 				}
@@ -49,7 +49,7 @@ public class EffectEntropyPoisoning extends MobEffect {
 				
 				
 				if(world.getBlockState(rand).getBlock() == Blocks.AIR && world.getBlockState(rand2).getBlock() == Blocks.AIR) {
-					livingEntity.moveTo(rand.getX() + 0.5, rand.getY() + 0.5, rand.getZ() + 0.5, (General.RAND.nextFloat() * 360f) - 180f, (General.RAND.nextFloat() * 180f) - 90f);
+					livingEntity.moveTo(rand.getX() + 0.5, rand.getY() + 0.5, rand.getZ() + 0.5, (Utils.RAND.nextFloat() * 360f) - 180f, (Utils.RAND.nextFloat() * 180f) - 90f);
 				}
 			}
 		}

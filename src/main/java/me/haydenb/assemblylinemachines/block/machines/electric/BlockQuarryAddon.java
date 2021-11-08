@@ -3,10 +3,11 @@ package me.haydenb.assemblylinemachines.block.machines.electric;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -53,9 +54,9 @@ public abstract class BlockQuarryAddon extends Block {
 			Block.box(7, 0, 7, 9, 2, 9)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockQuarryAddon() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
@@ -214,9 +215,9 @@ public abstract class BlockQuarryAddon extends Block {
 				Block.box(7, 7, 7, 9, 9, 9)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 		
-		private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-		private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-		private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+		private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+		private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+		private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 		
 		@Override
 		public VoxelShape getAddonBaseShape(Direction d) {
@@ -278,9 +279,9 @@ public abstract class BlockQuarryAddon extends Block {
 				Block.box(5, 5, 5, 11, 11, 11)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 		
-		private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-		private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-		private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+		private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+		private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+		private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 		
 		@Override
 		public VoxelShape getAddonBaseShape(Direction d) {

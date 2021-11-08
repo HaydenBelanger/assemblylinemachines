@@ -11,7 +11,7 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import me.haydenb.assemblylinemachines.world.rendering.GUIHelper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;

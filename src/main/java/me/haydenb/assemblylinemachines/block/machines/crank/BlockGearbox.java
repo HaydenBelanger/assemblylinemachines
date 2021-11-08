@@ -11,9 +11,9 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.item.categories.IGearboxFuel;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -43,7 +43,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 	public BlockGearbox() {
 		super(Block.Properties.of(Material.METAL).strength(1f, 2f).sound(SoundType.METAL), "gearbox", TEGearbox.class);
 		this.registerDefaultState(
-				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 	}
 	
 	
@@ -51,7 +51,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.MACHINE_ACTIVE);
+		builder.add(HorizontalDirectionalBlock.FACING).add(BathCraftingFluid.MACHINE_ACTIVE);
 	}
 
 	@Override
@@ -178,11 +178,11 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 						}
 						
 						
-						if(burnTime == 0 && getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+						if(burnTime == 0 && getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 							sendUpdate = true;
-						}else if(burnTime != 0 && !getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+						}else if(burnTime != 0 && !getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 							sendUpdate = true;
 						}
 						if(sendUpdate) {
@@ -221,7 +221,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 		public NonNullList<ItemStack> getItems() {
 			if(contents.get(1) != ItemStack.EMPTY && contents.get(1).getItem() != Items.AIR && !(contents.get(1).getItem() instanceof IGearboxFuel)) {
 				if(Upgrades.match(contents.get(0)) != Upgrades.GB_COMPATABILITY) {
-					General.spawnItem(contents.get(1), this.getBlockPos().above(), level);
+					Utils.spawnItem(contents.get(1), this.getBlockPos().above(), level);
 					contents.set(1, ItemStack.EMPTY);
 					burnTime = 0;
 					sendUpdates();
@@ -247,7 +247,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 		
 		
 		public ContainerGearbox(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEGearbox.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEGearbox.class));
 		}
 		
 		

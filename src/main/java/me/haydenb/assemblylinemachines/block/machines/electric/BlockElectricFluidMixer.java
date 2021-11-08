@@ -13,11 +13,12 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -68,22 +69,22 @@ public class BlockElectricFluidMixer extends BlockScreenBlockEntity<BlockElectri
 			Block.box(7, 4, 0, 9, 5, 1)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	private static final Random RAND = new Random();
 	
 	public BlockElectricFluidMixer() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "electric_fluid_mixer", BlockElectricFluidMixer.TEElectricFluidMixer.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	
 	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.FLUID).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
@@ -212,7 +213,7 @@ public class BlockElectricFluidMixer extends BlockScreenBlockEntity<BlockElectri
 								}
 							}else {
 								if(extHandler == null) {
-									extHandler = General.getCapabilityFromDirection(this, "extHandler", Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+									extHandler = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) extHandler = null;}, Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 								}
 								
 								if(extHandler != null) {
@@ -249,16 +250,16 @@ public class BlockElectricFluidMixer extends BlockScreenBlockEntity<BlockElectri
 								doShutoff = false;
 								
 								sendUpdates = true;
-								if(getBlockState().getValue(StateProperties.FLUID) != recipe.getFluid()) {
-									this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.FLUID, recipe.getFluid()));
+								if(getBlockState().getValue(BathCraftingFluid.FLUID) != recipe.getFluid()) {
+									this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.FLUID, recipe.getFluid()));
 								}
 							}
 							
 							
 							
 						}
-						if(doShutoff && getBlockState().getValue(StateProperties.FLUID) != BathCraftingFluids.NONE) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.FLUID, BathCraftingFluids.NONE));
+						if(doShutoff && getBlockState().getValue(BathCraftingFluid.FLUID) != BathCraftingFluids.NONE) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE));
 							sendUpdates = true;
 						}
 						
@@ -455,7 +456,7 @@ public class BlockElectricFluidMixer extends BlockScreenBlockEntity<BlockElectri
 		}
 		
 		public ContainerElectricFluidMixer(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEElectricFluidMixer.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEElectricFluidMixer.class));
 		}
 	}
 	
@@ -554,7 +555,7 @@ public class BlockElectricFluidMixer extends BlockScreenBlockEntity<BlockElectri
 			PacketData pd = new PacketData("efm_gui");
 			pd.writeBlockPos("pos", pos);
 
-			HashPacketImpl.INSTANCE.sendToServer(pd);
+			PacketHandler.INSTANCE.sendToServer(pd);
 		}
 	}
 	

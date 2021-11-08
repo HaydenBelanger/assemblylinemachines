@@ -5,8 +5,8 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
-import me.haydenb.assemblylinemachines.registry.FluidRegistry;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.world.generation.DimensionChaosPlane;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
 public class FluidCondensedVoid extends ALMFluid {
 
 	public FluidCondensedVoid(boolean source) {
-		super(FluidRegistry.buildProperties("condensed_void", -200, false, true, true), source);
+		super(Registry.createFluidProperties("condensed_void", -200, false, true, true), source, 0, 0, 0);
 	}
 
 	@Override
@@ -34,29 +34,32 @@ public class FluidCondensedVoid extends ALMFluid {
 		return 2;
 	}
 	
-	@Override
+	@Override	
 	protected void randomTick(Level world, BlockPos pos, FluidState state, Random randomom) {
-		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
-		while(iter.hasNext()) {
-			BlockPos cor = iter.next();
-			if(randomom.nextInt(2) == 0) {
-				Block block = world.getBlockState(cor).getBlock();
-				if(block.getTags().contains(new ResourceLocation("minecraft", "leaves")) || block.getTags().contains(new ResourceLocation("minecraft", "logs"))
-						|| block.getTags().contains(new ResourceLocation("minecraft", "flowers")) || block.getTags().contains(new ResourceLocation("minecraft", "planks"))
-						|| block.getTags().contains(new ResourceLocation("minecraft", "wool"))
-						|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
-						|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
-					world.destroyBlock(cor, false);
-				}else if(block.defaultBlockState().getMaterial() == Material.STONE) {
-					world.setBlockAndUpdate(cor, Blocks.GRAVEL.defaultBlockState());
-				}else if(block == Blocks.WATER) {
-					world.setBlockAndUpdate(cor, Blocks.PACKED_ICE.defaultBlockState());
-				}else if(block == Blocks.LAVA) {
-					world.setBlockAndUpdate(cor, Blocks.OBSIDIAN.defaultBlockState());
+		if(!world.dimension().location().equals(DimensionChaosPlane.CHAOS_PLANE.location())) {
+			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
+			while(iter.hasNext()) {
+				BlockPos cor = iter.next();
+				if(randomom.nextInt(2) == 0) {
+					Block block = world.getBlockState(cor).getBlock();
+					if(block.getTags().contains(new ResourceLocation("minecraft", "leaves")) || block.getTags().contains(new ResourceLocation("minecraft", "logs"))
+							|| block.getTags().contains(new ResourceLocation("minecraft", "flowers")) || block.getTags().contains(new ResourceLocation("minecraft", "planks"))
+							|| block.getTags().contains(new ResourceLocation("minecraft", "wool"))
+							|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
+							|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
+						world.destroyBlock(cor, false);
+					}else if(block.defaultBlockState().getMaterial() == Material.STONE) {
+						world.setBlockAndUpdate(cor, Blocks.GRAVEL.defaultBlockState());
+					}else if(block == Blocks.WATER) {
+						world.setBlockAndUpdate(cor, Blocks.PACKED_ICE.defaultBlockState());
+					}else if(block == Blocks.LAVA) {
+						world.setBlockAndUpdate(cor, Blocks.OBSIDIAN.defaultBlockState());
+					}
 				}
+					
 			}
-				
 		}
+		
 		
 		super.randomTick(world, pos, state, randomom);
 	}
@@ -70,11 +73,16 @@ public class FluidCondensedVoid extends ALMFluid {
 	public int getTickDelay(LevelReader world) {
 		return 5;
 	}
+	
+	@Override
+	public float getFogDensity() {
+		return 1f;
+	}
 
 	public static class FluidCondensedVoidBlock extends ALMFluidBlock {
 
 		public FluidCondensedVoidBlock(Supplier<? extends FlowingFluid> fluid) {
-			super(fluid, ALMFluid.CONDENSED_VOID, Material.WATER);
+			super(fluid, ALMFluid.getTag("condensed_void"), Material.WATER);
 		}
 
 		@Override

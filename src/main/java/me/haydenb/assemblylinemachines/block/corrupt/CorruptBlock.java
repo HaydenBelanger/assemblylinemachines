@@ -1,40 +1,102 @@
 package me.haydenb.assemblylinemachines.block.corrupt;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.datagen.IBlockWithHarvestableTags;
+import me.haydenb.assemblylinemachines.registry.TagMaster;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.IPlantable;
 
-public class CorruptBlock extends Block implements IBlockWithHarvestableTags {
+public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGenProvider {
 
 	private final Named<Block> type;
 	private final Named<Block> level;
+	private final boolean isGrass;
+	private final boolean shouldBePoisonous;
 	
-	public CorruptBlock(BlockBehaviour.Properties properties, Named<Block> type, Named<Block> level) {
-		super(properties.strength(13f, 30f));
+	public static final HashMap<Block, String> CORRUPT_VARIANTS = new HashMap<>();
+	static{
+		CORRUPT_VARIANTS.put(Blocks.DIRT, "corrupt_dirt");
+		CORRUPT_VARIANTS.put(Blocks.GRASS, "corrupt_grass");
+		CORRUPT_VARIANTS.put(Blocks.SAND, "corrupt_sand");
+		CORRUPT_VARIANTS.put(Blocks.STONE, "corrupt_stone");
+		CORRUPT_VARIANTS.put(Blocks.GRAVEL, "corrupt_gravel");
+	}
+	
+	public CorruptBlock(BlockBehaviour.Properties properties, Named<Block> type, Named<Block> level, boolean isGrass, boolean shouldBePoisonous) {
+		super(properties.strength(3f, 9f));
 		this.type = type;
 		this.level = level;
-
+		this.isGrass = isGrass;
+		this.shouldBePoisonous = shouldBePoisonous;
+	}
+	
+	public CorruptBlock(BlockBehaviour.Properties properties, Named<Block> type, Named<Block> level) {
+		super(properties.strength(3f, 9f));
+		this.type = type;
+		this.level = level;
+		this.isGrass = false;
+		this.shouldBePoisonous = true;
 	}
 
 	@Override
-	public void randomTick(BlockState state, ServerLevel worldIn, BlockPos pos, Random random) {
-		poisonAll(worldIn, pos);
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+		if(shouldBePoisonous) {
+			poisonAll(world, pos);
+		}
+		
+		if(isGrass) {
+			if(!SpreadingSnowyDirtBlock.canBeGrass(state, world, pos)) {
+				if(world.isAreaLoaded(pos, 3)) {
+					world.setBlockAndUpdate(pos, Registry.getBlock("corrupt_dirt").defaultBlockState());
+				}
 
+			}
+		}
+
+	}
+	
+	//Used for Chaosbark/Stripped Chaosbark Logs.
+	public static class CorruptBlockWithAxis extends CorruptBlock{
+
+		public CorruptBlockWithAxis(Properties properties, Named<Block> type, Named<Block> level, boolean isGrass, boolean shouldBePoisonous) {
+			super(properties, type, level, isGrass, shouldBePoisonous);
+			this.registerDefaultState(this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Axis.Y));
+		}
+		
+		@Override
+		protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
+			pBuilder.add(RotatedPillarBlock.AXIS);
+		}
+		
+		@Override
+		public BlockState rotate(BlockState pState, Rotation pRotation) {
+			return RotatedPillarBlock.rotatePillar(pState, pRotation);
+		}
+		
+		@Override
+		public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+			return this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, pContext.getClickedFace().getAxis());
+			
+		}
+		
 	}
 
 	@Override
@@ -56,9 +118,13 @@ public class CorruptBlock extends Block implements IBlockWithHarvestableTags {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
-		animate(stateIn, worldIn, pos, rand);
+		if(shouldBePoisonous) {
+			animate(stateIn, worldIn, pos, rand);
+		}
+		
 	}
 
+	//Provides gentle 'corrupt' particles to area of block.
 	@OnlyIn(Dist.CLIENT)
 	public static void animate(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		if (rand.nextInt(10) == 0) {
@@ -69,7 +135,17 @@ public class CorruptBlock extends Block implements IBlockWithHarvestableTags {
 		}
 
 	}
+	
+	@Override
+	public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
+		if(plantable.getPlantType(world, pos) == CorruptTallGrassBlock.CORRUPT_GRASS) {
+			Block b = state.getBlock();
+			return (b.equals(Registry.getBlock("corrupt_grass")) || b.equals(Registry.getBlock("corrupt_dirt")));
+		}
+		return false;
+	}
 
+	//Applies Entropy Poisoning to all entities in area.
 	public static void poisonAll(ServerLevel world, BlockPos pos) {
 
 		BlockPos pos1 = pos.above();

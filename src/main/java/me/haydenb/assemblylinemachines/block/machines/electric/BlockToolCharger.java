@@ -3,8 +3,8 @@ package me.haydenb.assemblylinemachines.block.machines.electric;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -41,14 +41,14 @@ public class BlockToolCharger extends BlockTileEntity{
 			Block.box(13, 3, 0, 16, 13, 3),
 			Block.box(0, 3, 13, 16, 13, 16)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockToolCharger() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "tool_charger");
 		
-		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
+		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 	}
 	
 	
@@ -103,7 +103,7 @@ public class BlockToolCharger extends BlockTileEntity{
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.MACHINE_ACTIVE);
+		builder.add(HorizontalDirectionalBlock.FACING).add(BathCraftingFluid.MACHINE_ACTIVE);
 	}
 	
 	
@@ -261,13 +261,13 @@ public class BlockToolCharger extends BlockTileEntity{
 					
 					if(didSomething) {
 						prevStatusMessage = "Charging " + prevStatusMessage + "...";
-						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+						if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE) == false) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 						}
 					}else {
 						prevStatusMessage = "Charger idle...";
-						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+						if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 						}
 					}
 					prevStatusMessage = prevStatusMessage + " (" + Formatting.GENERAL_FORMAT.format(amount) + "/30,000 FE)";

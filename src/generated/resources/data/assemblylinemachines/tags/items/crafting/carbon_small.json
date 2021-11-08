@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:coal",
+    "minecraft:charcoal",
+    "assemblylinemachines:ground_coal",
+    "assemblylinemachines:ground_charcoal",
+    "#minecraft:coal_ores"
+  ]
+}

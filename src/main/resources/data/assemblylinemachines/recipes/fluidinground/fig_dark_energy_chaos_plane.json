@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "assemblylinemachines:dark_energy",
+	"chance": 9,
+	"min": 750,
+	"max": 2500,
+	"criteria_set": "CHAOS_PLANE"
+}

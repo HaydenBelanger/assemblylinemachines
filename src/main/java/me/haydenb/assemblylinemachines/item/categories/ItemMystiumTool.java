@@ -1,7 +1,5 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,9 +10,8 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.General.IPoweredTool;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.IPoweredTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -54,14 +51,12 @@ import net.minecraftforge.energy.IEnergyStorage;
 public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements IPoweredTool {
 
 	private final A parent;
-	private final ItemStack item;
 	private final int maxPower;
 
-	public ItemMystiumTool(float damage, float speed, Item.Properties builder, int maxPower, A parent) {
-		super(parent.getTier(), builder);
+	public ItemMystiumTool(int maxPower, A parent) {
+		super(parent.getTier(), new Item.Properties().tab(parent.getItemCategory()));
 		this.parent = parent;
 		this.maxPower = maxPower;
-		this.item = new ItemStack(parent);
 
 	}
 
@@ -124,7 +119,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	@Override
 	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
 
-		return parent.canApplyAtEnchantingTable(item, enchantment);
+		return parent.canApplyAtEnchantingTable(stack, enchantment);
 	}
 
 	@Override
@@ -277,7 +272,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				Level level = pContext.getLevel();
 				BlockPos blockpos = pContext.getClickedPos();
-				Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = General.getTillableMap().get(level.getBlockState(blockpos).getBlock());
+				Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = HoeItem.TILLABLES.get(level.getBlockState(blockpos).getBlock());
 				int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(pContext);
 				if (hook != 0) return hook > 0 ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 				if (pContext.getClickedFace() != Direction.DOWN && level.isEmptyBlock(blockpos.above())) {
@@ -515,31 +510,5 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			return true;
 		}
 		return super.showDurabilityBar(stack);
-	}
-
-	/**
-	 * Returns a PowerTool version of A. WARNING: A MUST(!!!!!!) be either
-	 * SwordItem, PickaxeItem, ShovelItem, HoeItem, or AxeItem (Or any other class
-	 * with the exact constructor of IItemTier, float, (opt) float, Item.Properties,
-	 * like ItemHammer.)
-	 * 
-	 * @return Made PowerTool
-	 */
-	@SuppressWarnings("unchecked")
-	public static <A extends TieredItem> ItemMystiumTool<A> makePowerTool(Tier tier, int attackDamage, float attackSpeed, Item.Properties props,
-			int maxCranks, Class<A> clazz) {
-		try {
-			for (Constructor<?> c : clazz.getConstructors()) {
-				if (c.getParameterCount() == 4) {
-					return new ItemMystiumTool<A>((float) attackDamage, attackSpeed, props, maxCranks, (A) c.newInstance(tier, attackDamage, attackSpeed, props));
-				} else {
-					return new ItemMystiumTool<A>((float) attackDamage, attackSpeed, props, maxCranks, (A) c.newInstance(tier, attackSpeed, props));
-				}
-			}
-		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-
-		return null;
 	}
 }

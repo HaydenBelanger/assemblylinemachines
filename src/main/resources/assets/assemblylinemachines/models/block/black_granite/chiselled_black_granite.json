@@ -1,7 +1,7 @@
 {
     "parent": "block/cube_column",
     "textures": {
-        "side": "assemblylinemachines:block/black_granite/chiselled_black_granite",
-        "end": "assemblylinemachines:block/black_granite/chiselled_black_granite_top"
+        "side": "assemblylinemachines:block/black_granite/runed_black_granite",
+        "end": "assemblylinemachines:block/black_granite/smooth_black_granite"
     }
 }

@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:dusts/titanium",
+    "#forge:dusts/coal",
+    "#forge:dusts/iron",
+    "#forge:dusts/lapis",
+    "#forge:dusts/charcoal",
+    "#forge:dusts/flerovium",
+    "#forge:dusts/copper",
+    "#forge:dusts/diamond",
+    "#forge:dusts/gold",
+    "#forge:dusts/electrified_netherite",
+    "#forge:dusts/mystium",
+    "#forge:dusts/netherite"
+  ]
+}

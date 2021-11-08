@@ -12,11 +12,10 @@ import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.*;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkHandler.QuantumLinkNetwork;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkStatus;
@@ -347,7 +346,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 		}
 
 		public ContainerQuantumLink(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEQuantumLink.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEQuantumLink.class));
 		}
 
 	}
@@ -625,7 +624,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			pd.writeBlockPos("location", pos);
 			pd.writeInteger("button", button);
 
-			HashPacketImpl.INSTANCE.sendToServer(pd);
+			PacketHandler.INSTANCE.sendToServer(pd);
 		}
 
 		public static void pressConnectButton(int channel, Integer password, BlockPos pos) {
@@ -640,7 +639,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			}
 
 
-			HashPacketImpl.INSTANCE.sendToServer(pd);
+			PacketHandler.INSTANCE.sendToServer(pd);
 
 		}
 

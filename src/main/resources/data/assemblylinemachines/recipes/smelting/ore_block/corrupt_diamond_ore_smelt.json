@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:smelting",
+	"ingredient":{
+		"item": "assemblylinemachines:corrupt_diamond_ore"
+	},
+	"result": "minecraft:diamond",
+	"experience": 1,
+	"cookingtime": 200
+}

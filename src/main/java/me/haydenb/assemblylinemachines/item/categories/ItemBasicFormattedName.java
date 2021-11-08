@@ -10,12 +10,12 @@ public class ItemBasicFormattedName extends Item{
 
 	protected final ChatFormatting[] formats;
 	public ItemBasicFormattedName(ChatFormatting... formats) {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 		this.formats = formats;
 	}
 	
 	public ItemBasicFormattedName(Properties properties, ChatFormatting... formats) {
-		super(properties.tab(Registry.creativeTab));
+		super(properties.tab(Registry.CREATIVE_TAB));
 		this.formats = formats;
 	}
 

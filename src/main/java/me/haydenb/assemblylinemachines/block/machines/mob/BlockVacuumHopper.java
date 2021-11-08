@@ -1,26 +1,21 @@
 package me.haydenb.assemblylinemachines.block.machines.mob;
 
+import java.lang.reflect.Method;
 import java.util.List;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.mojang.math.Vector3f;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.Container;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -33,6 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 public class BlockVacuumHopper extends HopperBlock {
@@ -51,9 +47,9 @@ public class BlockVacuumHopper extends HopperBlock {
 				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.EAST, Direction.SOUTH, SHAPE_E);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.EAST, Direction.WEST, SHAPE_E);
-	private static final VoxelShape SHAPE_N = General.rotateShape(Direction.EAST, Direction.NORTH, SHAPE_E);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.EAST, Direction.SOUTH, SHAPE_E);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.EAST, Direction.WEST, SHAPE_E);
+	private static final VoxelShape SHAPE_N = Utils.rotateShape(Direction.EAST, Direction.NORTH, SHAPE_E);
 
 	public BlockVacuumHopper() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
@@ -108,6 +104,8 @@ public class BlockVacuumHopper extends HopperBlock {
 		private int timer = 0;
 		private int sTimer = 0;
 		private AABB bb = null;
+		
+		private static Method method = null;
 
 		@Override
 		public void tick() {
@@ -136,61 +134,18 @@ public class BlockVacuumHopper extends HopperBlock {
 				}
 				if(sTimer++ == 4) {
 					sTimer = 0;
-					if (transferItemsOut(this)) {
-						this.setChanged();
+					if(method == null) method = ObfuscationReflectionHelper.findMethod(HopperBlockEntity.class, "m_155562_", Level.class, BlockPos.class, BlockState.class, HopperBlockEntity.class);
+					try {
+						if (method.invoke(null, this.getLevel(), this.getBlockPos(), this.getBlockState(), this).equals(true)) {
+							this.setChanged();
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
 				
 			}
 
-		}
-
-		
-		//Below four methods copied from HopperBlockEntity.class as static
-		private static boolean transferItemsOut(TEVacuumHopper tevh) {
-			if (net.minecraftforge.items.VanillaInventoryCodeHooks.insertHook(tevh))
-				return true;
-			Container iinventory = getInventoryForHopperTransfer(tevh);
-			if (iinventory == null) {
-				return false;
-			} else {
-				Direction direction = tevh.getBlockState().getValue(HopperBlock.FACING).getOpposite();
-				if (TEVacuumHopper.isInventoryFull(iinventory, direction)) {
-					return false;
-				} else {
-					for (int i = 0; i < tevh.getContainerSize(); ++i) {
-						if (!tevh.getItem(i).isEmpty()) {
-							ItemStack itemstack = tevh.getItem(i).copy();
-							ItemStack itemstack1 = TEVacuumHopper.addItem(tevh, iinventory, tevh.removeItem(i, 1), direction);
-							if (itemstack1.isEmpty()) {
-								iinventory.setChanged();
-								return true;
-							}
-
-							tevh.setItem(i, itemstack);
-						}
-					}
-
-					return false;
-				}
-			}
-		}
-
-		private static Container getInventoryForHopperTransfer(TEVacuumHopper tevh) {
-			Direction direction = tevh.getBlockState().getValue(HopperBlock.FACING);
-			return HopperBlockEntity.getContainerAt(tevh.getLevel(), tevh.getBlockPos().relative(direction));
-		}
-
-		private static boolean isInventoryFull(Container inventoryIn, Direction side) {
-			return iterateSlotsForCompat(inventoryIn, side).allMatch((p_213970_1_) -> {
-				ItemStack itemstack = inventoryIn.getItem(p_213970_1_);
-				return itemstack.getCount() >= itemstack.getMaxStackSize();
-			});
-		}
-		
-		private static IntStream iterateSlotsForCompat(Container p_213972_0_, Direction p_213972_1_) {
-			return p_213972_0_ instanceof WorldlyContainer ? IntStream.of(((WorldlyContainer) p_213972_0_).getSlotsForFace(p_213972_1_))
-					: IntStream.range(0, p_213972_0_.getContainerSize());
 		}
 
 		@Override
@@ -208,7 +163,7 @@ public class BlockVacuumHopper extends HopperBlock {
 			pd.writeDouble("x", x);
 			pd.writeDouble("y", y);
 			pd.writeDouble("z", z);
-			HashPacketImpl.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), pd);
+			PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), pd);
 		}
 	}
 

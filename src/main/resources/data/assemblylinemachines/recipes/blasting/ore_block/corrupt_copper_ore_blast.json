@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:corrupt_coal_ore"
+	},
+	"result": "minecraft:coal",
+	"experience": 1,
+	"cookingtime": 100
+}

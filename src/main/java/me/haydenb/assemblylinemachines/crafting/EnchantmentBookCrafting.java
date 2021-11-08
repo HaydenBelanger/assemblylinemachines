@@ -1,11 +1,15 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.mob.BlockExperienceMill.TEExperienceMill;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class EnchantmentBookCrafting implements Recipe<Container>{
+public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<EnchantmentBookCrafting> ENCHANTMENT_BOOK_RECIPE = new TypeEnchantmentBookCrafting();
@@ -120,6 +124,16 @@ public class EnchantmentBookCrafting implements Recipe<Container>{
 		nnl.add(BOOK);
 		nnl.add(input);
 		return nnl;
+	}
+	
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		return List.of(input, BOOK, Ingredient.of(Registry.getItem("experience_mill")));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(getResultItem());
 	}
 
 	@Override

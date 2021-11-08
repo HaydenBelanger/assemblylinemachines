@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_separation",
+	"input_fluid":{
+		"fluid": "minecraft:water",
+		"amount": 9000
+	},
+	"input_item":{
+		"tag": "assemblylinemachines:crafting/carbon_large"
+	},
+	"proc_time": 18,
+	"output_fluid_a":{
+		"fluid": "assemblylinemachines:liquid_carbon",
+		"amount": 900,
+		"upgrade_multiply_chance": 0.25
+	}
+}

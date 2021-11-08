@@ -1,9 +1,12 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.TEAlloySmelter;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,7 +18,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class AlloyingCrafting implements Recipe<Container>{
+public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<AlloyingCrafting> ALLOYING_RECIPE = new TypeAlloyingCrafting();
@@ -94,13 +97,14 @@ public class AlloyingCrafting implements Recipe<Container>{
 		return nnl;
 	}
 	
-	public NonNullList<Ingredient> getIngredientsJEIFormatted(){
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(parta);
-		nnl.add(partb);
-		nnl.add(Ingredient.of(Registry.getItem("alloy_smelter")));
-		
-		return nnl;
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		return List.of(parta, partb, Ingredient.of(Registry.getItem("alloy_smelter")));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(output);
 	}
 	
 	@Override

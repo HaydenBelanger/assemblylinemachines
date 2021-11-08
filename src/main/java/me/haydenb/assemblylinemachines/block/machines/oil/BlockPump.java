@@ -3,8 +3,8 @@ package me.haydenb.assemblylinemachines.block.machines.oil;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.world.generation.FluidLevelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,9 +43,9 @@ public class BlockPump extends BlockTileEntity {
 				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
-	private static final VoxelShape PUMP_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, PUMP_N);
-	private static final VoxelShape PUMP_W = General.rotateShape(Direction.NORTH, Direction.WEST, PUMP_N);
-	private static final VoxelShape PUMP_E = General.rotateShape(Direction.NORTH, Direction.EAST, PUMP_N);
+	private static final VoxelShape PUMP_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, PUMP_N);
+	private static final VoxelShape PUMP_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, PUMP_N);
+	private static final VoxelShape PUMP_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, PUMP_N);
 
 	public BlockPump() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "pump");
@@ -174,7 +174,7 @@ public class BlockPump extends BlockTileEntity {
 					timer = 0;
 
 					if(handler == null) {
-						handler = General.getCapabilityFromDirection(this, "handler", Direction.UP, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						handler = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) handler = null;}, Direction.UP, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 					}
 					if (this.getLevel().getBlockState(this.getBlockPos().below()).getBlock() != Registry.getBlock("pumpshaft")) {
 						prevStatusMessage = "Not connected to Pumpshaft.";
@@ -265,10 +265,10 @@ public class BlockPump extends BlockTileEntity {
 		private void forceState(boolean status) {
 			
 			BlockState bs = this.getLevel().getBlockState(this.getBlockPos().below());
-			if(bs.hasProperty(StateProperties.MACHINE_ACTIVE)) {
+			if(bs.hasProperty(BathCraftingFluid.MACHINE_ACTIVE)) {
 				
-				if(bs.getValue(StateProperties.MACHINE_ACTIVE) != status) {
-					this.getLevel().setBlockAndUpdate(this.getBlockPos().below(), bs.setValue(StateProperties.MACHINE_ACTIVE, status));
+				if(bs.getValue(BathCraftingFluid.MACHINE_ACTIVE) != status) {
+					this.getLevel().setBlockAndUpdate(this.getBlockPos().below(), bs.setValue(BathCraftingFluid.MACHINE_ACTIVE, status));
 				}
 			}
 		}

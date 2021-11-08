@@ -7,9 +7,9 @@ import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -47,13 +47,13 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 	public BlockFluidBath() {
 		super(Block.Properties.of(Material.WOOD).strength(4f, 15f).sound(SoundType.WOOD));
-		this.registerDefaultState(this.getStateDefinition().any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
+		this.registerDefaultState(this.getStateDefinition().any().setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		
-		builder.add(StateProperties.FLUID).add(STATUS);
+		builder.add(BathCraftingFluid.FLUID).add(STATUS);
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 					if (player.isShiftKeyDown()) {
 
-						if (entity.fluid == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE) {
+						if (entity.fluid == BathCraftingFluids.NONE || state.getValue(BathCraftingFluid.FLUID) == BathCraftingFluids.NONE) {
 							player.displayClientMessage(new TextComponent("The basin is empty."), true);
 						} else {
 							int maxSludge = 2;
@@ -106,7 +106,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 							entity.drainAmt = 0;
 							entity.sendUpdates();
 							world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1f, 1f);
-							world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
+							world.setBlockAndUpdate(pos, state.setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
 							player.displayClientMessage(new TextComponent("Drained basin."), true);
 							
 							ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), RAND.nextInt(maxSludge)));
@@ -114,7 +114,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 					} else {
 						ItemStack held = player.getMainHandItem();
-						if (entity.fluid == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE) {
+						if (entity.fluid == BathCraftingFluids.NONE || state.getValue(BathCraftingFluid.FLUID) == BathCraftingFluids.NONE) {
 							if (held.getItem() == Items.LAVA_BUCKET || held.getItem() == Items.WATER_BUCKET) {
 								BathCraftingFluids f;
 								if (held.getItem() == Items.LAVA_BUCKET) {
@@ -130,7 +130,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 									ItemHandlerHelper.giveItemToPlayer(player, held.getContainerItem());
 									held.shrink(1);
 								}
-								world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, f).setValue(STATUS, 4));
+								world.setBlockAndUpdate(pos, state.setValue(BathCraftingFluid.FLUID, f).setValue(STATUS, 4));
 								entity.fluid = f;
 								entity.sendUpdates();
 								player.displayClientMessage(new TextComponent("Filled basin."), true);
@@ -193,7 +193,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 										entity.sendUpdates();
 										world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS,
 												1f, 1f);
-										world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, newFluid).setValue(STATUS, setDrain));
+										world.setBlockAndUpdate(pos, state.setValue(BathCraftingFluid.FLUID, newFluid).setValue(STATUS, setDrain));
 									} else {
 
 										if(!(held.getItem() instanceof ItemStirringStick)) {
@@ -362,7 +362,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 				return fluidColor;
 			}
 
-			if(getBlockState().getValue(StateProperties.FLUID) == BathCraftingFluids.LAVA) {
+			if(getBlockState().getValue(BathCraftingFluid.FLUID) == BathCraftingFluids.LAVA) {
 				return 0xcb3d07;
 			}else {
 				return BiomeColors.getAverageWaterColor(reader, pos);

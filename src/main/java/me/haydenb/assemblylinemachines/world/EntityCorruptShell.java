@@ -1,15 +1,14 @@
 package me.haydenb.assemblylinemachines.world;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.SoundRegistry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.client.model.ZombieModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -58,18 +57,16 @@ public class EntityCorruptShell extends Zombie{
 	}
 
 	private void validateSoundEvents() {
-		if(ambient == null || hurt == null || death == null) {
+		if(ambient == null || hurt == null || death == null || step == null) {
+			String cool = "";
 			if(ConfigHolder.COMMON.coolDudeMode.get()) {
-				ambient = SoundRegistry.SHADOW_AMBIENT.get();
-				hurt = SoundRegistry.SHADOW_HURT.get();
-				death = SoundRegistry.SHADOW_DEATH.get();
-				step = SoundRegistry.SHADOW_STEP.get();
-			}else {
-				ambient = SoundEvents.HUSK_AMBIENT;
-				hurt = SoundEvents.HUSK_HURT;
-				death = SoundEvents.HUSK_DEATH;
-				step = SoundEvents.HUSK_STEP;
+				cool = "_cool";
 			}
+			
+			ambient = Registry.getSound("corrupt_shell" + cool + "_ambient");
+			hurt = Registry.getSound("corrupt_shell" + cool + "_ambient");
+			death = Registry.getSound("corrupt_shell" + cool + "_ambient");
+			step = Registry.getSound("corrupt_shell" + cool + "_ambient");
 		}
 	}
 	

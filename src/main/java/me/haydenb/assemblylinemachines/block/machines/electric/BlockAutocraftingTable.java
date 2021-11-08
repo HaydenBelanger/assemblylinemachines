@@ -10,18 +10,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
-import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.SlotWithRestrictions;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockAutocraftingTable.TEAutocraftingTable.SerializableRecipe;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -68,21 +69,21 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			Block.box(11, 12, 14, 12, 16, 15),Block.box(4, 12, 14, 5, 16, 15)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	
 	public BlockAutocraftingTable() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).noOcclusion().dynamicShape().sound(SoundType.METAL), "autocrafting_table", BlockAutocraftingTable.TEAutocraftingTable.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	
 	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
@@ -345,16 +346,16 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						
 						fept = (float) cost / (float) nTimer;
 						
-						if(changeModelTimer == 0 && !getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+						if(changeModelTimer == 0 && !getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 						}
 						changeModelTimer = 15;
 						sendUpdates();
 					}else {
 						fept = 0;
 						if(changeModelTimer == 0) {
-							if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+							if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 								sendUpdates();
 							}
 							
@@ -536,7 +537,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		}
 		
 		public ContainerAutocraftingTable(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEAutocraftingTable.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEAutocraftingTable.class));
 		}
 		
 		@Override
@@ -907,7 +908,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		pd.writeUtf("button", "setrecipe");
 		pd.writeInteger("number", bNum);
 		
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	private static void tryLockInRecipe(BlockPos pos) {
@@ -916,7 +917,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		pd.writeBlockPos("location", pos);
 		pd.writeUtf("button", "lock");
 		
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	private static void sendOutputModeChangeRequest(BlockPos pos, int bNum, String button) {
@@ -925,7 +926,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		pd.writeUtf("button", button);
 		pd.writeInteger("number", bNum);
 		
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	public static void updateDataFromPacket(PacketData pd, Level world) {

@@ -15,11 +15,11 @@ import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery.TERefine
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -70,21 +70,21 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 
 	public BlockRefinery() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "refinery",
 				BlockRefinery.TERefinery.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 	public void animateTick(BlockState stateIn, Level world, BlockPos pos, Random rand) {
 
 		Block bsu = world.getBlockState(pos.above()).getBlock();
-		if (stateIn.getValue(StateProperties.MACHINE_ACTIVE)) {
+		if (stateIn.getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
 
 			if (bsu instanceof BlockRefineryAddon) {
 				((BlockRefineryAddon) bsu).animateTickFromBase(stateIn, world, pos.above(), rand);
@@ -375,7 +375,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 								case 0:
 									chance = 0f;
 								}
-								if (General.RAND.nextFloat() < chance) {
+								if (Utils.RAND.nextFloat() < chance) {
 									tankin.shrink(Math.round((float) recipe.fluidInput.getFirst().getAmount() / 3f));
 								} else {
 									tankin.shrink(recipe.fluidInput.getFirst().getAmount());
@@ -397,14 +397,14 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 									chance = 0f;
 								}
 
-								if (!(General.RAND.nextFloat() < chance)) {
+								if (!(Utils.RAND.nextFloat() < chance)) {
 									getItem(1).shrink(1);
 								}
 							}
 							cycles = recipe.time;
 							outputRecipe = recipe;
-							if (this.getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
-								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+							if (this.getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE) == false) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 							}
 							sendUpdates = true;
 
@@ -438,7 +438,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 										chance = 0f;
 									}
 
-									if (General.RAND.nextFloat() < chance) {
+									if (Utils.RAND.nextFloat() < chance) {
 										outstack.setCount(Math.round(((float) outstack.getCount() * 1.5f)));
 										if (outstack.getCount() > 64) {
 											outstack.setCount(64);
@@ -468,7 +468,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 										chance = 0f;
 									}
 
-									if (General.RAND.nextFloat() < chance) {
+									if (Utils.RAND.nextFloat() < chance) {
 										outstack.setAmount(Math.round(((float) outstack.getAmount() * 1.5f)));
 									}
 									if (tankouta.isEmpty() || (tankouta.isFluidEqual(outstack) && tankouta.getAmount() + outstack.getAmount() <= 4000)) {
@@ -496,7 +496,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 										chance = 0f;
 									}
 
-									if (General.RAND.nextFloat() < chance) {
+									if (Utils.RAND.nextFloat() < chance) {
 										outstack.setAmount(Math.round(((float) outstack.getAmount() * 1.5f)));
 									}
 									if (tankoutb.isEmpty() || (tankoutb.isFluidEqual(outstack) && tankoutb.getAmount() + outstack.getAmount() <= 4000)) {
@@ -554,8 +554,8 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 						}
 
-					} else if (getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+					} else if (getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 						sendUpdates = true;
 					}
 
@@ -707,7 +707,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 		}
 
 		public ContainerRefinery(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TERefinery.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TERefinery.class));
 		}
 
 	}
@@ -825,7 +825,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 	private static void sendDumpTank(BlockPos pos) {
 		PacketData pd = new PacketData("refinery_gui");
 		pd.writeBlockPos("pos", pos);
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 
 	public static void dumpFluid(PacketData pd, Level world) {

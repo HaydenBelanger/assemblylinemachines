@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:campfires",
+    "#minecraft:fire",
+    "#minecraft:strider_warm_blocks",
+    "assemblylinemachines:naphtha_fire",
+    "assemblylinemachines:naphtha_block",
+    "minecraft:torch",
+    "minecraft:redstone_torch",
+    "minecraft:soul_torch"
+  ]
+}

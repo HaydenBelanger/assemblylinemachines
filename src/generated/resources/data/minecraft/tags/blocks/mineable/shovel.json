@@ -1,15 +1,15 @@
 {
   "replace": false,
   "values": [
-    "assemblylinemachines:silt_iron",
     "assemblylinemachines:silt_titanium",
     "assemblylinemachines:silt_gold",
-    "assemblylinemachines:corrupt_gravel",
     "assemblylinemachines:corrupt_grass",
-    "assemblylinemachines:mystium_farmland",
     "assemblylinemachines:corrupt_sand",
     "assemblylinemachines:silt_copper",
     "assemblylinemachines:silt",
-    "assemblylinemachines:corrupt_dirt"
+    "assemblylinemachines:corrupt_dirt",
+    "assemblylinemachines:silt_iron",
+    "assemblylinemachines:corrupt_gravel",
+    "assemblylinemachines:mystium_farmland"
   ]
 }

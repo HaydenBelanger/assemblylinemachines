@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:corrupt_coal_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_coal",
+		"count": 6
+	},
+	"grinds": 10,
+	"bladetype": "PUREGOLD",
+	"machine_required": true
+}

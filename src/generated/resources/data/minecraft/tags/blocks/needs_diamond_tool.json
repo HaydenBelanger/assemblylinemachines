@@ -1,14 +1,25 @@
 {
   "replace": false,
   "values": [
-    "assemblylinemachines:chaosbark_log",
+    "assemblylinemachines:corrupt_coal_ore",
+    "assemblylinemachines:chaosbark_leaves",
     "assemblylinemachines:deepslate_titanium_ore",
-    "assemblylinemachines:corrupt_stone",
-    "assemblylinemachines:corrupt_gravel",
+    "assemblylinemachines:corrupt_emerald_ore",
     "assemblylinemachines:stripped_chaosbark_log",
     "assemblylinemachines:corrupt_grass",
     "assemblylinemachines:titanium_ore",
+    "assemblylinemachines:corrupt_redstone_ore",
     "assemblylinemachines:corrupt_sand",
-    "assemblylinemachines:corrupt_dirt"
+    "assemblylinemachines:corrupt_dirt",
+    "assemblylinemachines:corrupt_lapis_ore",
+    "assemblylinemachines:corrupt_gold_ore",
+    "assemblylinemachines:corrupt_titanium_ore",
+    "assemblylinemachines:corrupt_diamond_ore",
+    "assemblylinemachines:chaosbark_log",
+    "assemblylinemachines:corrupt_stone",
+    "assemblylinemachines:corrupt_gravel",
+    "assemblylinemachines:corrupt_iron_ore",
+    "assemblylinemachines:corrupt_copper_ore",
+    "assemblylinemachines:chaosbark_planks"
   ]
 }

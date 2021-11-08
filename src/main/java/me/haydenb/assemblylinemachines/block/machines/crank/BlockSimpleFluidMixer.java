@@ -8,10 +8,8 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBa
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +40,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 
 	public BlockSimpleFluidMixer() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_fluid_mixer", BlockSimpleFluidMixer.TESimpleFluidMixer.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	
@@ -50,7 +48,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.FLUID).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
@@ -111,7 +109,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 				if(timer++ == 20) {
 					timer = 0;
 					if(handler == null) {
-						handler = General.getCapabilityFromDirection(this, "handler", Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						handler = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) handler = null;}, Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 					}
 					if(output != null) {
 						boolean sendupdate = false;
@@ -133,7 +131,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 											pendingOutput = false;
 											sendupdate = true;
 											end = true;
-											this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.FLUID, BathCraftingFluids.NONE));
+											this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE));
 											break;
 										}
 									}
@@ -153,8 +151,8 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 							
 						}
 						
-						if(getBlockState().getValue(StateProperties.FLUID) != f && end == false) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.FLUID, f));
+						if(getBlockState().getValue(BathCraftingFluid.FLUID) != f && end == false) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.FLUID, f));
 							sendupdate = true;
 						}
 						
@@ -253,7 +251,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 		}
 		
 		public ContainerSimpleFluidMixer(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TESimpleFluidMixer.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TESimpleFluidMixer.class));
 		}
 		
 	}

@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:gears/gold",
+    "#forge:gears/flerovium",
+    "#forge:gears/titanium",
+    "#forge:gears/iron",
+    "#forge:gears/copper",
+    "#forge:gears/steel"
+  ]
+}

@@ -16,7 +16,7 @@ issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues" 
 # The modid of the mod
 modId="assemblylinemachines" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="1.17.1-1.2.2" #mandatory
+version="1.17.1-1.3.0-alpha" #mandatory
  # A display name for the mod
 displayName="Assembly Line Machines" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
@@ -24,15 +24,13 @@ updateJSONURL="https://haydenb.me/api/versionhistory.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 #displayURL="https://www.curseforge.com/minecraft/mc-mods/assemblylinemachines" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="logo.png" #optional
+logoFile="banner-compressed.png" #optional
 # A text field displayed in the mod UI
 #credits="NinjaKittens, for extensive effort put into texturing and modelling work." #optional
 # A text field displayed in the mod UI
 authors="Haydenman2 (Hayden) & NinjaKittens (Dax Flame)" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''
-This mod adds many machines to the game, many of which centered around creating and operating a factory.
-'''
+description='''This is Assembly Line Machines, a complete re-imagining of Minecraft's technological side. This mod features new features and an entirely new progression system, built from the ground up to give much more depth to Minecraft.'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 #[[dependencies.examplemod]] #optional
     # the modid of the dependency

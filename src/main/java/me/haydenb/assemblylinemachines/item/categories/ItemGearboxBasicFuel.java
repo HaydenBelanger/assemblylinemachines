@@ -11,7 +11,7 @@ public class ItemGearboxBasicFuel extends Item implements IGearboxFuel{
 	public final int burnTime;
 	
 	public ItemGearboxBasicFuel(int burnTime) {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 		this.burnTime = burnTime;
 	}
 	

@@ -6,14 +6,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
-import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -52,7 +53,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 	public BlockQuarry() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "quarry", BlockQuarry.TEQuarry.class);
 
-		BlockState bs = this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false);
+		BlockState bs = this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.MACHINE_ACTIVE, false);
 		bs = BlockQuarryAddon.addToBlockState(bs);
 		this.registerDefaultState(bs);
 	}
@@ -61,7 +62,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(HorizontalDirectionalBlock.FACING, StateProperties.MACHINE_ACTIVE);
+		builder.add(HorizontalDirectionalBlock.FACING, BathCraftingFluid.MACHINE_ACTIVE);
 		BlockQuarryAddon.addToBuilder(builder);
 	}
 
@@ -178,7 +179,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 							shutoff = true;
 						}else {
 							if(!pending.isEmpty()) {
-								pending = General.attemptDepositIntoAllSlots(pending, handler);
+								pending = Utils.attemptDepositIntoAllSlots(pending, handler);
 								if(!pending.isEmpty()) {
 									status = "Status:\nError\nStorage is full.";
 									shutoff = true;
@@ -259,7 +260,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverLevel).withParameter(LootContextParams.TOOL, pick).withParameter(LootContextParams.ORIGIN, new Vec3(mpos.getX(), mpos.getY(), mpos.getZ())));
 									
 									for(ItemStack stack : stackList) {
-										pending = General.attemptDepositIntoAllSlots(stack, handler);
+										pending = Utils.attemptDepositIntoAllSlots(stack, handler);
 										if(!pending.isEmpty()) {
 											break;
 										}
@@ -275,8 +276,8 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 									}
 									status = "Status:\nWorking...\n\n@" + current[0] + ", " + current[1] + ", " + current[2];
 									
-									if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-										this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+									if(!getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+										this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 										
 									}
 									sendUpdates = true;
@@ -290,8 +291,8 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 						
 						
 						if(shutoff == true) {
-							if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+							if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 								sendUpdates = true;
 								
 							}
@@ -412,7 +413,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 	public static class ContainerQuarry extends ContainerALMBase<TEQuarry>{
 		
 		public ContainerQuarry(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEQuarry.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEQuarry.class));
 		}
 		
 		public ContainerQuarry(final int windowId, final Inventory playerInventory, final TEQuarry tileEntity) {
@@ -527,7 +528,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		pd.writeUtf("cat", "dir");
 		pd.writeBlockPos("pos", pos);
 		
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	public static void sendChangeNum(BlockPos pos, boolean incr) {
@@ -536,7 +537,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		pd.writeBlockPos("pos", pos);
 		pd.writeBoolean("incr", incr);
 		
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	public static void sendInitQuarry(BlockPos pos) {
@@ -544,7 +545,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		pd.writeUtf("cat", "init");
 		pd.writeBlockPos("pos", pos);
 		
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	public static void updateDataFromPacket(PacketData pd, Level world) {

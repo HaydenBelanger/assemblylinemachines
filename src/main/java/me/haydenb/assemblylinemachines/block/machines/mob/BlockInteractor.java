@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.block.machines.mob;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -7,16 +8,16 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
-import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.*;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.DebugOptions;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -60,21 +61,21 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 			Block.box(2, 3, 3, 14, 13, 13)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockInteractor() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "interactor",
 				BlockInteractor.TEInteractor.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.FLUID).add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
@@ -131,7 +132,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 		private int nTimer = 0;
 		private int mode = 0;
 		private UUID origPlayerUUID = null;
-		private FakePlayer fp = null;
+		private WeakReference<FakePlayer> fpRef = null;
 		private boolean ordered = false;
 		
 		private float bbProg = 0f;
@@ -180,13 +181,13 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 						}
 					}
 					
-					if(fp == null) {
+					if(fpRef.get() == null) {
 						if(origPlayerUUID != null) {
-							fp = FakePlayerFactory.get(this.getLevel().getServer().getLevel(this.getLevel().dimension()), this.getLevel().getServer().getProfileCache().get(origPlayerUUID).orElse(null));
+							fpRef = new WeakReference<>(FakePlayerFactory.get(this.getLevel().getServer().getLevel(this.getLevel().dimension()), this.getLevel().getServer().getProfileCache().get(origPlayerUUID).orElse(null)));
 						}
 					}
-					if(fp != null && stack != null) {
-						
+					if(fpRef.get() != null && stack != null) {
+						FakePlayer fp = fpRef.get();
 						BlockPos offsetPos = this.getBlockPos().relative(getBlockState().getValue(HorizontalDirectionalBlock.FACING));
 						BlockState bs = this.getLevel().getBlockState(offsetPos);
 						
@@ -243,7 +244,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 										ItemStack nStack = fp.getInventory().getItem(i);
 										if(!nStack.isEmpty()) {
 											if(nStack != stack) {
-												General.spawnItem(nStack, offsetPos.above(), this.getLevel());
+												Utils.spawnItem(nStack, offsetPos.above(), this.getLevel());
 											}
 											fp.getInventory().removeItemNoUpdate(i);
 										}
@@ -350,7 +351,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 		}
 
 		public ContainerInteractor(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEInteractor.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEInteractor.class));
 		}
 
 	}
@@ -432,7 +433,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 		pd.writeBlockPos("pos", pos);
 		pd.writeUtf("button", "dir");
 
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 
 	private static void sendModeChange(BlockPos pos) {
@@ -440,7 +441,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 		pd.writeBlockPos("pos", pos);
 		pd.writeUtf("button", "mode");
 
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 
 	public static void updateDataFromPacket(PacketData pd, Level world) {

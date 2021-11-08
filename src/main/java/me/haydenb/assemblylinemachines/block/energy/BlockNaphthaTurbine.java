@@ -2,7 +2,7 @@ package me.haydenb.assemblylinemachines.block.energy;
 
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -53,9 +53,9 @@ public class BlockNaphthaTurbine extends Block{
 			Block.box(2, 0, 2, 14, 10, 14)
 			).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	
 	public BlockNaphthaTurbine() {
 		super(Block.Properties.of(Material.STONE).strength(3f, 30f).sound(SoundType.STONE));

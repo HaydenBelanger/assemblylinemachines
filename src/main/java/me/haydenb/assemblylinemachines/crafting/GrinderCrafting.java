@@ -1,9 +1,12 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,13 +14,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class GrinderCrafting implements Recipe<Container>{
+public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<GrinderCrafting> GRINDER_RECIPE = new TypeGrinderCrafting();
@@ -91,18 +93,16 @@ public class GrinderCrafting implements Recipe<Container>{
 		return nnl;
 	}
 	
-	public NonNullList<Ingredient> getIngredientsJEIFormatted(){
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(input);
-		Item grinderHandler = Registry.getItem("simple_grinder");
-		Item electricGrinder = Registry.getItem("electric_grinder");
-		if(this.machineReqd) {
-			nnl.add(Ingredient.of(grinderHandler, electricGrinder));
-		}else {
-			nnl.add(Ingredient.of(grinderHandler, electricGrinder, Registry.getItem("hand_grinder")));
-		}
-		nnl.add(Blades.getAllBladesAtMinTier(getBlade().tier));
-		return nnl;
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		Ingredient ing = this.getMachineReqd() ? Ingredient.of(Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder")) 
+				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder"));
+		return List.of(input, ing, Blades.getAllBladesAtMinTier(getBlade().tier));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(output);
 	}
 
 	@Override

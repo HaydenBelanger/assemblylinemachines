@@ -6,7 +6,7 @@ import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
 import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TextComponent;
@@ -142,9 +142,9 @@ public class PipeBase<T> extends Block implements EntityBlock {
 				default:
 					if (pco == PipeConnOptions.CONNECTOR) {
 						rt = Shapes.join(rt,
-								General.rotateShape(Direction.NORTH, d, SHAPE_CONN_CARDINAL), BooleanOp.OR);
+								Utils.rotateShape(Direction.NORTH, d, SHAPE_CONN_CARDINAL), BooleanOp.OR);
 					} else {
-						rt = Shapes.join(rt, General.rotateShape(Direction.WEST, d, SHAPE_CARDINAL),
+						rt = Shapes.join(rt, Utils.rotateShape(Direction.WEST, d, SHAPE_CARDINAL),
 								BooleanOp.OR);
 					}
 

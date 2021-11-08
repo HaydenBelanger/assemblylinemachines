@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:prism_rose"
+	},
+	"output":{
+		"item": "assemblylinemachines:prismatic_dust"
+	},
+	"grinds": 2,
+	"bladetype": "TITANIUM",
+	"machine_required": true
+}

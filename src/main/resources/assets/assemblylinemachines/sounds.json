@@ -1,20 +1,36 @@
 {
-	"shadow_ambient": {
-		"subtitle": "sound.assemblylinemachines.shadow_ambient",
-		"sounds": ["assemblylinemachines:shadow/ambient1", "assemblylinemachines:shadow/ambient2", "assemblylinemachines:shadow/ambient3", "assemblylinemachines:shadow/ambient4",
-		"assemblylinemachines:shadow/ambient5", "assemblylinemachines:shadow/ambient6", "assemblylinemachines:shadow/ambient7", "assemblylinemachines:shadow/ambient8", "assemblylinemachines:shadow/ambient9",
-		"assemblylinemachines:shadow/ambient10"]
+	"corrupt_shell_cool_ambient": {
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_ambient",
+		"sounds": ["assemblylinemachines:corrupt_shell/cm_ambient1", "assemblylinemachines:corrupt_shell/cm_ambient2", "assemblylinemachines:corrupt_shell/cm_ambient3", "assemblylinemachines:corrupt_shell/cm_ambient4",
+		"assemblylinemachines:corrupt_shell/cm_ambient5", "assemblylinemachines:corrupt_shell/cm_ambient6", "assemblylinemachines:corrupt_shell/cm_ambient7", "assemblylinemachines:corrupt_shell/cm_ambient8", "assemblylinemachines:corrupt_shell/cm_ambient9",
+		"assemblylinemachines:corrupt_shell/cm_ambient10"]
 	},
-	"shadow_hurt":{
-		"subtitle": "sound.assemblylinemachines.shadow_hurt",
-		"sounds": ["assemblylinemachines:shadow/hurt1", "assemblylinemachines:shadow/hurt2"]
+	"corrupt_shell_cool_hurt":{
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_hurt",
+		"sounds": ["assemblylinemachines:corrupt_shell/cm_hurt1", "assemblylinemachines:corrupt_shell/cm_hurt2"]
 	},
-	"shadow_death":{
-		"subtitle": "sound.assemblylinemachines.shadow_death",
-		"sounds": ["assemblylinemachines:shadow/death1", "assemblylinemachines:shadow/death2", "assemblylinemachines:shadow/death3"]
+	"corrupt_shell_cool_death":{
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_death",
+		"sounds": ["assemblylinemachines:corrupt_shell/cm_death1", "assemblylinemachines:corrupt_shell/cm_death2", "assemblylinemachines:corrupt_shell/cm_death3"]
 	},
-	"shadow_step":{
-		"subtitle": "sound.assemblylinemachines.shadow_step",
-		"sounds": ["assemblylinemachines:shadow/step1", "assemblylinemachines:shadow/step2", "assemblylinemachines:shadow/step3", "assemblylinemachines:shadow/step4"]
+	"corrupt_shell_cool_step":{
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_step",
+		"sounds": ["assemblylinemachines:corrupt_shell/cm_step1", "assemblylinemachines:corrupt_shell/cm_step2", "assemblylinemachines:corrupt_shell/cm_step3", "assemblylinemachines:corrupt_shell/cm_step4"]
+	},
+	"corrupt_shell_ambient": {
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_ambient",
+		"sounds": ["assemblylinemachines:corrupt_shell/ambient1", "assemblylinemachines:corrupt_shell/ambient2", "assemblylinemachines:corrupt_shell/ambient3"]
+	},
+	"corrupt_shell_hurt":{
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_hurt",
+		"sounds": ["assemblylinemachines:corrupt_shell/hurt1", "assemblylinemachines:corrupt_shell/hurt2"]
+	},
+	"corrupt_shell_death":{
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_death",
+		"sounds": ["assemblylinemachines:corrupt_shell/death1"]
+	},
+	"corrupt_shell_step":{
+		"subtitle": "sound.assemblylinemachines.corrupt_shell_step",
+		"sounds": ["assemblylinemachines:corrupt_shell/step1", "assemblylinemachines:corrupt_shell/step2", "assemblylinemachines:corrupt_shell/step3"]
 	}
 }

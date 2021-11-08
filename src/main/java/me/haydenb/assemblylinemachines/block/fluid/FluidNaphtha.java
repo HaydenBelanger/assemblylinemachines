@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import me.haydenb.assemblylinemachines.registry.FluidRegistry;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.world.rendering.FogRendering.ILiquidFogColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -20,10 +20,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
 import net.minecraftforge.event.ForgeEventFactory;
 
-public class FluidNaphtha extends ALMFluid {
-
+public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
+	
 	public FluidNaphtha(boolean source) {
-		super(FluidRegistry.buildProperties("naphtha", 2200, false, true, true), source);
+		super(Registry.createFluidProperties("naphtha", 2200, false, true, true), source, 222, 79, 22);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class FluidNaphtha extends ALMFluid {
 	protected boolean isRandomlyTicking() {
 		return true;
 	}
-
+	
 	private static boolean isSurroundingBlockFlammable(LevelReader worldIn, BlockPos pos) {
 		for (Direction direction : Direction.values()) {
 			if (getCanBlockBurn(worldIn, pos.relative(direction))) {
@@ -71,7 +71,7 @@ public class FluidNaphtha extends ALMFluid {
 	public static class FluidNaphthaBlock extends ALMFluidBlock {
 
 		public FluidNaphthaBlock(Supplier<? extends FlowingFluid> fluid) {
-			super(fluid, ALMFluid.NAPHTHA, Block.Properties.of(Material.LAVA).strength(100f).lightLevel((state) -> 11).noDrops());
+			super(fluid, ALMFluid.getTag("naphtha"), Block.Properties.of(Material.LAVA).strength(100f).lightLevel((state) -> 11).noDrops());
 		}
 		
 		@Override

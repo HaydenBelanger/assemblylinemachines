@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:corrupt_redstone_ore"
+	},
+	"result": "minecraft:redstone",
+	"experience": 1,
+	"cookingtime": 100
+}

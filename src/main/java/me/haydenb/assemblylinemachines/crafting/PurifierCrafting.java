@@ -1,9 +1,12 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricPurifier.TEElectricPurifier;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -16,7 +19,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class PurifierCrafting implements Recipe<Container>{
+public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<PurifierCrafting> PURIFIER_RECIPE = new TypePurifierCrafting();
@@ -114,14 +117,14 @@ public class PurifierCrafting implements Recipe<Container>{
 		return nnl;
 	}
 	
-	public NonNullList<Ingredient> getIngredientsJEIFormatted(){
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(parta);
-		nnl.add(partb);
-		nnl.add(tobepurified);
-		nnl.add(Ingredient.of(Registry.getItem("electric_purifier")));
-		
-		return nnl;
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		return List.of(parta, partb, tobepurified, Ingredient.of(Registry.getItem("electric_purifier")));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(output);
 	}
 	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<PurifierCrafting>{

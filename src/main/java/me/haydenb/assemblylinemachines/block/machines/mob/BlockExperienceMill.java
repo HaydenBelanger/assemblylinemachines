@@ -14,11 +14,11 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.crafting.EnchantmentBookCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -171,12 +171,12 @@ public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceM
 								ItemStack encht = ItemStack.EMPTY;
 								int n = 0;
 								if(contents.get(1).isEnchantable()) {
-									encht = EnchantmentHelper.enchantItem(General.RAND, contents.get(1).copy(), level, false);
+									encht = EnchantmentHelper.enchantItem(Utils.RAND, contents.get(1).copy(), level, false);
 									n = 1;
 								}
 								
 								if(!encht.isEnchanted() && contents.get(2).isEnchantable()) {
-									encht = EnchantmentHelper.enchantItem(General.RAND, contents.get(2).copy(), level, false);
+									encht = EnchantmentHelper.enchantItem(Utils.RAND, contents.get(2).copy(), level, false);
 									n = 2;
 								}
 								if(encht.isEnchanted()) {
@@ -584,7 +584,7 @@ public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceM
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerExperienceMill(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEExperienceMill.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEExperienceMill.class));
 		}
 		
 		public ContainerExperienceMill(final int windowId, final Inventory playerInventory, final TEExperienceMill tileEntity) {
@@ -715,7 +715,7 @@ public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceM
 		PacketData pd = new PacketData("exp_mill_gui");
 		pd.writeBlockPos("pos", pos);
 
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	public static void updateDataFromPacket(PacketData pd, Level world) {

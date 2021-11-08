@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
+import me.haydenb.assemblylinemachines.block.corrupt.CorruptBlock;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
@@ -15,10 +16,12 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.crafting.EntropyReactorCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -78,17 +81,17 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 	static {
 		HashMap<Direction, VoxelShape> bc = new HashMap<>();
 		bc.put(Direction.SOUTH, SHAPE_C_S);
-		bc.put(Direction.NORTH, General.rotateShape(Direction.SOUTH, Direction.NORTH, SHAPE_C_S));
-		bc.put(Direction.EAST, General.rotateShape(Direction.SOUTH, Direction.EAST, SHAPE_C_S));
-		bc.put(Direction.WEST, General.rotateShape(Direction.SOUTH, Direction.WEST, SHAPE_C_S));
+		bc.put(Direction.NORTH, Utils.rotateShape(Direction.SOUTH, Direction.NORTH, SHAPE_C_S));
+		bc.put(Direction.EAST, Utils.rotateShape(Direction.SOUTH, Direction.EAST, SHAPE_C_S));
+		bc.put(Direction.WEST, Utils.rotateShape(Direction.SOUTH, Direction.WEST, SHAPE_C_S));
 		SHAPES.put(EntropyReactorOptions.CORNER, bc);
 		SHAPES.put(EntropyReactorOptions.CORNER_ACTIVE, bc);
 		
 		HashMap<Direction, VoxelShape> be = new HashMap<>();
 		be.put(Direction.SOUTH, SHAPE_E_S);
-		be.put(Direction.NORTH, General.rotateShape(Direction.SOUTH, Direction.NORTH, SHAPE_E_S));
-		be.put(Direction.EAST, General.rotateShape(Direction.SOUTH, Direction.EAST, SHAPE_E_S));
-		be.put(Direction.WEST, General.rotateShape(Direction.SOUTH, Direction.WEST, SHAPE_E_S));
+		be.put(Direction.NORTH, Utils.rotateShape(Direction.SOUTH, Direction.NORTH, SHAPE_E_S));
+		be.put(Direction.EAST, Utils.rotateShape(Direction.SOUTH, Direction.EAST, SHAPE_E_S));
+		be.put(Direction.WEST, Utils.rotateShape(Direction.SOUTH, Direction.WEST, SHAPE_E_S));
 		SHAPES.put(EntropyReactorOptions.EDGE, be);
 		SHAPES.put(EntropyReactorOptions.EDGE_ACTIVE, be);
 	}
@@ -864,7 +867,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			if(entropy > 0.1f) {
 				
 				//When entropy is above 10%, randomly performs potion effects between 33-100% of the time, maxing out at 30% entropy
-				if((General.RAND.nextFloat() * 0.3f) < entropy) {
+				if((Utils.RAND.nextFloat() * 0.3f) < entropy) {
 					
 					int rgM;
 					
@@ -899,7 +902,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			
 			if(entropy > 0.3f && level.getDifficulty() != Difficulty.PEACEFUL) {
 				
-				if((General.RAND.nextFloat() * 0.5f) < entropy) {
+				if((Utils.RAND.nextFloat() * 0.5f) < entropy) {
 					
 					if(sw == null) {
 						sw = this.getLevel().getServer().getLevel(this.getLevel().dimension());
@@ -919,7 +922,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 							
 							if(this.getLevel().noCollision(type.getAABB(d0, d1, d2)) && SpawnPlacements.checkSpawnRules(type, sw, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), this.getLevel().getRandom())) {
 								Entity entity = type.create(this.getLevel());
-								entity.moveTo(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
+								entity.moveTo(d0, d1, d2, Utils.RAND.nextFloat() * 360f, 0f);
 								
 								this.getLevel().addFreshEntity(entity);
 								spamt++;
@@ -945,26 +948,16 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				
 				while(i < max) {
 					
-					double x = this.getBlockPos().getX() + ((General.RAND.nextDouble() * 20) - 10);
-					double y = this.getBlockPos().getY() + ((General.RAND.nextDouble() * 10) - 10);
-					double z = this.getBlockPos().getZ() + ((General.RAND.nextDouble() * 20) - 10);
+					double x = this.getBlockPos().getX() + ((Utils.RAND.nextDouble() * 20) - 10);
+					double y = this.getBlockPos().getY() + ((Utils.RAND.nextDouble() * 10) - 10);
+					double z = this.getBlockPos().getZ() + ((Utils.RAND.nextDouble() * 20) - 10);
 					
 					BlockPos posx = new BlockPos(new Vec3(x, y, z));
-					BlockState bs = null;
 					Block obs = this.getLevel().getBlockState(posx).getBlock();
+					Block nb = Registry.getBlock(CorruptBlock.CORRUPT_VARIANTS.get(obs));
 					
-					if(obs.equals(Blocks.SAND) || obs.equals(Blocks.RED_SAND)) {
-						bs = Registry.getBlock("corrupt_sand").defaultBlockState();
-					}else if(obs.equals(Blocks.STONE)) {
-						bs = Registry.getBlock("corrupt_stone").defaultBlockState();
-					}else if(obs.equals(Blocks.DIRT)) {
-						bs = Registry.getBlock("corrupt_dirt").defaultBlockState();
-					}else if(obs.equals(Blocks.GRASS_BLOCK) || obs.equals(Blocks.PODZOL) || obs.equals(Blocks.MYCELIUM)) {
-						bs = Registry.getBlock("corrupt_grass").defaultBlockState();
-					}
-					
-					if(bs != null) {
-						this.getLevel().setBlockAndUpdate(posx, bs);
+					if(nb != null) {
+						this.getLevel().setBlockAndUpdate(posx, nb.defaultBlockState());
 						entropy -= 0.00025f;
 						i++;
 					}
@@ -1085,7 +1078,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		}
 
 		public ContainerEntropyReactor(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEEntropyReactor.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEEntropyReactor.class));
 		}
 
 	}

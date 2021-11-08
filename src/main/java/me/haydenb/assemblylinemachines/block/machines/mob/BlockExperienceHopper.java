@@ -6,10 +6,8 @@ import java.util.stream.Stream;
 import com.mojang.math.Vector3f;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,9 +54,9 @@ public class BlockExperienceHopper extends BlockTileEntity {
 				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
 
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.EAST, Direction.SOUTH, SHAPE_E);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.EAST, Direction.WEST, SHAPE_E);
-	private static final VoxelShape SHAPE_N = General.rotateShape(Direction.EAST, Direction.NORTH, SHAPE_E);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.EAST, Direction.SOUTH, SHAPE_E);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.EAST, Direction.WEST, SHAPE_E);
+	private static final VoxelShape SHAPE_N = Utils.rotateShape(Direction.EAST, Direction.NORTH, SHAPE_E);
 
 	public BlockExperienceHopper() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "experience_hopper");
@@ -153,7 +151,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 					timer = 0;
 					
 					if(output == null) {
-						output = General.getCapabilityFromDirection(this, "output", getBlockState().getValue(BlockStateProperties.FACING_HOPPER), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						output = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) output = null;}, getBlockState().getValue(BlockStateProperties.FACING_HOPPER), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 					}
 					if(output != null) {
 						if(internalStoredXp != 0 && subTimer++ == 5) {
@@ -200,7 +198,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 			pd.writeDouble("x", x);
 			pd.writeDouble("y", y);
 			pd.writeDouble("z", z);
-			HashPacketImpl.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), pd);
+			PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), pd);
 		}
 	}
 

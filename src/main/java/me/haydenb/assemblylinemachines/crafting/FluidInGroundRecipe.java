@@ -1,9 +1,15 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
@@ -11,10 +17,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class FluidInGroundRecipe implements Recipe<Container>{
+public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<FluidInGroundRecipe> FIG_RECIPE = new TypeFluidInGroundRecipe();
@@ -77,6 +84,16 @@ public class FluidInGroundRecipe implements Recipe<Container>{
 	@Override
 	public boolean isSpecial() {
 		return true;
+	}
+	
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		return List.of(Ingredient.of(Registry.getItem("pump"), Registry.getItem("pumpshaft")));
+	}
+	
+	@Override
+	public List<FluidStack> getJEIFluidOutputs() {
+		return List.of(new FluidStack(fluid, 1000));
 	}
 	
 	public int getChance() {
@@ -158,7 +175,37 @@ public class FluidInGroundRecipe implements Recipe<Container>{
 	}
 	
 	public static enum FluidInGroundCriteria{
-		OVERWORLD_PREFCOLD, OVERWORLD_PREFHOT, OVERWORLD_ONLYCOLD, OVERWORLD_ONLYHOT, OVERWORLD_ANY, NETHER, END;
+		OVERWORLD_PREFCOLD(34, 99, true, new TextComponent("§9Favors very cold biomes.")), OVERWORLD_PREFHOT(102, 99, true, new TextComponent("§cFavors very hot biomes.")), 
+		OVERWORLD_ONLYCOLD(34, 99, true, new TextComponent("§9Only in very cold biomes.")), OVERWORLD_ONLYHOT(102, 99, true, new TextComponent("§cOnly in very hot biomes.")),
+		OVERWORLD_ANY(0, 133, false, new TextComponent("§2Found in The Overworld.")), NETHER(0, 99, false, new TextComponent("§4Found in The Nether.")), 
+		END(68, 99, false, new TextComponent("§5Found in The End.")), CHAOS_PLANE(34, 133, false, new TextComponent("§dFound in the Chaos Plane."));
+		
+		private final int jeiBlitX, jeiBlitY;
+		private final TextComponent descriptor;
+		private final boolean isOverworld;
+		
+		FluidInGroundCriteria(int jeiBlitX, int jeiBlitY, boolean isOverworld, TextComponent descriptor){
+			this.jeiBlitX = jeiBlitX;
+			this.jeiBlitY = jeiBlitY;
+			this.descriptor = descriptor;
+			this.isOverworld = isOverworld;
+		}
+		public int getJeiBlitX() {
+			return jeiBlitX;
+		}
+		
+		public int getJeiBlitY() {
+			return jeiBlitY;
+		}
+		
+		public List<Component> getTooltip(Component fluidDisplayName, int chanceToGenerate){
+			
+			if(isOverworld) {
+				return List.of(fluidDisplayName, OVERWORLD_ANY.descriptor, this.descriptor, new TextComponent("§e" + chanceToGenerate + "% chance to generate."));
+			}else {
+				return List.of(fluidDisplayName, this.descriptor, new TextComponent("§e" + chanceToGenerate + "% chance to generate."));
+			}
+		}
 	}
 	
 }

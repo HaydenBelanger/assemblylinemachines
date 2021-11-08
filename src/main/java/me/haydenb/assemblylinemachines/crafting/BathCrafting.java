@@ -1,24 +1,28 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
 import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class BathCrafting implements Recipe<Container>{
+public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
@@ -151,29 +155,26 @@ public class BathCrafting implements Recipe<Container>{
 		return nnl;
 	}
 	
-	public NonNullList<Ingredient> getIngredientsJEIFormatted(){
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(inputa);
-		nnl.add(inputb);
-		
-		
-		Item mixerHandler = Registry.getItem("simple_fluid_mixer");
-		Item electricMixer = Registry.getItem("electric_fluid_mixer");
-		Item basin = Registry.getItem("fluid_bath");
-		if(this.type == BathOption.MIXER_ONLY) {
-			
-			if(fluid.isElectricMixerOnly()) {
-				nnl.add(Ingredient.of(electricMixer));
-			}else {
-				nnl.add(Ingredient.of(mixerHandler, electricMixer));
-			}
-			
-		}else if(this.type == BathOption.BASIN_ONLY){
-			nnl.add(Ingredient.of(basin));
-		}else {
-			nnl.add(Ingredient.of(mixerHandler, electricMixer, basin));
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		ArrayList<ItemLike> items = new ArrayList<>();
+		switch(this.type) {
+		case MIXER_ONLY:
+		case ALL:
+			items.add(Registry.getItem("simple_fluid_mixer"));
+			items.add(Registry.getItem("electric_fluid_mixer"));
+			if(this.type == BathOption.MIXER_ONLY) break;
+		case BASIN_ONLY:
+			items.add(Registry.getItem("fluid_bath"));
+			break;
 		}
-		return nnl;
+		
+		return List.of(inputa, inputb, Ingredient.of(items.toArray(new ItemLike[items.size()])));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(output);
 	}
 	
 	public BathCraftingFluids getFluid() {

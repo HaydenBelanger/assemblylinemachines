@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" a ",
+		"aba",
+		" a "
+	],
+	"key":{
+		"a":{
+			"tag": "assemblylinemachines:crafting/entropy_reactor_outputs"
+		},
+		"b":{
+			"item": "minecraft:gravel"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_gravel",
+		"count": 4
+	}
+}

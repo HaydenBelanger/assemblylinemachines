@@ -1,10 +1,12 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -14,7 +16,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class EntropyReactorCrafting implements Recipe<Container>{
+public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<EntropyReactorCrafting> ERO_RECIPE = new TypeEntropyReactorCrafting();
@@ -58,11 +60,14 @@ public class EntropyReactorCrafting implements Recipe<Container>{
 		return true;
 	}
 	
-	public NonNullList<Ingredient> getIngredientsJEIFormatted(){
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(Ingredient.of(Registry.getItem("entropy_reactor_block"), Registry.getItem("entropy_reactor_core")));
-		nnl.add(Ingredient.of(Registry.getItem("corrupted_shard")));
-		return nnl;
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		return List.of(Ingredient.of(Registry.getItem("corrupted_shard")), Ingredient.of(Registry.getItem("entropy_reactor_block"), Registry.getItem("entropy_reactor_core")));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(output);
 	}
 
 	@Override

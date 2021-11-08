@@ -14,7 +14,7 @@ import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -51,9 +51,9 @@ public class BlockElectricPurifier extends BlockScreenBlockEntity<BlockElectricP
 			Block.box(2, 2, 2, 14, 7, 16)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	private static final Random RAND = new Random();
 	private static final EnumProperty<PurifierStates> PURIFIER_STATES = EnumProperty.create("active", PurifierStates.class);
@@ -288,7 +288,7 @@ public class BlockElectricPurifier extends BlockScreenBlockEntity<BlockElectricP
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerElectricPurifier(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEElectricPurifier.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEElectricPurifier.class));
 		}
 		
 		public ContainerElectricPurifier(final int windowId, final Inventory playerInventory, final TEElectricPurifier tileEntity) {

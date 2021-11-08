@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.util.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

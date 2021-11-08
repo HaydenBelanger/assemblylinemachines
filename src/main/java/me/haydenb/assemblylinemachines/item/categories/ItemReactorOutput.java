@@ -13,7 +13,7 @@ public class ItemReactorOutput extends Item {
 	private final String quality;
 	
 	public ItemReactorOutput(String quality) {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 		this.quality = quality;
 	}
 	

@@ -19,7 +19,7 @@ public class ItemFertilizer extends Item{
 
 	private final int range;
 	public ItemFertilizer(int range) {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 		this.range = range;
 	}
 

@@ -10,9 +10,7 @@ import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankabl
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleGrinder.TESimpleGrinder;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -40,7 +38,7 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 
 	public BlockSimpleGrinder() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_grinder", TESimpleGrinder.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -51,7 +49,7 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
@@ -124,7 +122,7 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 											pendingOutput = false;
 											sendupdate = true;
 											end = true;
-											this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+											this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 											break;
 										}
 									}
@@ -140,7 +138,7 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 								ItemStack isa = contents.get(0);
 								if(isa.isDamageableItem() && isa.getItem() instanceof ItemGrindingBlade) {
 									
-									if(General.RAND.nextInt(3) == 0) {
+									if(Utils.RAND.nextInt(3) == 0) {
 										isa.setDamageValue(isa.getDamageValue() + 1);
 									}
 									if(isa.getDamageValue() >= isa.getMaxDamage()) {
@@ -152,8 +150,8 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 							}
 						}
 						
-						if(end == false && getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+						if(end == false && getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE) == false) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 							sendupdate = true;
 						}
 						if(sendupdate) {
@@ -251,7 +249,7 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 		
 		
 		public ContainerSimpleGrinder(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TESimpleGrinder.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TESimpleGrinder.class));
 		}
 		
 		

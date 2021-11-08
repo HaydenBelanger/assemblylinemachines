@@ -10,12 +10,12 @@ public class ItemBlockFormattedName extends BlockItem{
 
 	protected final ChatFormatting[] formats;
 	public ItemBlockFormattedName(Block block, ChatFormatting... formats) {
-		super(block, new Item.Properties().tab(Registry.creativeTab));
+		super(block, new Item.Properties().tab(Registry.CREATIVE_TAB));
 		this.formats = formats;
 	}
 	
 	public ItemBlockFormattedName(Block block, Properties properties, ChatFormatting... formats) {
-		super(block, properties.tab(Registry.creativeTab));
+		super(block, properties.tab(Registry.CREATIVE_TAB));
 		this.formats = formats;
 	}
 

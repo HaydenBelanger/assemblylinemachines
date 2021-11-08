@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:corrupt_gold_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_gold",
+		"count": 3
+	},
+	"grinds": 6,
+	"bladetype": "TITANIUM",
+	"machine_required": true
+}

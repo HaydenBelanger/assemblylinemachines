@@ -1,0 +1,12 @@
+{
+	"multipart": [
+		{
+			"when": {"cap": true},
+			"apply": {"model": "assemblylinemachines:block/corrupt/plants/brain_cactus_cap"}
+		},
+		{
+			"when": {"cap": false},
+			"apply": {"model": "assemblylinemachines:block/corrupt/plants/brain_cactus"}
+		}
+	]
+}

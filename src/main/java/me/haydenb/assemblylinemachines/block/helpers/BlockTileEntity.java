@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.block.helpers;
 import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -103,7 +103,7 @@ public abstract class BlockTileEntity extends Block implements EntityBlock{
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		if(shape != null) {
 			if(shouldRotate == true && state.hasProperty(HorizontalDirectionalBlock.FACING)) {
-				return General.rotateShape(dir, state.getValue(HorizontalDirectionalBlock.FACING), shape);
+				return Utils.rotateShape(dir, state.getValue(HorizontalDirectionalBlock.FACING), shape);
 			}else {
 				return shape;
 			}

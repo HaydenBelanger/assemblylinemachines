@@ -11,10 +11,12 @@ import me.haydenb.assemblylinemachines.block.pipe.PipeBase.Type.MainType;
 import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeConnOptions;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -430,7 +432,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		public ItemPipeConnectorContainer(final int windowId, final Inventory playerInventory,
 				final FriendlyByteBuf data) {
 			this(windowId, playerInventory,
-					General.getBlockEntity(playerInventory, data, ItemPipeConnectorTileEntity.class));
+					Utils.getBlockEntity(playerInventory, data, ItemPipeConnectorTileEntity.class));
 		}
 
 		private class FilterPipeValidatorSlot extends SlotWithRestrictions {
@@ -572,7 +574,7 @@ public class ItemPipeConnectorTileEntity extends SimpleMachine<ItemPipeConnector
 		pd.writeBlockPos("location", pos);
 		pd.writeUtf("button", button);
 
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 
 	public static void updateDataFromPacket(PacketData pd, Level world) {

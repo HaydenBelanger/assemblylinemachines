@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.*;
 import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
@@ -18,7 +17,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.TierSortingRegistry;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings(value = { "deprecation" })
 public enum ItemTiers {
 	
 	TITANIUM(ConfigHolder.COMMON.titaniumToolAttack.get(), ConfigHolder.COMMON.titaniumToolHarvestSpeed.get(), ConfigHolder.COMMON.titaniumEnchantability.get(), ConfigHolder.COMMON.titaniumDurability.get(), 
@@ -134,15 +133,20 @@ public enum ItemTiers {
 	
 	public static enum ToolTiers implements Tier{
 		TITANIUM(ItemTiers.TITANIUM, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)), STEEL(ItemTiers.STEEL, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)),
-		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)), MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of());
+		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)), MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
 		
 		private final ItemTiers baseTier;
+		private final Tag.Named<Block> tierTag;
 		
 		ToolTiers(ItemTiers tier, List<Object> after, List<Object> before){
+			this(tier, after, before, null);
+		}
+		
+		ToolTiers(ItemTiers tier, List<Object> after, List<Object> before, ResourceLocation tierTag){
 			this.baseTier = tier;
 			
+			this.tierTag = tierTag != null ? BlockTags.createOptional(tierTag) : null;	
 			TierSortingRegistry.registerTier(this, new ResourceLocation(AssemblyLineMachines.MODID, this.name().toLowerCase()), after, before);
-			
 		}
 
 		@Override
@@ -177,9 +181,8 @@ public enum ItemTiers {
 		
 		@Override
 		public Tag<Block> getTag() {
-			return null;
+			return tierTag;
 		}
-		
 	}
 
 }

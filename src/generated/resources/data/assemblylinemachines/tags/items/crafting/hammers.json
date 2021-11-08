@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "assemblylinemachines:steel_hammer",
+    "assemblylinemachines:crank_hammer",
+    "assemblylinemachines:titanium_hammer",
+    "assemblylinemachines:mystium_hammer"
+  ]
+}

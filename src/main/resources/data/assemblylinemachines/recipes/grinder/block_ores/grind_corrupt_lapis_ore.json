@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:corrupt_lapis_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_lapis_lazuli",
+		"count": 12
+	},
+	"grinds": 10,
+	"bladetype": "PUREGOLD",
+	"machine_required": true
+}

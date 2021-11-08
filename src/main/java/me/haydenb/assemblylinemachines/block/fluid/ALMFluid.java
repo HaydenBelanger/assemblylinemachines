@@ -2,9 +2,12 @@ package me.haydenb.assemblylinemachines.block.fluid;
 
 import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.world.rendering.FogRendering.ILiquidFogColor;
 import net.minecraft.core.BlockPos;
-import net.minecraft.tags.FluidTags;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -13,22 +16,24 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.*;
+import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class ALMFluid extends ForgeFlowingFluid{
-
-	public static final Tag.Named<Fluid> OIL = FluidTags.bind("oil");
-	public static final Tag.Named<Fluid> OIL_BYPRODUCT = FluidTags.bind("oil_byproduct");
-	public static final Tag.Named<Fluid> LIQUID_EXPERIENCE = FluidTags.bind("liquid_experience");
-	public static final Tag.Named<Fluid> CONDENSED_VOID = FluidTags.bind("condensed_void");
-	public static final Tag.Named<Fluid> NAPHTHA = FluidTags.bind("naphtha");
-
+public class ALMFluid extends ForgeFlowingFluid implements ILiquidFogColor{
+	
+	protected final int[] rgb;
 	protected final boolean source;
-	public ALMFluid(Properties properties, boolean source) {
+	
+	public ALMFluid(Properties properties, boolean source, int... rgb) {
 		super(properties);
-
 		this.source = source;
-
+		this.rgb = rgb;
+		
+		if(rgb.length < 3) {
+			throw new IllegalArgumentException("RGB fog color value array contains less than 3 numbers.");
+		}
+		
 		if(!source) {
 			this.registerDefaultState(this.defaultFluidState().setValue(LEVEL, 7));
 		}
@@ -55,6 +60,11 @@ public class ALMFluid extends ForgeFlowingFluid{
 		}else {
 			return 8;
 		}
+	}
+	
+	@Override
+	public int[] getRGB() {
+		return rgb;
 	}
 
 	public static class ALMFluidBlock extends LiquidBlock {
@@ -89,6 +99,10 @@ public class ALMFluid extends ForgeFlowingFluid{
 			}
 		}
 
+	}
+	
+	public static Named<Fluid> getTag(String name){
+		return ForgeTagHandler.makeWrapperTag(ForgeRegistries.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, name));
 	}
 
 

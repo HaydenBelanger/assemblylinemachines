@@ -6,7 +6,7 @@ import me.haydenb.assemblylinemachines.block.machines.electric.BlockQuarryAddon;
 import me.haydenb.assemblylinemachines.item.items.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.world.generation.FluidLevelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,6 +40,7 @@ public class Events {
 	
 	private static final Direction[] dirs = new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 	
+	//Event responsible for only allowing correct placement of the Crank, Gearbox, and Quarry Addons.
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
 		if(!event.getWorld().isClientSide()) {
@@ -100,14 +101,14 @@ public class Events {
 		
 	}
 	
+	//Event to produce activated Mob Crystal when killed with Mystium Sword.
 	@SubscribeEvent
 	public static void kill(LivingDeathEvent event) {
 		if(event.getSource().getEntity() instanceof ServerPlayer) {
-			
 			ServerPlayer spe = (ServerPlayer) event.getSource().getEntity();
 			ItemStack stack = spe.getMainHandItem();
 			
-			if (stack.getItem() == Registry.getItem("mystium_sword") && General.RAND.nextInt(10) == 0 && ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null 
+			if (stack.getItem() == Registry.getItem("mystium_sword") && Utils.RAND.nextInt(10) == 0 && ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null 
 					&& stack.hasTag() && stack.getTag().contains("assemblylinemachines:fe") && stack.getTag().contains("assemblylinemachines:secondarystyle")) {
 				ItemStack inert = null;
 				for(int i = 0; i < spe.getInventory().getContainerSize(); i++) {
@@ -155,6 +156,7 @@ public class Events {
 		}
 	}
 	
+	//Event to allow instant-extinguish of Naphtha Fire.
 	@SubscribeEvent
 	public static void extinguishFire(PlayerInteractEvent.LeftClickBlock event) {
 
@@ -174,6 +176,7 @@ public class Events {
 			
 	}
 	
+	//Event to send message to players if mod is out of date, and give Guide Book if Patchouli is installed.
 	@SubscribeEvent
 	public static void join(PlayerLoggedInEvent event) {
 		Player player = event.getPlayer();

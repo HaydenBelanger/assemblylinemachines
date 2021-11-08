@@ -153,6 +153,19 @@
 	"item.assemblylinemachines.reality_crystal": "Reality Crystal",
 	"item.assemblylinemachines.ground_netherite": "Ground Netherite",
 	"item.assemblylinemachines.electrified_netherite_blend": "Electrified Netherite Blend",
+	"item.assemblylinemachines.dark_energy_bucket": "Dark Energy Bucket",
+	"item.assemblylinemachines.chaotic_sawdust": "Chaotic Sawdust",
+	"item.assemblylinemachines.chaotic_fertilizer": "Chaotic Fertilizer",
+	"item.assemblylinemachines.prismatic_dust": "Prismatic Dust",
+	"item.assemblylinemachines.graphene_rod": "Graphene Rod",
+	"item.assemblylinemachines.flerovium_gear": "Flerovium Gear",
+	"item.assemblylinemachines.flerovium_ingot": "Flerovium Ingot",
+	"item.assemblylinemachines.flerovium_plate": "Flerovium Plate",
+	"item.assemblylinemachines.ground_flerovium": "Ground Flerovium",
+	"item.assemblylinemachines.raw_flerovium": "Raw Flerovium",
+	"item.assemblylinemachines.flerovium_nugget": "Flerovium Nugget",
+	"item.assemblylinemachines.ground_diamond": "Ground Diamond",
+	"item.assemblylinemachines.liquid_carbon_bucket": "Liquid Carbon Bucket",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore": "Deepslate Titanium Ore",
@@ -182,7 +195,7 @@
 	"block.assemblylinemachines.coal_generator": "Coal Generator",
 	"block.assemblylinemachines.black_granite": "Black Granite",
 	"block.assemblylinemachines.smooth_black_granite": "Black Granite Block",
-	"block.assemblylinemachines.chiselled_black_granite": "Chiselled Black Granite",
+	"block.assemblylinemachines.chiselled_black_granite": "Runed Black Granite",
 	"block.assemblylinemachines.brick_black_granite": "Black Granite Bricks",
 	"block.assemblylinemachines.pillar_black_granite": "Black Granite Pillar",
 	"block.assemblylinemachines.slab_black_granite": "Black Granite Slab",
@@ -250,6 +263,20 @@
 	"block.assemblylinemachines.prism_rose": "Prism Rose",
 	"block.assemblylinemachines.tall_chaosweed": "Tall Chaosweed",
 	"block.assemblylinemachines.tall_blooming_chaosweed": "Tall Blooming Chaosweed",
+	"block.assemblylinemachines.corrupt_coal_ore": "Corrupt Coal Ore",
+	"block.assemblylinemachines.corrupt_copper_ore": "Corrupt Copper Ore",
+	"block.assemblylinemachines.corrupt_diamond_ore": "Corrupt Diamond Ore",
+	"block.assemblylinemachines.corrupt_iron_ore": "Corrupt Iron Ore",
+	"block.assemblylinemachines.corrupt_gold_ore": "Corrupt Gold Ore",
+	"block.assemblylinemachines.corrupt_emerald_ore": "Corrupt Emerald Ore",
+	"block.assemblylinemachines.corrupt_redstone_ore": "Corrupt Redstone Ore",
+	"block.assemblylinemachines.corrupt_lapis_ore": "Corrupt Lapis Lazuli Ore",
+	"block.assemblylinemachines.corrupt_titanium_ore": "Corrupt Titanium Ore",
+	"block.assemblylinemachines.brain_cactus": "Brain Cactus",
+	"block.assemblylinemachines.flerovium_ore": "Flerovium Ore",
+	"block.assemblylinemachines.flerovium_block": "Flerovium Block",
+	"block.assemblylinemachines.attuned_titanium_block": "Attuned Titanium Block",
+	"block.assemblylinemachines.energized_gold_block": "Energized Gold Block",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",
@@ -261,6 +288,8 @@
 	"fluid.assemblylinemachines.ethylene": "Ethylene",
 	"fluid.assemblylinemachines.propylene": "Propylene",
 	"fluid.assemblylinemachines.liquid_experience": "Liquid Experience",
+	"fluid.assemblylinemachines.dark_energy": "Dark Energy",
+	"fluid.assemblylinemachines.liquid_carbon": "Liquid Carbon",
 	
 	"gas.assemblylinemachines.ethane": "Ethane",
 	"gas.assemblylinemachines.propane": "Propane",
@@ -276,12 +305,13 @@
 	
 	"effect.assemblylinemachines.entropy_poisoning": "Entropy",
 	"effect.assemblylinemachines.deep_burn": "Deep Burn",
+	"effect.assemblylinemachines.dark_expulsion": "Dark Expulsion",
 	
 	"entity.assemblylinemachines.corrupt_shell": "Corrupt Shell",
 	
-	"sound.assemblylinemachines.shadow_ambient": "Shadow sounds",
-	"sound.assemblylinemachines.shadow_hurt": "Injured Shadow",
-	"sound.assemblylinemachines.shadow_death": "Fatally wounded Shadow",
-	"sound.assemblylinemachines.shadow_step": "Shadow footsteps"
+	"sound.assemblylinemachines.corrupt_shell_ambient": "Corrupt Shell groans",
+	"sound.assemblylinemachines.corrupt_shell_hurt": "Hurt Corrupt Shell",
+	"sound.assemblylinemachines.corrupt_shell_death": "Killed Corrupt Shell",
+	"sound.assemblylinemachines.corrupt_shell_step": "Corrupt Shell walking"
 	
 }

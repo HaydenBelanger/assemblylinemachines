@@ -1,0 +1,12 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"tag": "assemblylinemachines:chaosbark_logs"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:chaosbark_planks",
+		"count": 4
+	}
+}

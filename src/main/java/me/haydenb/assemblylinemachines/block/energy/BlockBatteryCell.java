@@ -11,10 +11,11 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -62,15 +63,15 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			Block.box(1, 5, 9, 2, 11, 10), Block.box(1, 5, 11, 2, 11, 12)).reduce((v1, v2) -> {
 				return Shapes.join(v1, v2, BooleanOp.OR);
 			}).get();
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 
 	public BlockBatteryCell(BatteryCellTiers tier) {
 		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), tier.teName, null, true,
 				Direction.NORTH, tier.clazz);
 		this.registerDefaultState(
-				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.BATTERY_PERCENT_STATE, 0));
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.BATTERY_PERCENT_STATE, 0));
 	}
 	
 	@Override
@@ -96,7 +97,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.BATTERY_PERCENT_STATE);
+		builder.add(HorizontalDirectionalBlock.FACING).add(BathCraftingFluid.BATTERY_PERCENT_STATE);
 	}
 	
 	public static enum BatteryCellTiers{
@@ -189,6 +190,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		@Override
 		public void tick() {
 			if(!level.isClientSide) {
+				this.getLevel().getServer().getWorldData().worldGenSettings().seed();
 				if(timer++ == 5) {
 					timer = 0;
 					for(Direction d : Direction.values()) {
@@ -333,7 +335,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 
 		public ContainerBatteryCell(final int windowId, final Inventory playerInventory,
 				final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEBatteryCell.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEBatteryCell.class));
 		}
 	}
 
@@ -379,7 +381,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
 			pd.writeUtf("button", button);
-			HashPacketImpl.INSTANCE.sendToServer(pd);
+			PacketHandler.INSTANCE.sendToServer(pd);
 		}
 		
 		public static void sendCellUpdatePacket(BlockPos pos, String button, Boolean shifting, Boolean ctrling) {
@@ -388,7 +390,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			pd.writeUtf("button", button);
 			pd.writeBoolean("shifting", shifting);
 			pd.writeBoolean("ctrling", ctrling);
-			HashPacketImpl.INSTANCE.sendToServer(pd);
+			PacketHandler.INSTANCE.sendToServer(pd);
 		}
 
 	}

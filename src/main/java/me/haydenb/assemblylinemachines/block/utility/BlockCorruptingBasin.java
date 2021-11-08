@@ -5,14 +5,12 @@ import java.util.stream.Stream;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
-import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.item.items.ItemCorruptedShard;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -48,12 +46,12 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 	
 	public BlockCorruptingBasin() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "corrupting_basin", BlockCorruptingBasin.TECorruptingBasin.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 	}
 	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE);
+		builder.add(BathCraftingFluid.MACHINE_ACTIVE);
 	}
 	
 	@Override
@@ -85,19 +83,19 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 				if(!level.isClientSide) {
 					boolean sendUpdates = false;
 					if(handler == null) {
-						handler = General.getCapabilityFromDirection(this, "handler", Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						handler = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) handler = null;}, Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 					}
 					
 					if(handler != null) {
 						
 						FluidStack stackInTank = handler.getFluidInTank(0);
-						if(stackInTank.getFluid() == Registry.getFluid("condensed_void") && !getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+						if(stackInTank.getFluid() == Registry.getFluid("condensed_void") && !getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 							sendUpdates = true;
 						}
 						
-						if(stackInTank.getFluid() != Registry.getFluid("condensed_void") && getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+						if(stackInTank.getFluid() != Registry.getFluid("condensed_void") && getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 							sendUpdates = true;
 						}
 						
@@ -130,8 +128,8 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 						}
 						
 						
-					}else if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)){
-						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+					}else if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)){
+						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 						sendUpdates = true;
 					}
 					
@@ -182,7 +180,7 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 		}
 		
 		public ContainerCorruptingBasin(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TECorruptingBasin.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TECorruptingBasin.class));
 		}
 	}
 	

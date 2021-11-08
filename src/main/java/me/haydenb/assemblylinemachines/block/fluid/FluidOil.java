@@ -2,7 +2,8 @@ package me.haydenb.assemblylinemachines.block.fluid;
 
 import java.util.function.Supplier;
 
-import me.haydenb.assemblylinemachines.registry.FluidRegistry;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.world.rendering.FogRendering.ILiquidFogColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -13,11 +14,11 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
 
-public class FluidOil extends ALMFluid {
+public class FluidOil extends ALMFluid implements ILiquidFogColor {
 
 	
 	public FluidOil(boolean source) {
-		super(FluidRegistry.buildProperties("oil", 400, false, true, true), source);
+		super(Registry.createFluidProperties("oil", 400, false, true, true), source, 0, 0, 0);
 	}
 	
 	@Override
@@ -30,20 +31,19 @@ public class FluidOil extends ALMFluid {
 	}
 	
 	@Override
-	public Fluid getSource() {
-		// TODO Auto-generated method stub
-		return super.getSource();
+	public int getTickDelay(LevelReader world) {
+		return 25;
 	}
 	
 	@Override
-	public int getTickDelay(LevelReader world) {
-		return 25;
+	public float getFogDensity() {
+		return 8f;
 	}
 	
 	public static class FluidOilBlock extends ALMFluidBlock{
 
 		public FluidOilBlock(Supplier<? extends FlowingFluid> fluid) {
-			super(fluid, ALMFluid.OIL, Material.WATER);
+			super(fluid, ALMFluid.getTag("oil"), Material.WATER);
 		}
 
 		@Override

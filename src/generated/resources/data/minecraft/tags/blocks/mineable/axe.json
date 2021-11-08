@@ -1,9 +1,11 @@
 {
   "replace": false,
   "values": [
+    "assemblylinemachines:chaosbark_leaves",
+    "assemblylinemachines:stripped_chaosbark_log",
     "assemblylinemachines:chaosbark_log",
     "assemblylinemachines:fluid_bath",
-    "assemblylinemachines:stripped_chaosbark_log",
+    "assemblylinemachines:chaosbark_planks",
     "assemblylinemachines:compressed_crafting_table"
   ]
 }

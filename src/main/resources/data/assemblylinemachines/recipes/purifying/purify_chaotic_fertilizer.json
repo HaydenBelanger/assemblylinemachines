@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:purifier",
+	"part_a":{
+		"item": "assemblylinemachines:chaotic_sawdust"
+	},
+	"part_b":{
+		"item": "assemblylinemachines:chaotic_sawdust"
+	},
+	"tobepurified":{
+		"item": "assemblylinemachines:ultimate_fertilizer"
+	},
+	"output":{
+		"item": "assemblylinemachines:chaotic_sawdust"
+	},
+	"time": 950
+}

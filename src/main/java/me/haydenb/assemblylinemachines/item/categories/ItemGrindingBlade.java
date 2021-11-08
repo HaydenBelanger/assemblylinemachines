@@ -10,7 +10,7 @@ public class ItemGrindingBlade extends Item{
 	public final Blades blade;
 	
 	public ItemGrindingBlade(Blades blade) {
-		super(new Item.Properties().durability(blade.uses).tab(Registry.creativeTab));
+		super(new Item.Properties().durability(blade.uses).tab(Registry.CREATIVE_TAB));
 		this.blade = blade;
 	}
 	

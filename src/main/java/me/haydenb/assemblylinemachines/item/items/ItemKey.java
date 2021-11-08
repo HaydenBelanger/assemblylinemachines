@@ -21,7 +21,7 @@ public class ItemKey extends Item {
 	
 	private String translationKey;
 	public ItemKey() {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 		translationKey = Util.makeDescriptionId("item", new ResourceLocation(AssemblyLineMachines.MODID, "key_configured"));
 	}
 	

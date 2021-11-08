@@ -4,18 +4,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Supplier;
 
+import com.mojang.datafixers.util.Pair;
+
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.*;
+import me.haydenb.assemblylinemachines.block.BlockBlackGranite.BlockBlackGranitePillar;
 import me.haydenb.assemblylinemachines.block.corrupt.*;
-import me.haydenb.assemblylinemachines.block.corrupt.ChaosbarkLeavesBlock.ChaosbarkSaplingBlock;
-import me.haydenb.assemblylinemachines.block.corrupt.CorruptTallGrassBlock.CorruptDoubleTallGrassBlock;
-import me.haydenb.assemblylinemachines.block.corrupt.CorruptTallGrassBlock.CorruptFlowerBlock;
+import me.haydenb.assemblylinemachines.block.corrupt.CorruptBlock.CorruptBlockWithAxis;
+import me.haydenb.assemblylinemachines.block.corrupt.CorruptTallGrassBlock.*;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCrankmill.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.*;
+import me.haydenb.assemblylinemachines.block.fluid.*;
+import me.haydenb.assemblylinemachines.block.fluid.ALMFluid.ALMFluidBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidDarkEnergy.FluidDarkEnergyBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct.FluidOilProductBlock;
 import me.haydenb.assemblylinemachines.block.machines.crank.*;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockGearbox.*;
 import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleCrankCharger.TESimpleCrankCharger;
@@ -67,13 +76,11 @@ import me.haydenb.assemblylinemachines.item.categories.*;
 import me.haydenb.assemblylinemachines.item.categories.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.items.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.datagen.BasicHarvestableTaggedBlock;
-import me.haydenb.assemblylinemachines.registry.datagen.MineableBlockProvider;
+import me.haydenb.assemblylinemachines.registry.TagMaster.DataProviderContainer;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
-import me.haydenb.assemblylinemachines.world.effect.EffectDeepBurn;
-import me.haydenb.assemblylinemachines.world.effect.EffectEntropyPoisoning;
-import me.haydenb.assemblylinemachines.world.generation.ChaosPlaneCarver;
+import me.haydenb.assemblylinemachines.world.effect.*;
+import me.haydenb.assemblylinemachines.world.generation.DimensionChaosPlane.ChaosPlaneCarver;
 import me.haydenb.assemblylinemachines.world.rendering.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.color.block.BlockColor;
@@ -88,6 +95,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.effect.MobEffect;
@@ -119,6 +127,8 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -127,6 +137,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fmllegacy.network.IContainerFactory;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -134,8 +145,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 public class Registry {
 	
-	//REGISTRY
-	static final TreeMap<String, Item> itemRegistry = new TreeMap<>(new Comparator<String>() {
+	//REGISTRY MAPS
+	private static final TreeMap<String, Item> MOD_ITEM_REGISTRY = new TreeMap<>(new Comparator<String>() {
 
 		@Override
 		public int compare(String o1, String o2) {
@@ -143,66 +154,41 @@ public class Registry {
 		}
 	});
 		
-	public static final HashMap<String, Block> blockRegistry = new HashMap<>();
+	private static final HashMap<String, Block> MOD_BLOCK_REGISTRY = new HashMap<>();
+	private static final HashMap<String, BlockEntityType<?>> MOD_BLOCKENTITY_REGISTRY = new HashMap<>();
+	private static final HashMap<String, Pair<MenuType<?>, Integer>> MOD_CONTAINER_REGISTRY = new HashMap<>();
+	private static final HashMap<String, MobEffect> MOD_EFFECT_REGISTRY = new HashMap<>();
+	private static final HashMap<String, SoundEvent> MOD_SOUND_REGISTRY = new HashMap<>();
+	private static final HashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new HashMap<>();
 	
-	private static final HashMap<String, BlockEntityType<?>> teRegistry = new HashMap<>();
-	private static final HashMap<String, MenuType<?>> containerRegistry = new HashMap<>();
-	private static final HashMap<MenuType<?>, Integer> containerIdRegistry = new HashMap<>();
-	private static final HashMap<String, MobEffect> effectRegistry = new HashMap<>();
+	//MOD CREATIVE TAB & DEFAULT PROPERTIES
+	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
 	
-	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
-	
-	//EVENTS
+	//BOTH-SIDED REGISTRATIONS - ITEMS, BLOCKS, TEs, CONTAINERS, ENTITIES, POTIONS, CRAFTING, CARVERS, SOUNDS
 	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
 		//DISABLED DUE TO PATCHOULI PLUGIN NON-UPDATE - createItem("guidebook", new ItemGuidebook());
 		
-		createItem("titanium_ingot");
-		createItem("titanium_nugget");
-		createItem("raw_titanium");
+		createItem("titanium_ingot", "titanium_nugget", "raw_titanium");
 		
-		createItem("titanium_blade_piece");
+		createItem("titanium_blade_piece", "pure_gold_blade_piece", "steel_blade_piece");
 		createItem("titanium_blade", new ItemGrindingBlade(Blades.TITANIUM));
-		createItem("pure_gold_blade_piece");
 		createItem("pure_gold_blade", new ItemGrindingBlade(Blades.PUREGOLD));
-		createItem("steel_blade_piece");
 		createItem("steel_blade", new ItemGrindingBlade(Blades.STEEL));
 		
-		createItem("ground_iron");
-		createItem("ground_gold");
-		createItem("ground_titanium");
-		createItem("ground_coal");
-		createItem("ground_charcoal");
-		createItem("ground_copper");
-		
+		createItem("ground_iron", "ground_gold", "ground_titanium", "ground_coal", "ground_charcoal", "ground_copper", "ground_lapis_lazuli");
 		createItem("sludge");
 		
-		createItem("steel_ingot");
-		createItem("steel_nugget");
+		createItem("steel_ingot", "steel_nugget", "steel_rod");
 		
-		createItem("pure_iron");
-		createItem("pure_gold");
-		createItem("pure_titanium");
-		createItem("pure_steel");
-		createItem("pure_copper");
+		createItem("pure_iron", "pure_gold", "pure_titanium", "pure_steel", "pure_copper");
 		
-		createItem("steel_rod");
-		
-		createItem("steel_plate");
-		createItem("wooden_board");
-		createItem("iron_plate");
-		createItem("gold_plate");
-		createItem("titanium_plate");
-		createItem("copper_plate");
+		createItem("steel_plate", "wooden_board", "iron_plate", "gold_plate", "titanium_plate", "copper_plate");
 		createItem("mystium_plate", new ItemBasicFormattedName(ChatFormatting.LIGHT_PURPLE));
 		
-		createItem("gold_gear");
-		createItem("steel_gear");
-		createItem("iron_gear");
-		createItem("titanium_gear");
-		createItem("copper_gear");
+		createItem("gold_gear", "steel_gear", "iron_gear", "titanium_gear", "copper_gear");
 		
 		createItem("empowered_coal", new ItemGearboxBasicFuel(3200));
 		createItem("empowered_fuel", new ItemGearboxBasicFuel(6400));
@@ -232,75 +218,56 @@ public class Registry {
 		
 		createItem("mystium_dowsing_rod", new ItemDowsingRod());
 		
-		createItem("ground_lapis_lazuli");
 		createItem("mystium_blend", new ItemBasicFormattedName(ChatFormatting.LIGHT_PURPLE));
 		createItem("mystium_ingot", new ItemBasicFormattedName(ChatFormatting.LIGHT_PURPLE));
 		createItem("corrupted_shard", new ItemCorruptedShard());
 		
-		createItem("titanium_sword", new SwordItem(ToolTiers.TITANIUM, 2, -1.5f, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_axe", new AxeItem(ToolTiers.TITANIUM, 3, -3.5f, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_pickaxe", new PickaxeItem(ToolTiers.TITANIUM, 0, -1.5f, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_shovel", new ShovelItem(ToolTiers.TITANIUM, 0, -1.3f, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_hoe", new HoeItem(ToolTiers.TITANIUM, 0, -0.5f, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_hammer", new ItemHammer(ToolTiers.TITANIUM, 8, -3.2f, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_sword", new SwordItem(ToolTiers.TITANIUM, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_axe", new AxeItem(ToolTiers.TITANIUM, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_pickaxe", new PickaxeItem(ToolTiers.TITANIUM, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_shovel", new ShovelItem(ToolTiers.TITANIUM, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_hoe", new HoeItem(ToolTiers.TITANIUM, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_hammer", new ItemHammer(ToolTiers.TITANIUM, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		int crankcapacity = ConfigHolder.COMMON.crankToolMaxCranks.get();
-		createItem("crank_sword", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 2, -1.5f, new Item.Properties().tab(creativeTab), crankcapacity, SwordItem.class));
-		createItem("crank_axe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 3, -3.5f, new Item.Properties().tab(creativeTab), crankcapacity, AxeItem.class));
-		createItem("crank_pickaxe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 0, -1.5f, new Item.Properties().tab(creativeTab), crankcapacity, PickaxeItem.class));
-		createItem("crank_shovel", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 0, -1.3f, new Item.Properties().tab(creativeTab), crankcapacity, ShovelItem.class));
-		createItem("crank_hoe", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 0, -0.5f, new Item.Properties().tab(creativeTab), crankcapacity, HoeItem.class));
-		createItem("crank_hammer", ItemCrankTool.makeCrankTool(ToolTiers.CRANK, 8, -3.2f, new Item.Properties().tab(creativeTab), crankcapacity, ItemHammer.class));
+		int crankCapacity = ConfigHolder.COMMON.crankToolMaxCranks.get();
+		createItem("crank_sword", new ItemCrankTool<TieredItem>(crankCapacity, new SwordItem(ToolTiers.CRANK, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_axe", new ItemCrankTool<TieredItem>(crankCapacity, new AxeItem(ToolTiers.CRANK, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_pickaxe", new ItemCrankTool<TieredItem>(crankCapacity, new PickaxeItem(ToolTiers.CRANK, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_shovel", new ItemCrankTool<TieredItem>(crankCapacity, new ShovelItem(ToolTiers.CRANK, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_hoe", new ItemCrankTool<TieredItem>(crankCapacity, new HoeItem(ToolTiers.CRANK, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_hammer", new ItemCrankTool<TieredItem>(crankCapacity, new ItemHammer(ToolTiers.CRANK, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
 		
-		int fecapacity = ConfigHolder.COMMON.mystiumToolMaxFE.get();
-		createItem("mystium_sword", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 2, -1.5f, new Item.Properties().tab(creativeTab), fecapacity, SwordItem.class));
-		createItem("mystium_axe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 3, -3.5f, new Item.Properties().tab(creativeTab), fecapacity, AxeItem.class));
-		createItem("mystium_pickaxe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 0, -1.5f, new Item.Properties().tab(creativeTab), fecapacity, PickaxeItem.class));
-		createItem("mystium_shovel", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 0, -1.3f, new Item.Properties().tab(creativeTab), fecapacity, ShovelItem.class));
-		createItem("mystium_hoe", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 0, -0.5f, new Item.Properties().tab(creativeTab), fecapacity, HoeItem.class));
-		createItem("mystium_hammer", ItemMystiumTool.makePowerTool(ToolTiers.MYSTIUM, 8, -3.2f, new Item.Properties().tab(creativeTab), fecapacity, ItemHammer.class));
+		int feCapacity = ConfigHolder.COMMON.mystiumToolMaxFE.get();
+		createItem("mystium_sword", new ItemMystiumTool<TieredItem>(feCapacity, new SwordItem(ToolTiers.MYSTIUM, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_axe", new ItemMystiumTool<TieredItem>(feCapacity, new AxeItem(ToolTiers.MYSTIUM, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_pickaxe", new ItemMystiumTool<TieredItem>(feCapacity, new PickaxeItem(ToolTiers.MYSTIUM, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_shovel", new ItemMystiumTool<TieredItem>(feCapacity, new ShovelItem(ToolTiers.MYSTIUM, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_hoe", new ItemMystiumTool<TieredItem>(feCapacity, new HoeItem(ToolTiers.MYSTIUM, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_hammer", new ItemMystiumTool<TieredItem>(feCapacity, new ItemHammer(ToolTiers.MYSTIUM, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
 		
-		createItem("steel_sword", new SwordItem(ToolTiers.STEEL, 2, -1.5f, new Item.Properties().tab(creativeTab)));
-		createItem("steel_axe", new AxeItem(ToolTiers.STEEL, 3, -3.5f, new Item.Properties().tab(creativeTab)));
-		createItem("steel_pickaxe", new PickaxeItem(ToolTiers.STEEL, 0, -1.5f, new Item.Properties().tab(creativeTab)));
-		createItem("steel_shovel", new ShovelItem(ToolTiers.STEEL, 0, -1.3f, new Item.Properties().tab(creativeTab)));
-		createItem("steel_hoe", new HoeItem(ToolTiers.STEEL, 0, -0.5f, new Item.Properties().tab(creativeTab)));
-		createItem("steel_hammer", new ItemHammer(ToolTiers.STEEL, 8, -3.2f, new Item.Properties().tab(creativeTab)));
+		createItem("steel_sword", new SwordItem(ToolTiers.STEEL, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_axe", new AxeItem(ToolTiers.STEEL, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_pickaxe", new PickaxeItem(ToolTiers.STEEL, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_shovel", new ShovelItem(ToolTiers.STEEL, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_hoe", new HoeItem(ToolTiers.STEEL, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_hammer", new ItemHammer(ToolTiers.STEEL, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		createItem("steel_helmet", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.HEAD, new Item.Properties().tab(creativeTab)));
-		createItem("steel_chestplate", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.CHEST, new Item.Properties().tab(creativeTab)));
-		createItem("steel_leggings", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.LEGS, new Item.Properties().tab(creativeTab)));
-		createItem("steel_boots", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.FEET, new Item.Properties().tab(creativeTab)));
+		createItem("steel_helmet", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_chestplate", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_leggings", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_boots", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		createItem("titanium_helmet", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.HEAD, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_chestplate", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.CHEST, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_leggings", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.LEGS, new Item.Properties().tab(creativeTab)));
-		createItem("titanium_boots", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.FEET, new Item.Properties().tab(creativeTab)));
+		createItem("titanium_helmet", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_chestplate", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_leggings", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_boots", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		createItem("crank_shaft");
-		createItem("convection_component");
-		createItem("conduction_component");
-		createItem("empowered_conduction_component");
-		createItem("basic_battery");
-		createItem("temperature_regulator");
-		createItem("fluid_regulator");
-		createItem("stainless_steel_tank_component");
-		createItem("steel_tank_component");
-		createItem("pneumatic_device");
+		createItem("crank_shaft", "convection_component", "conduction_component", "empowered_conduction_component", "empowered_convection_component", "basic_battery",
+				"temperature_regulator", "fluid_regulator", "stainless_steel_tank_component", "steel_tank_component", "pneumatic_device");
+		createItem("chromium_ingot", "chromium_nugget", "chromium_plate", "raw_chromium", "stainless_steel_plate", "ground_chromium");
+		createItem("energized_gold_ingot", "energized_gold_plate");
 		
-		createItem("chromium_ingot");
-		createItem("chromium_nugget");
-		createItem("chromium_plate");
-		createItem("raw_chromium");
-		
-		createItem("stainless_steel_plate");
-		createItem("energized_gold_ingot");
-		createItem("energized_gold_plate");
-		
-		createItem("plastic_sheet");
-		createItem("rubber_sheet");
-		createItem("rubber_ball");
-		createItem("plastic_ball");
+		createItem("plastic_sheet", "rubber_sheet", "plastic_ball", "rubber_ball");
 		
 		createItem("lock_remover", new ItemLockRemover());
 		createItem("key", new ItemKey());
@@ -310,22 +277,15 @@ public class Registry {
 		createItem("polished_rock");
 		createItem("mob_crystal", new ItemMobCrystal());
 		
-		createItem("sawdust");
-		createItem("warped_sawdust");
-		createItem("crimson_sawdust");
+		createItem("sawdust", "warped_sawdust", "crimson_sawdust");
 		
 		createItem("miniature_black_hole", new ItemBasicFormattedName(ChatFormatting.AQUA));
 		createItem("singularity", new ItemBasicFormattedName(ChatFormatting.DARK_AQUA));
-		createItem("empowered_convection_component");
 		
 		createItem("fertilizer", new ItemFertilizer(1));
 		createItem("enhanced_fertilizer", new ItemFertilizer(3));
 		createItem("ultimate_fertilizer", new ItemFertilizer(5));
-		createItem("enhanced_battery");
-		createItem("microprocessor");
-		createItem("energy_harness");
-		
-		createItem("ground_chromium");
+		createItem("enhanced_battery", "microprocessor", "energy_harness");
 		
 		createItem("attuned_titanium_ingot", new ItemBasicFormattedName(ChatFormatting.BLUE));
 		createItem("attuned_titanium_plate", new ItemBasicFormattedName(ChatFormatting.BLUE));
@@ -341,18 +301,19 @@ public class Registry {
 		createItem("quark_matter", new ItemReactorOutput("§9Medium-Quality"));
 		createItem("strange_matter", new ItemReactorOutput("§aHigh-Quality"));
 		
-		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(creativeTab)));
-		createItem("galactic_flesh");
-		createItem("reality_crystal");
+		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("galactic_flesh", "reality_crystal");
 		
-		createItem("electrified_netherite_blend");
-		createItem("ground_netherite");
+		createItem("electrified_netherite_blend", "ground_netherite");
 		
-		//1.17.1 CHANGE: Fluid registration is segmented due to build issues. See FluidRegistry.class.
-		FluidRegistry.registerBuckets();
+		createItem("chaotic_sawdust", "graphene_rod", "prismatic_dust");
+		createItem("chaotic_fertilizer", new ItemFertilizer(10));
 		
-		for(String i : itemRegistry.keySet()) {
-			event.getRegistry().register(itemRegistry.get(i));
+		createItem("flerovium_gear", "flerovium_ingot", "flerovium_plate", "ground_flerovium", "raw_flerovium", "flerovium_nugget");
+		createItem("ground_diamond");
+		
+		for(String i : MOD_ITEM_REGISTRY.keySet()) {
+			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
 		}
 	}
 	
@@ -402,7 +363,7 @@ public class Registry {
 		createBlock("smooth_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("brick_black_granite", Material.STONE, 3f, 9f,  SoundType.STONE, false, true);
 		createBlock("chiselled_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
-		createBlock("pillar_black_granite", new RotatedPillarBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
+		createBlock("pillar_black_granite", new BlockBlackGranitePillar(), true);
 		createBlock("slab_black_granite", new SlabBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		createBlock("stair_black_granite", new StairBlock(new Supplier<BlockState>() {
 
@@ -423,7 +384,7 @@ public class Registry {
 		createBlock("coal_generator", new BlockCoalGenerator(), true);
 		createBlock("crankmill", new BlockCrankmill(), true);
 		
-		createBlock("chromium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, MineableBlockProvider.NEEDS_NETHERITE_TOOL, true);
+		createBlock("chromium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_NETHERITE_TOOL, true);
 		createBlock("chromium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
 		
 		createBlock("electric_furnace", new BlockElectricFurnace(), true);
@@ -490,15 +451,15 @@ public class Registry {
 		createBlock("corrupting_basin", new BlockCorruptingBasin(), true);
 		
 		createBlock("corrupt_dirt", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_grass", new CorruptGrassBlock(), true);
+		createBlock("corrupt_grass", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL, true, true), true);
 		createBlock("corrupt_sand", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.SAND)), true);
 		createBlock("corrupt_stone", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		createBlock("corrupt_gravel", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL)), true);
-		createBlock("chaosbark_log", new ChaosbarkLogBlock(), true);
-		createBlock("stripped_chaosbark_log", new ChaosbarkLogBlock(), true);
-		createBlock("chaosbark_sapling", new ChaosbarkSaplingBlock(), true);
-		createBlock("chaosbark_leaves", new ChaosbarkLeavesBlock(), true);
-		createBlock("chaosbark_planks", Material.WOOD, 2f, 10f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
+		createBlock("stripped_chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
+		createBlock("chaosbark_sapling", new CorruptTallGrassBlock.ChaosbarkSaplingBlock(), true);
+		createBlock("chaosbark_leaves", Block.Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("chaosbark_planks", Material.WOOD, 3f, 9f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
 		createBlock("chaosweed", new CorruptTallGrassBlock(), true);
 		createBlock("blooming_chaosweed", new CorruptTallGrassBlock(), true);
@@ -506,35 +467,51 @@ public class Registry {
 		createBlock("tall_blooming_chaosweed", new CorruptDoubleTallGrassBlock(), true);
 		createBlock("mandelbloom", new CorruptFlowerBlock(MobEffects.CONFUSION, 15), true);
 		createBlock("prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 30), true);
+		createBlock("brain_cactus", new BrainCactusBlock(), true);
 		
-		//1.17.1 CHANGE: Fluid registration is segmented due to build issues. See FluidRegistry.class.
-		FluidRegistry.registerFluidBlocks();
+		createBlock("corrupt_coal_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_copper_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_diamond_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_emerald_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_gold_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_iron_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_lapis_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_redstone_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_titanium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("flerovium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL), true);
 		
-		event.getRegistry().registerAll(blockRegistry.values().toArray(new Block[blockRegistry.size()]));
+		createBlock("flerovium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
+		createBlock("energized_gold_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
+		createBlock("attuned_titanium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
+		
+		registerFluids(null);
+		
+		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
 	}
 	
-	/*
-	1.17.1 CHANGE: Due to issues related to building fluids, fluid registration is handled through a DeferredRegister in FluidRegistry.class.
+	//Method can be fired with event being null - this happens from the Block registration, to ensure all LiquidBlocks, Buckets, and Fluids get created before their respective registry events.
 	@SubscribeEvent
 	public static void registerFluids(RegistryEvent.Register<Fluid> event) {
-		
-		//FLUIDS - COPIED FROM BOTTOM OF #registerBlocks()
-		//FluidRegistration.buildAndRegister("oil", new FluidOil(true), new FluidOil(false), true, new FluidOilBlock(new FluidOil(true)));
-		//FluidRegistration.buildAndRegister("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), true, new FluidCondensedVoidBlock(new FluidCondensedVoid(true)));
-		//FluidRegistration.buildAndRegister("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), true, new FluidNaphthaBlock(new FluidNaphtha(true)));
-		//FluidRegistration.buildAndRegister("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), true, new FluidOilProductBlock(new FluidOilProduct("gasoline", true)));
-		//FluidRegistration.bildAndRegister("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), true, new FluidOilProductBlock(new FluidOilProduct("diesel", true)));
-		//FluidRegistration.buildAndRegister("liquid_experience", 35, false, true, ALMFluid.LIQUID_EXPERIENCE, Material.WATER);
-		
-		//FluidRegistration.buildAndRegister("ethane", new GaseousFluid("ethane", true, 0x135f0f), null, false, null);
-		//FluidRegistration.buildAndRegister("ethylene", new GaseousFluid("ethylene", true, 0xb3aac3), null, false, null);
-		//FluidRegistration.buildAndRegister("propane", new GaseousFluid("propane", true, 0x5f0f1c), null, false, null);
-		//FluidRegistration.buildAndRegister("propylene", new GaseousFluid("propylene", true, 0x290d55), null, false, null);
-		 * 
-		//All Fluids are handled at bottom of registerBlocks, to handle the _block and _bucket versions of fluids.
-		event.getRegistry().registerAll(fluidRegistry.values().toArray(new Fluid[fluidRegistry.size()]));
+		if(event == null) {
+			
+			createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(() -> Registry.getFluid("oil")), true);
+			createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(() -> Registry.getFluid("condensed_void")), true);
+			createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(() -> Registry.getFluid("naphtha")), true);
+			createFluid("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), new FluidOilProductBlock(() -> Registry.getFluid("gasoline"), "gasoline"), true);
+			createFluid("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), new FluidOilProductBlock(() -> Registry.getFluid("diesel"), "diesel"), true);
+			createFluid("liquid_carbon", new FluidOilProduct("liquid_carbon", true), new FluidOilProduct("liquid_carbon", false), new FluidOilProductBlock(() -> Registry.getFluid("liquid_carbon"), "liquid_carbon"), true);
+			createFluid("liquid_experience", 35, false, true, true, 0, 184, 18);
+			createFluid("dark_energy", new FluidDarkEnergy(true), new FluidDarkEnergy(false), new FluidDarkEnergyBlock(() -> Registry.getFluid("dark_energy")), true);
+			
+			createFluid("ethane", 0, true, false, false, 0, 0, 0);
+			createFluid("ethylene", 0, true, false, false, 0, 0, 0);
+			createFluid("propane", 0, true, false, false, 0, 0, 0);
+			createFluid("propylene", 0, true, false, false, 0, 0, 0);
+			
+		}else {
+			event.getRegistry().registerAll(MOD_FLUID_REGISTRY.values().toArray(new Fluid[MOD_FLUID_REGISTRY.size()]));
+		}
 	}
-	*/
 	
 	@SubscribeEvent
 	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) {
@@ -547,11 +524,11 @@ public class Registry {
 		
 		createBlockEntity("gearbox", TEGearbox.class);
 		
-		createBlockEntity("fluid_tank", TEFluidTank.class, blockRegistry.get("wooden_fluid_tank"), blockRegistry.get("steel_fluid_tank"), blockRegistry.get("mystium_fluid_tank"));
+		createBlockEntity("fluid_tank", TEFluidTank.class, MOD_BLOCK_REGISTRY.get("wooden_fluid_tank"), MOD_BLOCK_REGISTRY.get("steel_fluid_tank"), MOD_BLOCK_REGISTRY.get("mystium_fluid_tank"));
 		
-		createBlockEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, blockRegistry.get("item_pipe"));
-		createBlockEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, blockRegistry.get("fluid_pipe"), blockRegistry.get("advanced_fluid_pipe"));
-		createBlockEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, blockRegistry.get("energy_pipe"), blockRegistry.get("adv_energy_pipe"));
+		createBlockEntity("pipe_connector_item", ItemPipeConnectorTileEntity.class, MOD_BLOCK_REGISTRY.get("item_pipe"));
+		createBlockEntity("pipe_connector_fluid", FluidPipeConnectorTileEntity.class, MOD_BLOCK_REGISTRY.get("fluid_pipe"), MOD_BLOCK_REGISTRY.get("advanced_fluid_pipe"));
+		createBlockEntity("pipe_connector_energy", EnergyPipeConnectorTileEntity.class, MOD_BLOCK_REGISTRY.get("energy_pipe"), MOD_BLOCK_REGISTRY.get("adv_energy_pipe"));
 		
 		createBlockEntity("basic_battery_cell", TEBasicBatteryCell.class);
 		createBlockEntity("advanced_battery_cell", TEAdvancedBatteryCell.class);
@@ -573,7 +550,7 @@ public class Registry {
 		createBlockEntity("interactor", TEInteractor.class);
 		createBlockEntity("vacuum_hopper", TEVacuumHopper.class);
 		createBlockEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
-		createBlockEntity("fluid_generator", TEFluidGenerator.class, blockRegistry.get("geothermal_generator"), blockRegistry.get("combustion_generator"));
+		createBlockEntity("fluid_generator", TEFluidGenerator.class, MOD_BLOCK_REGISTRY.get("geothermal_generator"), MOD_BLOCK_REGISTRY.get("combustion_generator"));
 		createBlockEntity("experience_hopper", TEExperienceHopper.class);
 		
 		createBlockEntity("powered_spawner", TEPoweredSpawner.class);
@@ -585,12 +562,12 @@ public class Registry {
 		
 		createBlockEntity("metal_shaper", TEMetalShaper.class);
 		
-		createBlockEntity("entropy_reactor", TEEntropyReactor.class, blockRegistry.get("entropy_reactor_block"));
-		createBlockEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, blockRegistry.get("entropy_reactor_block"));
+		createBlockEntity("entropy_reactor", TEEntropyReactor.class, MOD_BLOCK_REGISTRY.get("entropy_reactor_block"));
+		createBlockEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, MOD_BLOCK_REGISTRY.get("entropy_reactor_block"));
 		
 		createBlockEntity("corrupting_basin", TECorruptingBasin.class);
 		
-		event.getRegistry().registerAll(teRegistry.values().toArray(new BlockEntityType<?>[teRegistry.size()]));
+		event.getRegistry().registerAll(MOD_BLOCKENTITY_REGISTRY.values().toArray(new BlockEntityType<?>[MOD_BLOCKENTITY_REGISTRY.size()]));
 	}
 	
 	@SubscribeEvent
@@ -629,7 +606,8 @@ public class Registry {
 		
 		createContainer("corrupting_basin", 1075, ContainerCorruptingBasin.class);
 		
-		event.getRegistry().registerAll(containerRegistry.values().toArray(new MenuType<?>[containerRegistry.size()]));
+		Iterator<Pair<MenuType<?>, Integer>> iter = MOD_CONTAINER_REGISTRY.values().iterator();
+		while(iter.hasNext()) event.getRegistry().register(iter.next().getFirst());
 		
 	}
 	
@@ -651,86 +629,9 @@ public class Registry {
 		
 		createEffect("entropy_poisoning", new EffectEntropyPoisoning());
 		createEffect("deep_burn", new EffectDeepBurn());
+		createEffect("dark_expulsion", new EffectDarkExpulsion());
 		
-		event.getRegistry().registerAll(effectRegistry.values().toArray(new MobEffect[effectRegistry.size()]));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@OnlyIn(Dist.CLIENT)
-	@SubscribeEvent
-	public static void clientSetup(FMLClientSetupEvent event) {
-		ItemBlockRenderTypes.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("autocrafting_table"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("geothermal_generator"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("naphtha_fire"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("powered_spawner"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("entropy_reactor_block"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_leaves"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_sapling"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosweed"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("blooming_chaosweed"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_chaosweed"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_blooming_chaosweed"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("mandelbloom"), RenderType.cutout());
-		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_rose"), RenderType.cutout());
-		
-		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel_flowing"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("gasoline"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("gasoline_flowing"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_experience"), RenderType.translucent());
-		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_experience_flowing"), RenderType.translucent());
-		
-		
-		BlockEntityRenderers.register((BlockEntityType<TEFluidTank>)getBlockEntity("fluid_tank"), new TankTER());
-		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
-		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());
-		
-		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
-		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
-		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
-		registerScreen("pipe_connector_item", ItemPipeConnectorContainer.class, ItemPipeConnectorScreen.class);
-		
-		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
-		registerScreen("crankmill", ContainerCrankmill.class, ScreenCrankmill.class);
-		registerScreen("battery_cell", ContainerBatteryCell.class, ScreenBatteryCell.class);
-		registerScreen("electric_furnace", ContainerElectricFurnace.class, ScreenElectricFurnace.class);
-		registerScreen("electric_purifier", ContainerElectricPurifier.class, ScreenElectricPurifier.class);
-		
-		registerScreen("electric_grinder", ContainerElectricGrinder.class, ScreenElectricGrinder.class);
-		registerScreen("electric_fluid_mixer", ContainerElectricFluidMixer.class, ScreenElectricFluidMixer.class);
-		registerScreen("autocrafting_table", ContainerAutocraftingTable.class, ScreenAutocraftingTable.class);
-		registerScreen("alloy_smelter", ContainerAlloySmelter.class, ScreenAlloySmelter.class);
-		registerScreen("refinery", ContainerRefinery.class, ScreenRefinery.class);
-		registerScreen("fluid_router", ContainerFluidRouter.class, ScreenFluidRouter.class);
-		registerScreen("interactor", ContainerInteractor.class, ScreenInteractor.class);
-		registerScreen("bottomless_storage_unit", ContainerBottomlessStorageUnit.class, ScreenBottomlessStorageUnit.class);
-		registerScreen("fluid_generator", ContainerFluidGenerator.class, ScreenFluidGenerator.class);
-		
-		registerScreen("experience_mill", ContainerExperienceMill.class, ScreenExperienceMill.class);
-		registerScreen("powered_spawner", ContainerPoweredSpawner.class, ScreenPoweredSpawner.class);
-		registerScreen("quarry", ContainerQuarry.class, ScreenQuarry.class);
-		
-		registerScreen("lumber_mill", ContainerLumberMill.class, ScreenLumberMill.class);
-		
-		registerScreen("quantum_link", ContainerQuantumLink.class, ScreenQuantumLink.class);
-		
-		registerScreen("metal_shaper", ContainerMetalShaper.class, ScreenMetalShaper.class);
-		
-		registerScreen("entropy_reactor", ContainerEntropyReactor.class, ScreenEntropyReactor.class);
-		
-		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
-		
-		((ItemMystiumTool<?>) Registry.getItem("mystium_pickaxe")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_axe")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_sword")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_shovel")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_hoe")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_hammer")).connectItemProperties();
+		event.getRegistry().registerAll(MOD_EFFECT_REGISTRY.values().toArray(new MobEffect[MOD_EFFECT_REGISTRY.size()]));
 	}
 	
 	@SubscribeEvent
@@ -771,6 +672,98 @@ public class Registry {
 	public static void registerCarvers(RegistryEvent.Register<WorldCarver<?>> event) {
 		event.getRegistry().register(new ChaosPlaneCarver(CaveCarverConfiguration.CODEC).setRegistryName("chaos_plane_cave"));
 		
+	}
+	
+	@SubscribeEvent
+	public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+		MOD_SOUND_REGISTRY.put("corrupt_shell_ambient", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_ambient")).setRegistryName("corrupt_shell_ambient"));
+		MOD_SOUND_REGISTRY.put("corrupt_shell_hurt", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_hurt")).setRegistryName("corrupt_shell_hurt"));
+		MOD_SOUND_REGISTRY.put("corrupt_shell_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_death")).setRegistryName("corrupt_shell_death"));
+		MOD_SOUND_REGISTRY.put("corrupt_shell_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_step")).setRegistryName("corrupt_shell_step"));
+		
+		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_ambient", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_ambient")).setRegistryName("corrupt_shell_cool_ambient"));
+		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_hurt", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_hurt")).setRegistryName("corrupt_shell_cool_hurt"));
+		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_death")).setRegistryName("corrupt_shell_cool_death"));
+		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_step")).setRegistryName("corrupt_shell_cool_step"));
+		
+		
+		event.getRegistry().registerAll(MOD_SOUND_REGISTRY.values().toArray(new SoundEvent[MOD_SOUND_REGISTRY.size()]));
+	}
+	
+	//CLIENT-RELATED SETUP EVENTS - RENDER LAYERS, TERs, SCREENS, ITEM PROPERTIES, TINTING HANDLERS, ENTITY RENDERERS
+	
+	@SuppressWarnings("unchecked")
+	@OnlyIn(Dist.CLIENT)
+	@SubscribeEvent
+	public static void clientSetup(FMLClientSetupEvent event) {
+		ItemBlockRenderTypes.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("autocrafting_table"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("geothermal_generator"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("naphtha_fire"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("powered_spawner"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("entropy_reactor_block"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_leaves"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_sapling"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("blooming_chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_blooming_chaosweed"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("mandelbloom"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_rose"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("brain_cactus"), RenderType.cutout());
+		
+		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("gasoline"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("gasoline_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_experience"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_experience_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("dark_energy"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("dark_energy_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_carbon"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_carbon_flowing"), RenderType.translucent());
+		
+		BlockEntityRenderers.register((BlockEntityType<TEFluidTank>)getBlockEntity("fluid_tank"), new TankTER());
+		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
+		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());
+		
+		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
+		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
+		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
+		registerScreen("pipe_connector_item", ItemPipeConnectorContainer.class, ItemPipeConnectorScreen.class);
+		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
+		registerScreen("crankmill", ContainerCrankmill.class, ScreenCrankmill.class);
+		registerScreen("battery_cell", ContainerBatteryCell.class, ScreenBatteryCell.class);
+		registerScreen("electric_furnace", ContainerElectricFurnace.class, ScreenElectricFurnace.class);
+		registerScreen("electric_purifier", ContainerElectricPurifier.class, ScreenElectricPurifier.class);
+		registerScreen("electric_grinder", ContainerElectricGrinder.class, ScreenElectricGrinder.class);
+		registerScreen("electric_fluid_mixer", ContainerElectricFluidMixer.class, ScreenElectricFluidMixer.class);
+		registerScreen("autocrafting_table", ContainerAutocraftingTable.class, ScreenAutocraftingTable.class);
+		registerScreen("alloy_smelter", ContainerAlloySmelter.class, ScreenAlloySmelter.class);
+		registerScreen("refinery", ContainerRefinery.class, ScreenRefinery.class);
+		registerScreen("fluid_router", ContainerFluidRouter.class, ScreenFluidRouter.class);
+		registerScreen("interactor", ContainerInteractor.class, ScreenInteractor.class);
+		registerScreen("bottomless_storage_unit", ContainerBottomlessStorageUnit.class, ScreenBottomlessStorageUnit.class);
+		registerScreen("fluid_generator", ContainerFluidGenerator.class, ScreenFluidGenerator.class);
+		registerScreen("experience_mill", ContainerExperienceMill.class, ScreenExperienceMill.class);
+		registerScreen("powered_spawner", ContainerPoweredSpawner.class, ScreenPoweredSpawner.class);
+		registerScreen("quarry", ContainerQuarry.class, ScreenQuarry.class);
+		registerScreen("lumber_mill", ContainerLumberMill.class, ScreenLumberMill.class);
+		registerScreen("quantum_link", ContainerQuantumLink.class, ScreenQuantumLink.class);
+		registerScreen("metal_shaper", ContainerMetalShaper.class, ScreenMetalShaper.class);
+		registerScreen("entropy_reactor", ContainerEntropyReactor.class, ScreenEntropyReactor.class);
+		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
+		
+		((ItemMystiumTool<?>) Registry.getItem("mystium_pickaxe")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_axe")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_sword")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_shovel")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_hoe")).connectItemProperties();
+		((ItemMystiumTool<?>) Registry.getItem("mystium_hammer")).connectItemProperties();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -824,6 +817,9 @@ public class Registry {
 		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
 	
+	
+	//CONFIG CREATOR/DATA GENERATOR
+	
 	@SubscribeEvent
 	public static void configEvent(ModConfigEvent event) {
 		final ModConfig cfg = event.getConfig();
@@ -832,7 +828,12 @@ public class Registry {
 		}
 	}
 	
-	
+	@SubscribeEvent
+	public static void gatherData(GatherDataEvent event) throws Exception {
+		DataProviderContainer dpc = new DataProviderContainer(event);
+		event.getGenerator().run();
+		dpc.writer.close();
+	}
 	
 	
 	//===============================================
@@ -840,19 +841,26 @@ public class Registry {
 	//EFFECTS
 	private static void createEffect(String name, MobEffect effect) {
 		effect.setRegistryName(name);
-		effectRegistry.put(name, effect);
+		MOD_EFFECT_REGISTRY.put(name, effect);
 	}
 	
 	public static MobEffect getEffect(String name) {
-		return effectRegistry.get(name);
+		return MOD_EFFECT_REGISTRY.get(name);
 	}
 	
 	//ITEMS
+	private static void createItem(String... names) {
+		for(String s : names) {
+			createItem(s);
+		}
+	}
+	
 	private static void createItem(String name) {
 		
-		Item.Properties properties = new Item.Properties().tab(creativeTab);
+		Item.Properties properties = new Item.Properties().tab(CREATIVE_TAB);
 		createItem(name, properties);
 	}
+	
 	static void createItem(String name, Item.Properties properties) {
 		Item i = new Item(properties);
 		createItem(name, i);
@@ -860,11 +868,11 @@ public class Registry {
 	
 	static void createItem(String name, Item item) {
 		item.setRegistryName(name);
-		itemRegistry.put(name, item);
+		MOD_ITEM_REGISTRY.put(name, item);
 	}
 	
 	public static Item getItem(String name) {
-		return itemRegistry.get(name);
+		return MOD_ITEM_REGISTRY.get(name);
 	}
 	
 	
@@ -887,8 +895,17 @@ public class Registry {
 	}
 	
 	private static void createBlock(String name, Block.Properties properties, Named<Block> type, Named<Block> level, boolean item) {
-		Block b = new BasicHarvestableTaggedBlock(properties, type, level);
-		createBlock(name, b, item);
+		class BlockWithTags extends Block implements TagMaster.IMiningLevelDataGenProvider{
+
+			public BlockWithTags(Properties p) {super(p);}
+			@Override
+			public Named<Block> getToolType() {return type;}
+			@Override
+			public Named<Block> getToolLevel() {return level;}
+			
+		}
+		
+		createBlock(name, new BlockWithTags(properties), item);
 	}
 	
 	private static void createBlock(String name, Block.Properties properties, boolean item) {
@@ -898,31 +915,97 @@ public class Registry {
 	
 	static void createBlock(String name, Block block, boolean item) {
 		block.setRegistryName(name);
-		blockRegistry.put(name, block);
+		MOD_BLOCK_REGISTRY.put(name, block);
 		if(item) {
-			createItem(name, new BlockItem(block, new Item.Properties().tab(creativeTab)));
+			createItem(name, new BlockItem(block, new Item.Properties().tab(CREATIVE_TAB)));
 		}
 		
 	}
 	
 	public static Block getBlock(String name) {
-		return blockRegistry.get(name);
+		return MOD_BLOCK_REGISTRY.get(name);
 	}
 	
+	public static Collection<Block> getAllBlocks(){
+		return MOD_BLOCK_REGISTRY.values();
+	}
 	
 	//FLUIDS
-	//Fluid Registration is handled in a separate class.
-	public static Fluid getFluid(String name) {
-		return ForgeRegistries.FLUIDS.getValue(new ResourceLocation("assemblylinemachines", name));
+	public static ForgeFlowingFluid getFluid(String name) {
+		return MOD_FLUID_REGISTRY.get(name);
+	}
+	
+	public static ForgeFlowingFluid.Properties createFluidProperties(String name, int temperature, boolean gaseous, boolean block, boolean bucket){
+		
+		ResourceLocation flowName = gaseous ? null : new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name + "_flowing");
+		FluidAttributes.Builder attribs = FluidAttributes.builder(new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name), flowName).temperature(temperature);
+		if(gaseous) {
+			return new ForgeFlowingFluid.Properties(() -> Registry.getFluid(name), null, attribs);
+		}else {
+			ForgeFlowingFluid.Properties props = new ForgeFlowingFluid.Properties(() -> Registry.getFluid(name), () -> Registry.getFluid(name + "_flowing"), attribs);
+			if(block) {
+				props.block(() -> (LiquidBlock) Registry.getBlock(name + "_block"));
+			}
+			if(bucket) {
+				props.bucket(() -> (BucketItem) Registry.getItem(name + "_bucket"));
+			}
+			return props;
+		}
+	}
+
+	public static void createFluid(String name, int temperature, boolean gaseous, boolean block, boolean bucket, int r, int g, int b) {
+		
+		if(gaseous) {
+			ALMFluid gas = new ALMFluid(createFluidProperties(name, temperature, true, false, false), true, r, g, b);
+			gas.setRegistryName(name);
+			MOD_FLUID_REGISTRY.put(name, gas);
+		}else {
+			ForgeFlowingFluid.Properties props = createFluidProperties(name, temperature, gaseous, block, bucket);
+			createFluid(name, new ALMFluid(props, true, r, g, b), new ALMFluid(props, false, r, g, b), block, bucket);
+		}
+	}
+	
+	public static void createFluid(String name, ALMFluid still, ALMFluid flowing, boolean block, boolean bucket) {
+		LiquidBlock lb = null;
+		if(block) {
+			lb = new ALMFluidBlock(() -> Registry.getFluid(name), ALMFluid.getTag("liquid_experience"), Material.WATER);
+		}
+		createFluid(name, still, flowing, lb, bucket);
+		
+	}
+
+	public static void createFluid(String name, ALMFluid still, ALMFluid flowing, LiquidBlock block, boolean bucket) {
+		BucketItem bi = bucket ? new BucketItem(() -> Registry.getFluid(name), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(Registry.CREATIVE_TAB)) : null;
+		if(bi != null) {
+			bi.setRegistryName(name + "_bucket");
+			MOD_ITEM_REGISTRY.put(name + "_bucket", bi);
+		}
+		if(block != null) {
+			block.setRegistryName(name + "_block");
+			MOD_BLOCK_REGISTRY.put(name + "_block", block);
+		}
+		if(flowing != null) {
+			flowing.setRegistryName(name + "_flowing");
+			MOD_FLUID_REGISTRY.put(name + "_flowing", flowing);
+		}
+		if(still != null) {
+			still.setRegistryName(name);
+			MOD_FLUID_REGISTRY.put(name, still);
+		}
+		
+	}
+	
+	public static Collection<ForgeFlowingFluid> getAllFluids() {
+		return MOD_FLUID_REGISTRY.values();
 	}
 	
 	//TILE ENTITIES
 	public static BlockEntityType<?> getBlockEntity(String name){
-		return teRegistry.get(name);
+		return MOD_BLOCKENTITY_REGISTRY.get(name);
 	}
 	
 	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz, Block... blocks){
-		teRegistry.put(name, BlockEntityType.Builder.of((pos, state) -> {
+		MOD_BLOCKENTITY_REGISTRY.put(name, BlockEntityType.Builder.of((pos, state) -> {
 
 			T inst;
 			try {
@@ -942,15 +1025,15 @@ public class Registry {
 	
 	//CONTAINERS, CONTAINER IDS, SCREENS
 	public static MenuType<?> getContainerType(String name){
-		return containerRegistry.get(name);
+		return MOD_CONTAINER_REGISTRY.get(name).getFirst();
 	}
 	
 	public static Integer getContainerId(String name){
-		return containerIdRegistry.get(containerRegistry.get(name));
+		return MOD_CONTAINER_REGISTRY.get(name).getSecond();
 	}
 	
 	public static <T extends AbstractContainerMenu> void createContainer(String name, int id, Class<T> clazz) {
-		containerRegistry.put(name, IForgeContainerType.create(new IContainerFactory<T>() {
+		MenuType<?> mt = IForgeContainerType.create(new IContainerFactory<T>() {
 
 			@Override
 			public T create(int windowId, Inventory inv, FriendlyByteBuf data) {
@@ -962,8 +1045,13 @@ public class Registry {
 					return null;
 				}
 			}
-		}).setRegistryName(name));
-		containerIdRegistry.put(containerRegistry.get(name), id);
+		}).setRegistryName(name);
+		MOD_CONTAINER_REGISTRY.put(name, Pair.of(mt, id));
+	}
+	
+	//SOUNDS
+	public static SoundEvent getSound(String name) {
+		return MOD_SOUND_REGISTRY.get(name);
 	}
 	
 	@SuppressWarnings("unchecked")

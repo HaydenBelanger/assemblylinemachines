@@ -9,7 +9,7 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -108,7 +108,7 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 						timer = 0;
 						
 						int ug = getUpgradeAmount(Upgrades.MACHINE_EXTRA);
-						int rand = General.RAND.nextInt((ug * 2) + 3) + ug;
+						int rand = Utils.RAND.nextInt((ug * 2) + 3) + ug;
 						int cost = 500;
 						switch(getUpgradeAmount(Upgrades.UNIVERSAL_SPEED)) {
 						case 3:
@@ -148,7 +148,7 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 								
 								if(this.getLevel().noCollision(spawnType.getAABB(d0, d1, d2)) && SpawnPlacements.checkSpawnRules(spawnType, sw, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), this.getLevel().getRandom())) {
 									Entity entity = spawnType.create(this.getLevel());
-									entity.moveTo(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
+									entity.moveTo(d0, d1, d2, Utils.RAND.nextFloat() * 360f, 0f);
 									
 									if(this.getLevel().getEntitiesOfClass(entity.getClass(), new AABB(this.getBlockPos()).inflate(size)).size() >= max) {
 										break;
@@ -234,7 +234,7 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 149);
 		
 		public ContainerPoweredSpawner(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEPoweredSpawner.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEPoweredSpawner.class));
 		}
 		
 		public ContainerPoweredSpawner(final int windowId, final Inventory playerInventory, final TEPoweredSpawner tileEntity) {

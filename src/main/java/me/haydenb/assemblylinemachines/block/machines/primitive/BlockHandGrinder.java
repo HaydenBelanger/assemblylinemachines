@@ -8,11 +8,12 @@ import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemGrindingBlade;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -76,9 +77,9 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		
 		if(state.getValue(BLADE_PROPERTY) == Blades.NONE) {
-			return General.rotateShape(Direction.NORTH, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE_NO_BLADE);
+			return Utils.rotateShape(Direction.NORTH, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE_NO_BLADE);
 		}else {
-			return General.rotateShape(Direction.NORTH, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE);
+			return Utils.rotateShape(Direction.NORTH, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE);
 		}
 	}
 	
@@ -93,7 +94,7 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 			if(worldIn.getBlockEntity(pos) instanceof TEHandGrinder) {
 				TEHandGrinder tehg = (TEHandGrinder) worldIn.getBlockEntity(pos);
 				if(tehg.blade != null) {
-					General.spawnItem(tehg.blade, pos, worldIn);
+					Utils.spawnItem(tehg.blade, pos, worldIn);
 				}
 				worldIn.removeBlockEntity(pos);
 			}

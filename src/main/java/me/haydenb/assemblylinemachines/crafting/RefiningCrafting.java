@@ -1,9 +1,16 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.*;
+
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import mezz.jei.api.gui.IRecipeLayout;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -16,7 +23,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class RefiningCrafting implements Recipe<Container>{
+public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<RefiningCrafting> REFINING_RECIPE = new TypeRefiningCrafting();
@@ -43,6 +50,19 @@ public class RefiningCrafting implements Recipe<Container>{
 		this.fluidOutputB = fluidOutputB;
 		this.itemOutput = itemOutput;
 	}
+	
+	private static final ArrayList<Pair<Integer, Integer>> SLOTS = new ArrayList<>();
+	static {
+		SLOTS.add(Pair.of(0, 0));
+		SLOTS.add(Pair.of(0, 23));
+		SLOTS.add(Pair.of(34, 0));
+		SLOTS.add(Pair.of(54, 0));
+		
+		SLOTS.add(Pair.of(24, 23));
+		SLOTS.add(Pair.of(44, 23));
+		SLOTS.add(Pair.of(64, 23));
+	}
+	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		return true;
@@ -82,6 +102,66 @@ public class RefiningCrafting implements Recipe<Container>{
 	@Override
 	public RecipeType<?> getType() {
 		return REFINING_RECIPE;
+	}
+	
+	@Override
+	public List<FluidStack> getJEIFluidInputs() {
+		return fluidInput.getFirst().isEmpty() ? null : List.of(fluidInput.getFirst());
+	}
+	
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		List<Ingredient> list = new ArrayList<>();
+		list.addAll(List.of(Ingredient.of(attachmentBlock), Ingredient.of(Registry.getBlock("refinery"))));
+		if(!itemInput.getFirst().isEmpty()) list.add(itemInput.getFirst());
+		return list;
+	}
+	
+	@Override
+	public List<FluidStack> getJEIFluidOutputs() {
+		if(fluidOutputA.getFirst().isEmpty() && fluidOutputB.getFirst().isEmpty()) {
+			return null;
+		}
+		
+		List<FluidStack> outputs = new ArrayList<>();
+		if(!fluidOutputA.getFirst().isEmpty()) outputs.add(fluidOutputA.getFirst());
+		if(!fluidOutputB.getFirst().isEmpty()) outputs.add(fluidOutputB.getFirst());
+		
+		return outputs;
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return itemOutput.getFirst().isEmpty() ? null : List.of(itemOutput.getFirst());
+	}
+	
+	@Override
+	public void setupSlots(IRecipeLayout supplier, IGuiHelper helper, Optional<IIngredientRenderer<FluidStack>> optional) {
+		List<Object> allInputs = List.of(Ingredient.of(attachmentBlock), Ingredient.of(Registry.getBlock("refinery")), itemInput.getFirst(), fluidInput.getFirst());
+		List<Object> allOutputs = List.of(itemOutput.getFirst(), fluidOutputA.getFirst(), fluidOutputB.getFirst());
+		
+		IIngredientRenderer<FluidStack> renderer = optional.orElseThrow();
+		int itemSlotNum, fluidSlotNum, i;
+		itemSlotNum = fluidSlotNum = i = 0;
+		boolean isInput = true;
+		
+		for(List<Object> list : List.of(allInputs, allOutputs)) {
+			for(Object o : list) {
+				if((o instanceof Ingredient && !((Ingredient) o).isEmpty()) || (o instanceof ItemStack && !((ItemStack) o).isEmpty())) {
+					supplier.getItemStacks().init(itemSlotNum, isInput, SLOTS.get(i).getFirst(), SLOTS.get(i).getSecond());
+					itemSlotNum++;
+					i++;
+				}
+				
+				if(o instanceof FluidStack && !((FluidStack) o).isEmpty()) {
+					supplier.getFluidStacks().init(fluidSlotNum, isInput, renderer, SLOTS.get(i).getFirst(), SLOTS.get(i).getSecond(), 18, 18, 1, 1);
+					fluidSlotNum++;
+					i++;
+				}
+			}
+			i = 4;
+			isInput = false;
+		}
 	}
 	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<RefiningCrafting>{

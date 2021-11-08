@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "assemblylinemachines:diesel",
+    "assemblylinemachines:diesel_flowing"
+  ]
+}

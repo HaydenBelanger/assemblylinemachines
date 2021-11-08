@@ -12,9 +12,7 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.General;
-import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -59,22 +57,22 @@ public class BlockAlloySmelter extends BlockScreenBlockEntity<BlockAlloySmelter.
 			Block.box(13, 10, 5, 15, 11, 8),Block.box(13, 12, 5, 15, 13, 8)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
 	
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockAlloySmelter() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "alloy_smelter", BlockAlloySmelter.TEAlloySmelter.class);
 		
 		
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 	
 	
 	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
+		builder.add(BathCraftingFluid.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
 	
 	@Override
@@ -149,12 +147,12 @@ public class BlockAlloySmelter extends BlockScreenBlockEntity<BlockAlloySmelter.
 							contents.get(1).shrink(1);
 							contents.get(2).shrink(1);
 							sendUpdates = true;
-							if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+							if(!getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 							}
 						}else {
-							if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+							if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 								sendUpdates = true;
 							}
 						}
@@ -259,7 +257,7 @@ public class BlockAlloySmelter extends BlockScreenBlockEntity<BlockAlloySmelter.
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
 		
 		public ContainerAlloySmelter(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEAlloySmelter.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEAlloySmelter.class));
 		}
 		
 		public ContainerAlloySmelter(final int windowId, final Inventory playerInventory, final TEAlloySmelter tileEntity) {

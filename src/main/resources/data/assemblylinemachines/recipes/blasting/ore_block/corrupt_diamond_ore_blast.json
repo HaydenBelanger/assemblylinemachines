@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:corrupt_diamond_ore"
+	},
+	"result": "minecraft:diamond",
+	"experience": 1,
+	"cookingtime": 100
+}

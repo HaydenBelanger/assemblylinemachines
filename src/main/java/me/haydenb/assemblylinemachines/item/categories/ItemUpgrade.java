@@ -20,21 +20,21 @@ public class ItemUpgrade extends Item {
 	
 	final boolean stackable;
 	public ItemUpgrade(boolean stackable, String[] positives, String[] negatives) {
-		super(new Item.Properties().stacksTo(1).tab(Registry.creativeTab));
+		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
 		this.stackable = stackable;
 		this.positives = positives;
 		this.negatives = negatives;
 	}
 	
 	public ItemUpgrade(boolean stackable, String positive, String negative) {
-		super(new Item.Properties().stacksTo(1).tab(Registry.creativeTab));
+		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
 		this.stackable = stackable;
 		this.positives = new String[] {positive};
 		this.negatives = new String[] {negative};
 	}
 	
 	public ItemUpgrade(boolean stackable, String positive) {
-		super(new Item.Properties().stacksTo(1).tab(Registry.creativeTab));
+		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
 		this.stackable = stackable;
 		this.positives = new String[] {positive};
 		this.negatives = null;

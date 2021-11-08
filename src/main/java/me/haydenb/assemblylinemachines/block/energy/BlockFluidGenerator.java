@@ -19,11 +19,11 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.plugins.PluginTOP.TOPProvider;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -66,7 +66,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		super(Block.Properties.of(Material.METAL).strength(3f, 15f).noOcclusion().dynamicShape().sound(SoundType.METAL), "fluid_generator", TEFluidGenerator.class);
 		
 		this.registerDefaultState(
-				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 		this.type = type;
 	}
 	
@@ -84,7 +84,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalDirectionalBlock.FACING, StateProperties.MACHINE_ACTIVE);
+		builder.add(HorizontalDirectionalBlock.FACING, BathCraftingFluid.MACHINE_ACTIVE);
 	}
 	
 	@Override
@@ -345,13 +345,13 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 							sendUpdates = true;
 						}
 						
-						if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
+						if(!getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
 						}
 					}else {
 						
-						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
+						if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 						}
 						fept = 0f;
 					}
@@ -477,7 +477,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		
 		
 		public ContainerFluidGenerator(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEFluidGenerator.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEFluidGenerator.class));
 		}
 	}
 	
@@ -648,9 +648,9 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		public final Supplier<ArrayList<Pair<Fluid, Integer>>> supplier;
 		FluidGeneratorTypes(VoxelShape NShape, boolean supportsCoolant, ManagedDirection inputSide, ManagedDirection outputSide, Supplier<ArrayList<Pair<Fluid, Integer>>> validFluids, int basefept){
 			shapeN = NShape;
-			shapeS = General.rotateShape(Direction.NORTH, Direction.SOUTH, shapeN);
-			shapeW = General.rotateShape(Direction.NORTH, Direction.WEST, shapeN);
-			shapeE = General.rotateShape(Direction.NORTH, Direction.EAST, shapeN);
+			shapeS = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, shapeN);
+			shapeW = Utils.rotateShape(Direction.NORTH, Direction.WEST, shapeN);
+			shapeE = Utils.rotateShape(Direction.NORTH, Direction.EAST, shapeN);
 			supplier = validFluids;
 			this.inputSide = inputSide;
 			this.outputSide = outputSide;

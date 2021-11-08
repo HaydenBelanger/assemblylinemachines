@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import me.haydenb.assemblylinemachines.registry.FluidRegistry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.util.General;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -21,9 +21,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
 
 public class FluidOilProduct extends ALMFluid {
-
+	
 	public FluidOilProduct(String name, boolean source) {
-		super(FluidRegistry.buildProperties(name, 350, false, true, true), source);
+		super(Registry.createFluidProperties(name, 350, false, true, true), source, getRGBFromFluidName(name));
 	}
 	
 	@Override
@@ -42,7 +42,7 @@ public class FluidOilProduct extends ALMFluid {
 				
 				Block block = world.getBlockState(cor).getBlock();
 				if(block.getTags().contains(new ResourceLocation("assemblylinemachines", "world/gas_flammable"))) {
-					if(General.RAND.nextInt(3) == 0) {
+					if(Utils.RAND.nextInt(3) == 0) {
 						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), breakAndBreakConnected(world, state, cor), true, BlockInteraction.BREAK);
 						
 					}
@@ -69,10 +69,22 @@ public class FluidOilProduct extends ALMFluid {
 		return pow;
 	}
 	
+	private static int[] getRGBFromFluidName(String name) {
+		if(name.equalsIgnoreCase("gasoline")) {
+			return new int[] {122, 104, 0};
+		}else if(name.equalsIgnoreCase("diesel")) {
+			return new int[] {82, 69, 0};
+		}else if(name.equalsIgnoreCase("liquid_carbon")) {
+			return new int[] {110, 110, 110};
+		}else {
+			return new int[] {0, 0, 0};
+		}
+	}
+	
 	public static class FluidOilProductBlock extends ALMFluidBlock {
 
-		public FluidOilProductBlock(Supplier<? extends FlowingFluid> fluid) {
-			super(fluid, ALMFluid.OIL_BYPRODUCT, Material.WATER);
+		public FluidOilProductBlock(Supplier<? extends FlowingFluid> fluid, String name) {
+			super(fluid, ALMFluid.getTag(name), Material.WATER);
 		}
 
 		@Override

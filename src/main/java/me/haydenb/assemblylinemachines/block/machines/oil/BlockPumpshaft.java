@@ -2,7 +2,7 @@ package me.haydenb.assemblylinemachines.block.machines.oil;
 
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.util.StateProperties;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -34,7 +34,7 @@ public class BlockPumpshaft extends Block{
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
 		
 		
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false));
+		this.registerDefaultState(this.stateDefinition.any().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
 	}
 	
 	
@@ -42,7 +42,7 @@ public class BlockPumpshaft extends Block{
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		
-		builder.add(StateProperties.MACHINE_ACTIVE);
+		builder.add(BathCraftingFluid.MACHINE_ACTIVE);
 	}
 	
 	@Override

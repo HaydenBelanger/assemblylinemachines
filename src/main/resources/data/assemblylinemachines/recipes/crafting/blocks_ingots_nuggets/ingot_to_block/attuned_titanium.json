@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xxx",
+		"xxx",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:attuned_titanium_ingot"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:attuned_titanium_block"
+	}
+}

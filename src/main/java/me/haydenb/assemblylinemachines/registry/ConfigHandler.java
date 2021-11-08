@@ -34,6 +34,12 @@ public class ConfigHandler {
 	
 	public static class ASMConfig{
 		
+		//MIXINS
+		public final BooleanValue experimentalWorldScreenDisable;
+		public final BooleanValue farBlockPosGeneratorSuppressed;
+		public final BooleanValue seedUnification;
+		public final BooleanValue oceansOfDarkEnergy;
+		
 		//MACHINE OPTIONS
 		public final BooleanValue coolDudeMode;
 		public final BooleanValue interactorInteractMode;
@@ -47,7 +53,6 @@ public class ConfigHandler {
 		//public final BooleanValue guideBook;
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
-		public final BooleanValue experimentalWorldScreenDisable;
 		
 		//TITANIUM TOOLS
 		public final ConfigValue<Double> titaniumToolAttack;
@@ -84,7 +89,6 @@ public class ConfigHandler {
 		//TITANIUM
 		public final ConfigValue<Integer> titaniumVeinSize;
 		public final ConfigValue<Integer> titaniumFrequency;
-		public final ConfigValue<Integer> deepslateTitaniumFrequency;
 		public final ConfigValue<Integer> titaniumMinHeight;
 		public final ConfigValue<Integer> titaniumMaxHeight;
 		
@@ -168,11 +172,10 @@ public class ConfigHandler {
 			//guideBook = builder.comment("Should new players be given the guide book when joining the world (as long as Patchouli is installed?) NOTE: For v1.2, this toggle is not functional as Patchouli hasn't been updated.").define("guideBook", true);
 			
 			builder.push("Titanium Generation");
-			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore and Deepslate Titanium Ore be? Set to 0 to disable completely.").define("titaniumVeinSize", 6);
-			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk? Set to 0 to disable completely.").define("titaniumFrequency", 3);
-			deepslateTitaniumFrequency = builder.comment("How many veins of Deepslate Titanium Ore should spawn per chunk? Set to 0 to disable completely.").define("deepslateTitaniumFrequency", 2);
-			titaniumMinHeight = builder.comment("What is the minimum Y value Titanium Ore and Deepslate Titanium Ore should spawn at in the overworld?").define("titaniumMinHeight", 8);
-			titaniumMaxHeight = builder.comment("What is the maximum Y value Titanium Ore and Deepslate Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", 16);
+			titaniumVeinSize = builder.comment("What should the maximum size per vein of Standard/Deepslate/Corrupt Titanium Ore be? Set to 0 to disable completely.").define("titaniumVeinSize", 6);
+			titaniumFrequency = builder.comment("How many veins of Standard/Deepslate/Corrupt Titanium Ore should generate per chunk? Set to 0 to disable completely.").define("titaniumFrequency", 3);
+			titaniumMinHeight = builder.comment("What is the minimum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld and Chaos Plane?").define("titaniumMinHeight", 8);
+			titaniumMaxHeight = builder.comment("What is the maximum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld and Chaos Plane?").define("titaniumMaxHeight", 16);
 			builder.pop();
 			
 			builder.push("Black Granite Generation");
@@ -189,9 +192,15 @@ public class ConfigHandler {
 			builder.pop();
 			
 			builder.push("Client-Side-Only Options");
-			experimentalWorldScreenDisable = builder.comment("Should Assembly Line Machines silence the World Experimental Settings screen?").define("experimentalWorldScreenDisable", true);
 			coolDudeMode = builder.comment("Do you want to enable 'Cool Dude Mode', enabling easter-egg/meme effects?").define("coolDudeMode", false);
 			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
+			builder.pop();
+			
+			builder.push("Experimental Mixin Settings");
+			experimentalWorldScreenDisable = builder.comment("Should Assembly Line Machines suppress the World Experimental Settings screen? This will have no effect if another mod performs the same task.").define("experimentalWorldScreenDisable", true);
+			farBlockPosGeneratorSuppressed = builder.comment("Should Assembly Line Machines suppress the warning related to far-away block generation error, an artifact of Mojang debug code? This will suppress ALL INSTANCES of this debug log being outputted.").define("farBlockPosGeneratorSuppressed", true);
+			seedUnification = builder.comment("Should Assembly Line Machines attempt to unify the world seed between the Vanilla dimensions and the Chaos Plane? Otherwise, the world will use seed '0'.").define("seedUnification", true);
+			oceansOfDarkEnergy = builder.comment("Should Assembly Line Machines inject Dark Energy as the default fluid in the Chaos Plane? Otherwise, the world will have no oceans. This will have no effect if 'seedUnification' is false.").define("oceansOfDarkEnergy", true);
 			builder.pop();
 			
 			
@@ -289,9 +298,6 @@ public class ConfigHandler {
 			}
 			if(titaniumFrequency.get() < 0) {
 				titaniumFrequency.set(0);
-			}
-			if(deepslateTitaniumFrequency.get() < 0) {
-				deepslateTitaniumFrequency.set(0);
 			}
 			if(titaniumMinHeight.get() < 0) {
 				titaniumMinHeight.set(0);

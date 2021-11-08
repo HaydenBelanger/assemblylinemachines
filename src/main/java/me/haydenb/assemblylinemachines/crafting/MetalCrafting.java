@@ -1,9 +1,12 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.electric.BlockMetalShaper.TEMetalShaper;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,21 +18,21 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class MetalCrafting implements Recipe<Container>{
+public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
 	public static final RecipeType<MetalCrafting> METAL_RECIPE = new TypeMetalCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
 	private final Ingredient input;
-	private final ItemStack outputa;
+	private final ItemStack output;
 	private final int time;
 	private final ResourceLocation id;
 	
 	public MetalCrafting(ResourceLocation id, Ingredient input, ItemStack outputa, int time) {
 		this.id = id;
 		this.input = input;
-		this.outputa = outputa;
+		this.output = outputa;
 		this.time = time;
 	}
 	@Override
@@ -49,7 +52,7 @@ public class MetalCrafting implements Recipe<Container>{
 	
 	@Override
 	public ItemStack assemble(Container inv) {
-		return this.outputa.copy();
+		return this.output.copy();
 	}
 
 	@Override
@@ -59,7 +62,7 @@ public class MetalCrafting implements Recipe<Container>{
 
 	@Override
 	public ItemStack getResultItem() {
-		return outputa;
+		return output;
 	}
 	
 	public int getTime() {
@@ -78,11 +81,14 @@ public class MetalCrafting implements Recipe<Container>{
 		return nnl;
 	}
 	
-	public NonNullList<Ingredient> getIngredientsJEIFormatted() {
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(input);
-		nnl.add(Ingredient.of(Registry.getItem("metal_shaper")));
-		return nnl;
+	@Override
+	public List<Ingredient> getJEIItemIngredients() {
+		return List.of(input, Ingredient.of(Registry.getItem("metal_shaper")));
+	}
+	
+	@Override
+	public List<ItemStack> getJEIItemOutputs() {
+		return List.of(output);
 	}
 
 	@Override
@@ -132,7 +138,7 @@ public class MetalCrafting implements Recipe<Container>{
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, MetalCrafting recipe) {
 			recipe.input.toNetwork(buffer);
-			buffer.writeItem(recipe.outputa);
+			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.time);
 			
 		}

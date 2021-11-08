@@ -96,7 +96,7 @@ public class ItemMobCrystal extends Item{
 	private static final String TRANSLATION_TAG = Util.makeDescriptionId("item", new ResourceLocation(AssemblyLineMachines.MODID, "mob_crystal_tuned"));
 	
 	public ItemMobCrystal() {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 		
 		
 	}

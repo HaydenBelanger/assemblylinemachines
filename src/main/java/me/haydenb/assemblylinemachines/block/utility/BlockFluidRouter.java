@@ -12,11 +12,11 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl;
-import me.haydenb.assemblylinemachines.registry.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.util.*;
-import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -62,9 +62,9 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 			Block.box(3, 3, 8, 13, 13, 16),
 			Block.box(3, 4, 4, 13, 12, 8)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
-	private static final VoxelShape SHAPE_S = General.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
-	private static final VoxelShape SHAPE_W = General.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-	private static final VoxelShape SHAPE_E = General.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
+	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
+	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	
 	public BlockFluidRouter() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "fluid_router", BlockFluidRouter.TEFluidRouter.class);
@@ -270,7 +270,7 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 		}
 		
 		public ContainerFluidRouter(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
-			this(windowId, playerInventory, General.getBlockEntity(playerInventory, data, TEFluidRouter.class));
+			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEFluidRouter.class));
 		}
 		
 		@Override
@@ -433,7 +433,7 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 		PacketData pd = new PacketData("fluid_router_gui");
 		pd.writeBlockPos("pos", pos);
 		pd.writeBoolean("left", left);
-		HashPacketImpl.INSTANCE.sendToServer(pd);
+		PacketHandler.INSTANCE.sendToServer(pd);
 	}
 	
 	public static void setFilter(PacketData pd, Level world) {

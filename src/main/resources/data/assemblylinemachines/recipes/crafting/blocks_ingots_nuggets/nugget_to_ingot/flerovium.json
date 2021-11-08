@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xxx",
+		"xxx",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:flerovium_nugget"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:flerovium_ingot"
+	}
+}

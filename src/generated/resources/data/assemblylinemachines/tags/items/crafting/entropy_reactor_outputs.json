@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "assemblylinemachines:semi_dense_neutron_matter",
+    "assemblylinemachines:quark_matter",
+    "assemblylinemachines:strange_matter"
+  ]
+}

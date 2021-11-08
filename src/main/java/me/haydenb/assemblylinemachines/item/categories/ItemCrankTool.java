@@ -1,7 +1,5 @@
 package me.haydenb.assemblylinemachines.item.categories;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -29,12 +27,11 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 
 	private final A parent;
 	private final int maxCranks;
-	private final ItemStack item;
-	public ItemCrankTool(float damage, float speed, Item.Properties builder, int maxCranks, A parent) {
-		super(parent.getTier(), builder);
+	
+	public ItemCrankTool(int maxCranks, A parent) {
+		super(parent.getTier(), new Item.Properties().tab(parent.getItemCategory()));
 		this.parent = parent;
 		this.maxCranks = maxCranks;
-		this.item = new ItemStack(parent);
 	}
 
 
@@ -73,7 +70,7 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 	@Override
 	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
 		
-		return parent.canApplyAtEnchantingTable(item, enchantment);
+		return parent.canApplyAtEnchantingTable(stack, enchantment);
 	}
 	
 	@Override
@@ -138,27 +135,6 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 		}
 		
 		tooltip.add(new TextComponent("Cranks: 0/" + getMaxCranks()).withStyle(ChatFormatting.DARK_RED));
-	}
-	/**
-	 * Returns a CrankTool version of A.
-	 * WARNING: A MUST(!!!!!!) be either SwordItem, PickaxeItem, ShovelItem, HoeItem, or AxeItem (Or any other class with the exact constructor of IItemTier, float, (opt) float, Item.Properties, like ItemHammer.)
-	 * @return Made CrankTool
-	 */
-	@SuppressWarnings("unchecked")
-	public static <A extends TieredItem> ItemCrankTool<A> makeCrankTool(Tier tier, int attackDamage, float attackSpeed, Item.Properties props, int maxCranks, Class<A> clazz) {
-		try {
-			for(Constructor<?> c : clazz.getConstructors()) {
-				if(c.getParameterCount() == 4) {
-					return new ItemCrankTool<A>((float) attackDamage, attackSpeed, props, maxCranks, (A) c.newInstance(tier, attackDamage, attackSpeed, props));
-				}else {
-					return new ItemCrankTool<A>((float) attackDamage, attackSpeed, props, maxCranks, (A) c.newInstance(tier, attackSpeed, props));
-				}
-			}
-		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 	
 	@Override

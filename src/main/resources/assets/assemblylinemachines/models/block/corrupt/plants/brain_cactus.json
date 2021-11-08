@@ -1,0 +1,70 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/corrupt/plants/brain_cactus/cactus_top",
+		"1": "assemblylinemachines:block/corrupt/plants/brain_cactus/cactus_shaft",
+		"particle": "assemblylinemachines:block/corrupt/plants/brain_cactus/cactus_top"
+	},
+	"elements": [
+		{
+			"name": "Bottom",
+			"from": [2, 0, 2],
+			"to": [14, 0, 14],
+			"faces": {
+				"down": {"uv": [2, 2, 14, 14], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [2, 16, 2],
+			"to": [14, 16, 14],
+			"faces": {
+				"up": {"uv": [2, 2, 14, 14], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Side1",
+			"from": [1, 0, 2],
+			"to": [15, 16, 2],
+			"faces": {
+				"north": {"uv": [1, 0, 15, 16], "texture": "#1"},
+				"south": {"uv": [15, 0, 1, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Side2",
+			"from": [2, 0, 1],
+			"to": [2, 16, 15],
+			"faces": {
+				"east": {"uv": [15, 0, 1, 16], "texture": "#1"},
+				"west": {"uv": [1, 0, 15, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Side3",
+			"from": [1, 0, 14],
+			"to": [15, 16, 14],
+			"faces": {
+				"north": {"uv": [15, 0, 1, 16], "texture": "#1"},
+				"south": {"uv": [1, 0, 15, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Side4",
+			"from": [14, 0, 1],
+			"to": [14, 16, 15],
+			"faces": {
+				"east": {"uv": [1, 0, 15, 16], "texture": "#1"},
+				"west": {"uv": [15, 0, 1, 16], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5]
+		}
+	]
+}

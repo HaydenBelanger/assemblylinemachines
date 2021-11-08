@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.world.ChunkCoords;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -60,13 +60,13 @@ public class FluidLevelManager {
 			List<FluidInGroundRecipe> recipes = world.getRecipeManager().getRecipesFor(FluidInGroundRecipe.FIG_RECIPE, null, world);
 			
 			float tc = world.getBiome(pos).getTemperature(pos);
-			DimensionType dc = world.dimensionType();
+			ResourceLocation dim = world.dimension().location();
 			for (FluidInGroundRecipe recipe : recipes) {
 
 				int chance = recipe.getChance();
 				boolean half = false;
 
-				if (dc.effectsLocation().equals(DimensionType.OVERWORLD_EFFECTS)) {
+				if (dim.equals(DimensionType.OVERWORLD_LOCATION.location())) {
 
 					if (recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ANY && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYCOLD
 							&& recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_ONLYHOT && recipe.getCriteria() != FluidInGroundCriteria.OVERWORLD_PREFCOLD
@@ -82,12 +82,16 @@ public class FluidLevelManager {
 						chance = Math.round((float) chance / 2f);
 						half = true;
 					}
-				}else if(dc.effectsLocation().equals(DimensionType.NETHER_EFFECTS)) {
+				}else if(dim.equals(DimensionType.NETHER_LOCATION.location())) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.NETHER) {
 						chance = -1;
 					}
-				}else if(dc.effectsLocation().equals(DimensionType.END_EFFECTS)) {
+				}else if(dim.equals(DimensionType.END_LOCATION.location())) {
 					if(recipe.getCriteria() != FluidInGroundCriteria.END) {
+						chance = -1;
+					}
+				}else if(dim.equals(DimensionChaosPlane.CHAOS_PLANE.location())){
+					if(recipe.getCriteria() != FluidInGroundCriteria.CHAOS_PLANE) {
 						chance = -1;
 					}
 				}else {
@@ -160,4 +164,36 @@ public class FluidLevelManager {
 		return new FluidStack(f, amt);
 	}
 
+	public static class ChunkCoords {
+		public int dimID;
+		public int posX;
+		public int posZ;
+
+		public ChunkCoords(int dim, int x, int z) {
+			dimID = dim;
+			posX = x;
+			posZ = z;
+		}
+		
+		@Override
+		public int hashCode() {
+			return dimID * posX * posZ;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if(obj instanceof ChunkCoords) {
+				ChunkCoords chunk = (ChunkCoords) obj;
+				return chunk.dimID == dimID && chunk.posX == posX && chunk.posZ == posZ;
+			}else {
+				return false;
+			}
+			
+		}
+		
+		@Override
+		public String toString() {
+			return "[" + dimID + "]: " + posX + ", " + posZ;
+		}
+	}
 }

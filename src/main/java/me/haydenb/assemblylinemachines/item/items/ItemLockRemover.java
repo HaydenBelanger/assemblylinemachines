@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 public class ItemLockRemover extends Item {
 	
 	public ItemLockRemover() {
-		super(new Item.Properties().tab(Registry.creativeTab));
+		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 	}
 	
 	@Override

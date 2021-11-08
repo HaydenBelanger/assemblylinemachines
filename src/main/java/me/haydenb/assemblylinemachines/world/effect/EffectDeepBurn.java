@@ -7,12 +7,12 @@ import net.minecraft.world.entity.LivingEntity;
 public class EffectDeepBurn extends MobEffect {
 
 	public EffectDeepBurn() {
-		super(MobEffectCategory.HARMFUL, 0xff4d00);
+		super(MobEffectCategory.HARMFUL, 0x000000);
 	}
 	
 	@Override
 	public void applyEffectTick(LivingEntity pLivingEntity, int pAmplifier) {
-		pLivingEntity.setSecondsOnFire(30);
+		//pLivingEntity.setSecondsOnFire(30);
 	}
 	
 	@Override
@@ -24,5 +24,4 @@ public class EffectDeepBurn extends MobEffect {
 	public boolean isInstantenous() {
 		return false;
 	}
-	
 }
