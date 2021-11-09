@@ -4,7 +4,7 @@ Welcome to Assembly Line Machines!
 
 This mod is a complete overhaul to base MC with emphasis on automation and automated processing. This guide will completely walk you through everything from the early game, to the complex late game systems!
 
-The first thing you're going to want to do is take a Pickaxe of mining level Diamond or higher (e.g. Iron Pickaxe) and venture into the earth to look for Titanium Ore (Found between Y8 and Y16), which can smelted into bars for later use.
+The first thing you're going to want to do is take a Pickaxe of mining level Diamond or higher (e.g. Iron Pickaxe) and venture into the earth to look for Titanium Ore (Found between Y8 and Y16), which can be smelted into bars for later use.
 
 
 ![Titanium and its Deepslate variant](../media/titanium.png)
@@ -40,7 +40,7 @@ The first recipe you will need to make using the fluid bath is Silt which is mad
 
 ## Manual Grindstone
 
-With silt bricks now aquired, you're ready to craft the Manual Grindstone for the next set of processing!
+With silt bricks now acquired, you're ready to craft the Manual Grindstone for the next set of processing!
 
 ![Manual Grindstone](../media/manual_grindstone_recipe.png)
 
@@ -66,7 +66,7 @@ Now with your grindstone you are able to grind down bars and other materials int
 
 ## Producing Your First Steel
 
-With both the fluid bath and manual grindstone aquired you are ready for the final piece of progression in this age! What you will need is a fair amount of ground iron and ground gold (aquired from either bars or raw ore in the manual grindstone), once aquired you can combine the ground iron & ground gold with silt and water in the fluid bath to yield Gold Silt and Iron Silt. Simply smelt the Ore Silts to aquire their pure variants, you will need many pure bars for future progression!
+With both the fluid bath and manual grindstone acquired you are ready for the final piece of progression in this age! What you will need is a fair amount of ground iron and ground gold (acquired from either bars or raw ore in the manual grindstone), once acquired you can combine the ground iron & ground gold with silt and water in the fluid bath to yield Gold Silt and Iron Silt. Simply smelt the Ore Silts to acquire their pure variants, you will need many pure bars for future progression!
 
 !!! note
 
@@ -115,7 +115,7 @@ The final step involves combining your ground coal and ground iron with lava in 
 
 !!! tip   
     
-    Once you've aquired your first ingots of steel, you may also want to further upgrade your stirring stick and grindstone blade as you will need quite a bit of steel to move onto the next age!
+    Once you've acquired your first ingots of steel, you may also want to further upgrade your stirring stick and grindstone blade as you will need quite a bit of steel to move onto the next age!
 
 ![Steel Stirring Stick](../media/steel_stirring_stick.png)
 
@@ -124,3 +124,4 @@ The final step involves combining your ground coal and ground iron with lava in 
 ![Steel Ingot](../media/steel_blade.png)
 
 # End of Chapter
+

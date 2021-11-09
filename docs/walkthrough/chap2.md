@@ -1,6 +1,6 @@
 # Crank Age (Kinetic Energy)
 
-With the creation of steel you are ready to move on to the crank age! Like the name implies in this age you'll be moving from doing everything manually to using crank power for a semi-automated setup.
+With the creation of steel you are ready to move on to the crank age! Like the name implies, in this age you'll be moving from doing everything manually to using crank power for a semi-automated setup.
 
 ## Simple Grinder and Crank Power
 
@@ -8,13 +8,13 @@ The first thing you'll want to do is upgrade your fluid bath and manual grindsto
 
 ![Simple Grinder](../media/simple_grinder.png)
 
-There's still a bit to do before your grinder is ready to use, because every machine in this age requires crank power the next thing you'll want to craft is a crank!
+There's still a bit to do before your grinder is ready to use, because every machine in this age requires crank power, the next thing you'll want to craft is a crank!
 
 ![Crank Shaft](../media/crank_shaft.png)
 
 ![Crank](../media/crank.png)
 
-With the crank aquired you're ready to start using the simple grinder. First place down the simple grinder, because simple machines do not have an internal output slot you'll want to place a chest (or any valid storage entity) on the right-hand side to store any output items you create. Afterwards simply SHIFT+RIGHT-CLICK with the crank in your main hand on any other available side of the simple grinder to attach it, the full multiblock should look something like this.
+With the crank acquired you're ready to start using the simple grinder. First place down the simple grinder, because simple machines do not have an internal output slot you'll want to place a chest (or any valid storage entity) on the right-hand side to store any output items you create. Afterwards simply SHIFT+RIGHT-CLICK with the crank in your main hand on any other available side of the simple grinder to attach it, the full multiblock should look something like this.
 
 !!! warning "Be careful!"
 
@@ -32,7 +32,7 @@ Once you've made the simple multiblock structure you're ready to start grinding.
 
 3.  Progress bar (once this fills up the output will be pushed to the inventory on its right)
 
-Once you've put in a valid recipe you'll want to start processing it. To do this just hold RIGHT-CLICK on the crank you attached, the crank should start emitting particles and the machine should start it's processing animation.
+Once you've put in a valid recipe you'll want to start processing it. To do this just hold RIGHT-CLICK on the crank you attached, the crank should start emitting particles and the machine should start its processing animation.
 
 !!! warning "Be careful!"
 
@@ -66,11 +66,11 @@ With the Simple Fluid Mixer crafted you're ready for the next step! The first th
 
 ![Steel Fluid Tank](../media/steel_tank.png)
 
-Once you have your tank you can set up the multiblock, the setup is exactly the same as the simple ginder, however the bottom of the block **must** have a valid fluid storage in order to operate. If setup correctly the multiblock should look like this!
+Once you have your tank you can set up the multiblock, the setup is exactly the same as the simple ginder, however the bottom of the block **must** have a valid fluid storage in order to operate. If set up correctly the multiblock should look like this!
 
 ![Simple Fluid Mixer Multiblock](../media/simple_fluid_mixer_multiblock.png)
 
-Now you're ready to start processing more advanced mixing recipes, while processing works the exact same way as the simple grinder the way recipes are processed and the GUI are a little different so let's run over that really quick.
+Now you're ready to start processing more advanced mixing recipes, while processing works the exact same way as the simple grinder, the way recipes are processed and the GUI are a little different so let's run over that really quick.
 
 ![Simple Fluid Mixer GUI](../media/simple_fluid_mixer_GUI.png)
 
@@ -104,7 +104,7 @@ With this empowered coal you're ready to start making the gearbox, first craft a
 
 ??? note inline end
 
-    Any pure ingot can be used to craft plates and gears, and likewise the gearbox or any other gear requiring recipe, however the amount of plates/gears recieved depend on the material used. Pure Copper is used here as it provides a much higher plate/gear per ingot as the other pure metals. You can obtain pure copper via the same method used to obtain pure gold/iron.
+    Any pure ingot can be used to craft plates and gears, and likewise the gearbox or any other gear requiring recipe, however the amount of plates/gears received depend on the material used. Pure Copper is used here as it provides a much higher plate/gear per ingot as the other pure metals. You can obtain pure copper via the same method used to obtain pure gold/iron.
 
 ![Pure Copper Plates](../media/pure_copper_plate.png)
 
@@ -126,7 +126,7 @@ The gearbox GUI is a little more complex as it is your first machine that can ac
 
 !!! note inline end
 
-    The gearbox will **ONLY** consume empowered coal and it's upgrades as a valid fuel source. Coal and Charcoal will not work inside without a Fuel Compatibility upgrade.
+    The gearbox will **ONLY** consume empowered coal and its upgrades as a valid fuel source. Coal and Charcoal will not work inside without a Fuel Compatibility upgrade.
 
 1.  Fuel slot
 
@@ -138,7 +138,7 @@ With the gearbox you can finally get rid of most of the manual work in this age 
 
 ## Crank Charger, Crank-Powered Tools, and Black Granite
 
-The final part of this age will require obtaining black granite, a material which spawns in the nether. However there are a couple of things to do before you can go harvest it.
+The final part of this age will require obtaining black granite, a material which spawns in the nether. However there are a couple of things to do before you can harvest it.
 
 The first will be the creation of a Crank Charger and Crank-Powered Tools (of which you will only need the crank-powered pickaxe), which will be needed in order to successfully harvest the Black Granite.
 
@@ -154,14 +154,15 @@ Crank-Powered Tools as their name suggests, uses cranks to break blocks and deal
 
 ![Crank Charger Multiblock](../media/crank_charger_multiblock.png)
 
-Simply put your crank tools in the inventory above the crank charger and supply crank power to the charger itself (only through a gearbox) and it will start to store cranks within the tool, starting from first on the left ending at the last to the right, top to bottom.
+Simply put your crank tools in the inventory above the crank charger and supply crank power to the charger itself (only through a gearbox) and it will start to store cranks within the tool, starting from first on the left and ending at the last to the right, top to bottom.
 
-![Crank Charger Chargin a Tool](../media/crank_tool_charging.png)
+![Crank Charger Charging a Tool](../media/crank_tool_charging.png)
 
-With your fully charged crank pickaxe in hand your next task is to find black granite in the nether! Black granite spawns anywhere in netherrack in large viens (pictured below).
+With your fully charged crank pickaxe in hand your next task is to find black granite in the nether! Black granite spawns anywhere in netherrack in large veins (pictured below).
 
 ![Black Granite](../media/black_granite.png)
 
 With black granite obtained you've reached the end of the Crank-Age and the dawn of the Electricity-Age!
 
 #End of Chapter
+
