@@ -68,7 +68,7 @@ In order for pipes to function they must have connections in the form of an outp
 
     Note that some machines will only output/input on specific sides (usually they'll have an indicator on the texture), so if you're having issues connecting to the machine try a different side!
 
-To create a connection SHIFT+RIGHT-CLICK with the desired pipe in your main hand on whatever side of the machine/inventory you want to connect it to, this will create a connection point into the pipe network, becuase of the way connections are formed using pipes you will always need **at least two** pipes (two connections; one for input, one for output) for a sucessful pipe network to be made. After a connection has been made simply RIGHT-CLICK on the connector with an empty hand to toggle it between input/output.
+To create a connection SHIFT+RIGHT-CLICK with the desired pipe in your main hand on whatever side of the machine/inventory you want to connect it to, this will create a connection point into the pipe network, because of the way connections are formed using pipes you will always need **at least two** pipes (two connections; one for input, one for output) for a successful pipe network to be made. After a connection has been made simply RIGHT-CLICK on the connector with an empty hand to toggle it between input/output.
 
 !!! note
 
@@ -84,9 +84,9 @@ To create a connection SHIFT+RIGHT-CLICK with the desired pipe in your main hand
 
 4.  Input/output. Blue is for input, orange is for output. Both can be active at the same time.
 
-5.  Nearest first/furthest first. Determines wether to send the items in the inventory it's connected to to either the nearest, or furthest valid inventory or connector depending on the buttons state.
+5.  Nearest first/furthest first. Determines whether to send the items in the inventory it's connected to to either the nearest, or furthest valid inventory or connector depending on the buttons state.
 
-6.  Redstone control. Only appears with the redstone control upgrade, allows the connector to be turned off/on via redstone signal.
+6.  Redstone control. Only appears with the redstone control upgrade, allowing the connector to be turned off/on via redstone signal.
 
 7.  Whitelist/blacklist. Determines the behavior of the item filters, whether to have them whitelist or blacklist the items within.
 
@@ -94,7 +94,7 @@ Now you're finally ready to set up your purifier! Connect it to the crank mill u
 
 ![Purifier Setup](../media/purifier_setup.png)
 
-The purifier has 1 very specific purpose, taking an ingot and converting it into it's pure form! It has a new, complex GUI so let's run over what's going on here.
+The purifier has 1 very specific purpose, taking an ingot and converting it into its pure form! It has a new, complex GUI so let's run over what's going on here.
 
 ![Purifier GUI](../media/purifier_gui.png)
 
@@ -126,7 +126,7 @@ Afterwards craft some steel plates and gears as you'll need them to move on.
 
 ## Crafting Materials, the Battery Cell, and the Coal Generator.
 
-With pure steel aquired you're ready to move towards a fully powered setup.
+With pure steel acquired you're ready to move towards a fully powered setup.
 
 The first things you'll want to make are components for your new machines, you'll want to make both convection and conduction machine components as well as steel tank components and a basic battery.
 
@@ -160,7 +160,7 @@ Next we'll run over the GUI.
 
 2.  Side configurator. Allows you to enable and disable output for specific sides.
 
-3.  Throughput adjuster. Allows you to specify how much FE/t can be insterted/extracted from the Battery Cell.
+3.  Throughput adjuster. Allows you to specify how much FE/t can be inserted/extracted from the Battery Cell.
 
 4.  Automatic input toggle. If the arrow is green the battery cell will automatically draw FE from the internal buffer of generators placed next to it (provided their FE output is pointed at the battery cell)
 
@@ -168,7 +168,7 @@ Now with vastly superior FE storage you can upgrade your power generation. The m
 
 ![Coal Generator](../media/coal_generator.png)
 
-Coal genertors are very simple to use, only featuring one input slot and an energy buffer and accepting any fuel a regular furnace can. To use them just throw in a fuel like some empowered coal and they'll generate a steady stream of FE while they have fuel making for a decent early power gen.
+Coal generators are very simple to use, only featuring one input slot and an energy buffer and accepting any fuel a regular furnace can. To use them just throw in a fuel like some empowered coal and they'll generate a steady stream of FE while they have fuel making for a decent early power gen.
 
 Now with both FE storage and generation handled you're ready for the next set of upgrades!
 
@@ -182,7 +182,7 @@ First off you'll be upgrading your Simple Machines from the crank era to their F
 
 !!! note inline end
 
-    Note the the Electric Fluid mixer still requires either a fluid tank next to it, or fluid to be pumped in via fluid pipes. You may also insert fluid inside the machine by RIGHT-CLICKING with a bucket of that fluid.
+    Note that the Electric Fluid mixer still requires either a fluid tank next to it, or fluid to be pumped in via fluid pipes. You may also insert fluid inside the machine by RIGHT-CLICKING with a bucket of that fluid.
 
 ![Electric Machines 1](../media/electric_machines1.png)
 
@@ -218,7 +218,7 @@ Next let's run over their GUI's again as there's been a change to them.
 
 6.  Internal fluid tank (holds up to 4000mb).
 
-7.  Draw from Internal/External tank toggle, this button will change wether or not the fluid mixer will draw from it's internal tank or an external tank (like the steel fluid tank in the picture above) as long as it is directly connected to one of the faces of the fluid mixer.
+7.  Draw from Internal/External tank toggle, this button will change wether or not the fluid mixer will draw from its internal tank or an external tank (like the steel fluid tank in the picture above) as long as it is directly connected to one of the faces of the fluid mixer.
 
 The next machine that you'll need for progression is the Alloy Smelter. First craft a temperature regulator and then the alloy smelter.
 
@@ -306,7 +306,7 @@ Mystium tools use FE and durability (FE is used over durability, if the FE stora
 
 ![Tool Charger](../media/tool_charger.png)
 
-The tool charger functions similar to the crank charger in that it requires a multiblock to function properly, simply hook power up to the FE input and put a valid inventory on top and it will start charging any tools inside the inventory. If setup correctly, it should look like this.
+The tool charger functions similar to the crank charger in that it requires a multiblock to function properly, simply hook power up to the FE input and put a valid inventory on top and it will start charging any tools inside the inventory. If set up correctly, it should look like this.
 
 ![Tool Charger Multiblock](../media/tool_charger_multiblock.png)
 
@@ -341,3 +341,4 @@ Finally with your Mystium Tools you'll want to venture into the End Islands to f
 ![Chromium Ingot](../media/chromium_ingot.png)
 
 #End of Chapter
+
