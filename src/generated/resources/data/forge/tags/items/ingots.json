@@ -1,17 +1,17 @@
 {
   "replace": false,
   "values": [
-    "#forge:ingots/pure_iron",
-    "#forge:ingots/pure_copper",
-    "#forge:ingots/pure_titanium",
-    "#forge:ingots/attuned_titanium",
-    "#forge:ingots/titanium",
-    "#forge:ingots/pure_steel",
-    "#forge:ingots/mystium",
-    "#forge:ingots/chromium",
     "#forge:ingots/flerovium",
     "#forge:ingots/energized_gold",
-    "#forge:ingots/pure_gold",
-    "#forge:ingots/steel"
+    "#forge:ingots/attuned_titanium",
+    "#forge:ingots/pure_copper",
+    "#forge:ingots/titanium",
+    "#forge:ingots/pure_iron",
+    "#forge:ingots/steel",
+    "#forge:ingots/mystium",
+    "#forge:ingots/pure_titanium",
+    "#forge:ingots/pure_steel",
+    "#forge:ingots/chromium",
+    "#forge:ingots/pure_gold"
   ]
 }

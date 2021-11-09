@@ -19,7 +19,7 @@ public final class AssemblyLineMachines{
 	public static final String MODID = "assemblylinemachines";
 	private static ModContainer modInfo = null;
 	
-	public static final Logger LOGGER = LogManager.getLogger();
+	public static final Logger LOGGER = LogManager.getLogger(MODID);
 	
 	public AssemblyLineMachines() {
 		

@@ -11,6 +11,7 @@ import me.haydenb.assemblylinemachines.block.*;
 import me.haydenb.assemblylinemachines.block.BlockBlackGranite.BlockBlackGranitePillar;
 import me.haydenb.assemblylinemachines.block.corrupt.*;
 import me.haydenb.assemblylinemachines.block.corrupt.CorruptBlock.CorruptBlockWithAxis;
+import me.haydenb.assemblylinemachines.block.corrupt.CorruptBlock.CorruptLeavesBlock;
 import me.haydenb.assemblylinemachines.block.corrupt.CorruptTallGrassBlock.*;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
@@ -458,7 +459,7 @@ public class Registry {
 		createBlock("chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
 		createBlock("stripped_chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
 		createBlock("chaosbark_sapling", new CorruptTallGrassBlock.ChaosbarkSaplingBlock(), true);
-		createBlock("chaosbark_leaves", Block.Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("chaosbark_leaves", new CorruptLeavesBlock(), true);
 		createBlock("chaosbark_planks", Material.WOOD, 3f, 9f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		
 		createBlock("chaosweed", new CorruptTallGrassBlock(), true);

@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:ultimate_fertilizer"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:chaotic_sawdust"
+	},
+	"output":{
+		"item": "assemblylinemachines:chaotic_fertilizer"
+	},
+	"stirs": 13,
+	"fluid": "dark_energy",
+	"mix_color": "0",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "HALF"
+}

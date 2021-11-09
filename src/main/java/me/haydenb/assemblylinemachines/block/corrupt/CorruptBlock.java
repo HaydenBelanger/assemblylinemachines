@@ -4,11 +4,13 @@ import java.util.*;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.TagMaster;
+import me.haydenb.assemblylinemachines.registry.TagMaster.IMiningLevelDataGenProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -19,6 +21,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -96,6 +99,26 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 			return this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, pContext.getClickedFace().getAxis());
 			
 		}
+		
+	}
+	
+	public static class CorruptLeavesBlock extends LeavesBlock implements IMiningLevelDataGenProvider{
+
+		public CorruptLeavesBlock() {
+			super(Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never));
+		}
+
+		@Override
+		public Named<Block> getToolType() {
+			return BlockTags.MINEABLE_WITH_PICKAXE;
+		}
+
+		@Override
+		public Named<Block> getToolLevel() {
+			return BlockTags.NEEDS_DIAMOND_TOOL;
+		}
+		
+		
 		
 	}
 

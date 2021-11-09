@@ -23,7 +23,11 @@
 		"facing=north,fluid=oil": { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_oil" },
         "facing=south,fluid=oil": { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_oil", "y": 180 },
         "facing=west,fluid=oil":  { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_oil", "y": 270 },
-        "facing=east,fluid=oil":  { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_oil", "y": 90 }
+        "facing=east,fluid=oil":  { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_oil", "y": 90 },
+		"facing=north,fluid=dark_energy": { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_dark_energy" },
+        "facing=south,fluid=dark_energy": { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_dark_energy", "y": 180 },
+        "facing=west,fluid=dark_energy":  { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_dark_energy", "y": 270 },
+        "facing=east,fluid=dark_energy":  { "model": "assemblylinemachines:block/mixer/electric_fluid_mixer_dark_energy", "y": 90 }
 
     }
 }

@@ -2,8 +2,8 @@
   "replace": false,
   "values": [
     "#forge:nuggets/flerovium",
-    "#forge:nuggets/steel",
     "#forge:nuggets/titanium",
+    "#forge:nuggets/steel",
     "#forge:nuggets/chromium"
   ]
 }

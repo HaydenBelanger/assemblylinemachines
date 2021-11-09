@@ -11,7 +11,6 @@ import com.mojang.serialization.Lifecycle;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.Utils.BlockPosError;
 import me.haydenb.assemblylinemachines.world.generation.DimensionChaosPlane.SeededNoiseBasedChunkGenerator;
 import net.minecraft.Util;
 import net.minecraft.core.MappedRegistry;
@@ -25,20 +24,12 @@ public class ChaosPlaneMixins {
 
 	//This Mixin will redirect calls to the Minecraft warning logger for out-of-range generation, as they cannot be avoided.
 	@Mixin(WorldGenRegion.class)
-	public static class BlockEditErrorSuppressor {
-		
-		private static BlockPosError log = BlockPosError.UNCHECKED;
+	private static final class BlockEditErrorSuppressor {
 		
 		@Redirect(method = "ensureCanWrite", at = @At(value = "INVOKE", target = "Lnet/minecraft/Util;logAndPauseIfInIde(Ljava/lang/String;)V"))
 		private void logAndPauseIfInIde(String message) {
 			
-			switch(log) {
-			case UNCHECKED:
-				log = ConfigHolder.COMMON.farBlockPosGeneratorSuppressed.get() ? BlockPosError.CHECKED_NOLOG : BlockPosError.CHECKED_LOG;
-				if(log == BlockPosError.CHECKED_NOLOG) AssemblyLineMachines.LOGGER.info("Assembly Line Machines is suppressing debug warnings related to far-distance generation. Disable in config.");
-			default:
-				if(log == BlockPosError.CHECKED_LOG) Util.logAndPauseIfInIde(message);
-			}
+			if(!ConfigHolder.COMMON.farBlockPosGeneratorSuppressed.get()) Util.logAndPauseIfInIde(message);
 		}
 		
 		
@@ -47,10 +38,10 @@ public class ChaosPlaneMixins {
 	
 	//This Mixin will make it so every world shows as STABLE even if it is actually EXPERIMENTAL, thereby suppressing the warning during world-load.
 	@Mixin(PrimaryLevelData.class)
-	public static class LifecycleInterceptor {
+	private static final class LifecycleInterceptor {
 
 		@Inject(method = "worldGenSettingsLifecycle", at = @At("HEAD"), cancellable = true)
-		public void worldGenSettingsLifecycle(CallbackInfoReturnable<Lifecycle> cir) {
+		private void worldGenSettingsLifecycle(CallbackInfoReturnable<Lifecycle> cir) {
 			if(ConfigHolder.COMMON.experimentalWorldScreenDisable.get()) {
 				cir.setReturnValue(Lifecycle.stable());
 			}else {
@@ -61,10 +52,10 @@ public class ChaosPlaneMixins {
 	
 	//This Mixin will patch in the saveseed into all dimensions with generator of type SeededNoiseBasedChunkGenerator.
 	@Mixin(WorldGenSettings.class)
-	public static class SeededNoiseGeneratorInjector {
+	private static final class SeededNoiseGeneratorInjector {
 		
 		@Inject(method = "<init>(JZZLnet/minecraft/core/MappedRegistry;Ljava/util/Optional;)V", at = @At(value = "TAIL"))
-		public void init(long seed, boolean generateFeautres, boolean generateBonusChest, MappedRegistry<LevelStem> dimensions, Optional<String> legacySettings, CallbackInfo ci) {
+		private void init(long seed, boolean generateFeautres, boolean generateBonusChest, MappedRegistry<LevelStem> dimensions, Optional<String> legacySettings, CallbackInfo ci) {
 			if(ConfigHolder.COMMON.seedUnification.get()) {
 				for(LevelStem d : dimensions) {
 					if(d.generator() instanceof SeededNoiseBasedChunkGenerator) {

@@ -121,8 +121,8 @@ public class ConfigHandler {
 			reactorExplosions = builder.comment("If the Entropy Reactor reaches higher than 98% Entropy, should it explode?").define("reactorExplosions", true);
 			
 			Predicate<Object> fluidTestPredicate = (object) -> true;
-			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 115000), Pair.of("assemblylinemachines:naphtha", 350000)), fluidTestPredicate);
-			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:gasoline", 600000), Pair.of("assemblylinemachines:diesel", 1050000)), fluidTestPredicate);
+			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 115000), Pair.of("assemblylinemachines:naphtha", 650000)), fluidTestPredicate);
+			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:liquid_carbon", 300000), Pair.of("assemblylinemachines:gasoline", 600000), Pair.of("assemblylinemachines:diesel", 1050000)), fluidTestPredicate);
 			coolantFluidsRaw = builder.comment("What fluids should be valid for use as coolant in Combustion and Geothermal Generators? Value is multiplier on burn time.").defineList("coolantFluids", getFluidDefaultConfig(Pair.of("minecraft:water", 2), Pair.of("assemblylinemachines:condensed_void", 4)), fluidTestPredicate);
 			builder.pop();
 			

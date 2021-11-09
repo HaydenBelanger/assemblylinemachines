@@ -105,10 +105,6 @@ public class Utils {
 		pFont.draw(pPoseStack, formattedcharsequence, (float)(pX - pFont.width(formattedcharsequence) / 2), (float)pY, pColor);
 	}
 	
-	public static enum BlockPosError{
-		UNCHECKED, CHECKED_LOG, CHECKED_NOLOG;
-	}
-	
 	public static class Formatting {
 
 		private static final NavigableMap<Long, String> SUFFIX = new TreeMap<>();

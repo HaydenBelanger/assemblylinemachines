@@ -32,15 +32,14 @@ authors="Haydenman2 (Hayden) & NinjaKittens (Dax Flame)" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''This is Assembly Line Machines, a complete re-imagining of Minecraft's technological side. This mod features new features and an entirely new progression system, built from the ground up to give much more depth to Minecraft.'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-#[[dependencies.examplemod]] #optional
+[[dependencies.assemblylinemachines]] #optional
     # the modid of the dependency
-    #modId="forge" #mandatory
+    modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
-    #mandatory=true #mandatory
+    mandatory=true #mandatory
     # The version range of the dependency
-    #versionRange="[31,)" #mandatory
+    versionRange="[37.0.94,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
-    #ordering="NONE"
+    ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
-    #side="BOTH"
-# Here's another dependency
+    side="BOTH"

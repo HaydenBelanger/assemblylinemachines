@@ -64,9 +64,9 @@ public class EntityCorruptShell extends Zombie{
 			}
 			
 			ambient = Registry.getSound("corrupt_shell" + cool + "_ambient");
-			hurt = Registry.getSound("corrupt_shell" + cool + "_ambient");
-			death = Registry.getSound("corrupt_shell" + cool + "_ambient");
-			step = Registry.getSound("corrupt_shell" + cool + "_ambient");
+			hurt = Registry.getSound("corrupt_shell" + cool + "_hurt");
+			death = Registry.getSound("corrupt_shell" + cool + "_death");
+			step = Registry.getSound("corrupt_shell" + cool + "_step");
 		}
 	}
 	

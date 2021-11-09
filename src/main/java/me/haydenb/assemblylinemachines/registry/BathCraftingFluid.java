@@ -21,7 +21,8 @@ public class BathCraftingFluid {
 	
 	public static enum BathCraftingFluids implements StringRepresentable {
 		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52), new Pair<>(87, 197)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68), new Pair<>(87, 213)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153), new Pair<>(102, 229)), 
-		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), new Pair<>(102, 213)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), new Pair<>(102, 197));
+		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), new Pair<>(102, 213)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), new Pair<>(102, 197)),
+		DARK_ENERGY(() -> Registry.getFluid("dark_energy"), true, null, new Pair<>(176, 169), new Pair<>(87, 229));
 
 		private Supplier<Fluid> f;
 		private Fluid fx;

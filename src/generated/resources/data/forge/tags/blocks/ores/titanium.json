@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "assemblylinemachines:titanium_ore",
-    "assemblylinemachines:deepslate_titanium_ore"
+    "assemblylinemachines:deepslate_titanium_ore",
+    "assemblylinemachines:titanium_ore"
   ]
 }
