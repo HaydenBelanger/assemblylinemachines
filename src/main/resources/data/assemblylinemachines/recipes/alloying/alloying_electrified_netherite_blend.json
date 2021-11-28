@@ -7,7 +7,8 @@
 		"tag": "forge:dusts/netherite"
 	},
 	"output":{
-		"item": "assemblylinemachines:electrified_netherite_blend"
+		"item": "assemblylinemachines:electrified_netherite_blend",
+		"count": 2
 	},
 	"time": 350
 }

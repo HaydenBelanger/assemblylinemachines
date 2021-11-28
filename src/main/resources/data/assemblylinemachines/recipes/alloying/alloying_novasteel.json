@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:ingots/raw_novasteel"
+	},
+	"part_b":{
+		"tag": "forge:dusts/novasteel"
+	},
+	"output":{
+		"item": "assemblylinemachines:novasteel_ingot"
+	},
+	"time": 350
+}

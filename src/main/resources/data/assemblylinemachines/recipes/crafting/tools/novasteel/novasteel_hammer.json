@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" x ",
+		" sx",
+		"s  "
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:novasteel_ingot"
+		},
+		"s":{
+			"tag": "forge:rods/graphene"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:novasteel_hammer"
+	}
+}

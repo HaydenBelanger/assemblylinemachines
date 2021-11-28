@@ -16,7 +16,7 @@
 			"item": "assemblylinemachines:convection_component"
 		},
 		"a":{
-			"item": "assemblylinemachines:adv_energy_pipe"
+			"item": "assemblylinemachines:advanced_energy_pipe"
 		},
 		"c":{
 			"item": "assemblylinemachines:conduction_component"

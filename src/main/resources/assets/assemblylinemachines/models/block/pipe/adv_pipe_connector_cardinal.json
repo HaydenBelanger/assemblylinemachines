@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "assemblylinemachines:block/adv_pipe_connector_side",
-		"1": "assemblylinemachines:block/adv_pipe_connector_front",
-		"particle": "assemblylinemachines:block/adv_pipe_connector_side"
+		"0": "assemblylinemachines:block/pipes/adv_pipe_connector_side",
+		"1": "assemblylinemachines:block/pipes/adv_pipe_connector_front",
+		"particle": "assemblylinemachines:block/pipes/adv_pipe_connector_side"
 	},
 	"elements": [
 		{

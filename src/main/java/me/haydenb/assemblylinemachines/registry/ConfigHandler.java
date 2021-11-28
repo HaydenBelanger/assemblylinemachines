@@ -86,6 +86,13 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> mystiumToolDurability;
 		public final ConfigValue<Integer> mystiumToolMaxFE;
 		
+		//NOVASTEEL TOOLS
+		public final ConfigValue<Double> novasteelToolAttack;
+		public final ConfigValue<Double> novasteelToolHarvestSpeed;
+		public final ConfigValue<Integer> novasteelToolEnchantability;
+		public final ConfigValue<Integer> novasteelToolDurability;
+		public final ConfigValue<Integer> novasteelToolMaxFE;
+		
 		//TITANIUM
 		public final ConfigValue<Integer> titaniumVeinSize;
 		public final ConfigValue<Integer> titaniumFrequency;
@@ -162,6 +169,13 @@ public class ConfigHandler {
 			mystiumToolDurability = builder.comment("What should the base physical durability of Mystium Tools be?").define("mystiumToolDurability", 150);
 			mystiumToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Mystium Tools be?").define("mystiumToolMaxFE", 1000000);
 			builder.pop();
+			
+			builder.push("Novasteel");
+			novasteelToolAttack = builder.comment("What is the base damage Novasteel Tools should do?").define("novasteelToolAttack", 10.5d);
+			novasteelToolHarvestSpeed = builder.comment("What is the base harvest speed Novasteel Tools should do?").define("novasteelToolHarvestSpeed", 23d);
+			novasteelToolEnchantability = builder.comment("What should the enchantability of Novasteel Tools be?").define("novasteelToolEnchantability", 37);
+			novasteelToolDurability = builder.comment("What should the base physical durability of Novasteel Tools be?").define("novasteelToolDurability", 300);
+			novasteelToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Novasteel Tools be?").define("novasteelToolMaxFE", 20000000);
 			
 			builder.pop();
 			builder.push("World");

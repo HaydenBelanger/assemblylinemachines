@@ -2,10 +2,10 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/cube",
 	"textures": {
-		"0": "block/oak_log",
+		"0": "assemblylinemachines:block/steel_block",
 		"1": "assemblylinemachines:block/steel_block",
 		"2": "block/glass",
-		"particle": "block/oak_log"
+		"particle": "assemblylinemachines:block/steel_block"
 	},
 	"elements": [
 		{

@@ -11,7 +11,7 @@ import com.mojang.serialization.Lifecycle;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.world.generation.DimensionChaosPlane.SeededNoiseBasedChunkGenerator;
+import me.haydenb.assemblylinemachines.world.DimensionChaosPlane.SeededNoiseBasedChunkGenerator;
 import net.minecraft.Util;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.resources.ResourceLocation;
@@ -28,7 +28,6 @@ public class ChaosPlaneMixins {
 		
 		@Redirect(method = "ensureCanWrite", at = @At(value = "INVOKE", target = "Lnet/minecraft/Util;logAndPauseIfInIde(Ljava/lang/String;)V"))
 		private void logAndPauseIfInIde(String message) {
-			
 			if(!ConfigHolder.COMMON.farBlockPosGeneratorSuppressed.get()) Util.logAndPauseIfInIde(message);
 		}
 		
@@ -36,7 +35,7 @@ public class ChaosPlaneMixins {
 		
 	}
 	
-	//This Mixin will make it so every world shows as STABLE even if it is actually EXPERIMENTAL, thereby suppressing the warning during world-load.
+	//This Mixin will make it so every world shows as STABLE even if it is actually EXPERIMENTAL, thereby suppressing the warning during world-load about experimental settings being used.
 	@Mixin(PrimaryLevelData.class)
 	private static final class LifecycleInterceptor {
 
@@ -44,8 +43,6 @@ public class ChaosPlaneMixins {
 		private void worldGenSettingsLifecycle(CallbackInfoReturnable<Lifecycle> cir) {
 			if(ConfigHolder.COMMON.experimentalWorldScreenDisable.get()) {
 				cir.setReturnValue(Lifecycle.stable());
-			}else {
-				cir.setReturnValue(((PrimaryLevelData)(Object) this).worldGenSettingsLifecycle);
 			}
 		}
 	}
@@ -74,4 +71,6 @@ public class ChaosPlaneMixins {
 		}
 		
 	}
+	
+	
 }

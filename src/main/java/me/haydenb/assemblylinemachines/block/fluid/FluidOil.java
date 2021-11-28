@@ -2,8 +2,8 @@ package me.haydenb.assemblylinemachines.block.fluid;
 
 import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.world.rendering.FogRendering.ILiquidFogColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;

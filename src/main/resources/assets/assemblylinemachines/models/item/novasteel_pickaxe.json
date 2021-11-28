@@ -1,0 +1,15 @@
+{
+	"parent": "item/handheld",
+	"textures":{
+		"layer0": "assemblylinemachines:item/novasteel_tools/novasteel_pickaxe"
+	},
+	"overrides":[
+		{
+			"predicate":{
+				"assemblylinemachines:active": 1
+			},
+			"model": "assemblylinemachines:item/novasteel_pickaxe_active"
+		}
+	]
+	
+}

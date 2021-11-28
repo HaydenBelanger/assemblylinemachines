@@ -1,0 +1,29 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "assemblylinemachines:block/pipes/ultimate_pipe_item_connection",
+		"1": "assemblylinemachines:block/pipes/pipe_end",
+		"particle": "assemblylinemachines:block/pipes/ultimate_pipe_item_connection"
+	},
+	"elements": [
+		{
+			"from": [4, 0, 4],
+			"to": [12, 4, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [12, 4, 12]},
+			"faces": {
+				"north": {"uv": [0, 4, 4, 12], "rotation": 270, "texture": "#0"},
+				"east": {"uv": [0, 4, 4, 12], "rotation": 270, "texture": "#0"},
+				"south": {"uv": [0, 4, 4, 12], "rotation": 270, "texture": "#0"},
+				"west": {"uv": [0, 4, 4, 12], "rotation": 270, "texture": "#0"},
+				"down": {"uv": [4, 4, 12, 12], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0]
+		}
+	]
+}

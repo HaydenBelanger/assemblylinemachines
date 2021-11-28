@@ -8,14 +8,14 @@ import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.block.corrupt.CorruptBlock;
+import me.haydenb.assemblylinemachines.block.chaosplane.CorruptBlock;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.crafting.EntropyReactorCrafting;
-import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -727,12 +727,11 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 						List<EntropyReactorCrafting> recipes = level.getRecipeManager().getRecipesFor(EntropyReactorCrafting.ERO_RECIPE, null, level);
 						Collections.sort(recipes, Comparator.comparing(EntropyReactorCrafting::getVarietyReqd));
 						Collections.reverse(recipes);
-						Random rand = new Random();
 						for(EntropyReactorCrafting erc : recipes) {
 							
 							if(varietyRating >= erc.getVarietyReqd()) {
 								int wastecount = 0;
-								while(rand.nextFloat() < erc.getOdds() && wastecount < erc.getMax()) {
+								while(this.getLevel().getRandom().nextFloat() < erc.getOdds() && wastecount < erc.getMax()) {
 									wastecount++;
 								}
 								if(wastecount != 0) {
@@ -863,11 +862,11 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		}
 		
 		public float performEntropyTask(float entropy) {
-			
+			Random rand = this.getLevel().getRandom();
 			if(entropy > 0.1f) {
 				
 				//When entropy is above 10%, randomly performs potion effects between 33-100% of the time, maxing out at 30% entropy
-				if((Utils.RAND.nextFloat() * 0.3f) < entropy) {
+				if((rand.nextFloat() * 0.3f) < entropy) {
 					
 					int rgM;
 					
@@ -902,7 +901,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			
 			if(entropy > 0.3f && level.getDifficulty() != Difficulty.PEACEFUL) {
 				
-				if((Utils.RAND.nextFloat() * 0.5f) < entropy) {
+				if((rand.nextFloat() * 0.5f) < entropy) {
 					
 					if(sw == null) {
 						sw = this.getLevel().getServer().getLevel(this.getLevel().dimension());
@@ -922,7 +921,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 							
 							if(this.getLevel().noCollision(type.getAABB(d0, d1, d2)) && SpawnPlacements.checkSpawnRules(type, sw, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), this.getLevel().getRandom())) {
 								Entity entity = type.create(this.getLevel());
-								entity.moveTo(d0, d1, d2, Utils.RAND.nextFloat() * 360f, 0f);
+								entity.moveTo(d0, d1, d2, rand.nextFloat() * 360f, 0f);
 								
 								this.getLevel().addFreshEntity(entity);
 								spamt++;
@@ -948,9 +947,9 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				
 				while(i < max) {
 					
-					double x = this.getBlockPos().getX() + ((Utils.RAND.nextDouble() * 20) - 10);
-					double y = this.getBlockPos().getY() + ((Utils.RAND.nextDouble() * 10) - 10);
-					double z = this.getBlockPos().getZ() + ((Utils.RAND.nextDouble() * 20) - 10);
+					double x = this.getBlockPos().getX() + ((rand.nextDouble() * 20) - 10);
+					double y = this.getBlockPos().getY() + ((rand.nextDouble() * 10) - 10);
+					double z = this.getBlockPos().getZ() + ((rand.nextDouble() * 20) - 10);
 					
 					BlockPos posx = new BlockPos(new Vec3(x, y, z));
 					Block obs = this.getLevel().getBlockState(posx).getBlock();

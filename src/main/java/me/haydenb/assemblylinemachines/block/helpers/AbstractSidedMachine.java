@@ -2,7 +2,7 @@ package me.haydenb.assemblylinemachines.block.helpers;
 
 import java.util.HashMap;
 
-import me.haydenb.assemblylinemachines.registry.BathCraftingFluid;
+import me.haydenb.assemblylinemachines.registry.StateProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -171,10 +171,10 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		private void recalcBattery(){
 			
-			if(sided.getBlockState().hasProperty(BathCraftingFluid.BATTERY_PERCENT_STATE)) {
+			if(sided.getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
 				int fx = (int) Math.floor(((double) sided.amount / (double) sided.properties.getCapacity()) * 4d);
-				if(sided.getBlockState().getValue(BathCraftingFluid.BATTERY_PERCENT_STATE) != fx) {
-					sided.getLevel().setBlockAndUpdate(sided.getBlockPos(), sided.getBlockState().setValue(BathCraftingFluid.BATTERY_PERCENT_STATE, fx));
+				if(sided.getBlockState().getValue(StateProperties.BATTERY_PERCENT_STATE) != fx) {
+					sided.getLevel().setBlockAndUpdate(sided.getBlockPos(), sided.getBlockState().setValue(StateProperties.BATTERY_PERCENT_STATE, fx));
 				}
 			}
 		}

@@ -24,7 +24,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -66,12 +65,15 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
+	
+	private final BatteryCellStats bcs;
 
-	public BlockBatteryCell(BatteryCellTiers tier) {
-		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), tier.teName, null, true,
-				Direction.NORTH, tier.clazz);
+	public BlockBatteryCell(BatteryCellStats bcs) {
+		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), "battery_cell", null, true,
+				Direction.NORTH, TEBatteryCell.class);
 		this.registerDefaultState(
-				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.BATTERY_PERCENT_STATE, 0));
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.BATTERY_PERCENT_STATE, 0));
+		this.bcs = bcs;
 	}
 	
 	@Override
@@ -97,54 +99,41 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalDirectionalBlock.FACING).add(BathCraftingFluid.BATTERY_PERCENT_STATE);
+		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.BATTERY_PERCENT_STATE);
 	}
 	
-	public static enum BatteryCellTiers{
+	public static enum BatteryCellStats{
 		
-		BASIC("basic_battery_cell", BlockBatteryCell.TEBasicBatteryCell.class), 
-		ADVANCED("advanced_battery_cell", BlockBatteryCell.TEAdvancedBatteryCell.class);
+		BASIC(2500000, 2000, 2000), ADVANCED(50000000, 25000, 25000), ULTIMATE(500000000, 75000, 75000);
 		
-		private final String teName;
-		private final Class<? extends TEBatteryCell> clazz;
+		public final int capacity;
+		public final int maxfept;
+		public final int deffept;
 		
-		BatteryCellTiers(String teName, Class<? extends TEBatteryCell> clazz){
-			this.teName = teName;
-			this.clazz = clazz;
-		}
-	}
-
-	public static class TEBasicBatteryCell extends TEBatteryCell{
-		public TEBasicBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, new TranslatableComponent(Registry.getBlock("basic_battery_cell").getDescriptionId()), 2500000, 2000, 200, pos, state);
-		}
-
-		public TEBasicBatteryCell(BlockPos pos, BlockState state) {
-			this(Registry.getBlockEntity("basic_battery_cell"), pos, state);
+		BatteryCellStats(int capacity, int maxfept, int deffept){
+			this.capacity = capacity;
+			this.maxfept = maxfept;
+			this.deffept = deffept;
 		}
 	}
 	
-	public static class TEAdvancedBatteryCell extends TEBatteryCell{
-		public TEAdvancedBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, new TranslatableComponent(Registry.getBlock("advanced_battery_cell").getDescriptionId()), 50000000, 25000, 5000, pos, state);
-		}
-
-		public TEAdvancedBatteryCell(BlockPos pos, BlockState state) {
-			this(Registry.getBlockEntity("advanced_battery_cell"), pos, state);
-		}
-	}
-	
-	public static abstract class TEBatteryCell extends ManagedSidedMachine<ContainerBatteryCell> implements ALMTicker<TEBatteryCell> {
+	public static class TEBatteryCell extends ManagedSidedMachine<ContainerBatteryCell> implements ALMTicker<TEBatteryCell> {
 
 		private int fept;
 		private boolean autoIn = true;
 		private int timer = 0;
 		private final int mx;
-		public TEBatteryCell(final BlockEntityType<?> tileEntityTypeIn, TranslatableComponent ttc, int ep, int mx, int fept, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 0, ttc, Registry.getContainerId("battery_cell"),
-					ContainerBatteryCell.class, new EnergyProperties(true, true, ep), pos, state);
-			this.mx = mx;
-			this.fept = fept;
+		public TEBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, 0, new TranslatableComponent(state.getBlock().getDescriptionId()), Registry.getContainerId("battery_cell"),
+					ContainerBatteryCell.class, new EnergyProperties(true, true, ((BlockBatteryCell) state.getBlock()).bcs.capacity), pos, state);
+			BlockBatteryCell bbc = (BlockBatteryCell) state.getBlock();
+			
+			this.mx = bbc.bcs.maxfept;
+			this.fept = bbc.bcs.deffept;
+		}
+		
+		public TEBatteryCell(BlockPos pos, BlockState state) {
+			this(Registry.getBlockEntity("battery_cell"), pos, state);
 		}
 		
 		@Override
@@ -157,16 +146,6 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		}
 
 		private HashMap<Direction, IEnergyStorage> caps = new HashMap<>();
-		
-		@Override
-		public AbstractContainerMenu createMenu(int id, Inventory player) {
-			try {
-				return clazz.getConstructor(int.class, Inventory.class, TEBatteryCell.class).newInstance(id, player, this);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
 		
 		@Override
 		public void load(CompoundTag compound) {

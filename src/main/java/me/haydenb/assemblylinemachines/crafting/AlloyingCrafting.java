@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockAlloySmelter.TEAlloySmelter;
+import me.haydenb.assemblylinemachines.block.machines.BlockAlloySmelter.TEAlloySmelter;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;

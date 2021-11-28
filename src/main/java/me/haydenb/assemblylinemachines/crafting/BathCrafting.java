@@ -6,10 +6,10 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.electric.BlockElectricFluidMixer.TEElectricFluidMixer;
-import me.haydenb.assemblylinemachines.block.machines.primitive.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.block.machines.BlockElectricFluidMixer.TEElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;

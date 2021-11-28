@@ -14,8 +14,4 @@ public interface ICrankableMachine {
 		public boolean needsGearbox();
 	}
 	
-	public interface ICrankableItem{
-		public int getMaxCranks();
-	}
-	
 }

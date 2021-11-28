@@ -7,12 +7,12 @@ import java.util.function.*;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.automation.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.TEBatteryCell;
-import me.haydenb.assemblylinemachines.block.machines.electric.*;
-import me.haydenb.assemblylinemachines.block.machines.mob.*;
-import me.haydenb.assemblylinemachines.block.machines.oil.BlockRefinery;
-import me.haydenb.assemblylinemachines.block.pipe.ItemPipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.utility.BlockFluidRouter;
+import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidRouter;
+import me.haydenb.assemblylinemachines.block.fluidutility.BlockRefinery;
+import me.haydenb.assemblylinemachines.block.machines.*;
+import me.haydenb.assemblylinemachines.block.pipe.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -31,7 +31,7 @@ public class PacketHandler {
 	static {
 		
 		//CLIENT -> SERVER
-		PACKET_TARGETS.put("item_pipe_gui", (pd, world) -> ItemPipeConnectorTileEntity.updateDataFromPacket(pd, world));
+		PACKET_TARGETS.put("item_pipe_gui", (pd, world) -> PipeConnectorTileEntity.updateDataFromPacket(pd, world));
 		PACKET_TARGETS.put("battery_cell_gui", (pd, world) -> TEBatteryCell.updateDataFromPacket(pd, world));
 		PACKET_TARGETS.put("autocrafting_gui", (pd, world) -> BlockAutocraftingTable.updateDataFromPacket(pd, world));
 		PACKET_TARGETS.put("refinery_gui", (pd, world) -> BlockRefinery.dumpFluid(pd, world));

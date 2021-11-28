@@ -1,0 +1,10 @@
+{
+	"type": "assemblylinemachines:metal",
+	"input":{
+		"tag": "forge:ingots/novasteel"
+	},
+	"output":{
+		"item": "assemblylinemachines:novasteel_plate"
+	},
+	"time": 6
+}

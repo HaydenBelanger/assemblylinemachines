@@ -29,6 +29,7 @@ public class TagMaster {
 	//Below is all in reference to Mining Level and Tool Type, referenced by the block data generator.
 	public static final Named<Block> NEEDS_NETHERITE_TOOL = ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation("forge", "needs_netherite_tool"));
 	public static final Named<Block> NEEDS_MYSTIUM_TOOL = ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
+	
 	private static final HashMap<Material, Optional<Named<Block>>> MATERIAL_TOOL = new HashMap<>();
 	static {
 		MATERIAL_TOOL.put(Material.AMETHYST, Optional.of(BlockTags.MINEABLE_WITH_PICKAXE));
@@ -57,7 +58,7 @@ public class TagMaster {
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/gears/precious"), List.of(Pair.of("forge", "gears/gold"), Pair.of("forge", "gears/titanium"), Pair.of("forge", "gears/flerovium")));
 		
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/entropy_reactor_outputs"), List.of("semi_dense_neutron_matter", "quark_matter", "strange_matter"));
-		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/hammers"), List.of("steel_hammer", "crank_hammer", "titanium_hammer", "mystium_hammer"));
+		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/hammers"), List.of("steel_hammer", "crank_hammer", "titanium_hammer", "mystium_hammer", "novasteel_hammer"));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/organics"), List.of(Pair.of("minecraft", "flowers"), Pair.of("minecraft", "leaves"), Pair.of("minecraft", "saplings")));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/sawdust"), List.of("sawdust", "warped_sawdust", "crimson_sawdust", "chaotic_sawdust"));
 		
@@ -85,22 +86,24 @@ public class TagMaster {
 				Pair.of("copper", "ground_copper"), Pair.of("electrified_netherite", "electrified_netherite_blend"), 
 				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"), 
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
-				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond")));
+				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"),
+				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust")));
 		forgeTags.putAll("gears", List.of(Pair.of("copper", "copper_gear"), Pair.of("gold", "gold_gear"), Pair.of("iron", "iron_gear"),
 				Pair.of("steel", "steel_gear"), Pair.of("titanium", "titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
 		forgeTags.putAll("ingots", List.of(Pair.of("attuned_titanium", "attuned_titanium_ingot"), Pair.of("chromium", "chromium_ingot"),
 				Pair.of("energized_gold", "energized_gold_ingot"), Pair.of("mystium", "mystium_ingot"), Pair.of("pure_copper", "pure_copper"), Pair.of("pure_gold", "pure_gold"),
 				Pair.of("pure_iron", "pure_iron"), Pair.of("pure_steel", "pure_steel"), Pair.of("pure_titanium", "pure_titanium"), Pair.of("steel", "steel_ingot"), 
-				Pair.of("titanium", "titanium_ingot"), Pair.of("flerovium", "flerovium_ingot")));
+				Pair.of("titanium", "titanium_ingot"), Pair.of("flerovium", "flerovium_ingot"), Pair.of("raw_novasteel", "raw_novasteel_compound"), Pair.of("novasteel", "novasteel_ingot")));
 		forgeTags.putAll("nuggets", List.of(Pair.of("chromium", "chromium_nugget"), Pair.of("steel", "steel_nugget"), Pair.of("titanium", "titanium_nugget"), Pair.of("flerovium", "flerovium_nugget")));
 		forgeTags.putAll("plates", List.of(Pair.of("attuned_titanium", "attuned_titanium_plate"), Pair.of("chromium", "chromium_plate"), Pair.of("copper", "copper_plate"), 
 				Pair.of("energized_gold", "energized_gold_plate"), Pair.of("gold", "gold_plate"), Pair.of("iron", "iron_plate"), Pair.of("mystium", "mystium_plate"),
-				Pair.of("stainless_steel", "stainless_steel_plate"), Pair.of("steel", "steel_plate"), Pair.of("titanium", "titanium_plate"), Pair.of("flerovium", "flerovium_plate")));
+				Pair.of("stainless_steel", "stainless_steel_plate"), Pair.of("steel", "steel_plate"), Pair.of("titanium", "titanium_plate"), Pair.of("flerovium", "flerovium_plate"),
+				Pair.of("novasteel", "novasteel_plate")));
 		forgeTags.putAll("rods", List.of(Pair.of("steel", "steel_rod"), Pair.of("graphene", "graphene_rod")));
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));
 		forgeTags.putAll("ores", List.of(Pair.of("chromium", "chromium_ore"), Pair.of("titanium", "titanium_ore;deepslate_titanium_ore"), Pair.of("flerovium", "flerovium_ore")));
 		forgeTags.putAll("storage_blocks", List.of(Pair.of("chromium", "chromium_block"), Pair.of("titanium", "titanium_block"), Pair.of("mystium", "mystium_block"), Pair.of("steel", "steel_block"),
-				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block")));
+				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block"), Pair.of("novasteel", "novasteel_block")));
 		
 		//Blocks get special treatment since they need to have both a block and item tag
 		List<String> forgeBlockTypes = List.of("ores", "storage_blocks");

@@ -2,16 +2,20 @@
   "replace": false,
   "values": [
     "#forge:dusts/iron",
-    "#forge:dusts/diamond",
-    "#forge:dusts/coal",
-    "#forge:dusts/copper",
-    "#forge:dusts/netherite",
     "#forge:dusts/titanium",
-    "#forge:dusts/lapis",
-    "#forge:dusts/mystium",
     "#forge:dusts/flerovium",
+    "#forge:dusts/netherite",
+    "#forge:dusts/diamond",
+    "#forge:dusts/sawdust",
+    "#forge:dusts/copper",
+    "#forge:dusts/lapis",
+    "#forge:dusts/electrified_netherite",
     "#forge:dusts/charcoal",
     "#forge:dusts/electrified_netherite",
-    "#forge:dusts/gold"
+    "#forge:dusts/coal",
+    "#forge:dusts/gold",
+    "#forge:dusts/novasteel",
+    "#forge:dusts/prismatic",
+    "#forge:dusts/mystium"
   ]
 }

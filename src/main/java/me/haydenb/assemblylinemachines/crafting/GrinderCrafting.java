@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.primitive.BlockHandGrinder.Blades;
+import me.haydenb.assemblylinemachines.block.rudimentary.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
@@ -28,11 +28,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	private final Ingredient input;
 	private final ItemStack output;
 	private final int grinds;
-	private final Blades tier;
+	private final Blade tier;
 	private final ResourceLocation id;
 	private final boolean machineReqd;
 	
-	public GrinderCrafting(ResourceLocation id, Ingredient input, ItemStack output, int grinds, Blades tier, boolean machineReqd) {
+	public GrinderCrafting(ResourceLocation id, Ingredient input, ItemStack output, int grinds, Blade tier, boolean machineReqd) {
 		this.input = input;
 		this.output = output;
 		this.grinds = grinds;
@@ -97,7 +97,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	public List<Ingredient> getJEIItemIngredients() {
 		Ingredient ing = this.getMachineReqd() ? Ingredient.of(Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder")) 
 				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder"));
-		return List.of(input, ing, Blades.getAllBladesAtMinTier(getBlade().tier));
+		return List.of(input, ing, Blade.getAllBladesAtMinTier(getBlade().tier));
 	}
 	
 	@Override
@@ -120,7 +120,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		return GRINDER_RECIPE;
 	}
 	
-	public Blades getBlade() {
+	public Blade getBlade() {
 		return tier;
 	}
 	
@@ -136,9 +136,9 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
 				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				final int grinds = GsonHelper.getAsInt(json, "grinds");
-				final Blades tier = Blades.valueOf(Blades.class, GsonHelper.getAsString(json, "bladetype"));
+				final Blade tier = Blade.valueOf(Blade.class, GsonHelper.getAsString(json, "bladetype"));
 				
-				if(tier == Blades.NONE) {
+				if(tier == Blade.NONE) {
 					AssemblyLineMachines.LOGGER.error("Error deserializing Grinder Crafting Recipe from JSON: Cannot use 'none' as bladetype.");
 					return null;
 				}
@@ -164,7 +164,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			final Ingredient input = Ingredient.fromNetwork(buffer);
 			final ItemStack output = buffer.readItem();
 			final int grinds = buffer.readInt();
-			final Blades tier = buffer.readEnum(Blades.class);
+			final Blade tier = buffer.readEnum(Blade.class);
 			final boolean machineReqd = buffer.readBoolean();
 			
 			return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd);

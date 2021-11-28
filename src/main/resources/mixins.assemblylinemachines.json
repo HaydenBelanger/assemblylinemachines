@@ -6,7 +6,8 @@
 		"ChaosPlaneMixins$BlockEditErrorSuppressor",
 		"ChaosPlaneMixins$LifecycleInterceptor",
 		"ChaosPlaneMixins$SeededNoiseGeneratorInjector",
-		"FluidPatchMixin"
+		"FluidPatchMixin",
+		"HoeItemTillingMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

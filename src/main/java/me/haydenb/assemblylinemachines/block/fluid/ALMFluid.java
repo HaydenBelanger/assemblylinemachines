@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.block.fluid;
 import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.world.rendering.FogRendering.ILiquidFogColor;
+import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;

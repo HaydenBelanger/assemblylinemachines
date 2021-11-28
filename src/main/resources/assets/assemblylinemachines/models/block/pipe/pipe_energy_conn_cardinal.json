@@ -1,9 +1,9 @@
 {
 	"parent": "block/cube",
 	"textures": {
-		"0": "assemblylinemachines:block/energy_pipe_conn",
-		"1": "assemblylinemachines:block/pipe_end",
-		"particle": "assemblylinemachines:block/energy_pipe_conn"
+		"0": "assemblylinemachines:block/pipes/energy_pipe_conn",
+		"1": "assemblylinemachines:block/pipes/pipe_end",
+		"particle": "assemblylinemachines:block/pipes/energy_pipe_conn"
 	},
 	"elements": [
 		{

@@ -26,7 +26,8 @@ public enum ItemTiers {
 			ConfigHolder.COMMON.steelArmorKnockbackResistance.get(), ConfigHolder.COMMON.steelArmorDamageReduction.get(), "steel", ConfigHolder.COMMON.steelArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
 	CRANK(ConfigHolder.COMMON.crankToolAttack.get(), ConfigHolder.COMMON.crankToolDurability.get(), ConfigHolder.COMMON.crankToolEnchantability.get(), ConfigHolder.COMMON.crankToolDurability.get(), 
 			()->{return Ingredient.of(ItemTags.getAllTags().getTag(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
-	MYSTIUM(ConfigHolder.COMMON.mystiumToolAttack.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ConfigHolder.COMMON.mystiumToolEnchantability.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));});
+	MYSTIUM(ConfigHolder.COMMON.mystiumToolAttack.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ConfigHolder.COMMON.mystiumToolEnchantability.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
+	NOVASTEEL(ConfigHolder.COMMON.novasteelToolAttack.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ConfigHolder.COMMON.novasteelToolEnchantability.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));});
 
 	private float attack;
 	private float efficiency;
@@ -133,7 +134,8 @@ public enum ItemTiers {
 	
 	public static enum ToolTiers implements Tier{
 		TITANIUM(ItemTiers.TITANIUM, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)), STEEL(ItemTiers.STEEL, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)),
-		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)), MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
+		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)), MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool")),
+		NOVASTEEL(ItemTiers.NOVASTEEL, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
 		
 		private final ItemTiers baseTier;
 		private final Tag.Named<Block> tierTag;

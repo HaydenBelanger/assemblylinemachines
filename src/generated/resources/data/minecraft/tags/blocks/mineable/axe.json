@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "assemblylinemachines:chaosbark_leaves",
     "assemblylinemachines:stripped_chaosbark_log",
     "assemblylinemachines:chaosbark_log",
     "assemblylinemachines:fluid_bath",

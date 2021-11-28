@@ -2,8 +2,8 @@ package me.haydenb.assemblylinemachines.block.fluid;
 
 import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.world.rendering.FogRendering.ILiquidFogColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -41,7 +41,7 @@ public class FluidDarkEnergy extends ALMFluid implements ILiquidFogColor {
 			if (entity instanceof LivingEntity) {
 				LivingEntity player = (LivingEntity) entity;
 				if(!player.hasEffect(Registry.getEffect("dark_expulsion"))) {
-					player.addEffect(new MobEffectInstance(Registry.getEffect("dark_expulsion"), 129));
+					player.addEffect(new MobEffectInstance(Registry.getEffect("dark_expulsion"), 129, 0, false, false, true));
 				}
 				
 			}

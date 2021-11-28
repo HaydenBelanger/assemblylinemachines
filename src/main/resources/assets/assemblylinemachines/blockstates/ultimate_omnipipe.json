@@ -1,0 +1,43 @@
+{
+    "multipart": [
+        {   "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_base" }},
+        {   "when": { "north": "pipe" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_conn_cardinal", "y": 90}
+        },
+        {   "when": { "east": "pipe" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_conn_cardinal", "y": 180}
+        },
+        {   "when": { "south": "pipe" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_conn_cardinal", "y": 270}
+        },
+        {   "when": { "west": "pipe" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_conn_cardinal"}
+        },
+        {   "when": { "down": "pipe" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_conn_vertical"}
+        },
+        {   "when": { "up": "pipe" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_omni_conn_vertical", "x": 180}
+        },
+		{   "when": { "north": "connector" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_connector_cardinal"}
+        },
+        {   "when": { "east": "connector" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_connector_cardinal", "y": 90}
+        },
+        {   "when": { "south": "connector" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_connector_cardinal", "y": 180}
+        },
+        {   "when": { "west": "connector" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_connector_cardinal", "y": 270}
+        },
+        {   "when": { "down": "connector" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_connector_vertical"}
+        },
+        {   "when": { "up": "connector" },
+            "apply": { "model": "assemblylinemachines:block/pipe/ultimate_pipe_connector_vertical", "x": 180}
+        }
+
+
+    ]
+}

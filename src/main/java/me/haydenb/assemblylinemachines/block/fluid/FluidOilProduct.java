@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -42,7 +41,7 @@ public class FluidOilProduct extends ALMFluid {
 				
 				Block block = world.getBlockState(cor).getBlock();
 				if(block.getTags().contains(new ResourceLocation("assemblylinemachines", "world/gas_flammable"))) {
-					if(Utils.RAND.nextInt(3) == 0) {
+					if(world.getRandom().nextInt(3) == 0) {
 						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), breakAndBreakConnected(world, state, cor), true, BlockInteraction.BREAK);
 						
 					}

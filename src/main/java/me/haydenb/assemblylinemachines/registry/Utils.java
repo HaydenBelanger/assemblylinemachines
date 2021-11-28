@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
@@ -15,15 +16,19 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,8 +39,6 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.IItemHandler;
 
 public class Utils {
-
-	public static final Random RAND = new Random();
 
 	public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
 		VoxelShape[] buffer = new VoxelShape[] { shape, Shapes.empty() };
@@ -80,8 +83,100 @@ public class Utils {
 	}
 
 
-	public static interface IPoweredTool{
-		public int getMaxPower();
+	public static interface IToolWithCharge{
+		default public int getMaxPower(ItemStack stack) {
+			return stack.isEnchanted() ? Math.round(this.getPowerToolType().getMaxCharge() * (1 + (EnchantmentHelper.getItemEnchantmentLevel(Registry.getEnchantment("overclock"), stack) * 0.2f))) : this.getPowerToolType().getMaxCharge();
+		}
+		
+		default public ItemStack damageItem(ItemStack stack, int amount) {
+			if (stack.hasTag()) {
+				CompoundTag compound = stack.getTag();
+
+				PowerToolType ptt = this.getPowerToolType();
+				if (compound.contains(ptt.getKeyName())) {
+
+					int power = compound.getInt(ptt.getKeyName());
+					if ((power - (amount * ptt.getCostMultiplier())) < 1) {
+						compound.remove(ptt.getKeyName());
+						compound.remove("assemblylinemachines:canbreakblackgranite");
+						compound.remove("assemblylinemachines:secondarystyle");
+					} else {
+						compound.putInt(ptt.getKeyName(), power - (amount * ptt.getCostMultiplier()));
+					}
+
+					stack.setTag(compound);
+					return stack;
+				}
+			}
+			return null;
+		}
+		
+		default public int addCharge(ItemStack stack, int amount, boolean simulated) {
+			CompoundTag nbt = stack.hasTag() ? stack.getTag() : new CompoundTag();
+			
+			PowerToolType ptt = this.getPowerToolType();
+			int current = nbt.getInt(ptt.getKeyName());
+			
+			if(current + (amount * ptt.getChargeMultiplier()) > getMaxPower(stack)) {
+				amount = getMaxPower(stack) - current;
+				if(!simulated) nbt.putInt(ptt.getKeyName(), getMaxPower(stack));
+			}else {
+				if(!simulated) nbt.putInt(ptt.getKeyName(), current + (amount * ptt.getChargeMultiplier()));
+				
+			}
+			if((simulated && current > 0) || (!simulated && current + (amount * ptt.getChargeMultiplier()) > 0)) {
+				nbt.putBoolean("assemblylinemachines:canbreakblackgranite", true);
+			}else {
+				nbt.remove("assemblylinemachines:canbreakblackgranite");
+			}
+			
+			stack.setTag(nbt);
+			
+			return amount;
+		}
+		
+		public PowerToolType getPowerToolType();
+		
+		public String getToolType();
+		
+		default public int getCurrentCharge(ItemStack stack) {
+			return stack.hasTag() ? stack.getTag().getInt(this.getPowerToolType().getKeyName()) : 0;
+		}
+		
+		default public boolean canUseSecondaryAbilities(ItemStack stack, String secondaryName) {
+			return this.getPowerToolType().getHasSecondaryAbilities() && stack.hasTag() && stack.getTag().contains(getPowerToolType().getKeyName())
+					&& stack.getTag().contains("assemblylinemachines:secondarystyle") && secondaryName.equals(this.getToolType());
+		}
+		
+		default public void addEnergyInfoToHoverText(ItemStack stack, List<Component> tooltip) {
+			DecimalFormat df = Formatting.GENERAL_FORMAT;
+			CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
+			PowerToolType ptt = this.getPowerToolType();
+			String colorChar = compound.getInt(ptt.getKeyName()) == 0 ? "c" : "a";
+			tooltip.add(new TextComponent("§" + colorChar + df.format(compound.getInt(ptt.getKeyName())) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.getFriendlyNameOfUnit()));
+			if(compound.getBoolean("assemblylinemachines:secondarystyle")) {
+				tooltip.add(new TextComponent("§bSecondary Ability Enabled"));
+			}
+		}
+	}
+	
+	public static int breakAndBreakConnected(Level world, BlockState origState, int ctx, int cmax, BlockPos posx, LivingEntity player) {
+		world.destroyBlock(posx, true, player);
+
+		int cost = 2;
+		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(posx.below().north().west(), posx.above().south().east()).iterator();
+
+		while(iter.hasNext()) {
+			BlockPos posq = iter.next();
+
+			BlockState bs = world.getBlockState(posq);
+			if(bs.getBlock() == origState.getBlock() && ctx <= cmax) {
+				ctx++;
+				cost = cost + breakAndBreakConnected(world, origState, ctx, cmax, posq, player);
+			}
+		}
+
+		return cost;
 	}
 
 	public static <H> H getCapabilityFromDirection(BlockEntity pte, NonNullConsumer<LazyOptional<H>> consumer, Direction dir, Capability<H> capType) {

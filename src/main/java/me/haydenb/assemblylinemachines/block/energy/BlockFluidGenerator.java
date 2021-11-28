@@ -17,11 +17,11 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
-import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
-import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.BathCraftingFluid.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.client.Minecraft;
@@ -66,7 +66,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		super(Block.Properties.of(Material.METAL).strength(3f, 15f).noOcclusion().dynamicShape().sound(SoundType.METAL), "fluid_generator", TEFluidGenerator.class);
 		
 		this.registerDefaultState(
-				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
+				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
 		this.type = type;
 	}
 	
@@ -84,7 +84,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(HorizontalDirectionalBlock.FACING, BathCraftingFluid.MACHINE_ACTIVE);
+		builder.add(HorizontalDirectionalBlock.FACING, StateProperties.MACHINE_ACTIVE);
 	}
 	
 	@Override
@@ -345,13 +345,13 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 							sendUpdates = true;
 						}
 						
-						if(!getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, true));
+						if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 						}
 					}else {
 						
-						if(getBlockState().getValue(BathCraftingFluid.MACHINE_ACTIVE)) {
-							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(BathCraftingFluid.MACHINE_ACTIVE, false));
+						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						}
 						fept = 0f;
 					}

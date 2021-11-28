@@ -7,7 +7,7 @@ import me.haydenb.assemblylinemachines.plugins.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.*;
-import me.haydenb.assemblylinemachines.world.generation.DimensionChaosPlane.SeededNoiseBasedChunkGenerator;
+import me.haydenb.assemblylinemachines.world.DimensionChaosPlane.SeededNoiseBasedChunkGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.*;

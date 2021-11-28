@@ -1,0 +1,30 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/pipes/ultimate_pipe_liquid_connection",
+		"1": "assemblylinemachines:block/pipes/pipe_end",
+		"particle": "assemblylinemachines:block/pipes/ultimate_pipe_liquid_connection"
+	},
+	"elements": [
+		{
+			"from": [0, 4, 4],
+			"to": [4, 12, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 12, 12]},
+			"faces": {
+				"north": {"uv": [0, 4, 4, 12], "rotation": 180, "texture": "#0"},
+				"east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+				"south": {"uv": [0, 4, 4, 12], "texture": "#0"},
+				"west": {"uv": [4, 4, 12, 12], "texture": "#1"},
+				"up": {"uv": [0, 4, 4, 12], "texture": "#0"},
+				"down": {"uv": [0, 4, 4, 12], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0]
+		}
+	]
+}

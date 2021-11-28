@@ -1,0 +1,30 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "assemblylinemachines:block/pipes/ultimate_pipe_connector_side",
+		"1": "assemblylinemachines:block/pipes/ultimate_pipe_connector_front",
+		"particle": "assemblylinemachines:block/pipes/ultimate_pipe_connector_side"
+	},
+	"elements": [
+		{
+			"from": [3, 3, 0],
+			"to": [13, 13, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 11, 8]},
+			"faces": {
+				"north": {"uv": [3, 3, 13, 13], "texture": "#1"},
+				"east": {"uv": [0, 3, 4, 13], "rotation": 180, "texture": "#0"},
+				"south": {"uv": [3, 3, 13, 13], "texture": "#1"},
+				"west": {"uv": [0, 3, 4, 13], "texture": "#0"},
+				"up": {"uv": [0, 3, 4, 13], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 3, 4, 13], "rotation": 270, "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"children": [0]
+		}
+	]
+}

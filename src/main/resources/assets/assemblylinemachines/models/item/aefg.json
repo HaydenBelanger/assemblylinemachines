@@ -1,0 +1,15 @@
+{
+	"parent": "item/handheld",
+	"textures":{
+		"layer0": "assemblylinemachines:item/aefg"
+	},
+	"overrides":[
+		{
+			"predicate":{
+				"assemblylinemachines:active": 1
+			},
+			"model": "assemblylinemachines:item/aefg_active"
+		}
+	]
+	
+}

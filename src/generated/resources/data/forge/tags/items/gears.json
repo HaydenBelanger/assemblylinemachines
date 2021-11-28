@@ -1,10 +1,10 @@
 {
   "replace": false,
   "values": [
-    "#forge:gears/gold",
-    "#forge:gears/iron",
-    "#forge:gears/copper",
     "#forge:gears/steel",
+    "#forge:gears/iron",
+    "#forge:gears/gold",
+    "#forge:gears/copper",
     "#forge:gears/titanium",
     "#forge:gears/flerovium"
   ]

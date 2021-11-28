@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.block.helpers;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -9,10 +10,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.client.GUIHelper;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
-import me.haydenb.assemblylinemachines.world.rendering.GUIHelper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -376,6 +377,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 		protected final Pair<Integer, Integer> invTextLoc;
 		protected boolean renderTitleText;
 		protected boolean renderInventoryText;
+		protected Supplier<Component> inventoryText;
 		protected PoseStack mx;
 
 		public ScreenALMBase(T screenContainer, Inventory inv, Component titleIn, Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc,
@@ -387,6 +389,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			this.imageHeight = size.getSecond();
 			this.titleTextLoc = titleTextLoc;
 			this.invTextLoc = invTextLoc;
+			this.inventoryText = () -> this.playerInventoryTitle;
 			String a = "";
 			if (hasCool == true && ConfigHolder.COMMON.coolDudeMode.get() == true) {
 				a = "cool/";
@@ -457,7 +460,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 				
 			}
 			if(renderInventoryText == true) {
-				this.font.draw(mx, this.playerInventoryTitle, invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
+				this.font.draw(mx, this.inventoryText.get(), invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
 			}
 			
 		}

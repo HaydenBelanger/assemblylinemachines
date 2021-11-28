@@ -1,0 +1,12 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients":[
+		{
+			"item": "assemblylinemachines:novasteel_block"
+		}
+	],
+	"result":{
+		"item": "assemblylinemachines:novasteel_ingot",
+		"count": 9
+	}
+}

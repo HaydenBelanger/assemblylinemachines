@@ -10,10 +10,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 
-//Monitor this Mixin, as it may become redundant with future updates to Forge. This is solely to fix a bug.
 @Mixin(LiquidBlock.class)
 public class FluidPatchMixin {
 	
+	//This Mixin is responsible for patching in the Supplier result in LiquidBlock into the static Fluid field, as a Forge bug prevents it from being read normally.
 	@Redirect(method = {"getCollisionShape", "isPathfindable", 
 			"skipRendering", "onPlace", "updateShape", "neighborChanged",
 			"shouldSpreadLiquid", "pickupBlock"}, at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/LiquidBlock;fluid:Lnet/minecraft/world/level/material/FlowingFluid;", opcode = Opcodes.GETFIELD))

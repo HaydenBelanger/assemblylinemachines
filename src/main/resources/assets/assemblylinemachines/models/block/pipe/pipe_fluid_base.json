@@ -1,8 +1,8 @@
 {
 	"parent": "block/cube",
 	"textures": {
-		"0": "assemblylinemachines:block/fluid_pipe_base",
-		"particle": "assemblylinemachines:block/fluid_pipe_base"
+		"0": "assemblylinemachines:block/pipes/fluid_pipe_base",
+		"particle": "assemblylinemachines:block/pipes/fluid_pipe_base"
 	},
 	"elements": [
 		{

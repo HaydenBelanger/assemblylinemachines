@@ -169,7 +169,7 @@ jar{
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.103'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.114'
     
     //FTB GUI LIBRARY - Not yet updated to 1.17.1.
 	//compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
