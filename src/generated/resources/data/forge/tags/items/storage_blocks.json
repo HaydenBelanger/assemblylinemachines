@@ -2,12 +2,12 @@
   "replace": false,
   "values": [
     "#forge:storage_blocks/steel",
+    "#forge:storage_blocks/titanium",
     "#forge:storage_blocks/mystium",
-    "#forge:storage_blocks/energized_gold",
-    "#forge:storage_blocks/attuned_titanium",
     "#forge:storage_blocks/flerovium",
-    "#forge:storage_blocks/novasteel",
     "#forge:storage_blocks/chromium",
-    "#forge:storage_blocks/titanium"
+    "#forge:storage_blocks/attuned_titanium",
+    "#forge:storage_blocks/energized_gold",
+    "#forge:storage_blocks/novasteel"
   ]
 }

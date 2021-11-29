@@ -43,6 +43,7 @@ public class TagMaster {
 		MATERIAL_TOOL.put(Material.STONE, Optional.of(BlockTags.MINEABLE_WITH_PICKAXE));
 		MATERIAL_TOOL.put(Material.WOOD, Optional.of(BlockTags.MINEABLE_WITH_AXE));
 		MATERIAL_TOOL.put(Material.CLAY, Optional.of(BlockTags.MINEABLE_WITH_SHOVEL));
+		MATERIAL_TOOL.put(Material.GLASS, Optional.empty());
 		MATERIAL_TOOL.put(Material.PLANT, Optional.empty());
 		MATERIAL_TOOL.put(Material.REPLACEABLE_PLANT, Optional.empty());
 		MATERIAL_TOOL.put(Material.CACTUS, Optional.empty());
@@ -65,7 +66,7 @@ public class TagMaster {
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/carbon_small"), List.of("minecraft:coal", "minecraft:charcoal", "ground_coal", "ground_charcoal"));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/carbon_small"), List.of(Pair.of("minecraft", "coal_ores")));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/carbon_large"), List.of(Pair.of("forge", "storage_blocks/coal")));
-		
+		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/prism_roses"), List.of("prism_rose", "bright_prism_rose"));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.BLOCK, "world/gas_flammable"), List.of("naphtha_fire", "naphtha_block", "minecraft:torch", "minecraft:redstone_torch", "minecraft:soul_torch"));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.BLOCK, "world/gas_flammable"), List.of(Pair.of("minecraft", "campfires"), Pair.of("minecraft", "fire"), Pair.of("minecraft", "strider_warm_blocks")));
 		

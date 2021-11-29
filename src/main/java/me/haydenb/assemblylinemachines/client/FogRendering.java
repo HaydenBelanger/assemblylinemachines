@@ -1,6 +1,8 @@
 package me.haydenb.assemblylinemachines.client;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -34,7 +36,8 @@ public class FogRendering {
 		if(f instanceof ILiquidFogColor) {
 			ILiquidFogColor fogColor = (ILiquidFogColor) f;
 			event.setCanceled(true);
-			event.setDensity(fogColor.getFogDensity());
+			Minecraft mc = Minecraft.getInstance();
+			event.setDensity(fogColor.getFogDensity(mc.player));
 		}
 	}
 	
@@ -44,6 +47,10 @@ public class FogRendering {
 		default public float getFogDensity() {
 			//48 is the default return value for Water visibility.
 			return 48.0f;
+		}
+		
+		default public float getFogDensity(LocalPlayer player) {
+			return this.getFogDensity();
 		}
 	}
 }

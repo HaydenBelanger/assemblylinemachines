@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ada",
+		"ueu",
+		"ada"
+	],
+	"key":{
+		"a":{
+			"tag": "forge:plates/attuned_titanium"
+		},
+		"d":{
+			"tag": "forge:dusts/prismatic"
+		},
+		"u":{
+			"item": "assemblylinemachines:enhanced_battery"
+		},
+		"e":{
+			"tag": "forge:storage_blocks/energized_gold"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:ultimate_battery"
+	}
+}

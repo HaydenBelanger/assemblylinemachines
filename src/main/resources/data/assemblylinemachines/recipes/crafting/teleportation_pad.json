@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"g g",
+		"grg",
+		"aaa"
+	],
+	"key":{
+		"a":{
+			"tag": "forge:storage_blocks/attuned_titanium"
+		},
+		"g":{
+			"item": "assemblylinemachines:galactic_flesh"
+		},
+		"r":{
+			"item": "assemblylinemachines:reality_crystal"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:teleportation_pad"
+	}
+}

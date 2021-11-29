@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ggg",
+		"rir",
+		"ggg"
+	],
+	"key":{
+		"i":{
+			"item": "assemblylinemachines:bright_prism_rose"
+		},
+		"r":{
+			"tag": "forge:dusts/prismatic"
+		},
+		"g":{
+			"tag": "forge:glass"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:prism_glass",
+		"count": 6
+	}
+}

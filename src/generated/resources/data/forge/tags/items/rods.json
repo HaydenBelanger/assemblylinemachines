@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#forge:rods/graphene",
-    "#forge:rods/steel"
+    "#forge:rods/steel",
+    "#forge:rods/graphene"
   ]
 }

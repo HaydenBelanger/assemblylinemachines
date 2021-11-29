@@ -38,7 +38,6 @@ public class ConfigHandler {
 		public final BooleanValue experimentalWorldScreenDisable;
 		public final BooleanValue farBlockPosGeneratorSuppressed;
 		public final BooleanValue seedUnification;
-		public final BooleanValue oceansOfDarkEnergy;
 		
 		//MACHINE OPTIONS
 		public final BooleanValue coolDudeMode;
@@ -46,6 +45,8 @@ public class ConfigHandler {
 		public final BooleanValue reactorExplosions;
 		public final EnumValue<DebugOptions> interactorInteractDebug;
 		public final ConfigValue<Integer> crankSnapChance;
+		public final ConfigValue<Integer> toolChargerChargeRate;
+		public final ConfigValue<Integer> toolChargerMaxEnergyStorage;
 		
 		//MISC/WORLD
 		public final BooleanValue jeiSupport;
@@ -126,6 +127,8 @@ public class ConfigHandler {
 			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?").define("interactorInteractMode", true);
 			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
 			reactorExplosions = builder.comment("If the Entropy Reactor reaches higher than 98% Entropy, should it explode?").define("reactorExplosions", true);
+			toolChargerChargeRate = builder.comment("What is the maximum amount of FE the Tool Charger can place into an item per cycle? The Tool Charger runs at 2.5 cycles per second.").define("toolChargerChargeRate", 10000);
+			toolChargerMaxEnergyStorage = builder.comment("What should the FE capacity of the Tool Charger be?").define("toolChargerMaxEnergyStorage", 100000);
 			
 			Predicate<Object> fluidTestPredicate = (object) -> true;
 			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 115000), Pair.of("assemblylinemachines:naphtha", 650000)), fluidTestPredicate);
@@ -214,7 +217,6 @@ public class ConfigHandler {
 			experimentalWorldScreenDisable = builder.comment("Should Assembly Line Machines suppress the World Experimental Settings screen? This will have no effect if another mod performs the same task.").define("experimentalWorldScreenDisable", true);
 			farBlockPosGeneratorSuppressed = builder.comment("Should Assembly Line Machines suppress the warning related to far-away block generation error, an artifact of Mojang debug code? This will suppress ALL INSTANCES of this debug log being outputted.").define("farBlockPosGeneratorSuppressed", true);
 			seedUnification = builder.comment("Should Assembly Line Machines attempt to unify the world seed between the Vanilla dimensions and the Chaos Plane? Otherwise, the world will use seed '0'.").define("seedUnification", true);
-			oceansOfDarkEnergy = builder.comment("Should Assembly Line Machines inject Dark Energy as the default fluid in the Chaos Plane? Otherwise, the world will have no oceans. This will have no effect if 'seedUnification' is false.").define("oceansOfDarkEnergy", true);
 			builder.pop();
 			
 			
@@ -224,6 +226,13 @@ public class ConfigHandler {
 		public void validateConfig() {
 			if(crankSnapChance.get() < 1 && crankSnapChance.get() != -1) {
 				crankSnapChance.set(100);
+			}
+			
+			if(toolChargerChargeRate.get() < 1) {
+				toolChargerChargeRate.set(10000);
+			}
+			if(toolChargerMaxEnergyStorage.get() < toolChargerChargeRate.get()) {
+				toolChargerMaxEnergyStorage.set(100000);
 			}
 			
 			checkFluidLists(Pair.of(geothermalFluidsRaw.get().iterator(), geothermalFluids), Pair.of(combustionFluidsRaw.get().iterator(), combustionFluids), Pair.of(coolantFluidsRaw.get().iterator(), coolantFluids));

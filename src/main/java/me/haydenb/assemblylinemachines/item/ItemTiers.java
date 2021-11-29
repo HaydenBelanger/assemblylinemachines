@@ -27,7 +27,8 @@ public enum ItemTiers {
 	CRANK(ConfigHolder.COMMON.crankToolAttack.get(), ConfigHolder.COMMON.crankToolDurability.get(), ConfigHolder.COMMON.crankToolEnchantability.get(), ConfigHolder.COMMON.crankToolDurability.get(), 
 			()->{return Ingredient.of(ItemTags.getAllTags().getTag(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
 	MYSTIUM(ConfigHolder.COMMON.mystiumToolAttack.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ConfigHolder.COMMON.mystiumToolEnchantability.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
-	NOVASTEEL(ConfigHolder.COMMON.novasteelToolAttack.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ConfigHolder.COMMON.novasteelToolEnchantability.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));});
+	NOVASTEEL(ConfigHolder.COMMON.novasteelToolAttack.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ConfigHolder.COMMON.novasteelToolEnchantability.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
+	CRG(750, 5, 0d, 3, "crg", 0d, () -> Ingredient.EMPTY);
 
 	private float attack;
 	private float efficiency;
@@ -61,8 +62,18 @@ public enum ItemTiers {
 		this.ingredient = new LazyLoadedValue<>(ingredient);
 	}
 	
+	ItemTiers(int durability, int enchantability, double armorKnockbackResistance, int armorDamageReduction, String armorSetName, double toughness, Supplier<Ingredient> ingredient){
+	this.durability = durability;
+	this.armorKnockbackResistance = (float) armorKnockbackResistance;
+	this.damageReduction = armorDamageReduction;
+	this.armorSetName = armorSetName;
+	this.toughness = (float) toughness;
+	this.ingredient = new LazyLoadedValue<>(ingredient);
+	this.enchantability = enchantability;
+	}
+	
 	public static enum ArmorTiers implements ArmorMaterial{
-		TITANIUM(ItemTiers.TITANIUM), STEEL(ItemTiers.STEEL);
+		TITANIUM(ItemTiers.TITANIUM), STEEL(ItemTiers.STEEL), CRG(ItemTiers.CRG);
 		
 		private final ItemTiers baseTier;
 		ArmorTiers(ItemTiers base){

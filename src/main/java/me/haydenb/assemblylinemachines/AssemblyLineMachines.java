@@ -35,8 +35,6 @@ public final class AssemblyLineMachines{
 		
 		//Registers the Seeded Noise chunk generator, used to generate the Chaos Plane.
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(MODID, "seeded_noise"), SeededNoiseBasedChunkGenerator.CODEC);
-		
-		
 	}
 	
 	public static ModContainer getModContainer() {

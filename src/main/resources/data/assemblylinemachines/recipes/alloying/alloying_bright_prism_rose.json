@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"item": "assemblylinemachines:prism_rose"
+	},
+	"part_b":{
+		"tag": "forge:dusts/glowstone"
+	},
+	"output":{
+		"item": "assemblylinemachines:bright_prism_rose"
+	},
+	"time": 50
+}

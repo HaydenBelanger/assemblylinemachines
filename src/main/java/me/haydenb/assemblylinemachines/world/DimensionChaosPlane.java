@@ -177,7 +177,7 @@ public class DimensionChaosPlane {
 			corruptRedstoneOre = getCorruptOreGenerator("corrupt_redstone_ore", 8, 4, VerticalAnchor.bottom(), VerticalAnchor.absolute(15));
 
 			corruptEmeraldOre = Feature.REPLACE_SINGLE_BLOCK.configured(chaosPlaneEmeraldRBC).rangeUniform(VerticalAnchor.absolute(4), VerticalAnchor.absolute(31)).squared().count(UniformInt.of(3, 8));
-			fleroviumOre = Feature.REPLACE_SINGLE_BLOCK.configured(fleroviumRBC).rangeUniform(VerticalAnchor.absolute(30), VerticalAnchor.absolute(63)).squared().count(UniformInt.of(4, 10));
+			fleroviumOre = Feature.REPLACE_SINGLE_BLOCK.configured(fleroviumRBC).rangeUniform(VerticalAnchor.absolute(30), VerticalAnchor.absolute(63)).squared().count(UniformInt.of(12, 20));
 		}
 
 		private static ConfiguredFeature<?, ?> getCorruptOreGenerator(String block, int size, int freq, VerticalAnchor min, VerticalAnchor max){

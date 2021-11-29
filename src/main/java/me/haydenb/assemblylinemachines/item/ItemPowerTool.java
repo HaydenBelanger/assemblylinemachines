@@ -286,6 +286,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		this.addEnergyInfoToHoverText(stack, tooltip);
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
@@ -293,6 +294,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		return dmg == 0 ? super.getDurabilityForDisplay(stack) : (double) ((compound.getInt(ptt.keyName) - getMaxPower(stack)) * -1) / (double) getMaxPower(stack);
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
 		if(!stack.hasTag() || stack.getTag().getInt(ptt.keyName) == 0) return super.showDurabilityBar(stack);

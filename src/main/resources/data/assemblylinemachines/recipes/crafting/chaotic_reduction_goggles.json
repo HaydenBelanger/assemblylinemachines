@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"l l",
+		"gag",
+		"l l"
+	],
+	"key":{
+		"g":{
+			"item": "assemblylinemachines:prism_glass"
+		},
+		"l":{
+			"tag": "forge:leather"
+		},
+		"a":{
+			"tag": "forge:plates/attuned_titanium"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:chaotic_reduction_goggles"
+	}
+}

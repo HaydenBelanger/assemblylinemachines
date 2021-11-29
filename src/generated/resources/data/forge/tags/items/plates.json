@@ -1,17 +1,17 @@
 {
   "replace": false,
   "values": [
-    "#forge:plates/iron",
-    "#forge:plates/novasteel",
-    "#forge:plates/gold",
-    "#forge:plates/energized_gold",
-    "#forge:plates/stainless_steel",
-    "#forge:plates/flerovium",
     "#forge:plates/attuned_titanium",
+    "#forge:plates/chromium",
+    "#forge:plates/novasteel",
+    "#forge:plates/iron",
+    "#forge:plates/mystium",
+    "#forge:plates/gold",
+    "#forge:plates/titanium",
     "#forge:plates/copper",
     "#forge:plates/steel",
-    "#forge:plates/chromium",
-    "#forge:plates/mystium",
-    "#forge:plates/titanium"
+    "#forge:plates/flerovium",
+    "#forge:plates/energized_gold",
+    "#forge:plates/stainless_steel"
   ]
 }

@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"pap",
+		"ama",
+		"bab"
+	],
+	"key":{
+		"a":{
+			"tag": "forge:plates/attuned_titanium"
+		},
+		"p":{
+			"tag": "forge:sheets/plastic"
+		},
+		"m":{
+			"item": "assemblylinemachines:microprocessor"
+		},
+		"b":{
+			"item": "assemblylinemachines:enhanced_battery"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:aefg"
+	}
+}

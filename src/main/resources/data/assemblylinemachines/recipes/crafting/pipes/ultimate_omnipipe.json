@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"imi",
+		"sss"
+	],
+	"key":{
+		"s":{
+			"tag": "forge:plates/attuned_titanium"
+		},
+		"i":{
+			"item": "assemblylinemachines:advanced_omnipipe"
+		},
+		"m":{
+			"tag": "forge:plates/flerovium"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:ultimate_omnipipe",
+		"count": 4
+	}
+}

@@ -4,15 +4,17 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class FluidDarkEnergy extends ALMFluid implements ILiquidFogColor {
 	
@@ -25,9 +27,10 @@ public class FluidDarkEnergy extends ALMFluid implements ILiquidFogColor {
 		return 3;
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public float getFogDensity() {
-		return 12f;
+	public float getFogDensity(LocalPlayer player) {
+		return player.getInventory().getArmor(EquipmentSlot.HEAD.getIndex()).is(Registry.getItem("chaotic_reduction_goggles")) ? 96f : 12f;
 	}
 	
 	public static class FluidDarkEnergyBlock extends ALMFluidBlock {

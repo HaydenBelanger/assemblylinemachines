@@ -313,6 +313,7 @@ public class Registry {
 		createItem("nova_blend", "novasteel_ingot", "novasteel_plate", "raw_novasteel_compound", "ultimate_battery");
 		
 		createItem("aefg", new ItemAEFG());
+		createItem("chaotic_reduction_goggles", new ItemChaoticReductionGoggles());
 		
 		for(String i : MOD_ITEM_REGISTRY.keySet()) {
 			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
@@ -462,8 +463,9 @@ public class Registry {
 		createBlock("blooming_chaosweed", new CorruptTallGrassBlock(), true);
 		createBlock("tall_chaosweed", new CorruptDoubleTallGrassBlock(), true);
 		createBlock("tall_blooming_chaosweed", new CorruptDoubleTallGrassBlock(), true);
-		createBlock("mandelbloom", new CorruptFlowerBlock(MobEffects.CONFUSION, 15), true);
-		createBlock("prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 30), true);
+		createBlock("mandelbloom", new CorruptFlowerBlock(MobEffects.CONFUSION, 15, 0), true);
+		createBlock("prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 30, 7), true);
+		createBlock("bright_prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 240, 15), true);
 		createBlock("brain_cactus", new BrainCactusBlock(), true);
 		
 		createBlock("corrupt_coal_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
@@ -475,7 +477,7 @@ public class Registry {
 		createBlock("corrupt_lapis_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		createBlock("corrupt_redstone_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		createBlock("corrupt_titanium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("flerovium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL), true);
+		createBlock("flerovium_ore", new CorruptBlock(Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL), true);
 		
 		createBlock("flerovium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
 		createBlock("energized_gold_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
@@ -491,6 +493,7 @@ public class Registry {
 		createBlock("novasteel_fluid_tank", new BlockFluidTank(50000000, TemperatureResistance.HOT), true);
 		
 		createBlock("teleportation_pad", new BlockTeleportationPad(), true);
+		createBlock("prism_glass", new Block(Block.Properties.of(Material.GLASS).sound(SoundType.GLASS).lightLevel((state) -> 15).noOcclusion()), true);
 		registerFluids(null);
 		
 		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
@@ -733,6 +736,8 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getBlock("mandelbloom"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_rose"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("brain_cactus"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("bright_prism_rose"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_glass"), RenderType.cutoutMipped());
 		
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());

@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "assemblylinemachines:prism_rose"
+		"tag": "assemblylinemachines:crafting/prism_roses"
 	},
 	"output":{
 		"item": "assemblylinemachines:prismatic_dust"

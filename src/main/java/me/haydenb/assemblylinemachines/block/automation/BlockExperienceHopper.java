@@ -170,7 +170,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 					
 					if(internalStoredXp <= 1000) {
 						if (bb == null) {
-							bb = new AABB(this.getBlockPos().relative(getBlockState().getValue(BlockStateProperties.FACING_HOPPER).getOpposite(), 2)).inflate(1);
+							bb = new AABB(this.getBlockPos().relative(getBlockState().getValue(BlockStateProperties.FACING_HOPPER).getOpposite(), 3)).inflate(2);
 						}
 						
 						List<ExperienceOrb> el = this.getLevel().getEntitiesOfClass(ExperienceOrb.class, bb);

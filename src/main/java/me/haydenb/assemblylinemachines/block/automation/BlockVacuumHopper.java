@@ -114,7 +114,7 @@ public class BlockVacuumHopper extends HopperBlock {
 					timer = 0;
 
 					if (bb == null) {
-						bb = new AABB(this.getBlockPos().relative(getBlockState().getValue(BlockStateProperties.FACING_HOPPER).getOpposite(), 2)).inflate(1);
+						bb = new AABB(this.getBlockPos().relative(getBlockState().getValue(BlockStateProperties.FACING_HOPPER).getOpposite(), 3)).inflate(2);
 					}
 
 					List<ItemEntity> el = this.getLevel().getEntitiesOfClass(ItemEntity.class, bb);

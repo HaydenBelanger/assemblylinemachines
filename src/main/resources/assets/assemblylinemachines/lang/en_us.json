@@ -178,6 +178,7 @@
 	"item.assemblylinemachines.raw_novasteel_compound": "Raw Novasteel Compound",
 	"item.assemblylinemachines.aefg": "AEFG",
 	"item.assemblylinemachines.ultimate_battery": "Ultimate Battery",
+	"item.assemblylinemachines.chaotic_reduction_goggles": "Chaotic Reduction Goggles",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore": "Deepslate Titanium Ore",
@@ -301,6 +302,8 @@
 	"block.assemblylinemachines.attuned_titanium_fluid_tank": "Attuned Titanium Fluid Tank",
 	"block.assemblylinemachines.novasteel_fluid_tank": "Novasteel Fluid Tank",
 	"block.assemblylinemachines.teleportation_pad": "Teleportation Pad",
+	"block.assemblylinemachines.bright_prism_rose": "Bright Prism Rose",
+	"block.assemblylinemachines.prism_glass": "Prism Glass",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",

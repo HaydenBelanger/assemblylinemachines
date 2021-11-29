@@ -68,8 +68,8 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 
 	public static class CorruptFlowerBlock extends FlowerBlock{
 
-		public CorruptFlowerBlock(MobEffect pSuspiciousStewEffect, int pEffectDuration) {
-			super(pSuspiciousStewEffect, pEffectDuration, Block.Properties.of(Material.PLANT).noCollission().instabreak().sound(SoundType.GRASS));
+		public CorruptFlowerBlock(MobEffect pSuspiciousStewEffect, int pEffectDuration, int lightValue) {
+			super(pSuspiciousStewEffect, pEffectDuration, Block.Properties.of(Material.PLANT).noCollission().instabreak().sound(SoundType.GRASS).lightLevel((state) -> lightValue));
 		}
 
 		@Override

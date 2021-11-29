@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sss",
+		"gwg",
+		"sss"
+	],
+	"key":{
+		"g":{
+			"item": "assemblylinemachines:prism_glass"
+		},
+		"s":{
+			"tag": "forge:plates/novasteel"
+		},
+		"w":{
+			"item": "assemblylinemachines:attuned_titanium_fluid_tank"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:novasteel_fluid_tank"
+	}
+}

@@ -1,8 +1,8 @@
 {
   "replace": false,
   "values": [
-    "#forge:ores/titanium",
     "#forge:ores/chromium",
+    "#forge:ores/titanium",
     "#forge:ores/flerovium"
   ]
 }

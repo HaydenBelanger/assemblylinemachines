@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -114,9 +115,13 @@ public class BlockToolCharger extends BlockTileEntity{
 		private String prevStatusMessage = "";
 		private int timer = 0;
 		
+		private final int configMaxChargeRate;
+		private final int configMaxCapacity;
 		
 		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
+			this.configMaxChargeRate = ConfigHolder.COMMON.toolChargerChargeRate.get();
+			this.configMaxCapacity = ConfigHolder.COMMON.toolChargerMaxEnergyStorage.get();
 		}
 
 		public TEToolCharger(BlockPos pos, BlockState state) {
@@ -129,8 +134,8 @@ public class BlockToolCharger extends BlockTileEntity{
 			@Override
 			public int receiveEnergy(int maxReceive, boolean simulate) {
 
-				if (30000 < maxReceive + amount) {
-					maxReceive = 30000 - amount;
+				if (configMaxCapacity < maxReceive + amount) {
+					maxReceive = configMaxCapacity - amount;
 				}
 
 				if (simulate == false) {
@@ -240,8 +245,8 @@ public class BlockToolCharger extends BlockTileEntity{
 								
 								int max;
 								
-								if(amount >= 2000) {
-									max = 2000;
+								if(amount >= this.configMaxChargeRate) {
+									max = this.configMaxChargeRate;
 								}else {
 									max = amount;
 								}
@@ -270,7 +275,7 @@ public class BlockToolCharger extends BlockTileEntity{
 							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						}
 					}
-					prevStatusMessage = prevStatusMessage + " (" + Formatting.GENERAL_FORMAT.format(amount) + "/30,000 FE)";
+					prevStatusMessage = prevStatusMessage + " (" + Formatting.GENERAL_FORMAT.format(amount) + "/" + Formatting.GENERAL_FORMAT.format(configMaxCapacity) + " FE)";
 					sendUpdates();
 				}
 			}
