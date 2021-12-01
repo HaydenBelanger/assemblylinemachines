@@ -17,8 +17,8 @@ out
 # gradle
 build
 .gradle
-/src/generated/
-/src/test/
+src/generated
+src/test
 
 # other
 eclipse
