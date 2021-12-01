@@ -127,7 +127,7 @@ public class BlockTeleportationPad extends Block {
 					Iterator<BlockPos> platform = BlockPos.betweenClosed(setPos.below().east(2).north(2), setPos.below().west(2).south(2)).iterator();
 					while(platform.hasNext()) {
 						BlockPos nextPos = platform.next();
-						level.setBlockAndUpdate(nextPos, glowStone.contains(nextPos) ? Blocks.GLOWSTONE.defaultBlockState() : Registry.getBlock("smooth_black_granite").defaultBlockState());
+						level.setBlockAndUpdate(nextPos, glowStone.contains(nextPos) ? Registry.getBlock("prism_glass").defaultBlockState() : Registry.getBlock("smooth_black_granite").defaultBlockState());
 					}
 					
 					

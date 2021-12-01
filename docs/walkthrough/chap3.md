@@ -1,5 +1,8 @@
 # Electricity Age part a (Logistics and Machines)
 
+!!! danger "Out-of-date Information"
+    The information contained in this article is not up-to-date and will not be maintained. For documentation, install [Patchouli](https://www.curseforge.com/minecraft/mc-mods/patchouli), an in-game rich documentation viewer.
+    
 With the acquisition of black granite you're ready to enter into the largest age, FE! In this age you'll finally move from semi-automated cranking to everything from mob farming, fully automated ore doubling through the use of vastly superior logistics systems, to the creation of advanced synthetic materials.
 
 ## The Electric Purifier, Pipes, and Pure Steel

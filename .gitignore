@@ -16,9 +16,8 @@ out
 
 # gradle
 build
-
 .gradle
-/src/generated/resources/.cache
+/src/generated
 /src/test
 
 # other

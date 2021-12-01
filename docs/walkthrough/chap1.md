@@ -1,5 +1,8 @@
 # Primitive Age
 
+!!! danger "Out-of-date Information"
+    The information contained in this article is not up-to-date and will not be maintained. For documentation, install [Patchouli](https://www.curseforge.com/minecraft/mc-mods/patchouli), an in-game rich documentation viewer.
+    
 Welcome to Assembly Line Machines! 
 
 This mod is a complete overhaul to base MC with emphasis on automation and automated processing. This guide will completely walk you through everything from the early game, to the complex late game systems!

@@ -10,7 +10,9 @@ This mod is currently available for Minecraft 1.17.1, used with the Forge Mod Lo
 
 ## Wiki
 
-This Wiki will provide continuously updated documentation, both for pack developers and players. This will feature in-depth guides on specific blocks and items, as well as a general walkthrough for the mod to help push in the correct direction.
+For documentation about progression, we strongly recommend [Patchouli](https://www.curseforge.com/minecraft/mc-mods/patchouli). That allows for in-game documentation to be presented in an aesthetically pleasing way. 
 
-!!! warning
-    This wiki will upgrade and change with every major version, so accuracy of the Wiki will only be guaranteed for the latest available downloadable version, and features may not be applicable or available for versions older than.
+For developer/packmaker information, this site will host up-to-date documentation for that audience for people who may want to implement one of ALM's tags or recipe types themselves.
+
+??? warning "Web Guide"
+    There is also an out-of-date Web Guide available here, which covers content up until the mid-game. Please note that this information is relevant up until 1.17.1-1.2.1, and as the mod is updated, this information may lose accuracy.

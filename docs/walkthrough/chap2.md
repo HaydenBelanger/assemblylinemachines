@@ -1,5 +1,8 @@
 # Crank Age (Kinetic Energy)
 
+!!! danger "Out-of-date Information"
+    The information contained in this article is not up-to-date and will not be maintained. For documentation, install [Patchouli](https://www.curseforge.com/minecraft/mc-mods/patchouli), an in-game rich documentation viewer.
+    
 With the creation of steel you are ready to move on to the crank age! Like the name implies, in this age you'll be moving from doing everything manually to using crank power for a semi-automated setup.
 
 ## Simple Grinder and Crank Power

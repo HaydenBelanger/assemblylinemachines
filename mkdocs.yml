@@ -9,7 +9,7 @@ edit_uri: edit/1.17.1-dev/docs/
 
 nav:
   - Home: index.md
-  - Chapters:
+  - Web Guide (Out-of-Date):
     - Chapter 1 - Primitive: walkthrough/chap1.md
     - Chapter 2 - Kinetic Energy: walkthrough/chap2.md
     - Chapter 3a - Logistics and Machines: walkthrough/chap3.md
