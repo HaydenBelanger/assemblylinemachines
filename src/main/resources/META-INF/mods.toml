@@ -16,7 +16,7 @@ issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues" 
 # The modid of the mod
 modId="assemblylinemachines" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="1.17.1-1.3.0-alpha" #mandatory
+version="1.17.1-1.3" #mandatory
  # A display name for the mod
 displayName="Assembly Line Machines" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>

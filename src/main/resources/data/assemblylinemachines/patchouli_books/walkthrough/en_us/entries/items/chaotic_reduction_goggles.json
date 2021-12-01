@@ -1,0 +1,23 @@
+{
+	"name": "CR. Goggles",
+	"category": "assemblylinemachines:items",
+	"icon": "assemblylinemachines:chaotic_reduction_goggles",
+	"pages":[
+		{
+			"type": "text",
+			"text": "Unfortunately, $(l:age5#fleroviumore)Flerovium Ore$(/l) is challenging to find, thanks to it being in the seabeds of the $(d)Chaos Plane$() Dark Energy oceans. Thankfully, you can make $(item)Chaotic Reduction Goggles,$() an item that will increase visibility in Dark Energy."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:bright_prism_rose",
+			"link_recipe": true,
+			"text": "Combine a $(item)Glowstone Dust$() and a $(l:age5#prismrose)Prism Rose$(/l) in an Alloy Smelter, and you will get a $(6)Bright Prism Rose.$() This is just like a Prism Rose, but glows very brightly when placed."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/prism_glass",
+			"recipe2": "assemblylinemachines:crafting/chaotic_reduction_goggles",
+			"title": "Prism Glass & CRG"
+		}
+	]
+}

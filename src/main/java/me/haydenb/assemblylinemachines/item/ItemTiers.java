@@ -29,7 +29,7 @@ public enum ItemTiers {
 	MYSTIUM(ConfigHolder.COMMON.mystiumToolAttack.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ConfigHolder.COMMON.mystiumToolEnchantability.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
 	NOVASTEEL(ConfigHolder.COMMON.novasteelToolAttack.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ConfigHolder.COMMON.novasteelToolEnchantability.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
 	CRG(750, 5, 0d, 3, "crg", 0d, () -> Ingredient.EMPTY);
-
+	
 	private float attack;
 	private float efficiency;
 	private int enchantability;
@@ -144,9 +144,13 @@ public enum ItemTiers {
 	}
 	
 	public static enum ToolTiers implements Tier{
+		
 		TITANIUM(ItemTiers.TITANIUM, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)), STEEL(ItemTiers.STEEL, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)),
-		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)), MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool")),
-		NOVASTEEL(ItemTiers.NOVASTEEL, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
+		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)),
+		MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool")),
+		NOVASTEEL(ItemTiers.NOVASTEEL, List.of(ToolTiers.MYSTIUM), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_novasteel_tool"));
+		
+		
 		
 		private final ItemTiers baseTier;
 		private final Tag.Named<Block> tierTag;
@@ -160,6 +164,7 @@ public enum ItemTiers {
 			
 			this.tierTag = tierTag != null ? BlockTags.createOptional(tierTag) : null;	
 			TierSortingRegistry.registerTier(this, new ResourceLocation(AssemblyLineMachines.MODID, this.name().toLowerCase()), after, before);
+			
 		}
 
 		@Override
@@ -196,6 +201,7 @@ public enum ItemTiers {
 		public Tag<Block> getTag() {
 			return tierTag;
 		}
+		
 	}
 
 }

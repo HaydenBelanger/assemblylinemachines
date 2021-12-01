@@ -9,6 +9,7 @@ import com.google.common.collect.Multimap;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import net.minecraft.ChatFormatting;
@@ -21,6 +22,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -40,8 +42,12 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @SuppressWarnings("deprecation")
+@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class ItemPowerTool<A extends TieredItem> extends TieredItem implements IToolWithCharge {
 
 	private final A parent;
@@ -395,6 +401,40 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		
 		public String getFriendlyNameOfUnit() {
 			return friendlyNameOfUnit;
+		}
+	}
+	
+	//Gives the Charged Mob Crystal when killed with a charged Secondary Ability Sword.
+	@SubscribeEvent
+	public static void kill(LivingDeathEvent event) {
+		if(event.getSource().getEntity() instanceof ServerPlayer) {
+			ServerPlayer spe = (ServerPlayer) event.getSource().getEntity();
+			ItemStack stack = spe.getMainHandItem();
+			
+			if(ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null && stack.getItem() instanceof IToolWithCharge) {
+				IToolWithCharge chargeTool = (IToolWithCharge) stack.getItem();
+				if(spe.getLevel().getRandom().nextFloat() <= chargeTool.getPowerToolType().getChanceToDropMobCrystal() && chargeTool.canUseSecondaryAbilities(stack, "SwordItem")) {
+					ItemStack inert = null;
+					for(int i = 0; i < spe.getInventory().getContainerSize(); i++) {
+						ItemStack sis = spe.getInventory().getItem(i);
+						if(sis.getItem() == Registry.getItem("mob_crystal") && !sis.hasTag()) {
+							inert = sis;
+							break;
+						}
+					}
+					if(spe.isCreative() || inert != null) {
+						ItemStack crystal = new ItemStack(Registry.getItem("mob_crystal"), 1);
+						CompoundTag tag = new CompoundTag();
+						tag.putString("assemblylinemachines:mob", event.getEntity().getType().getRegistryName().toString());
+						crystal.setTag(tag);
+						event.getEntity().spawnAtLocation(crystal);
+						stack.hurtAndBreak(20, spe, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
+						if(!spe.isCreative() && inert != null) {
+							inert.shrink(1);
+						}
+					}
+				}
+			}
 		}
 	}
 }

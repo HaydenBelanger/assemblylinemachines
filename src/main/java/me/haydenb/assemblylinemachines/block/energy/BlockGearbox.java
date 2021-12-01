@@ -8,11 +8,12 @@ import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
+import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.item.IGearboxFuel;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.StateProperties;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.StateProperties;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +25,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -64,6 +66,19 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 		}
 
 		return stateIn;
+	}
+	
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		for(Direction d : Utils.CARDINAL_DIRS) {
+			BlockState state = context.getLevel().getBlockState(context.getClickedPos().relative(d));
+			if(state.getBlock() instanceof ICrankableBlock) {
+				if(((ICrankableBlock) state.getBlock()).validSide(state, d.getOpposite())) {
+					return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, d);
+				}
+			}
+		}
+		return null;
 	}
 	
 	public static class TEGearbox extends SimpleMachine<ContainerGearbox> implements ALMTicker<TEGearbox>{

@@ -51,7 +51,7 @@ public class ConfigHandler {
 		//MISC/WORLD
 		public final BooleanValue jeiSupport;
 		public final BooleanValue updateChecker;
-		//public final BooleanValue guideBook;
+		public final BooleanValue guideBook;
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
 		
@@ -185,8 +185,7 @@ public class ConfigHandler {
 			mystiumFarmlandDeath = builder.comment("Should Mystium Farmland get exhausted over time and stop performing grow operations?").define("mystiumFarmlandDeath", true);
 			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
 			gasolineExplosions = builder.comment("Should Gasoline and Diesel explode when placed next to a flammable block?").define("gasolineExplosions", true);
-			
-			//guideBook = builder.comment("Should new players be given the guide book when joining the world (as long as Patchouli is installed?) NOTE: For v1.2, this toggle is not functional as Patchouli hasn't been updated.").define("guideBook", true);
+			guideBook = builder.comment("When Patchouli is installed, should players be automatically given the Guidebook when they first connect?").define("guideBook", true);
 			
 			builder.push("Titanium Generation");
 			titaniumVeinSize = builder.comment("What should the maximum size per vein of Standard/Deepslate/Corrupt Titanium Ore be? Set to 0 to disable completely.").define("titaniumVeinSize", 6);

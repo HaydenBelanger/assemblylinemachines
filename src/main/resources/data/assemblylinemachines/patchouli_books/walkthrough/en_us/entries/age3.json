@@ -4,36 +4,13 @@
 	"icon": "assemblylinemachines:item_pipe",
 	"pages":[
 		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/energy_pipe",
-			"text": "You have collected Black Granite, and now you can craft $(item)Basic Energy Pipes,$() a $(item)Crankmill,$() and an $(item)Electric Purifier."
+			"type": "text",
+			"text": "You have collected Black Granite, and now you can craft $(item)Basic Energy Pipes,$() a $(item)Crankmill,$() and an $(item)Electric Purifier. The Crankmill will generate power from kinetic energy from a Gearbox.$()$(p)$(l:blocks/pipes)Follow this link for more information on Pipes.$(/l)"
 		},
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/crankmill",
 			"recipe2": "assemblylinemachines:crafting/electric_purifier"
-		},
-		{
-			"type": "text",
-			"text": "To use the Basic Energy Pipes, you need to SHIFT-RIGHT CLICK on the face you wish to attach the Connector to. This is the side that will work with the block.$(br)The Pipe can be switched between Input and Output mode with a SHIFT-RIGHT CLICK, once placed on a valid block.$(p)Place down the Crankmill with a Gearbox facing it. Connect the Electric Purifier to this device with some of the Basic Energy Pipes."
-		},
-		{
-			"type": "multiblock",
-			"multiblock":{
-				"mapping":{
-					"g": "assemblylinemachines:gearbox[facing=south,active=true]",
-					"c": "assemblylinemachines:crankmill",
-					"0": "assemblylinemachines:energy_pipe[south=pipe,north=connector]",
-					"x": "assemblylinemachines:energy_pipe[south=connector,north=pipe]",
-					"p": "assemblylinemachines:electric_purifier[facing=west]"
-				},
-				"pattern":[
-					["gc0xp"]
-				]
-			},
-			"name": "Wiring Setup",
-			"enable_visualize": false,
-			"text": "$(7)$(o)This is what the most basic configuration would look like."
 		},
 		{
 			"type": "text",
@@ -57,7 +34,7 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium_dowsing_rod",
+			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_dowsing_rod",
 			"text": "Now that we have Mystium, we can make a neat tool: The $(item)Mystium Dowsing Rod.$()$(p)This handy tool will help you find $(l)Oil$() in the Overworld. You will also need to go to The End to find Chromium Ore."
 		},
 		{
@@ -114,12 +91,8 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/fluid_pipe",
-			"recipe2": "assemblylinemachines:crafting/item_pipe"
-		},
-		{
-			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/upgrades/machine_upgrade_gas",
+			"title": "Gas Upgrade",
 			"text": "This upgrade is REQUIRED for all Refineries that accept Gas as an input. They are not necessary for those which output it."
 		},
 		{
@@ -163,11 +136,11 @@
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/metal_shaper",
-			"text": "Plastic and Rubber Balls can be shapped into $(item)Plastic and Rubber Sheets$() using the Metal Shaper."
+			"text": "Plastic and Rubber Balls can be shapped into $(item)Plastic and Rubber Sheets$() using the Metal Shaper.$(p)As always, you can also use a Hammer."
 		},
 		{
 			"type": "text",
-			"text": "Now that you have Plastic and Rubber, your long time in the Electrical Era draws to a close, as does the structured part of this tutorial (for now). $(p)I implore you to look into the other tabs on this guide, as there are many machines, items, and more not covered here!$(p)$(l)THANK YOU FOR PLAYING ASSEMBLY LINE MACHINES!"
+			"text": "Now that you have Plastic and Rubber, your long time in the Electrical Era draws to a close, and thus begins your exploration into the $(l:age4)Synthetic Age."
 		}
 		
 	],

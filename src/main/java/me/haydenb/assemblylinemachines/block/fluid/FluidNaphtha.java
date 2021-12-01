@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
@@ -19,6 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.*;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 	
@@ -87,6 +91,7 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 		
 	}
 	
+	@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 	public static class BlockNaphthaFire extends BaseFireBlock {
 		public BlockNaphthaFire() {
 			super(Block.Properties.of(Material.FIRE, MaterialColor.FIRE).noCollission().randomTicks()
@@ -177,6 +182,26 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 				return true;
 			}
 			return false;
+		}
+		
+		//Event to allow instant-extinguish of Naphtha Fire.
+		@SubscribeEvent
+		public static void extinguishFire(PlayerInteractEvent.LeftClickBlock event) {
+
+			Level world = event.getWorld();
+			if(event.getFace() == Direction.UP) {
+				BlockPos up = event.getPos().above();
+				Block block = world.getBlockState(up).getBlock();
+				
+				if(block == Registry.getBlock("naphtha_fire")) {
+					if(event.getPlayer().isCreative()) {
+						event.setCanceled(true);
+					}
+					world.levelEvent(event.getPlayer(), 1009, up, 0);
+					world.removeBlock(up, false);
+				}
+			}
+				
 		}
 
 	}

@@ -10,7 +10,7 @@
 		{
 			"type": "crafting",
 			"title": "Autocrafting Table",
-			"recipe": "assemblylinemachines:crafting/blocks_ingots_nuggets/crft_ingots_block",
+			"recipe": "assemblylinemachines:crafting/blocks_ingots_nuggets/ingot_to_block/crafting_table",
 			"recipe2": "assemblylinemachines:crafting/autocrafting_table"
 		},
 		{

@@ -50,8 +50,8 @@
 		},
 		{
 			"type": "smelting",
-			"recipe": "assemblylinemachines:smelting/silt_iron_smelt",
-			"recipe2": "assemblylinemachines:smelting/silt_gold_smelt",
+			"recipe": "assemblylinemachines:smelting/silt/silt_iron_smelt",
+			"recipe2": "assemblylinemachines:smelting/silt/silt_gold_smelt",
 			"title": "Ore Silt",
 			"text": "$(o)$(7)This process can also be performed on Titanium, but it is not required to progress through this Age."
 		},
@@ -75,7 +75,7 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/steel_stirring_stick",
+			"recipe": "assemblylinemachines:crafting/tools/steel/steel_stirring_stick",
 			"recipe2": "assemblylinemachines:crafting/steel_blade"
 		}
 		

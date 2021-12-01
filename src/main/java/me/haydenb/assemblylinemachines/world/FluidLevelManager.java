@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines.world;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -15,8 +16,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.event.world.ChunkDataEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class FluidLevelManager {
 
 	private static final ConcurrentHashMap<ChunkCoords, FluidStack> CHUNK_FLUIDS = new ConcurrentHashMap<>();
@@ -191,6 +197,28 @@ public class FluidLevelManager {
 		@Override
 		public String toString() {
 			return "[" + dimID + "]: " + posX + ", " + posZ;
+		}
+	}
+	
+	//Three events related to the storage of Fluid Level per chunk.
+	@SubscribeEvent
+	public static void chunkLoad(ChunkDataEvent.Load event) {
+		if(event.getWorld() != null && !event.getWorld().isClientSide()) {
+			FluidLevelManager.readData(event.getChunk().getPos(), event.getWorld(), event.getData());
+		}
+	}
+
+	@SubscribeEvent
+	public static void chunkSave(ChunkDataEvent.Save event) {
+		if(event.getWorld() != null && !event.getWorld().isClientSide()) {
+			FluidLevelManager.writeData(event.getChunk(), event.getWorld(), event.getData().getCompound("Level"));
+		}
+	}
+	
+	@SubscribeEvent
+	public static void chunkUnload(ChunkEvent.Unload event) {
+		if(event.getWorld() != null && !event.getWorld().isClientSide()) {
+			FluidLevelManager.clearData(event.getWorld(), event.getChunk().getPos());
 		}
 	}
 }

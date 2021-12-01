@@ -3,9 +3,11 @@ package me.haydenb.assemblylinemachines.block.machines;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -106,6 +108,16 @@ public abstract class BlockQuarryAddon extends Block {
 		return stateIn;
 	}
 	
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		for(Direction d : Direction.values()) {
+			if(context.getLevel().getBlockState(context.getClickedPos().relative(d)).getBlock().equals(Registry.getBlock("quarry"))) {
+				return this.defaultBlockState().setValue(BlockStateProperties.FACING, d).setValue(getAddonProperty(d), true);
+			}
+		}
+		
+		return null;
+	}
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		

@@ -9,6 +9,7 @@
 		},
 		{
 			"type": "crafting",
+			"anchor": "gearboxcompatability",
 			"recipe": "assemblylinemachines:crafting/upgrades/gearbox_upgrade_compatability",
 			"title": "Gearbox Compatability",
 			"text": "This special upgrade works in the Gearbox!$(p)It expands the acceptable fuel from only Empowered Fuel to accept any burnable material!"
@@ -63,6 +64,7 @@
 		},
 		{
 			"type": "crafting",
+			"anchor": "purifierfiltering",
 			"recipe": "assemblylinemachines:crafting/upgrades/purifier_upgrade_filtering",
 			"title": "Purifier Filtering",
 			"text": "This upgrade is required in the Purifier for all recipes which do not use Gravel and Sand in the recipe, for example in the craft for Attuned Titanium."

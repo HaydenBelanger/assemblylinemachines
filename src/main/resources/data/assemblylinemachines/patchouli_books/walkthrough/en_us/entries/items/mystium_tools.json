@@ -14,27 +14,28 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium_pickaxe",
+			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_pickaxe",
 			"text": "The Pickaxe's $(3)Secondary Ability $()is to mine in a 3x3 pattern, allowing you to hollow the earth with ease."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium_shovel",
+			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_shovel",
 			"text": "The Shovel's $(3)Secondary Ability $()is to mine soft Dirt downwards up to 5 blocks in a row, allowing you to quickly terraform hills and fields."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium_sword",
-			"text": "The Sword's $(3)Secondary Ability $()is to harvest and bind an $(l:blocks/mob_farming)Inert Mob Crystal,$() allowing you to harness the power of mob spawning."
+			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_sword",
+			"text": "The Sword's $(3)Secondary Ability $()is to harvest and bind an $(l:blocks/mob_farming#mobcrystal)Inert Mob Crystal,$() allowing you to harness the power of mob spawning."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium_axe",
-			"text": "The Sword's $(3)Secondary Ability $()is to chop down an entire tree at once while only breaking the bottom block, allowing forests to be felled quickly and swiftly."
+			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_axe",
+			"text": "The Axe's $(3)Secondary Ability $()is to chop down an entire tree at once while only breaking the bottom block, allowing forests to be felled quickly and swiftly."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium_hoe",
+			"anchor": "mystiumhoe",
+			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_hoe",
 			"text": "The Hoe's $(3)Secondary Ability $()is to generate $(item)Mystium Farmland,$() a block that acts as normal Farmland, accelerates plant growth, and never dehydrates!"
 		}
 	]

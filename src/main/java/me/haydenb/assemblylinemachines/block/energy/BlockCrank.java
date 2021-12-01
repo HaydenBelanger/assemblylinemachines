@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine;
+import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -17,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -53,6 +55,20 @@ public class BlockCrank extends Block {
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
 		return Utils.rotateShape(Direction.EAST, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE);
+	}
+	
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		for(Direction d : Utils.CARDINAL_DIRS) {
+			BlockState state = context.getLevel().getBlockState(context.getClickedPos().relative(d));
+			Block block = state.getBlock();
+			if(block instanceof ICrankableBlock) {
+				if(((ICrankableBlock) block).validSide(state, d.getOpposite()) && !((ICrankableBlock) block).needsGearbox()) {
+					return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, d.getOpposite());
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override

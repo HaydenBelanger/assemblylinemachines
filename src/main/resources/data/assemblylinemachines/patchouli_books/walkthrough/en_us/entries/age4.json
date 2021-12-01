@@ -1,0 +1,43 @@
+{
+	"name": "Synthetic Age",
+	"category": "assemblylinemachines:walkthrough",
+	"icon": "assemblylinemachines:plastic_sheet",
+	"sortnum": 4,
+	"read_by_default": true,
+	"pages":[
+		{
+			"type": "text",
+			"text": "Now that you have $(thing)Plastic,$() you will need to create $(item)Attuned Titanium.$()$(p)This alloy must be made in an $(thing)Upgraded Electric Purifier.$() See $(l:items/upgrades#purifierfiltering)Filtering Upgrade$(/l) for more information."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:attuned_titanium_ingot",
+			"link_recipe": true,
+			"text": "Place $(thing)1 Ender Pearl and 1 Mystium Blend$() as the filter items, and $(item)1 Pure Titanium Ingot$() in the main spot, to get $(9)1 Attuned Titanium Ingot.$()"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/blocks_ingots_nuggets/ingot_to_block/attuned_titanium",
+			"text": "You will need 3 $(item)Attuned Titanium Blocks$()..."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/teleportation_pad",
+			"text": "...In order to make a $(5)Teleportation Pad.$() To get the $(thing)Galactic Flesh and Reality Crystal,$() you will also need to make an $(l:blocks/entropy_reactor)Entropy Reactor.$()"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/aefg",
+			"text": "As well as the $(thing)Teleportation Pad,$() you will also need an $(item)AEFG.$()$(p)This will protect you from negative effects in the $(d)Chaos Plane,$() at least while it's charged."
+		},
+		{
+			"type": "text",
+			"text": "As well as your new items to protect against the dimension, $(c)Netherite Armor$() or better, as well as $(d)Mystium Tools$() is recommended, as the $(l:blocks/entropy_reactor#corruptshell)mobs native to the Chaos Plane$(/l) are tough.$(p)Finally, $(9)Night Vision Potions$() are recommended, as it is very dark there."
+		},
+		{
+			"type": "text",
+			"text": "When you are ready, place down the $(thing)Teleportation Pad$() and RIGHT-CLICK it whilst standing on it to teleport to the $(d)Chaos Plane,$() thus ending the Synthetic Age, and beginning the $(l:age5)Chaotic Age."
+		}
+		
+	]
+}

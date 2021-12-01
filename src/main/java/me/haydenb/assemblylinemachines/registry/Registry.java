@@ -83,6 +83,7 @@ import me.haydenb.assemblylinemachines.item.ItemPowerTool.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ArmorTiers;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
+import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.TagMaster.DataProviderContainer;
 import me.haydenb.assemblylinemachines.world.DimensionChaosPlane.ChaosPlaneCarver;
@@ -171,7 +172,9 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
-		//DISABLED DUE TO PATCHOULI PLUGIN NON-UPDATE - createItem("guidebook", new ItemGuidebook());
+		if(PluginPatchouli.get().isPatchouliInstalled()) {
+			createItem("guidebook", new ItemGuidebook());
+		}
 		
 		createItem("titanium_ingot", "titanium_nugget", "raw_titanium");
 		
@@ -477,7 +480,7 @@ public class Registry {
 		createBlock("corrupt_lapis_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		createBlock("corrupt_redstone_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 		createBlock("corrupt_titanium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("flerovium_ore", new CorruptBlock(Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL), true);
+		createBlock("flerovium_ore", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL).requiresCorrectToolForDrops(), TagMaster.NEEDS_MYSTIUM_TOOL), true);
 		
 		createBlock("flerovium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
 		createBlock("energized_gold_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);

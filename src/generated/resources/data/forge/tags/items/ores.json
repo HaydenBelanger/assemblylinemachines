@@ -2,7 +2,7 @@
   "replace": false,
   "values": [
     "#forge:ores/chromium",
-    "#forge:ores/flerovium",
-    "#forge:ores/titanium"
+    "#forge:ores/titanium",
+    "#forge:ores/flerovium"
   ]
 }

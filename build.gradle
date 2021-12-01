@@ -18,7 +18,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '1.17.1-1.3.0-alpha'
+version = '1.17.1-1.3'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -30,13 +30,18 @@ minecraft {
 
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     mappings channel: 'parchment', version: '2021.10.31-1.17.1'
-
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            arg "-mixin.config=mixins.assemblylinemachines.json"
+            
+            //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
+        	property 'forge.logging.markers', 'REGISTRIES'
+        	//Mixin-required properties and arg (3)
+        	property 'mixin.env.remapRefMap', 'true'
+        	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
+        	arg '-mixin.config=mixins.assemblylinemachines.json'
+            
             mods {
                 examplemod {
                     source sourceSets.main
@@ -46,9 +51,15 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            arg "-mixin.config=mixins.assemblylinemachines.json"
+            
+            //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
+        	property 'forge.logging.markers', 'REGISTRIES'
+        	//Mixin-required properties and arg (3)
+        	property 'mixin.env.remapRefMap', 'true'
+        	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
+        	arg '-mixin.config=mixins.assemblylinemachines.json'
+        	
             mods {
                 examplemod {
                     source sourceSets.main
@@ -58,9 +69,16 @@ minecraft {
 
         data {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
+            
+            //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        	property 'forge.logging.markers', 'REGISTRIES'
+        	//Mixin-required properties and arg (3)
+        	property 'mixin.env.remapRefMap', 'true'
+        	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
+        	arg '-mixin.config=mixins.assemblylinemachines.json'
+        	//Datagen-required args (4)
+            args '--mod', 'assemblylinemachines', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
                 examplemod {
@@ -122,7 +140,7 @@ dependencies {
  	runtimeOnly fg.deobf("mezz.jei:jei-1.17.1:8.0.0.16")
  	
  	//PATCHOULI - Updated.
-    implementation "vazkii.patchouli:Patchouli:1.17.1-57-SNAPSHOT"
+    implementation fg.deobf("vazkii.patchouli:Patchouli:1.17.1-57-SNAPSHOT")
     
 	//MEKANISM - Not yet updated to 1.17.1.
 	//compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")

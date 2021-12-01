@@ -68,13 +68,13 @@
 		},
 		{
 			"type": "text",
-			"text": "Just like the Simple Grinder, two items will be loaded into the machine, same as for the Fluid Bath, fluid will be added to the Tank below. Crank, and the result will be placed in the Chest!$(p)The first recipe you need to use this machine for is $(item)Empowered Coal.$() Mix $(thing)Ground Coal$() and $(thing)Redstone Dust$() in the Simple Fluid Mixer with Lava to get one."
+			"text": "Just like the Simple Grinder, two items will be loaded into the machine, same as for the Fluid Bath, fluid will be added to the Tank below. Crank, and the result will be placed in the Chest!$(p)The first recipe you need to use this machine for is $(item)Empowered Coal.$() Mix $(thing)Ground Coal$() and $(thing)Redstone Dust$() in the Simple Fluid Mixer with Lava..$(br)$(6)TIP: You can make all recipes you could make in the Fluid Bath in the Simple Fluid Mixer."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/steel_hammer",
+			"recipe": "assemblylinemachines:crafting/tools/steel/steel_hammer",
 			"title": "Hammer",
-			"text": "Next up, we will need to craft a $(item)Hammer, $()used to craft $(item)Plates, $()finally, used to craft $(item)Gears."
+			"text": "Next up, we will need to craft a $(item)Hammer, $()used to craft $(item)Plates, $()finally, used to craft $(item)Gears.$(p)$(9)You can also craft the the Hammer out of Titanium right now!"
 		},
 		{
 			"type": "crafting",
@@ -83,7 +83,7 @@
 		},
 		{
 			"type": "text",
-			"text": "You can make the Hammer out of Titanium as well.$(br)The Plates and Gears recipe is the same for all metals. the results for currently accessible metals as follows:$(li)Iron: 3 Plates/Ingot, 1 Gear/Plate$(li)Gold: 2 Plates/Ingot, 0.25 Gear/Plate$(li)Titanium: 5 Plates/Ingot, 0.5 Gear/Plate$(br)$()$(6)Therefore, the Titanium recipe is the most efficient!$(br)$(3)Remember, these Plates need to be made with Pure Ingots!"
+			"text": "The Plates and Gears recipe is the same for all metals. the results for currently accessible metals as follows:$(li)Copper: 5 Plates/Ingot, 1.25 Gear/Plate$(li)Iron: 3 Plates/Ingot, 1 Gear/Plate$(li)Gold: 2 Plates/Ingot, 0.25 Gear/Plate$(li)Titanium: 5 Plates/Ingot, 0.5 Gear/Plate$(br)$()$(6)Therefore, the Copper recipe is the most efficient!$(br)$(3)Remember, these Plates need to be made with Pure Ingots!"
 		},
 		{
 			"type": "crafting",
@@ -108,11 +108,11 @@
 		},
 		{
 			"type": "text",
-			"text": "You can use the $(item)Gearbox$() the same as the Cranks: Positioning them facing a Simple Machine. Adding Empowered Coal will allow the Gearbox to automatically crank for you. $(p)The $(item)Simple Crank Charger$() is unique as it requires the Gearbox and cannot be operated with a Crank."
+			"text": "You can use the $(item)Gearbox$() the same as the Cranks: Positioning them facing a Simple Machine. Add fuel, and the Gearbox will crank for you. $(p)The $(item)Simple Crank Charger$() is unique as it requires the Gearbox and cannot be operated with a Crank.$(br)$(c)The Gearbox requires Empowered Coal for fuel. $(2)Want to change that? Put in an $(l:items/upgrades#gearboxcompatability)Upgrade$(/l) to use any burable fuel."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/crank_pickaxe",
+			"recipe": "assemblylinemachines:crafting/tools/crank/crank_pickaxe",
 			"title": "Crank-Powered Tools",
 			"text": "This is the recipe for the $(item)Crank-Powered Pickaxe.$()$(p) You can also make Crank-Powered Hoes, Hammers, Axes, Hoes, and Swords."
 		},

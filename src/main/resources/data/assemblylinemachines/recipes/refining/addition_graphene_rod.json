@@ -1,6 +1,6 @@
 {
 	"type": "assemblylinemachines:refining",
-	"attachment": "assemblylinemachines:refinery_attachment_separation",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
 	"input_fluid":{
 		"fluid": "assemblylinemachines:liquid_carbon",
 		"amount": 5000

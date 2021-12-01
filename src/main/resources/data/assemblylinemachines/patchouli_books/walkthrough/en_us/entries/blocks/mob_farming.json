@@ -43,6 +43,7 @@
 		{
 			"type": "spotlight",
 			"item": "assemblylinemachines:mob_crystal",
+			"anchor": "mobcrystal",
 			"link_recipe": true,
 			"text": "The Inert Mob Crystal will be used to configure the $(item)Powered Spawner.$()To obtain:$(li)Use a Smooth Stone with Gravel and Sand in the Purifier to get a $(item)Polished Rock.$()$(li)Alloy Smelt the Polished Rock and a Netherrite Scrap to get the crystal."
 		},

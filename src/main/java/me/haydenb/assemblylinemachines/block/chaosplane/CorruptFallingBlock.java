@@ -22,10 +22,16 @@ public class CorruptFallingBlock extends FallingBlock implements TagMaster.IMini
 
 	
 	private final int dustColor;
+	private final Named<Block> toolLevelTag;
 	
-	public CorruptFallingBlock(int dustColor, Properties properties) {
+	public CorruptFallingBlock(int dustColor, Properties properties, Named<Block> toolLevelTag) {
 		super(properties.strength(3f, 9f));
 		this.dustColor = dustColor;
+		this.toolLevelTag = toolLevelTag;
+	}
+	
+	public CorruptFallingBlock(int dustColor, Properties properties) {
+		this(dustColor, properties, BlockTags.NEEDS_DIAMOND_TOOL);
 	}
 	
 	@Override
@@ -36,7 +42,7 @@ public class CorruptFallingBlock extends FallingBlock implements TagMaster.IMini
 
 	@Override
 	public Named<Block> getToolLevel() {
-		return BlockTags.NEEDS_DIAMOND_TOOL;
+		return toolLevelTag;
 	}
 	
 	@Override
