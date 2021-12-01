@@ -1,7 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "#assemblylinemachines:crafting/gears/industrial",
-    "#assemblylinemachines:crafting/gears/precious"
-  ]
-}

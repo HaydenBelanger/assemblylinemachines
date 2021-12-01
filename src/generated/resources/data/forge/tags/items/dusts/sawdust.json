@@ -1,9 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "assemblylinemachines:warped_sawdust",
-    "assemblylinemachines:sawdust",
-    "assemblylinemachines:crimson_sawdust",
-    "assemblylinemachines:chaotic_sawdust"
-  ]
-}
