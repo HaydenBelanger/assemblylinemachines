@@ -29,8 +29,14 @@
 			"text": "Now that we have Steel Plates, crafted as you would expect, we can make a series of machines, including the $(item)Alloy Smelter.$(p)$() For information on the other machines, check the Blocks tab."
 		},
 		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/empowered_conduction_component",
+			"title": "Crafting Components",
+			"text": "$(item)Energized Gold Ingot$() is obtained by combining Redstone Dust and Gold Plate in Alloy Smelter. Plates can be made in the way you would expect."
+		},
+		{
 			"type": "text",
-			"text": "The Alloy Smelter can seriously increase your Steel production, no longer requiring Lava. You can also use it to get $(5)$(l)Mystium Ingots,$() the next compound on your quest. The tree is as follows:$(li)Grind Lapis in Grinder to get Ground Lapis Lazuli.$(li)Combine Ground Lapis and Redstone Dust in Mixer with Lava to get $(5)Mystium Blend.$()$(li)Combine Mystium Blend and Pure Gold in Alloy Smelter to get $(item)Mystium Ingot."
+			"text": "The Alloy Smelter can make Steel without Lava. You can also get $(5)$(l)Mystium Ingots.$() The tree is as follows:$(li)Combine Ground Lapis Lazuli and Redstone Dust in Mixer with Lava to get $(5)Mystium Blend.$()$(li)Combine Ground Netherite and Energized Gold in Alloy Smelter to get Electrified Netherite Blend.$(li)Combine Mystium Blend and Electrified Netherite Blend in Alloy Smelter to get $(item)Mystium Ingot."
 		},
 		{
 			"type": "crafting",
@@ -76,12 +82,6 @@
 		{
 			"type": "text",
 			"text": "Next, we will begin the biggest hurdle for processing so far: The $(item)Refinery.$() This multiblock will take fluids and items, process them based on the attachment, and give back a fluid or item. $(p)I advise researching power generation options in Blocks section.$(p)For this tree, you will also need $(item)Stainless Steel Plates,$() by combining Chromium Plate and Steel Plate in Alloy Smelter."
-		},
-		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/empowered_conduction_component",
-			"title": "Crafting Components",
-			"text": "$(item)Empowered Gold Ingot$() is obtained by combining Mystium Ingot and Gold Plate in Alloy Smelter. Plates can be made in the way you would expect."
 		},
 		{
 			"type": "crafting",

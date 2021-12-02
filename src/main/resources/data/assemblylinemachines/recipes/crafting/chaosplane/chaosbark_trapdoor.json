@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"aaa",
+		"aaa"
+	],
+	"key":{
+		"a":{
+			"item": "assemblylinemachines:chaosbark_planks"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:chaosbark_trapdoor",
+		"count": 2
+	}
+}

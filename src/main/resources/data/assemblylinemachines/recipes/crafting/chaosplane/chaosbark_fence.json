@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"asa",
+		"asa"
+	],
+	"key":{
+		"a":{
+			"item": "assemblylinemachines:chaosbark_planks"
+		},
+		"s":{
+			"tag": "forge:rods/wooden"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:chaosbark_fence",
+		"count": 3
+	}
+}

@@ -1,6 +1,8 @@
 package me.haydenb.assemblylinemachines.block.helpers;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.registry.StateProperties;
 import net.minecraft.core.BlockPos;
@@ -20,7 +22,8 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> extends EnergyMachine<A> {
 	
 	
-	protected HashMap<Direction, LazyOptional<SidedCheckingHandler>> lazies = new HashMap<>();
+	protected HashMap<Direction, LazyOptional<SidedEnergyHandler>> energyLazies = new HashMap<>();
+	protected HashMap<Direction, LazyOptional<SidedItemHandler>> itemLazies = new HashMap<>();
 	
 	public AbstractSidedMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, TranslatableComponent name,
 			int containerId, Class<A> clazz, EnergyProperties properties, BlockPos pos, BlockState state) {
@@ -36,23 +39,42 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || cap == CapabilityEnergy.ENERGY) {
 			
-			
-			LazyOptional<SidedCheckingHandler> vx = lazies.get(side);
-			if(vx != null) {
-				SidedCheckingHandler sch = vx.orElse(null);
-				if(sch != null && sch.side == side) {
-					return vx.cast();
-				}else {
-					vx.invalidate();
-					lazies.remove(side);
+			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+				LazyOptional<SidedItemHandler> sih = itemLazies.getOrDefault(side, LazyOptional.empty());
+				if(sih.orElse(null) != null) {
+					if(sih.orElse(null).side == side) {
+						return sih.cast();
+					}
+					sih.invalidate();
+					itemLazies.remove(side);
 				}
+				
+				LazyOptional<SidedItemHandler> handler = LazyOptional.of(() -> {
+					SidedItemHandler sihx = new SidedItemHandler();
+					sihx.side = side;
+					return sihx;
+				});
+				itemLazies.put(side, handler);
+				return handler.cast();
+			}else {
+				LazyOptional<SidedEnergyHandler> seh = energyLazies.getOrDefault(side, LazyOptional.empty());
+				if(seh.orElse(null) != null) {
+					if(seh.orElse(null).side == side) {
+						return seh.cast();
+					}
+					seh.invalidate();
+					energyLazies.remove(side);
+				}
+				
+				LazyOptional<SidedEnergyHandler> handler = LazyOptional.of(() -> {
+					SidedEnergyHandler sehx = new SidedEnergyHandler();
+					sehx.side = side;
+					return sehx;
+				});
+				energyLazies.put(side, handler);
+				return handler.cast();
 			}
-			
-			LazyOptional<SidedCheckingHandler> v = LazyOptional.of(() -> new SidedCheckingHandler(this).assignSide(side));
-			lazies.put(side, v);
-			return v.cast();
 		}
-		
 		return LazyOptional.empty();
 	}
 	
@@ -62,26 +84,28 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 	
 	@Override
 	public void setRemoved() {
-		for(LazyOptional<SidedCheckingHandler> handler : lazies.values()) {
+		for(LazyOptional<?> handler : Stream.concat(energyLazies.values().stream(), itemLazies.values().stream()).collect(Collectors.toSet())) {
 			handler.invalidate();
 		}
 		
-		lazies.clear();
+		energyLazies.clear();
+		itemLazies.clear();
 		super.setRemoved();
 	}
 	
-	protected static class SidedCheckingHandler extends InvWrapper implements IEnergyStorage{
+	protected class SidedItemHandler extends InvWrapper{
 		
-		private final AbstractSidedMachine<?> sided;
 		private Direction side = null;
-		SidedCheckingHandler(AbstractSidedMachine<?> v){
-			super(v);
-			sided = v;
+		
+		public SidedItemHandler() {
+			super(AbstractSidedMachine.this);
 		}
+
+		
 		
 		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-			if(sided.canExtractFromSide(slot, side)) {
+			if(canExtractFromSide(slot, side)) {
 				return super.extractItem(slot, amount, simulate);
 			}else {
 				return ItemStack.EMPTY;
@@ -91,7 +115,7 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if(sided.canInsertToSide(slot, side)) {
+			if(canInsertToSide(slot, side)) {
 				
 				return super.insertItem(slot, stack, simulate);
 			}else {
@@ -99,11 +123,12 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 			}
 		}
 		
-		private SidedCheckingHandler assignSide(Direction dir) {
-			side = dir;
-			return this;
-		}
+	}
+	
+	protected class SidedEnergyHandler implements IEnergyStorage{
 
+		private Direction side = null;
+		
 		@Override
 		public int receiveEnergy(int maxReceive, boolean simulate) {
 			
@@ -111,14 +136,14 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 				return 0;
 			}
 			
-			if(sided.properties.getCapacity() < maxReceive + sided.amount) {
-				maxReceive = sided.properties.getCapacity() - sided.amount;
+			if(properties.getCapacity() < maxReceive + amount) {
+				maxReceive = properties.getCapacity() - amount;
 			}
 			
 			if(simulate == false) {
-				sided.amount += maxReceive;
+				amount += maxReceive;
 				recalcBattery();
-				sided.sendUpdates();
+				sendUpdates();
 			}
 			
 			return maxReceive;
@@ -126,12 +151,12 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public int getMaxEnergyStored() {
-			return sided.properties.getCapacity();
+			return properties.getCapacity();
 		}
 		
 		@Override
 		public int getEnergyStored() {
-			return sided.amount;
+			return amount;
 		}
 		
 		@Override
@@ -140,14 +165,14 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 			if(!canExtract()) {
 				return 0;
 			}
-			if(maxExtract > sided.amount) {
-				maxExtract = sided.amount;
+			if(maxExtract > amount) {
+				maxExtract = amount;
 			}
 			
 			if(simulate == false) {
-				sided.amount -= maxExtract;
+				amount -= maxExtract;
 				recalcBattery();
-				sided.sendUpdates();
+				sendUpdates();
 			}
 			
 			return maxExtract;
@@ -155,28 +180,29 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public boolean canReceive() {
-			if(sided.canInsertToSide(-1, side)) {
-				return sided.properties.getIn();
+			if(canInsertToSide(-1, side)) {
+				return properties.getIn();
 			}
 			return false;
 		}
 		
 		@Override
 		public boolean canExtract() {
-			if(sided.canExtractFromSide(0, side)) {
-				return sided.properties.getOut();
+			if(canExtractFromSide(0, side)) {
+				return properties.getOut();
 			}
 			return false;
 		}
 		
 		private void recalcBattery(){
 			
-			if(sided.getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
-				int fx = (int) Math.floor(((double) sided.amount / (double) sided.properties.getCapacity()) * 4d);
-				if(sided.getBlockState().getValue(StateProperties.BATTERY_PERCENT_STATE) != fx) {
-					sided.getLevel().setBlockAndUpdate(sided.getBlockPos(), sided.getBlockState().setValue(StateProperties.BATTERY_PERCENT_STATE, fx));
+			if(getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
+				int fx = (int) Math.floor(((double) amount / (double) properties.getCapacity()) * 4d);
+				if(getBlockState().getValue(StateProperties.BATTERY_PERCENT_STATE) != fx) {
+					getLevel().setBlockAndUpdate(getBlockPos(), getBlockState().setValue(StateProperties.BATTERY_PERCENT_STATE, fx));
 				}
 			}
 		}
+		
 	}
 }

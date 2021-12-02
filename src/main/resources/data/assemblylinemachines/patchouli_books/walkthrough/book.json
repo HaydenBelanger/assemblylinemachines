@@ -1,6 +1,6 @@
 {
 	"name": "Assembly Lines & You",
-	"landing_text": "This is Assembly Line Machines, a complete reimagining of Minecraft's technological side. This walkthrough will help you understand and work through this mod from start to end.",
+	"landing_text": "This is Assembly Line Machines, a complete reimagining of Minecraft's technological side. This walkthrough will help you understand and work through this mod from start to end.$(li)$(l:https://www.curseforge.com/minecraft/mc-mods/assemblylinemachines)CurseForge$(/l)$(li)$(l:https://github.com/HaydenBelanger/assemblylinemachines/issues)GitHub Issue Tracker$(/l)$(li)$(l:https://assemblylinemachines.haydenb.me/en/latest/)Developer Wiki$(/l)",
 	"version": 2,
 	"book_texture": "patchouli:textures/gui/book_cyan.png",
 	"show_progress": false,

@@ -169,7 +169,6 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		@Override
 		public void tick() {
 			if(!level.isClientSide) {
-				this.getLevel().getServer().getWorldData().worldGenSettings().seed();
 				if(timer++ == 5) {
 					timer = 0;
 					for(Direction d : Direction.values()) {

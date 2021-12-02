@@ -10,8 +10,9 @@
 		{
 			"type": "spotlight",
 			"item": "assemblylinemachines:graphene_rod",
+			"anchor": "graphenerod",
 			"link_recipe": true,
-			"text": "The $(item)Graphene Rod$() is used for some recipes, including as the handle for the Novasteel Tools.$(p)First, you will need to make Liquid Carbon. 1 Coal and $(9)1,000mB of Water$() in the Refinery will make 100mB Liquid Coal. Then, you need $(b)Ground Diamond$() and 5,000mB Liquid Coal with the Addition Attachment to make 1 Graphene Rod."
+			"text": "The $(item)Graphene Rod$() is used for some recipes, including as the handle for the Novasteel Tools.$(p)First, you will need to make Liquid Carbon. 1 Coal and $(9)1,000mB of Water$() in the Refinery will make 100mB Liquid Carbon. Then, you need $(b)Ground Diamond$() and 5,000mB Liquid Carbon with the Addition Attachment to make 1 Graphene Rod."
 		},
 		{
 			"type": "crafting",
@@ -26,7 +27,7 @@
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/tools/novasteel/novasteel_sword",
-			"text": "The Sword's $(3)Secondary Ability$() is to harvest an bind an $(l:blocks/mob_farming#mobcrystal)Inert Mob Crystal,$() but it does it 2.5x more often than the Mystium Sword."
+			"text": "The Sword's $(3)Secondary Ability$() is to harvest and bind an $(l:blocks/mob_farming#mobcrystal)Inert Mob Crystal,$() but it does it 2.5x more often than the Mystium Sword."
 		},
 		{
 			"type": "crafting",

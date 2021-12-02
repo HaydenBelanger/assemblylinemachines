@@ -136,15 +136,19 @@ public class PipeProperties {
 		public Pair<Object, TriConsumer<PipeConnectorTileEntity, Object, Integer>> getCapability(BlockEntity te, Direction dir, PipeConnectorTileEntity pipeConnector) {
 			if(te != null) {
 				LazyOptional<?> lx;
+				Class<?> clazz;
 				switch(this) {
 				case FLUID:
 					lx = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir);
+					clazz = IFluidHandler.class;
 					break;
 				case ITEM:
 					lx = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir);
+					clazz = IItemHandler.class;
 					break;
 				case POWER:
 					lx = te.getCapability(CapabilityEnergy.ENERGY, dir);
+					clazz = IEnergyStorage.class;
 					break;
 				case OMNI:
 					for(TransmissionType tt : TRANSMISSIONS_FOR_OMNIPIPE) {
@@ -156,9 +160,10 @@ public class PipeProperties {
 					return null;
 				default:
 					lx = LazyOptional.empty();
+					clazz = null;
 					break;
 				}
-				if(lx.isPresent()) {
+				if(lx.isPresent() && clazz != null) {
 					Object res = lx.orElse(null);
 					if(res != null) {
 						String key = getTransmissionFromCapability(res).getCapabilityName();
@@ -173,7 +178,7 @@ public class PipeProperties {
 								}
 							});
 							
-							return Pair.of(res, cons);
+							return Pair.of(clazz.cast(res), cons);
 						}
 					}
 				}
@@ -272,7 +277,7 @@ public class PipeProperties {
 	public static class ProcessingAssistant{
 		public static final HashMap<String, TriConsumer<PipeConnectorTileEntity, Object, Integer>> CONNECTOR_DEFAULT_PROCESSING = new HashMap<>();
 		static {
-			CONNECTOR_DEFAULT_PROCESSING.put(TransmissionType.ITEM.getCapabilityName(), (pipeConnector, handler, max) -> {	
+			CONNECTOR_DEFAULT_PROCESSING.put(TransmissionType.ITEM.getCapabilityName(), (pipeConnector, handler, max) -> {
 				IItemHandler output = (IItemHandler) handler;
 				for (int i = 0; i < output.getSlots(); i++) {
 					ItemStack origStack = output.extractItem(i, max, true);

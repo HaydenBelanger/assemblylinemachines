@@ -190,7 +190,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 						List<TransmissionType> typesToProcess;
 						if(transType != TransmissionType.OMNI) {
 							nTimer = transType.getNTimerBase(getUpgradeAmount(Upgrades.UNIVERSAL_SPEED));
-							typesToProcess = List.of(TransmissionType.values());
+							typesToProcess = List.of(transType);
 						}else {
 							typesToProcess = new ArrayList<>();
 							for(TransmissionType tt : TransmissionType.values()) {
@@ -221,7 +221,6 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 									}
 
 								}
-
 								for(Object obj : conCapabilities.keySet()) {
 									if(typesToProcess.contains(TransmissionType.getTransmissionFromCapability(obj))) {
 										conCapabilities.get(obj).accept(this, obj, this.transType.getMaxTransfer(this, this.pipeType, obj));
@@ -388,17 +387,21 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 
 	private boolean connectToOutput() {
 
+		boolean success = false;
 		for (Direction d : Direction.values()) {
 			if (getBlockState().getValue(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
-				Pair<Object, TriConsumer<PipeConnectorTileEntity, Object, Integer>> res = this.transType.getCapability(this.getLevel().getBlockEntity(this.getBlockPos().relative(d)), d.getOpposite(), this);
-				if(res != null) {
-					this.conCapabilities.put(res.getFirst(), res.getSecond());
-					return true;
+				for(TransmissionType tt : TransmissionType.values()) {
+					Pair<Object, TriConsumer<PipeConnectorTileEntity, Object, Integer>> res = tt.getCapability(this.getLevel().getBlockEntity(this.getBlockPos().relative(d)), d.getOpposite(), this);
+					if(res != null) {
+						this.conCapabilities.put(res.getFirst(), res.getSecond());
+						success = true;
+					}
 				}
+				
 			}
 		}
 
-		return false;
+		return success;
 	}
 
 	public static class PipeConnectorContainer extends AbstractMachine.ContainerALMBase<PipeConnectorTileEntity> {

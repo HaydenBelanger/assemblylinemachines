@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"nbn",
+		"cec",
+		"nbn"
+	],
+	"key":{
+		"n":{
+			"tag": "forge:plates/novasteel"
+		},
+		"b":{
+			"tag": "forge:dusts/novasteel"
+		},
+		"c":{
+			"item": "assemblylinemachines:empowered_conduction_component"
+		},
+		"e":{
+			"tag": "forge:storage_blocks/energized_gold"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:overclocked_conduction_component"
+	}
+}

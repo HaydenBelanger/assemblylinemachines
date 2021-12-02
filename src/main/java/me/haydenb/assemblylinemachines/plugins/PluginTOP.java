@@ -13,11 +13,12 @@ import net.minecraftforge.fml.ModList;
 
 public class PluginTOP {
 	private static boolean registered = false;
+	private static final boolean TOP_SUPPORTED = true;
 	
 	public static void register() {
 		if(!registered) {
 			registered = true;
-			if(ModList.get().isLoaded("theoneprobe")) {
+			if(TOP_SUPPORTED && ModList.get().isLoaded("theoneprobe")) {
 				InterModComms.sendTo("theoneprobe", "getTheOneProbe", PluginTOPRegistry::new);
 			}
 		}

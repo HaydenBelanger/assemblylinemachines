@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.registry;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -16,8 +15,7 @@ import me.haydenb.assemblylinemachines.block.automation.BlockInteractor.*;
 import me.haydenb.assemblylinemachines.block.automation.BlockPoweredSpawner.*;
 import me.haydenb.assemblylinemachines.block.automation.BlockVacuumHopper.TEVacuumHopper;
 import me.haydenb.assemblylinemachines.block.chaosplane.*;
-import me.haydenb.assemblylinemachines.block.chaosplane.CorruptBlock.CorruptBlockWithAxis;
-import me.haydenb.assemblylinemachines.block.chaosplane.CorruptBlock.CorruptLeavesBlock;
+import me.haydenb.assemblylinemachines.block.chaosplane.CorruptBlock.*;
 import me.haydenb.assemblylinemachines.block.chaosplane.CorruptTallGrassBlock.*;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
@@ -303,7 +301,8 @@ public class Registry {
 		createItem("strange_matter", new ItemReactorOutput("§aHigh-Quality"));
 		
 		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("galactic_flesh", "reality_crystal");
+		createItem("reality_crystal");
+		createItem("galactic_flesh", new ItemGalacticFlesh());
 		
 		createItem("electrified_netherite_blend", "ground_netherite");
 		
@@ -318,6 +317,7 @@ public class Registry {
 		createItem("aefg", new ItemAEFG());
 		createItem("chaotic_reduction_goggles", new ItemChaoticReductionGoggles());
 		
+		createItem("overclocked_convection_component", "overclocked_conduction_component");
 		for(String i : MOD_ITEM_REGISTRY.keySet()) {
 			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
 		}
@@ -352,14 +352,7 @@ public class Registry {
 		createBlock("silt", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
 		createBlock("slab_silt_brick", new SlabBlock(Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
-		createBlock("stair_silt_brick", new StairBlock(new Supplier<BlockState>() {
-
-			@Override
-			public BlockState get() {
-				return Registry.getBlock("silt_brick").defaultBlockState();
-			}
-			
-		}, Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
+		createBlock("stair_silt_brick", new StairBlock(() -> Registry.getBlock("silt_brick").defaultBlockState(), Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
 		
 		createBlock("steel_block", Material.METAL, 7f, 30f, SoundType.METAL, false, true);
 		
@@ -369,14 +362,7 @@ public class Registry {
 		createBlock("chiselled_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("pillar_black_granite", new BlockBlackGranitePillar(), true);
 		createBlock("slab_black_granite", new SlabBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
-		createBlock("stair_black_granite", new StairBlock(new Supplier<BlockState>() {
-
-			@Override
-			public BlockState get() {
-				return Registry.getBlock("smooth_black_granite").defaultBlockState();
-			}
-			
-		}, Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
+		createBlock("stair_black_granite", new StairBlock(() -> Registry.getBlock("smooth_black_granite").defaultBlockState(), Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		
 		createBlock("silt_iron", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("silt_gold", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
@@ -461,6 +447,12 @@ public class Registry {
 		createBlock("chaosbark_sapling", new CorruptTallGrassBlock.ChaosbarkSaplingBlock(), true);
 		createBlock("chaosbark_leaves", new CorruptLeavesBlock(), true);
 		createBlock("chaosbark_planks", Material.WOOD, 3f, 9f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("chaosbark_stairs", new StairBlock(() -> Registry.getBlock("chaosbark_planks").defaultBlockState(), Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD)), true);
+		createBlock("chaosbark_slab", new SlabBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD)), true);
+		createBlock("chaosbark_door", new DoorBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion()), true);
+		createBlock("chaosbark_trapdoor", new TrapDoorBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion()), true);
+		createBlock("chaosbark_fence", new ChaosbarkFenceBlock(), true);
+		createBlock("chaosbark_fence_gate", new FenceGateBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion()), true);
 		
 		createBlock("chaosweed", new CorruptTallGrassBlock(), true);
 		createBlock("blooming_chaosweed", new CorruptTallGrassBlock(), true);

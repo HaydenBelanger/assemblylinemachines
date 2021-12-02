@@ -10,12 +10,13 @@ import vazkii.patchouli.api.PatchouliAPI;
 public class PluginPatchouli {
 
 	private static PatchouliInterface pInt = null;
+	private static final boolean PATCHOULI_SUPPORTED = true;
 	
 	@SuppressWarnings("deprecation")
 	public static PatchouliInterface get() {
 		
 		if(pInt == null) {
-			if(ModList.get().isLoaded("patchouli")) {
+			if(PATCHOULI_SUPPORTED && ModList.get().isLoaded("patchouli")) {
 				try {
 					pInt = Class.forName("me.haydenb.assemblylinemachines.plugins.PluginPatchouli$PatchouliPresent").asSubclass(PatchouliInterface.class).newInstance();
 					AssemblyLineMachines.LOGGER.info("Detected Patchouli in installation. Creating in-game walkthrough book...");

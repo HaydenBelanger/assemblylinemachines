@@ -17,7 +17,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.TierSortingRegistry;
 
-@SuppressWarnings(value = { "deprecation" })
 public enum ItemTiers {
 	
 	TITANIUM(ConfigHolder.COMMON.titaniumToolAttack.get(), ConfigHolder.COMMON.titaniumToolHarvestSpeed.get(), ConfigHolder.COMMON.titaniumEnchantability.get(), ConfigHolder.COMMON.titaniumDurability.get(), 

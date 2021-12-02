@@ -145,7 +145,12 @@ public class BlockPipe extends Block implements EntityBlock {
 				if(state.getValue(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
 					set = false;
 					if(pco == PipeConnOptions.NONE && playerForConnector == null && world.getBlockEntity(currentPos.relative(d)) == null) set = true;
-					if(set == true) world.removeBlockEntity(currentPos);
+					if(set == true) {
+						if(world.getBlockEntity(currentPos) instanceof PipeConnectorTileEntity) {
+							Containers.dropContents(world, currentPos, ((PipeConnectorTileEntity) world.getBlockEntity(currentPos)).getItems());
+						}
+						world.removeBlockEntity(currentPos);
+					}
 				}
 			}
 			if(set) state = state.setValue(PipeProperties.DIRECTION_BOOL.get(d), pco);

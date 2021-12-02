@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/fence_inventory",
+  "textures": {
+    "texture": "assemblylinemachines:block/corrupt/chaosbark_planks"
+  }
+}

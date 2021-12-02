@@ -179,6 +179,8 @@
 	"item.assemblylinemachines.aefg": "AEFG",
 	"item.assemblylinemachines.ultimate_battery": "Ultimate Battery",
 	"item.assemblylinemachines.chaotic_reduction_goggles": "Chaotic Reduction Goggles",
+	"item.assemblylinemachines.overclocked_convection_component": "Overclocked Convection Component",
+	"item.assemblylinemachines.overclocked_conduction_component": "Overclocked Conduction Component",
 	
 	"block.assemblylinemachines.titanium_ore": "Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore": "Deepslate Titanium Ore",
@@ -304,6 +306,12 @@
 	"block.assemblylinemachines.teleportation_pad": "Teleportation Pad",
 	"block.assemblylinemachines.bright_prism_rose": "Bright Prism Rose",
 	"block.assemblylinemachines.prism_glass": "Prism Glass",
+	"block.assemblylinemachines.chaosbark_door": "Chaosbark Door",
+	"block.assemblylinemachines.chaosbark_stairs": "Chaosbark Stairs",
+	"block.assemblylinemachines.chaosbark_slab": "Chaosbark Slab",
+	"block.assemblylinemachines.chaosbark_fence": "Chaosbark Fence",
+	"block.assemblylinemachines.chaosbark_fence_gate": "Chaosbark Fence Gate",
+	"block.assemblylinemachines.chaosbark_trapdoor": "Chaosbark Trapdoor",
 	
 	"fluid.assemblylinemachines.oil": "Oil",
 	"fluid.assemblylinemachines.condensed_void": "Condensed Void",

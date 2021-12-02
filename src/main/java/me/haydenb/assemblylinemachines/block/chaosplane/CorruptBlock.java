@@ -75,52 +75,6 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		}
 
 	}
-	
-	//Used for Chaosbark/Stripped Chaosbark Logs.
-	public static class CorruptBlockWithAxis extends CorruptBlock{
-
-		public CorruptBlockWithAxis(Properties properties, Named<Block> type, Named<Block> level, boolean isGrass, boolean shouldBePoisonous) {
-			super(properties, type, level, isGrass, shouldBePoisonous);
-			this.registerDefaultState(this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Axis.Y));
-		}
-		
-		@Override
-		protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
-			pBuilder.add(RotatedPillarBlock.AXIS);
-		}
-		
-		@Override
-		public BlockState rotate(BlockState pState, Rotation pRotation) {
-			return RotatedPillarBlock.rotatePillar(pState, pRotation);
-		}
-		
-		@Override
-		public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-			return this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, pContext.getClickedFace().getAxis());
-			
-		}
-		
-	}
-	
-	public static class CorruptLeavesBlock extends LeavesBlock implements IMiningLevelDataGenProvider{
-
-		public CorruptLeavesBlock() {
-			super(Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never));
-		}
-
-		@Override
-		public Named<Block> getToolType() {
-			return BlockTags.MINEABLE_WITH_PICKAXE;
-		}
-
-		@Override
-		public Named<Block> getToolLevel() {
-			return BlockTags.NEEDS_DIAMOND_TOOL;
-		}
-		
-		
-		
-	}
 
 	@Override
 	public Named<Block> getToolType() {
@@ -179,4 +133,62 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 			p.addEffect(new MobEffectInstance(Registry.getEffect("entropy_poisoning"), 100, 0, false, false, true));
 		}
 	}
+	
+	//Used for Chaosbark/Stripped Chaosbark Logs.
+	public static class CorruptBlockWithAxis extends CorruptBlock{
+
+		public CorruptBlockWithAxis(Properties properties, Named<Block> type, Named<Block> level, boolean isGrass, boolean shouldBePoisonous) {
+			super(properties, type, level, isGrass, shouldBePoisonous);
+			this.registerDefaultState(this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Axis.Y));
+		}
+		
+		@Override
+		protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
+			pBuilder.add(RotatedPillarBlock.AXIS);
+		}
+		
+		@Override
+		public BlockState rotate(BlockState pState, Rotation pRotation) {
+			return RotatedPillarBlock.rotatePillar(pState, pRotation);
+		}
+		
+		@Override
+		public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+			return this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, pContext.getClickedFace().getAxis());
+			
+		}
+		
+	}
+	
+	public static class CorruptLeavesBlock extends LeavesBlock implements IMiningLevelDataGenProvider{
+
+		public CorruptLeavesBlock() {
+			super(Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never));
+		}
+
+		@Override
+		public Named<Block> getToolType() {
+			return BlockTags.MINEABLE_WITH_PICKAXE;
+		}
+
+		@Override
+		public Named<Block> getToolLevel() {
+			return BlockTags.NEEDS_DIAMOND_TOOL;
+		}
+		
+		
+		
+	}
+	
+	public static class ChaosbarkFenceBlock extends FenceBlock {
+		public ChaosbarkFenceBlock() {
+			super(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion());
+		}
+		
+		@Override
+		public boolean isSameFence(BlockState pState) {
+			return pState.is(Registry.getBlock("chaosbark_fence"));
+		}
+	}
+		
 }

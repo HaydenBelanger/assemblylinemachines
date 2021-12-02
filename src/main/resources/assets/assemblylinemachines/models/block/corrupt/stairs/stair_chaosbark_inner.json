@@ -1,0 +1,8 @@
+{
+    "parent": "block/inner_stairs",
+   "textures": {
+        "bottom": "assemblylinemachines:block/corrupt/chaosbark_planks",
+        "top": "assemblylinemachines:block/corrupt/chaosbark_planks",
+        "side": "assemblylinemachines:block/corrupt/chaosbark_planks"
+    }
+}

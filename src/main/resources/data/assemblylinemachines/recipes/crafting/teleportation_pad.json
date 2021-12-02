@@ -3,17 +3,20 @@
 	"pattern":[
 		"g g",
 		"grg",
-		"aaa"
+		"aba"
 	],
 	"key":{
 		"a":{
 			"tag": "forge:storage_blocks/attuned_titanium"
 		},
 		"g":{
-			"item": "assemblylinemachines:galactic_flesh"
+			"tag": "forge:rods/graphene"
 		},
 		"r":{
 			"item": "assemblylinemachines:reality_crystal"
+		},
+		"b":{
+			"item": "assemblylinemachines:miniature_black_hole"
 		}
 	},
 	"result":{

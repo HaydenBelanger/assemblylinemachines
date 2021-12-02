@@ -18,12 +18,12 @@
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/blocks_ingots_nuggets/ingot_to_block/attuned_titanium",
-			"text": "You will need 3 $(item)Attuned Titanium Blocks$()..."
+			"text": "You will need 2 $(item)Attuned Titanium Blocks$() and $(l:items/novasteel_tools#graphenerod)4 Graphene Rods$()..."
 		},
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/teleportation_pad",
-			"text": "...In order to make a $(5)Teleportation Pad.$() To get the $(thing)Galactic Flesh and Reality Crystal,$() you will also need to make an $(l:blocks/entropy_reactor)Entropy Reactor.$()"
+			"text": "...In order to make a $(5)Teleportation Pad.$() To get the $(thing)Reality Crystal,$() you will also need to make an $(l:blocks/entropy_reactor)Entropy Reactor.$()"
 		},
 		{
 			"type": "crafting",
