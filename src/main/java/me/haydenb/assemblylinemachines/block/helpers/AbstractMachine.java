@@ -36,6 +36,8 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class AbstractMachine<A extends AbstractContainerMenu> extends RandomizableContainerBlockEntity {
 
@@ -371,6 +373,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	}
 
 	// SCREEN DYNAMIC
+	@OnlyIn(Dist.CLIENT)
 	public static class ScreenALMBase<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
 		protected final ResourceLocation bg;
 		protected final Pair<Integer, Integer> titleTextLoc;

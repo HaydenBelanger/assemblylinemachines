@@ -13,9 +13,9 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import mezz.jei.api.IModPlugin;
@@ -35,6 +35,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.*;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 
 @JeiPlugin
@@ -48,6 +50,7 @@ public class JEICategoryRegistry implements IModPlugin{
 	}
 	
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void registerCategories(IRecipeCategoryRegistration registration) {
 		if(ConfigHolder.COMMON.jeiSupport.get() == true) {
 			IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
