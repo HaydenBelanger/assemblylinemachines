@@ -197,6 +197,7 @@ public class Utils {
 		return null;
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Font pFont, Component pText, int pX, int pY, int pColor) {
 		FormattedCharSequence formattedcharsequence = pText.getVisualOrderText();
 		pFont.draw(pPoseStack, formattedcharsequence, (float)(pX - pFont.width(formattedcharsequence) / 2), (float)pY, pColor);
@@ -281,6 +282,7 @@ public class Utils {
 		
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	public static class TrueFalseButton extends Button {
 
 		public final int blitx;
