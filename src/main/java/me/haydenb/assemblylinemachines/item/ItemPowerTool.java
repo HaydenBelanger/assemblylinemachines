@@ -291,20 +291,18 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		this.addEnergyInfoToHoverText(stack, tooltip);
 	}
-
-	@SuppressWarnings("removal")
+	
 	@Override
-	public double getDurabilityForDisplay(ItemStack stack) {
+	public boolean isBarVisible(ItemStack stack) {
+		if(!stack.hasTag() || stack.getTag().getInt(ptt.keyName) == 0) return super.isBarVisible(stack);
+		return stack.getTag().getInt(ptt.keyName) != this.getMaxPower(stack);
+	}
+	
+	@Override
+	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
-		return dmg == 0 ? super.getDurabilityForDisplay(stack) : (double) ((compound.getInt(ptt.keyName) - getMaxPower(stack)) * -1) / (double) getMaxPower(stack);
-	}
-
-	@SuppressWarnings("removal")
-	@Override
-	public boolean showDurabilityBar(ItemStack stack) {
-		if(!stack.hasTag() || stack.getTag().getInt(ptt.keyName) == 0) return super.showDurabilityBar(stack);
-		return stack.getTag().getInt(ptt.keyName) != this.getMaxPower(stack);
+		return dmg == 0 ? super.getBarWidth(stack) : Math.round((((compound.getInt(ptt.keyName) - getMaxPower(stack)) * -1) / (float) getMaxPower(stack)) * 13f);
 	}
 	
 	public static class EnchantmentOverclock extends Enchantment{

@@ -12,10 +12,10 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.*;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.DebugOptions;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -405,7 +405,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			
-			if (modeB.isHovered()) {
+			if (modeB.isHoveredOrFocused()) {
 				
 				int x = (this.width - this.imageWidth) / 2;
 				int y = (this.height - this.imageHeight) / 2;

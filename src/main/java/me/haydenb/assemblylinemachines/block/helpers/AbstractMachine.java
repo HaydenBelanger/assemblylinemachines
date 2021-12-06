@@ -76,7 +76,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	//Synchronizes data on block update between client and server.
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.getBlockPos(), -1, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override

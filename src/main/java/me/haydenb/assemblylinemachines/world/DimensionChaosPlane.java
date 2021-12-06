@@ -5,47 +5,47 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.chaosplane.CorruptTallGrassBlock.BrainCactusBlock;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.data.worldgen.Features;
-import net.minecraft.data.worldgen.Features.Decorators;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.valueproviders.*;
+import net.minecraft.data.worldgen.features.FeatureUtils;
+import net.minecraft.data.worldgen.features.VegetationFeatures;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.resources.*;
+import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.valueproviders.BiasedToBottomInt;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.carver.*;
 import net.minecraft.world.level.levelgen.feature.*;
-import net.minecraft.world.level.levelgen.feature.blockplacers.*;
 import net.minecraft.world.level.levelgen.feature.configurations.*;
 import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
-import net.minecraft.world.level.levelgen.feature.stateproviders.*;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
-import net.minecraft.world.level.levelgen.heightproviders.UniformHeight;
+import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
+import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -81,10 +81,6 @@ public class DimensionChaosPlane {
 		CORRUPT_BIOMES.add(CORRUPT_OCEAN.location());
 	}
 
-	//Ranges, for plant and tree generation.
-	private static final RangeDecoratorConfiguration PLANTS_RANGE = new RangeDecoratorConfiguration(UniformHeight.of(VerticalAnchor.aboveBottom(64), VerticalAnchor.aboveBottom(170)));
-	private static final RangeDecoratorConfiguration CHAOSBARK_RANGE = new RangeDecoratorConfiguration(UniformHeight.of(VerticalAnchor.aboveBottom(75), VerticalAnchor.aboveBottom(120)));
-
 	//Biome loader to actually add the features to the appropriate biomes.
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void addFeaturesToBiome(BiomeLoadingEvent event) {
@@ -94,27 +90,27 @@ public class DimensionChaosPlane {
 			int flowerCount = 0;
 			if(event.getName().equals(CORRUPT_PLAINS.location())) {
 				treeCount = 4;
-				plantCount = 3;
-				flowerCount = 1;
+				plantCount = 2;
+				flowerCount = 6;
 			}else if(event.getName().equals(CORRUPT_FOREST.location())) {
 				treeCount = 120;
-				plantCount = 2;
+				plantCount = 4;
 			}else if(event.getName().equals(CORRUPT_CLIFFS.location())) {
 				treeCount = 8;
-				plantCount = 1;
+				plantCount = 6;
 
 				event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, ChaosPlaneOres.corruptEmeraldOre);
 			}else if(event.getName().equals(CORRUPT_DESERT.location())) {
-				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.brainCactus);
+				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.brainCactus.placed(InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, RarityFilter.onAverageOnceEvery(6)));
 			}else if(event.getName().equals(CORRUPT_OCEAN.location())) {
 				event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, ChaosPlaneOres.fleroviumOre);
 			}
 
 			if(treeCount != 0) {
-				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosbarkTreeGrower.chaosbarkTree.range(CHAOSBARK_RANGE).squared().count(treeCount));
-				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.chaosPlaneGrass.range(PLANTS_RANGE).squared().count(plantCount));
+				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosbarkTreeGrower.chaosbarkTree.placed(HeightRangePlacement.uniform(VerticalAnchor.aboveBottom(75), VerticalAnchor.aboveBottom(120)), InSquarePlacement.spread(), CountPlacement.of(treeCount)));
+				event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.chaosPlaneGrass.placed(InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, RarityFilter.onAverageOnceEvery(plantCount)));
 				if(flowerCount != 0) {
-					event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.chaosPlaneFlowers.range(PLANTS_RANGE).squared().count(flowerCount));
+					event.getGeneration().addFeature(Decoration.VEGETAL_DECORATION, ChaosPlaneVegetation.chaosPlaneFlowers.placed(InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, RarityFilter.onAverageOnceEvery(flowerCount)));
 				}
 
 			}
@@ -152,15 +148,16 @@ public class DimensionChaosPlane {
 		private static ReplaceBlockConfiguration chaosPlaneEmeraldRBC;
 		private static ReplaceBlockConfiguration fleroviumRBC;
 
-		public static ConfiguredFeature<?, ?> corruptCoalOre;
-		public static ConfiguredFeature<?, ?> corruptCopperOre;
-		public static ConfiguredFeature<?, ?> corruptDiamondOre;
-		public static ConfiguredFeature<?, ?> corruptEmeraldOre;
-		public static ConfiguredFeature<?, ?> corruptGoldOre;
-		public static ConfiguredFeature<?, ?> corruptIronOre;
-		public static ConfiguredFeature<?, ?> corruptLapisOre;
-		public static ConfiguredFeature<?, ?> corruptRedstoneOre;
-		public static ConfiguredFeature<?, ?> fleroviumOre;
+		public static PlacedFeature corruptCoalOre;
+		public static PlacedFeature corruptCopperOre;
+		public static PlacedFeature corruptDiamondOre;
+		public static PlacedFeature corruptEmeraldOre;
+		public static PlacedFeature corruptGoldOre;
+		public static PlacedFeature corruptIronOre;
+		public static PlacedFeature corruptLapisOre;
+		public static PlacedFeature corruptRedstoneOre;
+		public static PlacedFeature fleroviumOre;
+		
 		//Note that Corrupt Titanium Ore is generated in the main OreGeneration, as that could be supplied as an additional predicate to the main Titanium.
 
 		public static void initializeChaosPlaneOreFeatures() {
@@ -176,14 +173,13 @@ public class DimensionChaosPlane {
 			corruptLapisOre = getCorruptOreGenerator("corrupt_lapis_ore", 7, 1, VerticalAnchor.absolute(0), VerticalAnchor.absolute(30));
 			corruptRedstoneOre = getCorruptOreGenerator("corrupt_redstone_ore", 8, 4, VerticalAnchor.bottom(), VerticalAnchor.absolute(15));
 
-			corruptEmeraldOre = Feature.REPLACE_SINGLE_BLOCK.configured(chaosPlaneEmeraldRBC).rangeUniform(VerticalAnchor.absolute(4), VerticalAnchor.absolute(31)).squared().count(UniformInt.of(3, 8));
-			fleroviumOre = Feature.REPLACE_SINGLE_BLOCK.configured(fleroviumRBC).rangeUniform(VerticalAnchor.absolute(30), VerticalAnchor.absolute(63)).squared().count(UniformInt.of(12, 20));
+			corruptEmeraldOre = Feature.REPLACE_SINGLE_BLOCK.configured(chaosPlaneEmeraldRBC).placed(List.of(HeightRangePlacement.uniform(VerticalAnchor.absolute(4), VerticalAnchor.absolute(31)), InSquarePlacement.spread(), CountPlacement.of(UniformInt.of(3, 8))));
+			fleroviumOre = Feature.REPLACE_SINGLE_BLOCK.configured(fleroviumRBC).placed(List.of(HeightRangePlacement.uniform(VerticalAnchor.absolute(30), VerticalAnchor.absolute(63)), InSquarePlacement.spread(), CountPlacement.of(UniformInt.of(12, 20))));
 		}
 
-		private static ConfiguredFeature<?, ?> getCorruptOreGenerator(String block, int size, int freq, VerticalAnchor min, VerticalAnchor max){
+		private static PlacedFeature getCorruptOreGenerator(String block, int size, int freq, VerticalAnchor min, VerticalAnchor max){
 
-			return Feature.ORE.configured(new OreConfiguration(chaosPlaneRule, Registry.getBlock(block).defaultBlockState(), size))
-					.rangeUniform(min, max).squared().count(freq);
+			return Feature.ORE.configured(new OreConfiguration(chaosPlaneRule, Registry.getBlock(block).defaultBlockState(), size)).placed(List.of(HeightRangePlacement.uniform(min, max), InSquarePlacement.spread(), CountPlacement.of(freq)));
 		}
 	}
 
@@ -209,25 +205,25 @@ public class DimensionChaosPlane {
 	//Tree generator - Including patching for STRIPPABLES map.
 	public static class ChaosbarkTreeGrower extends AbstractTreeGrower{
 
-		public static ConfiguredFeature<TreeConfiguration, ?> chaosbarkTree;
-
+		public static ConfiguredFeature<?, ?> chaosbarkTree;
+		
+		
+		
 		@Override
-		protected ConfiguredFeature<TreeConfiguration, ?> getConfiguredFeature(Random pRandom, boolean pLargeHive) {
-
+		protected ConfiguredFeature<?, ?> getConfiguredFeature(Random p_60014_, boolean p_60015_) {
 			return chaosbarkTree;
 		}
 
 		public static void registerTreeGen() {
-			BlockStateProvider bspTrunk = new SimpleStateProvider(Registry.getBlock("chaosbark_log").defaultBlockState());
+			BlockStateProvider bspTrunk = BlockStateProvider.simple(Registry.getBlock("chaosbark_log").defaultBlockState());
 			TrunkPlacer trunkPlacer = new StraightTrunkPlacer(4, 2, 0);
-			BlockStateProvider bspLeaves = new SimpleStateProvider(Registry.getBlock("chaosbark_leaves").defaultBlockState());
+			BlockStateProvider bspLeaves = BlockStateProvider.simple(Registry.getBlock("chaosbark_leaves").defaultBlockState());
 
 			FoliagePlacer foliagePlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
-			BlockStateProvider bspSapling = new SimpleStateProvider(Registry.getBlock("chaosbark_sapling").defaultBlockState());
 			FeatureSize size = new TwoLayersFeatureSize(1, 0, 1);
-			BlockStateProvider bspDirt = new SimpleStateProvider(Registry.getBlock("corrupt_dirt").defaultBlockState());
+			BlockStateProvider bspDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
 
-			chaosbarkTree = new TreeFeature(TreeConfiguration.CODEC).configured(new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, bspSapling, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
+			chaosbarkTree = new TreeFeature(TreeConfiguration.CODEC).configured(new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
 		}
 
 		public static void patchStrippables() {
@@ -256,101 +252,39 @@ public class DimensionChaosPlane {
 		public static ConfiguredFeature<?, ?> brainCactus;
 
 		public static void initializeChaosPlaneVegetationFeatures() {
-			RandomPatchConfiguration grassPatch = new RandomPatchConfiguration.GrassConfigurationBuilder(new WeightedStateProvider(Features.weightedBlockStateBuilder().add(Registry.getBlock("chaosweed").defaultBlockState(), 7)
-					.add(Registry.getBlock("tall_chaosweed").defaultBlockState(), 4).add(Registry.getBlock("blooming_chaosweed").defaultBlockState(), 2).add(Registry.getBlock("tall_blooming_chaosweed").defaultBlockState(), 1).build()), SingleOrDoublePlantPlacer.INSTANCE).tries(64).noProjection().build();
-			RandomPatchConfiguration flowerPatch = new RandomPatchConfiguration.GrassConfigurationBuilder(new WeightedStateProvider(Features.weightedBlockStateBuilder().add(Registry.getBlock("prism_rose").defaultBlockState(), 4)
-					.add(Registry.getBlock("mandelbloom").defaultBlockState(), 1).build()), SimpleBlockPlacer.INSTANCE).tries(64).build();
-			chaosPlaneGrass = Feature.RANDOM_PATCH.configured(grassPatch).decorated(Features.Decorators.HEIGHTMAP_DOUBLE_SQUARE).count(8);
-			chaosPlaneFlowers = Feature.FLOWER.configured(flowerPatch).decorated(Features.Decorators.ADD_32).decorated(Features.Decorators.HEIGHTMAP_SQUARE).count(3);
-			brainCactus = Feature.RANDOM_PATCH.configured(new RandomPatchConfiguration.GrassConfigurationBuilder(new SimpleStateProvider(Registry.getBlock("brain_cactus").defaultBlockState()), ColumnPlacerWithDifferentTop.of(BiasedToBottomInt.of(1, 3), BrainCactusBlock.CAP, true)).tries(10).noProjection().build()).decorated(Decorators.HEIGHTMAP_DOUBLE_SQUARE).count(10);
+			chaosPlaneGrass = Feature.RANDOM_PATCH.configured(getGrassPatch(64, Pair.of("chaosweed", 7), Pair.of("blooming_chaosweed", 2), Pair.of("tall_chaosweed", 4), Pair.of("tall_blooming_chaosweed", 1)));
+			chaosPlaneFlowers = Feature.FLOWER.configured(getGrassPatch(64, Pair.of("prism_rose", 4), Pair.of("mandelbloom", 1)));
+			brainCactus = Feature.RANDOM_PATCH.configured(FeatureUtils.simpleRandomPatchConfiguration(10, Feature.BLOCK_COLUMN.configured(BlockColumnConfiguration.simple(BiasedToBottomInt.of(1, 3), BlockStateProvider.simple(Registry.getBlock("brain_cactus")))).placed(BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.wouldSurvive(Registry.getBlock("brain_cactus").defaultBlockState(), BlockPos.ZERO))))));
 		}
-
-		public static class SingleOrDoublePlantPlacer extends SimpleBlockPlacer{
-
-			public static final SingleOrDoublePlantPlacer INSTANCE = new SingleOrDoublePlantPlacer();
-			public static final Codec<SingleOrDoublePlantPlacer> CODEC = Codec.unit(() -> {return INSTANCE;});
-			public static final BlockPlacerType<?> TYPE = new BlockPlacerType<>(CODEC);
-
-			@Override
-			public void place(LevelAccessor pLevel, BlockPos pPos, BlockState pState, Random pRandom) {
-				if(pState.getBlock() instanceof DoublePlantBlock) {
-					DoublePlantBlock.placeAt(pLevel, pState, pPos, 2);
-				}else {
-					super.place(pLevel, pPos, pState, pRandom);
-				}
-
+		
+		@SafeVarargs
+		private static RandomPatchConfiguration getGrassPatch(int passes, Pair<String, Integer>... blocks){
+			SimpleWeightedRandomList.Builder<BlockState> builder = SimpleWeightedRandomList.builder();
+			for(Pair<String, Integer> block : blocks) {
+				builder.add(Registry.getBlock(block.getFirst()).defaultBlockState(), block.getSecond());
 			}
-
-			@Override
-			protected BlockPlacerType<?> type() {
-				return TYPE;
-			}
-
-		}
-
-		public static class ColumnPlacerWithDifferentTop<T extends Comparable<T>> extends ColumnPlacer {
-
-			public static final Codec<ColumnPlacer> CODEC = RecordCodecBuilder.create((p_160711_) -> {
-				return p_160711_.group(IntProvider.NON_NEGATIVE_CODEC.fieldOf("size").forGetter((p_160713_) -> {
-					return p_160713_.size;
-				})).apply(p_160711_, ColumnPlacerWithDifferentTop::new);
-			});
-			public static final BlockPlacerType<?> TYPE = new BlockPlacerType<>(CODEC);
-			
-			private final Property<T> property;
-			private final T value;
-
-			private ColumnPlacerWithDifferentTop(IntProvider provider) {
-				this(provider, null, null);
-			}
-
-			private ColumnPlacerWithDifferentTop(IntProvider provider, Property<T> property, T value) {
-				super(provider);
-				this.property = property;
-				this.value = value;
-			}
-
-			@Override
-			public void place(LevelAccessor pLevel, BlockPos pPos, BlockState pState, Random pRandom) {
-				BlockPos.MutableBlockPos blockpos$mutableblockpos = pPos.mutable();
-				int i = this.size.sample(pRandom);
-
-				for(int j = 0; j < i; ++j) {
-
-					BlockState setState = property != null && value != null ? j == i - 1 ? pState.setValue(property, value) : pState : pState;
-
-					pLevel.setBlock(blockpos$mutableblockpos, setState, 2);
-					blockpos$mutableblockpos.move(Direction.UP);
-				}
-			}
-			
-			public static BlockPlacerType<?> getType() {
-				return TYPE;
-			}
-
-			public static <T extends Comparable<T>> ColumnPlacerWithDifferentTop<T> of(IntProvider provider, Property<T> property, T value) {
-				return new ColumnPlacerWithDifferentTop<T>(provider, property, value);
-			}
-
-
+			VegetationFeatures.grassPatch(null, 0);
+			return VegetationFeatures.grassPatch(new WeightedStateProvider(builder.build()), passes);
 		}
 	}
 
 	//Chunk generation - seeded additional dimensions using Mixins.
 	public static class SeededNoiseBasedChunkGenerator extends NoiseBasedChunkGenerator {
 
-		public static final Codec<SeededNoiseBasedChunkGenerator> CODEC = RecordCodecBuilder.create((p_64405_) -> {
-			return p_64405_.group(BiomeSource.CODEC.fieldOf("biome_source").forGetter((p_158489_) -> {
-				return p_158489_.biomeSource;
-			}), NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter((p_158458_) -> {
-				return p_158458_.settings;
-			})).apply(p_64405_, p_64405_.stable(SeededNoiseBasedChunkGenerator::new));
-		});
+		public static final Codec<SeededNoiseBasedChunkGenerator> CODEC = RecordCodecBuilder.create((p_188643_) -> {
+		      return p_188643_.group(RegistryLookupCodec.create(net.minecraft.core.Registry.NOISE_REGISTRY).forGetter((p_188716_) -> {
+		         return p_188716_.noises;
+		      }), BiomeSource.CODEC.fieldOf("biome_source").forGetter((p_188711_) -> {
+		         return p_188711_.biomeSource;
+		      }), NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter((p_188652_) -> {
+		         return p_188652_.settings;
+		      })).apply(p_188643_, p_188643_.stable(SeededNoiseBasedChunkGenerator::new));
+		   });
 		/**
 		 * Note that the first item of the seed array is the only one read.
 		 */
-		public SeededNoiseBasedChunkGenerator(BiomeSource source, Supplier<NoiseGeneratorSettings> settings, long... seed) {
-			super(source, getFirstOrZero(seed), settings);
+		public SeededNoiseBasedChunkGenerator(net.minecraft.core.Registry<NoiseParameters> noises, BiomeSource source, Supplier<NoiseGeneratorSettings> settings, long... seed) {
+			super(noises, source, getFirstOrZero(seed), settings);
 
 		}
 
@@ -367,7 +301,7 @@ public class DimensionChaosPlane {
 
 		@Override
 		public ChunkGenerator withSeed(long pSeed) {
-			return new SeededNoiseBasedChunkGenerator(this.getBiomeSource().withSeed(pSeed), this.settings, pSeed);
+			return new SeededNoiseBasedChunkGenerator(this.noises, this.getBiomeSource().withSeed(pSeed), this.settings, pSeed);
 		}
 
 	}	
