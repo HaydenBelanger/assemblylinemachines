@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.*;
-import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -37,7 +36,7 @@ public enum ItemTiers {
 	private String armorSetName;
 	private float toughness;
 	private float armorKnockbackResistance;
-	private LazyLoadedValue<Ingredient> ingredient;	
+	private Supplier<Ingredient> ingredient;	
 	
 	ItemTiers(double attack, double efficiency, int enchantability, int durability, double armorKnockbackResistance, int armorDamageReduction, String armorSetName, double toughness, Supplier<Ingredient> ingredient) {
 		
@@ -50,7 +49,7 @@ public enum ItemTiers {
 		this.damageReduction = armorDamageReduction;
 		this.armorSetName = armorSetName;
 		this.toughness = (float) toughness;
-		this.ingredient = new LazyLoadedValue<>(ingredient);
+		this.ingredient = ingredient;
 	}
 	
 	ItemTiers(double attack, double efficiency, int enchantability, int durability, Supplier<Ingredient> ingredient){
@@ -58,7 +57,7 @@ public enum ItemTiers {
 		this.efficiency = (float) efficiency;
 		this.enchantability = enchantability;
 		this.durability = durability;
-		this.ingredient = new LazyLoadedValue<>(ingredient);
+		this.ingredient = ingredient;
 	}
 	
 	ItemTiers(int durability, int enchantability, double armorKnockbackResistance, int armorDamageReduction, String armorSetName, double toughness, Supplier<Ingredient> ingredient){
@@ -67,7 +66,7 @@ public enum ItemTiers {
 	this.damageReduction = armorDamageReduction;
 	this.armorSetName = armorSetName;
 	this.toughness = (float) toughness;
-	this.ingredient = new LazyLoadedValue<>(ingredient);
+	this.ingredient = ingredient;
 	this.enchantability = enchantability;
 	}
 	

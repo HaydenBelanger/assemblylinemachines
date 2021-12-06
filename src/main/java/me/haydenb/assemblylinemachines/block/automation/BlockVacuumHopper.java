@@ -1,7 +1,7 @@
 package me.haydenb.assemblylinemachines.block.automation;
 
-import java.lang.reflect.Method;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.stream.Stream;
 
 import com.mojang.math.Vector3f;
@@ -16,6 +16,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -28,8 +29,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class BlockVacuumHopper extends HopperBlock {
 
@@ -105,7 +108,7 @@ public class BlockVacuumHopper extends HopperBlock {
 		private int sTimer = 0;
 		private AABB bb = null;
 		
-		private static Method method = null;
+		private IItemHandler handler = null;
 
 		@Override
 		public void tick() {
@@ -134,13 +137,31 @@ public class BlockVacuumHopper extends HopperBlock {
 				}
 				if(sTimer++ == 4) {
 					sTimer = 0;
-					if(method == null) method = ObfuscationReflectionHelper.findMethod(HopperBlockEntity.class, "m_155562_", Level.class, BlockPos.class, BlockState.class, HopperBlockEntity.class);
-					try {
-						if (method.invoke(null, this.getLevel(), this.getBlockPos(), this.getBlockState(), this).equals(true)) {
-							this.setChanged();
+					if(handler == null) {
+						Direction d = this.getBlockState().getValue(HopperBlock.FACING);
+						if(this.getLevel().getBlockEntity(this.getBlockPos().relative(d)) != null) {
+							LazyOptional<IItemHandler> lO = this.getLevel().getBlockEntity(this.getBlockPos().relative(d)).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
+							if(lO.orElse(null) != null) {
+								handler = lO.orElse(null);
+								lO.addListener((lOX) -> handler = null);
+							}
 						}
-					} catch (Exception e) {
-						e.printStackTrace();
+						
+					}
+					if(handler != null) {
+						ListIterator<ItemStack> iter = this.getItems().listIterator();
+						
+						while(iter.hasNext()) {
+							ItemStack item = iter.next();
+							for(int i = 0; i < handler.getSlots(); i++) {
+								if(item.isEmpty()) {
+									break;
+								}
+								item = handler.insertItem(i, item, false);
+							}
+							iter.set(item);
+						}
+						
 					}
 				}
 				
