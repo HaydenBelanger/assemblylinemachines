@@ -13,8 +13,8 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBa
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import net.minecraft.client.Minecraft;

@@ -13,8 +13,8 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.*;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkHandler.QuantumLinkNetwork;
@@ -477,7 +477,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			
 			@Override
 			public void renderToolTip(PoseStack pMatrixStack, int pMouseX, int pMouseY) {
-				if(this.isHovered()) {
+				if(this.isHoveredOrFocused()) {
 					List<String> vals = new ArrayList<>();
 					switch(tsfm.pfi[channel]) {
 					case 0:

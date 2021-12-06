@@ -102,13 +102,13 @@ public class ItemAEFG extends Item implements IToolWithCharge {
 	}
 	
 	@Override
-	public double getDurabilityForDisplay(ItemStack stack) {
+	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		return (double) ((compound.getInt(this.getPowerToolType().getKeyName()) - getMaxPower(stack)) * -1) / (double) getMaxPower(stack);
+		return Math.round((((compound.getInt(this.getPowerToolType().getKeyName()) - getMaxPower(stack)) * -1) / (float) getMaxPower(stack)) * 13f);
 	}
 	
 	@Override
-	public boolean showDurabilityBar(ItemStack stack) {
+	public boolean isBarVisible(ItemStack stack) {
 		return true;
 	}
 	

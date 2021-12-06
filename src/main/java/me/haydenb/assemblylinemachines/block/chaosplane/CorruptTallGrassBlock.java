@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
+import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 import net.minecraftforge.common.util.FakePlayerFactory;
@@ -137,11 +138,12 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		@Override
 		public BlockState updateShape(BlockState pState, Direction pFacing, BlockState pFacingState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pFacingPos) {
 			if (!pState.canSurvive(pLevel, pCurrentPos)) {
-				pLevel.getBlockTicks().scheduleTick(pCurrentPos, this, 1);
+				pLevel.getBlockTicks().schedule(new ScheduledTick<Block>(this, pCurrentPos, 1, 1));
 			}
 			return (pLevel.isEmptyBlock(pCurrentPos.above()) ? true : false) == pState.getValue(CAP) ? pState : pState.setValue(CAP, (pLevel.isEmptyBlock(pCurrentPos.above()) ? true : false));
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRand) {
 			if(!pLevel.isAreaLoaded(pPos, 1)) return;

@@ -15,8 +15,8 @@ import me.haydenb.assemblylinemachines.crafting.EnchantmentBookCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import net.minecraft.client.Minecraft;
@@ -692,7 +692,7 @@ public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceM
 				}
 			}
 			
-			if(modeB.isHovered()) {
+			if(modeB.isHoveredOrFocused()) {
 				switch(tsfm.mode) {
 				case 3:
 					this.renderComponentTooltip("Anvil Mode", mouseX - x, mouseY - y);

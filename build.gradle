@@ -2,12 +2,10 @@ buildscript {
     repositories {
         // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
         maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
-        classpath 'org.parchmentmc:librarian:1.+'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
         classpath files("gradle/plugins/mixingradle-0.7-FG5BUILD.jar")
     }
 }
@@ -16,7 +14,6 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 version = '1.17.1-1.3.0.1'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -29,7 +26,7 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
 
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    mappings channel: 'parchment', version: '2021.10.31-1.17.1'
+    mappings channel: 'official', version: '1.18'
     runs {
         client {
             workingDirectory project.file('run')
@@ -133,21 +130,21 @@ jar{
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.126'
+    minecraft 'net.minecraftforge:forge:1.18-38.0.14'
 	
-	//JEI - Updated.
-    compileOnly fg.deobf("mezz.jei:jei-1.17.1:8.0.0.16:api")
- 	runtimeOnly fg.deobf("mezz.jei:jei-1.17.1:8.0.0.16")
+	//JEI - Updated 1.18.
+    compileOnly fg.deobf("mezz.jei:jei-1.18:9.0.0.40:api")
+ 	runtimeOnly fg.deobf("mezz.jei:jei-1.18:9.0.0.40")
  	
- 	//PATCHOULI - Updated.
-    implementation fg.deobf("vazkii.patchouli:Patchouli:1.17.1-57-SNAPSHOT")
+ 	//PATCHOULI - Not yet updated to 1.18.
+    //implementation fg.deobf("vazkii.patchouli:Patchouli:1.17.1-57-SNAPSHOT")
     
-	//MEKANISM - Not yet updated to 1.17.1.
+	//MEKANISM - Not yet updated to 1.18.
 	//compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
     //runtimeOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
     
     //THE ONE PROBE - Updated.
-    implementation fg.deobf("curse.maven:theoneprobe-245211:3430022")
+    implementation fg.deobf("curse.maven:theoneprobe-245211:3550084")
     
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }

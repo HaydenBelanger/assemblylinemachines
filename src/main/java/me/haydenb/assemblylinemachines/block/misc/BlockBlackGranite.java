@@ -58,11 +58,11 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 	}
 	
 	@Override
-	public boolean removedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+	public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 		if(!player.isCreative() && !canToolMine(player, state)) {
 			player.displayClientMessage(new TextComponent("§cA Pickaxe with mechanical power is needed to extract the Black Granite."), true);
 		}
-		return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
+		return super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
 	}
 	
 	private static boolean canToolMine(Player player, BlockState state) {

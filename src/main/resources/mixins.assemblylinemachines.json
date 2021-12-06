@@ -6,7 +6,6 @@
 		"ChaosPlaneMixins$BlockEditErrorSuppressor",
 		"ChaosPlaneMixins$LifecycleInterceptor",
 		"ChaosPlaneMixins$SeededNoiseGeneratorInjector",
-		"FluidPatchMixin",
 		"HoeItemTillingMixin"
 	],
 	"injectors": {

@@ -326,7 +326,7 @@ public class Utils {
 		
 		@Override
 		public void renderButton(PoseStack mx, int mouseX, int mouseY, float partialTicks) {
-			if(this.isHovered()) {
+			if(this.isHoveredOrFocused()) {
 				this.renderToolTip(mx, mouseX, mouseY);
 			}
 			

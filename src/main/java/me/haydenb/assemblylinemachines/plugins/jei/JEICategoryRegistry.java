@@ -206,3 +206,4 @@ public class JEICategoryRegistry implements IModPlugin{
 	}
 
 }
+
