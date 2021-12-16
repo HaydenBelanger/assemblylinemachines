@@ -591,7 +591,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new TextComponent("§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
 			probeInfo.horizontal().item(new ItemStack(Items.COAL)).vertical().text(new TextComponent("§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
 		}
-		
+
 		
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {

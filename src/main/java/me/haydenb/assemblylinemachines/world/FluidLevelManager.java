@@ -62,7 +62,7 @@ public class FluidLevelManager {
 
 			List<FluidInGroundRecipe> recipes = world.getRecipeManager().getRecipesFor(FluidInGroundRecipe.FIG_RECIPE, null, world);
 			
-			float tc = world.getBiome(pos).getBaseTemperature();
+			float tc = world.getBiome(pos).getTemperature(pos);
 			ResourceLocation dim = world.dimension().location();
 			for (FluidInGroundRecipe recipe : recipes) {
 

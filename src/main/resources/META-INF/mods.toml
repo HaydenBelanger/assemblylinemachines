@@ -1,6 +1,6 @@
 license="AGPL-3.0 License"
 modLoader="javafml" #mandatory
-loaderVersion="[38,)"
+loaderVersion="[37,)"
 issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[mods]]
 	modId="assemblylinemachines"
@@ -13,6 +13,6 @@ issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[dependencies.assemblylinemachines]]
     modId="forge"
     mandatory=true
-    versionRange="[38,)" #mandatory
+    versionRange="[37.1.0,)" #mandatory
     ordering="NONE"
     side="BOTH"

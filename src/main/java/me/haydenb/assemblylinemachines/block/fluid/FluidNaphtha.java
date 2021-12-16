@@ -105,7 +105,6 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 			builder.add(FireBlock.AGE);
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void tick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
 			if (world.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {

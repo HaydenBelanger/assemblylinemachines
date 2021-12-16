@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.plugins;
 
-/*
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -66,5 +65,3 @@ public class PluginPatchouli {
 	}
 	
 }
-
-*/

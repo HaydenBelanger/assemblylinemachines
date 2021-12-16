@@ -18,7 +18,7 @@ public class FogRendering {
 	@SubscribeEvent
 	public static void applyFogColor(EntityViewRenderEvent.FogColors event) {
 	
-		Fluid f = event.getCamera().getBlockAtCamera().getFluidState().getType();
+		Fluid f = event.getInfo().getBlockAtCamera().getFluidState().getType();
 		if(f instanceof ILiquidFogColor) {
 			ILiquidFogColor fogColor = (ILiquidFogColor) f;
 			int[] rgb = fogColor.getRGB();
@@ -32,7 +32,7 @@ public class FogRendering {
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void applyFogDensity(EntityViewRenderEvent.FogDensity event) {
-		Fluid f = event.getCamera().getBlockAtCamera().getFluidState().getType();
+		Fluid f = event.getInfo().getBlockAtCamera().getFluidState().getType();
 		if(f instanceof ILiquidFogColor) {
 			ILiquidFogColor fogColor = (ILiquidFogColor) f;
 			event.setCanceled(true);

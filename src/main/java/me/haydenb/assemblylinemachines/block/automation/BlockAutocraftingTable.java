@@ -810,7 +810,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			}
 			
 			//Render special filter slot button TT.
-			if(bSwitch.isHoveredOrFocused()) {
+			if(bSwitch.isHovered()) {
 				switch(tsfm.slotTargets[tsfm.selectedRecipe]) {
 				case 3:
 					this.renderComponentTooltip("Output to Orange Slots", mouseX - x, mouseY - y);
@@ -856,7 +856,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				break;
 			}
 			
-			if (bSwitch.isHoveredOrFocused()) {
+			if (bSwitch.isHovered()) {
 				
 				
 				//blit overlay for the color slots on the internal inventory.

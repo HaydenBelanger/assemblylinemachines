@@ -1,7 +1,5 @@
 package me.haydenb.assemblylinemachines.world;
 
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -9,18 +7,17 @@ import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ASMConfig;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.Predicates;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
-import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
-import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,9 +28,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.FORGE)
 public class VanillaDimensionOres {
 
-	public static PlacedFeature titaniumOre = null;
-	public static PlacedFeature blackGranite = null;
-	public static PlacedFeature chromiumOre = null;
+	public static ConfiguredFeature<?, ?> titaniumOre = null;
+	public static ConfiguredFeature<?, ?> blackGranite = null;
+	public static ConfiguredFeature<?, ?> chromiumOre = null;
 	
 	//Where the initialized features are actually added to the biomes during world load.
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -54,35 +51,24 @@ public class VanillaDimensionOres {
 			
 			//Titanium, Deepslate Titanium, Corrupt Titanium
 			if(cfg.titaniumVeinSize.get() != 0 && cfg.titaniumFrequency.get() != 0) {
-				ImmutableList<TargetBlockState> targetList = ImmutableList.of(OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, Registry.getBlock("titanium_ore").defaultBlockState()),
-						OreConfiguration.target(OreFeatures.DEEPSLATE_ORE_REPLACEABLES, Registry.getBlock("deepslate_titanium_ore").defaultBlockState()),
+				ImmutableList<TargetBlockState> targetList = ImmutableList.of(OreConfiguration.target(Predicates.STONE_ORE_REPLACEABLES, Registry.getBlock("titanium_ore").defaultBlockState()),
+						OreConfiguration.target(Predicates.DEEPSLATE_ORE_REPLACEABLES, Registry.getBlock("deepslate_titanium_ore").defaultBlockState()),
 						OreConfiguration.target(new BlockMatchTest(Registry.getBlock("corrupt_stone")), Registry.getBlock("corrupt_titanium_ore").defaultBlockState()));
-				titaniumOre = getFeature(targetList, cfg.titaniumVeinSize.get(), VerticalAnchor.absolute(cfg.titaniumMinHeight.get()), VerticalAnchor.absolute(cfg.titaniumMaxHeight.get()), cfg.titaniumFrequency.get());
+				titaniumOre = Feature.ORE.configured(new OreConfiguration(targetList, cfg.titaniumVeinSize.get())).rangeUniform(VerticalAnchor.absolute(cfg.titaniumMinHeight.get()), VerticalAnchor.absolute(cfg.titaniumMaxHeight.get())).squared().count(cfg.titaniumFrequency.get());
 			}
 			
 			//Black Granite
 			if(cfg.blackGraniteVeinSize.get() != 0 && cfg.blackGraniteFrequency.get() != 0) {
 				BlockState state = Registry.getBlock("black_granite").defaultBlockState();
 				state = cfg.blackGraniteSpawnsWithNaturalTag.get() ? state.setValue(BlockBlackGranite.NATURAL_GRANITE, true) : state;
-				blackGranite = getFeature(getBasicList(OreFeatures.NETHER_ORE_REPLACEABLES, state), cfg.blackGraniteVeinSize.get(), cfg.blackGraniteFrequency.get());
+				blackGranite = Feature.ORE.configured(new OreConfiguration(OreConfiguration.Predicates.NETHERRACK, state, cfg.blackGraniteVeinSize.get())).rangeUniform(VerticalAnchor.bottom(), VerticalAnchor.top()).squared().count(cfg.blackGraniteFrequency.get());
 			}
 			
 			//Chromium
 			if(cfg.chromiumVeinSize.get() != 0 && cfg.chromiumFrequency.get() != 0) {
-				chromiumOre = getFeature(getBasicList(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState()), cfg.chromiumVeinSize.get(), cfg.chromiumFrequency.get());
+				chromiumOre = Feature.ORE.configured(new OreConfiguration(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState(), cfg.chromiumVeinSize.get())).rangeUniform(VerticalAnchor.bottom(), VerticalAnchor.top()).squared().count(cfg.blackGraniteFrequency.get());
 			}
 			
-		}
-		
-		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, int freq) {
-			return getFeature(targets, veinsize, VerticalAnchor.bottom(), VerticalAnchor.top(), freq);
-		}
-		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, VerticalAnchor min, VerticalAnchor max, int freq) {
-			return Feature.ORE.configured(new OreConfiguration(targets, veinsize)).placed(HeightRangePlacement.uniform(min, max), InSquarePlacement.spread(), CountPlacement.of(freq));
-		}
-		
-		private static List<TargetBlockState> getBasicList(RuleTest target, BlockState result){
-			return ImmutableList.of(OreConfiguration.target(target, result));
 		}
 	}
 	

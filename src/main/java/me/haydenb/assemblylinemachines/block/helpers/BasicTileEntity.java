@@ -22,7 +22,7 @@ public class BasicTileEntity extends BlockEntity {
 	//Synchronizes data on block update between client and server.
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return ClientboundBlockEntityDataPacket.create(this);
+		return new ClientboundBlockEntityDataPacket(this.getBlockPos(), -1, this.getUpdateTag());
 	}
 
 	@Override

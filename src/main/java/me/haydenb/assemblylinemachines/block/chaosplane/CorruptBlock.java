@@ -59,7 +59,6 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		this.shouldBePoisonous = true;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
 		if(shouldBePoisonous) {

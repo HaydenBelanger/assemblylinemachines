@@ -1,10 +1,19 @@
 package me.haydenb.assemblylinemachines.item;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.world.InteractionResult;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
@@ -20,7 +29,6 @@ public class ItemGuidebook extends Item {
 		return InteractionResult.CONSUME;
 	}
 	
-	/*
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
 		if(!pLevel.isClientSide) {
@@ -43,6 +51,5 @@ public class ItemGuidebook extends Item {
 			}
 		}
 	}
-	*/
 	
 }

@@ -263,6 +263,28 @@ public class RecipeCategoryBuilder {
 		};
 	}
 	
+	public static interface IRecipeCategoryBuilder{
+		default public List<Ingredient> getJEIItemIngredients(){
+			return null;
+		}
+		
+		default public List<FluidStack> getJEIFluidInputs(){
+			return null;
+		}
+		
+		default public List<ItemStack> getJEIItemOutputs(){
+			return null;
+		}
+		
+		default public List<FluidStack> getJEIFluidOutputs(){
+			return null;
+		}
+		
+		default public void setupSlots(IRecipeLayout layout, IGuiHelper helper, Optional<IIngredientRenderer<FluidStack>> renderer) {
+			return;
+		}
+	}
+	
 	public static ResourceLocation getGUIPath(String name) {
 		return new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/jei/" + name + ".png");
 	}
