@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "forge:ores/titanium"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_titanium_ore"
+	}
+}

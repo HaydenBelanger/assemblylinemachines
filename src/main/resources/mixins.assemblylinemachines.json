@@ -3,13 +3,10 @@
 	"package": "me.haydenb.assemblylinemachines.mixins",
 	"refmap": "mixins.assemblylinemachines.refmap.json",
 	"mixins": [
-		"ChaosPlaneMixins$BlockEditErrorSuppressor",
-		"ChaosPlaneMixins$LifecycleInterceptor",
-		"ChaosPlaneMixins$SeededNoiseGeneratorInjector",
 		"HoeItemTillingMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
 	},
-	"minVersion": "0.8.4"
+	"minVersion": "0.8.5"
 }

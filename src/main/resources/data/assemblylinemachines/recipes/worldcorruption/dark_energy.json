@@ -1,0 +1,5 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"fluidInput": "minecraft:water",
+	"fluidOutput": "assemblylinemachines:dark_energy"
+}

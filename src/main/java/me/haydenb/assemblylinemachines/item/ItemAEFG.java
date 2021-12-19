@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.item;
 
+import java.awt.Color;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -102,14 +103,24 @@ public class ItemAEFG extends Item implements IToolWithCharge {
 	}
 	
 	@Override
-	public int getBarWidth(ItemStack stack) {
-		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		return Math.round((((compound.getInt(this.getPowerToolType().getKeyName()) - getMaxPower(stack)) * -1) / (float) getMaxPower(stack)) * 13f);
+	public boolean isBarVisible(ItemStack stack) {
+		return true;
 	}
 	
 	@Override
-	public boolean isBarVisible(ItemStack stack) {
-		return true;
+	public int getBarColor(ItemStack stack) {
+		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
+		int dmg = compound.getInt(this.getPowerToolType().getKeyName());
+		float v = (float) dmg / (float) getMaxPower(stack);
+		return new Color(v, v, 1f).getRGB();
+		
+	}
+	
+	@Override
+	public int getBarWidth(ItemStack stack) {
+		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
+		int dmg = compound.getInt(this.getPowerToolType().getKeyName());
+		return Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
 	
 	@Override

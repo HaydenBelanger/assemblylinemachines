@@ -97,13 +97,20 @@
 			"type": "spotlight",
 			"item": "assemblylinemachines:galactic_flesh",
 			"link_recipe": true,
-			"text": "This is $(item)Galactic Flesh.$() This item is a common drop from the $(d)Corrupt Shell."
+			"text": "This is $(item)Galactic Flesh.$() This item is a common drop from the $(d)Corrupt Shell.$()$(p)Eating this will restore some hunger and provide you with a completely random potion effect."
 		},
 		{
 			"type": "spotlight",
 			"item": "assemblylinemachines:reality_crystal",
 			"link_recipe": true,
 			"text": "This is a $(item)Reality Crystal,$() an exceedingly rare drop from the $(d)Corrupt Shell.$() $(thing)Looting$() enchantments increase the chance to get this."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/upgrades/entropy_reactor_upgrade_entropic_harnesser",
+			"title": "E. Harnesser Upgrade",
+			"anchor": "entropicharnesser",
+			"text": "The $(2)Entropic Harnesser Upgrade$() changes the reactor to produce only $(c)Entropy$() instead of FE, and will only perform $(d)World Corruption$() instead of the other negative effects."
 		}
 		
 	]

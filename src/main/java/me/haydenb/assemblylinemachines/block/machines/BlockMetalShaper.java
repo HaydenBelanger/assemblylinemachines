@@ -204,7 +204,7 @@ public class BlockMetalShaper extends BlockScreenBlockEntity<BlockMetalShaper.TE
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
@@ -213,7 +213,7 @@ public class BlockMetalShaper extends BlockScreenBlockEntity<BlockMetalShaper.TE
 				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

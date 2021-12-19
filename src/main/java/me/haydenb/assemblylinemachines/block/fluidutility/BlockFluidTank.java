@@ -207,15 +207,14 @@ public class BlockFluidTank extends Block implements EntityBlock {
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
-			super.save(compound);
+		public void saveAdditional(CompoundTag compound) {
 
 			if (fluid != null) {
 				CompoundTag sub = new CompoundTag();
 				fluid.writeToNBT(sub);
 				compound.put("assemblylinemachines:fluidstack", sub);
 			}
-			return compound;
+			super.saveAdditional(compound);
 		}
 
 		public boolean isEmpty() {

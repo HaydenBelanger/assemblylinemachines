@@ -1,0 +1,102 @@
+{
+	"type":"assemblylinemachines:chaos_plane",
+	"generator":{
+		"biome_source":{
+			"type":"minecraft:multi_noise",
+			"humidity_noise":{
+				"firstOctave":-9,
+				"amplitudes":[
+					1.0,
+					1.0
+				]
+			},
+			"altitude_noise":{
+				"firstOctave":-9,
+				"amplitudes":[
+					2.8,
+					1.0
+				]
+			},
+			"weirdness_noise":{
+				"firstOctave":-5,
+				"amplitudes":[
+					1.0,
+					1.0
+				]
+			},
+			"temperature_noise":{
+				"firstOctave":-9,
+				"amplitudes":[
+					1.0,
+					1.0
+				]
+			},
+			"seed":0,
+			"biomes":[
+				{
+					"parameters":{
+						"weirdness":0.15,
+						"offset":0.0,
+						"temperature":0.1,
+						"humidity":0.1,
+						"continentalness": 0.5,
+						"erosion": 0.8,
+						"depth": 0
+						
+					},
+					"biome":"assemblylinemachines:corrupt_plains"
+				},
+				{
+					"parameters":{
+						"weirdness":0.20,
+						"offset":0.0,
+						"temperature":0.2,
+						"humidity":-0.1,
+						"continentalness": 0.7,
+						"erosion": 0.9,
+						"depth": 0
+					},
+					"biome":"assemblylinemachines:corrupt_desert"
+				},
+				{
+					"parameters":{
+						"weirdness":0.20,
+						"offset":0.0,
+						"temperature":0.15,
+						"humidity":0.15,
+						"continentalness": 0.3,
+						"erosion": 0.65,
+						"depth": 0
+					},
+					"biome":"assemblylinemachines:corrupt_forest"
+				},
+				{
+					"parameters":{
+						"weirdness":1.3,
+						"offset":0.6,
+						"temperature":0.05,
+						"humidity":0,
+						"continentalness": 1,
+						"erosion": 0,
+						"depth": 0
+					},
+					"biome":"assemblylinemachines:corrupt_cliffs"
+				},
+				{
+					"parameters":{
+						"weirdness":0.40,
+						"offset":0.1,
+						"temperature":0.1,
+						"humidity":0.1,
+						"continentalness": 0,
+						"erosion": 0.6,
+						"depth": 0
+					},
+					"biome":"assemblylinemachines:corrupt_ocean"
+				}
+			]
+		},
+		"settings":"assemblylinemachines:chaos_plane",
+		"type":"assemblylinemachines:seeded_noise"
+	}
+}

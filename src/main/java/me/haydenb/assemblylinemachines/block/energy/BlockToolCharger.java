@@ -196,10 +196,10 @@ public class BlockToolCharger extends BlockTileEntity{
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 
 			compound.putInt("assemblylinemachines:amount", amount);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		private boolean getCapability() {

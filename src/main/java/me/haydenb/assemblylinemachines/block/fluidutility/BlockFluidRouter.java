@@ -149,13 +149,13 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putString("assemblylinemachines:fluidl", fluidL.getRegistryName().toString());
 			compound.putString("assemblylinemachines:fluidr", fluidR.getRegistryName().toString());
 			CompoundTag sub = new CompoundTag();
 			tank.writeToNBT(sub);
 			compound.put("assemblylinemachines:tank", sub);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {

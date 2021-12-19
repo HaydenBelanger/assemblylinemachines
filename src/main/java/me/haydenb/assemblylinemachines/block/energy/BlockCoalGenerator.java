@@ -126,12 +126,12 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:initgen", genper);
 			compound.putInt("assemblylinemachines:remgen", timeremaining);
 			compound.putBoolean("assemblylinemachines:naphtha", naphthaActive);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {

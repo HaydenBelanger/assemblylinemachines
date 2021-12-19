@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"nrn",
+		"dve",
+		"nrn"
+	],
+	"key":{
+		"n":{
+			"tag": "forge:plates/novasteel"
+		},
+		"r":{
+			"item": "assemblylinemachines:reality_crystal"
+		},
+		"d":{
+			"item": "assemblylinemachines:corrupt_diamond_ore"
+		},
+		"e":{
+			"item": "assemblylinemachines:corrupt_emerald_ore"
+		},
+		"v":{
+			"item": "assemblylinemachines:entropy_reactor_upgrade_variety"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:entropy_reactor_upgrade_entropic_harnesser"
+	}
+}

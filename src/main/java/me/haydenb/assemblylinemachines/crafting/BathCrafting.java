@@ -269,6 +269,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		public String toString() {
 			return "assemblylinemachines:bath";
 		}
+		
 	}
 
 	public static enum BathOption{

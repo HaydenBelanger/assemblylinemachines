@@ -8,12 +8,12 @@ import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.block.chaosplane.CorruptBlock;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.crafting.EntropyReactorCrafting;
+import me.haydenb.assemblylinemachines.crafting.WorldCorruptionCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
@@ -48,7 +48,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
@@ -467,7 +467,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putBoolean("assemblylinemachines:assigned", assigned);
 
 			if(assigned == true) {
@@ -476,7 +476,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				compound.putInt("assemblylinemachines:master_z", master_z);
 			}
 
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 
 		@Override
@@ -556,7 +556,8 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		private float capacity = 100f;
 		
 		private float entropy = 0f;
-		private float entropyTimer = 0f;
+		private int entropyTimer = 0;
+		private int nEntropyTimer = 200;
 
 		private int genPerCycle = 0;
 		private int cyclesRemaining = 0;
@@ -624,7 +625,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 
 			compound.putInt("assemblylinemachines:nburntimer", nBurnTimer);
 
@@ -638,7 +639,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 			compound.putInt("assemblylinemachines:genpercycle", genPerCycle);
 			compound.putInt("assemblylinemachines:cyclesremaining", cyclesRemaining);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 
 		private void updateAllEdgesAndCorners(boolean active) {
@@ -714,8 +715,15 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 						sendUpdates = true;
 
-						genPerCycle = (int) total * 6000;
-						cyclesRemaining = Math.round(varietyRating * 9f);
+						if(this.getUpgradeAmount(Upgrades.E_R_ENTROPIC_HARNESSER) != 0) {
+							entropy += (total * 0.0025f) * (varietyRating * 9f);
+						}else {
+							genPerCycle = (int) total * 6000;
+							cyclesRemaining = Math.round(varietyRating * 9f);
+							
+							this.updateAllEdgesAndCorners(true);
+							this.getLevel().setBlockAndUpdate(this.getBlockPos(), this.getLevel().getBlockState(this.getBlockPos()).setValue(ENTROPY_REACTOR_PIECE, EntropyReactorOptions.SCREEN_ACTIVE));
+						}
 
 						entropy += (0.2f - varietyRating) / 4f;
 						if(entropy < 0f) {
@@ -760,9 +768,6 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 						updateCoreBlockBasedOnEntropy();
 						
-						this.updateAllEdgesAndCorners(true);
-						this.getLevel().setBlockAndUpdate(this.getBlockPos(), this.getLevel().getBlockState(this.getBlockPos()).setValue(ENTROPY_REACTOR_PIECE, EntropyReactorOptions.SCREEN_ACTIVE));
-
 					}
 					
 					if(cyclesRemaining == 0 && operationTimer++ == 20) {
@@ -790,6 +795,15 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 							total = capacity;
 						}
 
+						
+						switch(getUpgradeAmount(Upgrades.E_R_ENTROPIC_HARNESSER)) {
+						case 0:
+							nEntropyTimer = 200;
+							break;
+						default:
+							nEntropyTimer = 100;
+						}
+						
 						if(slavesReporting == false) {
 							Direction inDir = getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite();
 
@@ -829,7 +843,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 				}
 				
-				if(entropyTimer++ == 200) {
+				if(entropyTimer++ == nEntropyTimer) {
 					entropyTimer = 0;
 					
 					sendUpdates = true;
@@ -838,6 +852,8 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 					
 					if(entropy < 0f) {
 						entropy = 0f;
+					}else if(entropy > 1f) {
+						entropy = 1f;
 					}
 					
 				}
@@ -862,8 +878,9 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		}
 		
 		public float performEntropyTask(float entropy) {
+			boolean hasUpgrade = getUpgradeAmount(Upgrades.E_R_ENTROPIC_HARNESSER) == 1;
 			Random rand = this.getLevel().getRandom();
-			if(entropy > 0.1f) {
+			if(!hasUpgrade && entropy > 0.1f) {
 				
 				//When entropy is above 10%, randomly performs potion effects between 33-100% of the time, maxing out at 30% entropy
 				if((rand.nextFloat() * 0.3f) < entropy) {
@@ -899,7 +916,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				
 			}
 			
-			if(entropy > 0.3f && level.getDifficulty() != Difficulty.PEACEFUL) {
+			if(!hasUpgrade && entropy > 0.3f && level.getDifficulty() != Difficulty.PEACEFUL) {
 				
 				if((rand.nextFloat() * 0.5f) < entropy) {
 					
@@ -940,35 +957,41 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			
 			if(entropy > 0.5f) {
 				
-				
-				int max = Math.round(entropy * 17f);
+				int upMx = hasUpgrade ? 3 : 1;
+				int max = Math.round(entropy * 17f * upMx);
 				int i = 0;
 				int ii = 0;
 				
-				while(i < max) {
+				upMx = hasUpgrade ? 2 : 1;
+				
+				while(i < max && ii < (max * 3)) {
 					
-					double x = this.getBlockPos().getX() + ((rand.nextDouble() * 20) - 10);
-					double y = this.getBlockPos().getY() + ((rand.nextDouble() * 10) - 10);
-					double z = this.getBlockPos().getZ() + ((rand.nextDouble() * 20) - 10);
+					double x = this.getBlockPos().getX() + ((rand.nextDouble() * (20 * upMx)) - (10 * upMx));
+					double y = this.getBlockPos().getY() + ((rand.nextDouble() * 10) - 5);
+					double z = this.getBlockPos().getZ() + ((rand.nextDouble() * (20 * upMx)) - (10 * upMx));
 					
 					BlockPos posx = new BlockPos(new Vec3(x, y, z));
-					Block obs = this.getLevel().getBlockState(posx).getBlock();
-					Block nb = Registry.getBlock(CorruptBlock.CORRUPT_VARIANTS.get(obs));
-					
-					if(nb != null) {
-						this.getLevel().setBlockAndUpdate(posx, nb.defaultBlockState());
-						entropy -= 0.00025f;
-						i++;
+					if(!this.getLevel().isEmptyBlock(posx) || !this.getLevel().getFluidState(posx).getType().equals(Fluids.EMPTY)) {
+						for(WorldCorruptionCrafting recipe : this.getLevel().getRecipeManager().getRecipesFor(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, null, this.getLevel())) {
+							Optional<Block> res = recipe.testBlock(this.getLevel().getBlockState(posx).getBlock());
+							if(res.isPresent()) {
+								this.getLevel().setBlockAndUpdate(posx, res.get().defaultBlockState());
+								entropy -= 0.00025f;
+								i++;
+							}
+							Optional<Fluid> resF = recipe.testFluid(this.getLevel().getFluidState(posx).getType());
+							if(resF.isPresent()) {
+								this.getLevel().setBlockAndUpdate(posx, resF.get().defaultFluidState().createLegacyBlock());
+								entropy -= 0.00025f;
+								i++;
+							}
+						}
 					}
-					
-					if(ii++ == 50) {
-						entropy -= 0.001f;
-						break;
-					}
+					ii++;
 				}
 			}
 			
-			if(entropy > 0.98f && ConfigHolder.COMMON.reactorExplosions.get()) {
+			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.COMMON.reactorExplosions.get()) {
 				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
 				entropy = 0f;
 			}

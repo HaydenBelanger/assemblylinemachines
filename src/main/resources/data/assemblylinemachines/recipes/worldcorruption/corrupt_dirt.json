@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:dirt"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_dirt"
+	}
+}

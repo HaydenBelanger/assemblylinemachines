@@ -2,15 +2,15 @@
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
 		"c c",
-		"m m",
+		"n n",
 		"ccc"
 	],
 	"key":{
 		"c":{
 			"tag": "forge:plates/chromium"
 		},
-		"m":{
-			"item": "assemblylinemachines:strange_matter"
+		"n":{
+			"tag": "forge:plates/novasteel"
 		}
 	},
 	"result":{

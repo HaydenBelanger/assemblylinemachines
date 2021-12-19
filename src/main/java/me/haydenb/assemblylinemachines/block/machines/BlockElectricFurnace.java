@@ -218,7 +218,7 @@ public class BlockElectricFurnace extends BlockScreenBlockEntity<BlockElectricFu
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
@@ -229,7 +229,7 @@ public class BlockElectricFurnace extends BlockScreenBlockEntity<BlockElectricFu
 			}else {
 				compound.remove("assemblylinemachines:output");
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

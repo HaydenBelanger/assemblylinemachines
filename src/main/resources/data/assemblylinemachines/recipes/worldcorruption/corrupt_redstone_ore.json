@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "forge:ores/redstone"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_redstone_ore"
+	}
+}

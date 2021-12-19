@@ -274,8 +274,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
-			super.save(compound);
+		public void saveAdditional(CompoundTag compound) {
 
 			compound.putInt("assemblylinemachines:stirs", stirsRemaining);
 			compound.putString("assemblylinemachines:fluid", fluid.toString());
@@ -302,7 +301,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 			} else {
 				compound.remove("assemblylinemachines:output");
 			}
-			return compound;
+			super.saveAdditional(compound);
 		}
 
 		@Override

@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "forge:gravel"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_gravel"
+	}
+}

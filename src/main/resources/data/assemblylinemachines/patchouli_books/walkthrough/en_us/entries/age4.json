@@ -15,28 +15,60 @@
 			"link_recipe": true,
 			"text": "Place $(thing)1 Ender Pearl and 1 Mystium Blend$() as the filter items, and $(item)1 Pure Titanium Ingot$() in the main spot, to get $(9)1 Attuned Titanium Ingot.$()"
 		},
-		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/blocks_ingots_nuggets/ingot_to_block/attuned_titanium",
-			"text": "You will need 2 $(item)Attuned Titanium Blocks$() and $(l:items/novasteel_tools#graphenerod)4 Graphene Rods$()..."
+		{ 
+			"type": "spotlight",
+			"item": "assemblylinemachines:silt_mystium",
+			"link_recipe": true,
+			"text": "Using the latent power of the $(l:blocks/entropy_reactor)Entropy Reactor,$(/l) you will be able to create your next resource: $(item)Flerovium Ore.$()$(p)This is obtained by intentionally inducing a high level of $(c)Entropy$() and allowing the device to corrupt blocks in a surrounding area."
 		},
 		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/teleportation_pad",
-			"text": "...In order to make a $(5)Teleportation Pad.$() To get the $(thing)Reality Crystal,$() you will also need to make an $(l:blocks/entropy_reactor)Entropy Reactor.$()"
+			"type": "spotlight",
+			"item": "assemblylinemachines:flerovium_ore",
+			"link_recipe": true,
+			"text": "Create $(thing)Mystium Silt$() by combining Silt and Mystium Blend in a Fluid Mixer, and place in the world near the Entropy Reactor. With time, the Mystium Silt will be replaced with $(item)Flerovium Ore.$()$(p)$(4)Note that Flerovium Ore is tough, and requires a Mystium tool or better to be harvested."
 		},
 		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/aefg",
-			"text": "As well as the $(thing)Teleportation Pad,$() you will also need an $(item)AEFG.$()$(p)This will protect you from negative effects in the $(d)Chaos Plane,$() at least while it's charged."
+			"type": "spotlight",
+			"item": "assemblylinemachines:prismatic_dust",
+			"link_recipe": true,
+			"text": "You can also use world corruption via the Entropy Reactor to create a $(3)Prism Rose.$() Just place any small flower, like a Poppy or Dandelion, near the reactor to receive a Prism Rose.$(p)Use a Grinder with a Prism Rose to create a $(item)Prismatic Dust.$()"
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:raw_novasteel_compound",
+			"link_recipe": true,
+			"text": "Now, we can start putting it all together to get the final alloy available to you: $(9)Novasteel.$()$(p)Combine 1 Flerovium Ingot and 1 Attuned Titanium Ingot in an Alloy Smelter to get 2 Raw Novasteel Compound."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:nova_blend",
+			"link_recipe": true,
+			"text": "Combine 1 Mystium Blend and 1 Prismatic Dust in a Fluid Mixer with Condensed Void to receive 2 Nova Blend."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:novasteel_ingot",
+			"anchor": "novasteel",
+			"link_recipe": true,
+			"text": "Finally, combine 1 Raw Novasteel Compound and 1 Nova Blend in an Alloy Smelter to receive $(9)1 Novasteel Ingot.$()$(p)Having trouble mass-producing Flerovium for this setup? Try the $(l:blocks/entropy_reactor#entropicharnesser)Entropic Harnesser Upgrade.$(/l)"
 		},
 		{
 			"type": "text",
-			"text": "As well as your new items to protect against the dimension, $(c)Netherite Armor$() or better, as well as $(d)Mystium Tools$() is recommended, as the $(l:blocks/entropy_reactor#corruptshell)mobs native to the Chaos Plane$(/l) are tough.$(p)Finally, $(9)Night Vision Potions$() are recommended, as it is very dark there."
+			"text": "With $(thing)Novasteel Ingots$() under your belt, you have reached the end of the Synthetic Age, and the structured tutorial. However, this is by no means the end of the mod, as there are still many things to do and machines to make.$(p)$(l)Thank you for playing Assembly Line Machines!"
 		},
 		{
-			"type": "text",
-			"text": "When you are ready, place down the $(thing)Teleportation Pad$() and RIGHT-CLICK it whilst standing on it to teleport to the $(d)Chaos Plane,$() thus ending the Synthetic Age, and beginning the $(l:age5)Chaotic Age."
+			"type": "relations",
+			"entries":[
+				"assemblylinemachines:blocks/generators",
+				"assemblylinemachines:blocks/mob_farming",
+				"assemblylinemachines:blocks/quantum_link",
+				"assemblylinemachines:blocks/quarry",
+				"assemblylinemachines:blocks/pipes",
+				"assemblylinemachines:items/novasteel_tools",
+				"assemblylinemachines:blocks/corrupting_basin"
+			],
+			"title": "Further Reading",
+			"text": "Hungry for more? Check out these hand-picked articles about more things that guarantee a good time."
 		}
 		
 	]

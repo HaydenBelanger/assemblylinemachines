@@ -35,9 +35,9 @@ public class ConfigHandler {
 	public static class ASMConfig{
 		
 		//MIXINS
-		public final BooleanValue experimentalWorldScreenDisable;
-		public final BooleanValue farBlockPosGeneratorSuppressed;
-		public final BooleanValue seedUnification;
+		//public final BooleanValue experimentalWorldScreenDisable;
+		//public final BooleanValue farBlockPosGeneratorSuppressed;
+		//public final BooleanValue seedUnification;
 		
 		//MACHINE OPTIONS
 		public final BooleanValue coolDudeMode;
@@ -190,8 +190,8 @@ public class ConfigHandler {
 			builder.push("Titanium Generation");
 			titaniumVeinSize = builder.comment("What should the maximum size per vein of Standard/Deepslate/Corrupt Titanium Ore be? Set to 0 to disable completely.").define("titaniumVeinSize", 6);
 			titaniumFrequency = builder.comment("How many veins of Standard/Deepslate/Corrupt Titanium Ore should generate per chunk? Set to 0 to disable completely.").define("titaniumFrequency", 3);
-			titaniumMinHeight = builder.comment("What is the minimum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld and Chaos Plane?").define("titaniumMinHeight", 8);
-			titaniumMaxHeight = builder.comment("What is the maximum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld and Chaos Plane?").define("titaniumMaxHeight", 16);
+			titaniumMinHeight = builder.comment("What is the minimum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld?").define("titaniumMinHeight", -64);
+			titaniumMaxHeight = builder.comment("What is the maximum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", -32);
 			builder.pop();
 			
 			builder.push("Black Granite Generation");
@@ -212,12 +212,12 @@ public class ConfigHandler {
 			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
 			builder.pop();
 			
-			builder.push("Experimental Mixin Settings");
+			/*builder.push("Experimental Mixin Settings");
 			experimentalWorldScreenDisable = builder.comment("Should Assembly Line Machines suppress the World Experimental Settings screen? This will have no effect if another mod performs the same task.").define("experimentalWorldScreenDisable", true);
 			farBlockPosGeneratorSuppressed = builder.comment("Should Assembly Line Machines suppress the warning related to far-away block generation error, an artifact of Mojang debug code? This will suppress ALL INSTANCES of this debug log being outputted.").define("farBlockPosGeneratorSuppressed", true);
 			seedUnification = builder.comment("Should Assembly Line Machines attempt to unify the world seed between the Vanilla dimensions and the Chaos Plane? Otherwise, the world will use seed '0'.").define("seedUnification", true);
 			builder.pop();
-			
+			*/
 			
 			
 		}

@@ -11,7 +11,9 @@ public class ItemHammer extends SwordItem {
 	}
 
 	@Override
-	public ItemStack getContainerItem(ItemStack itemStack) {
+	public ItemStack getContainerItem(ItemStack origStack) {
+		
+		ItemStack itemStack = origStack.copy();
 		
 		if(itemStack.getDamageValue() >= itemStack.getMaxDamage()) {
 			return ItemStack.EMPTY;

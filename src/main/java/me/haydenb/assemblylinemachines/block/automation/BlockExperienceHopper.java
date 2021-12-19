@@ -135,12 +135,10 @@ public class BlockExperienceHopper extends BlockTileEntity {
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
-			super.save(compound);
+		public void saveAdditional(CompoundTag compound) {
 
 			compound.putInt("assemblylinemachines:internalxp", internalStoredXp);
-			
-			return compound;
+			super.saveAdditional(compound);
 		}
 		
 		@Override

@@ -71,13 +71,13 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			if(spawnType != null) {
 				compound.putString("assemblylinemachines:spawntype", spawnType.getRegistryName().toString());
 			}
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

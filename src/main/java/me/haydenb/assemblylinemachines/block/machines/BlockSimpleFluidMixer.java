@@ -199,7 +199,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			compound.putBoolean("assemblylinemachines:pendingoutput", pendingOutput);
@@ -211,7 +211,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

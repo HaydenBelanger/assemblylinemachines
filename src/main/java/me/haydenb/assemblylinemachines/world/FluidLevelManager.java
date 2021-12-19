@@ -93,11 +93,11 @@ public class FluidLevelManager {
 					if(recipe.getCriteria() != FluidInGroundCriteria.END) {
 						chance = -1;
 					}
-				}else if(dim.equals(DimensionChaosPlane.CHAOS_PLANE_LOCATION.location())){
+				}/*else if(dim.equals(DimensionChaosPlane.CHAOS_PLANE_LOCATION.location())){
 					if(recipe.getCriteria() != FluidInGroundCriteria.CHAOS_PLANE) {
 						chance = -1;
 					}
-				}else {
+				}*/else {
 					chance = -1;
 				}
 

@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "minecraft:sand"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_sand"
+	}
+}

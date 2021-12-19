@@ -344,7 +344,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			if(min != null) {
 				compound.putIntArray("assemblylinemachines:min", min);
@@ -368,7 +368,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 			compound.putString("assemblylinemachines:status", status);
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 
 		public int getUpgradeBlockCount(Block block) {

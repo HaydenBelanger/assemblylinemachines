@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:grass_block"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_grass"
+	}
+}

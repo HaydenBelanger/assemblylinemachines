@@ -209,7 +209,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			return true;
 		}
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 
 			compound.putBoolean("assemblylinemachines:configured", configured);
 			compound.putIntArray("assemblylinemachines:pfi", pfi);
@@ -225,7 +225,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			compound.putBoolean("assemblylinemachines:connected", connected);
 			compound.putBoolean("assemblylinemachines:passwordconnection", passwordEnabled);
 
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 
 		@Override

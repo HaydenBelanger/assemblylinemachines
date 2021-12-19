@@ -133,6 +133,8 @@ public class RecipeCategoryBuilder {
 	//Build
 	public <R extends Recipe<?> & IRecipeCategoryBuilder> IRecipeCategory<R> build(Class<R> clazz){
 		
+		if(fluidTooltip == null) fluidTooltip = RecipeCategoryBuilder::defaultFluidRenderer;
+		
 		class ALMRecipeCategory implements IRecipeCategory<R>{
 
 			@Override
@@ -221,12 +223,7 @@ public class RecipeCategoryBuilder {
 					}
 				}
 				
-				if(fluidTooltip != null) {
-					recipe.setupSlots(recipeLayout, helper, Optional.of(getBasicFluidStackRenderer(recipe)));
-				}else {
-					recipe.setupSlots(recipeLayout, helper, Optional.empty());
-				}
-				
+				recipe.setupSlots(recipeLayout, helper, Optional.of(getBasicFluidStackRenderer(recipe)));
 				
 				i = 0;
 				for(List<ItemStack> it : Stream.of(ingredients.getInputs(VanillaTypes.ITEM), ingredients.getOutputs(VanillaTypes.ITEM)).flatMap(List::stream).collect(Collectors.toList())) {
@@ -261,6 +258,10 @@ public class RecipeCategoryBuilder {
 				return fluidTooltip.apply(recipe, ingredient, tooltipFlag);
 			}
 		};
+	}
+	
+	private static List<Component> defaultFluidRenderer(Recipe<?> p1, FluidStack p2, TooltipFlag p3) {
+		return List.of(p2.getDisplayName());
 	}
 	
 	public static ResourceLocation getGUIPath(String name) {

@@ -226,8 +226,7 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
-			super.save(compound);
+		public void saveAdditional(CompoundTag compound) {
 			
 			if(blade != null) {
 				CompoundTag sub = new CompoundTag();
@@ -235,7 +234,7 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 				compound.put("assemblylinemachines:blade", sub);
 			}
 			
-			return compound;
+			super.saveAdditional(compound);
 		}
 		
 		

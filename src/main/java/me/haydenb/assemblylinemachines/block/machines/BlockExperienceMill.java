@@ -436,7 +436,7 @@ public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceM
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			compound.putByte("assemblylinemachines:mode", mode);
 			compound.putFloat("assemblylinemachines:progress", progress);
@@ -450,7 +450,7 @@ public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceM
 				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

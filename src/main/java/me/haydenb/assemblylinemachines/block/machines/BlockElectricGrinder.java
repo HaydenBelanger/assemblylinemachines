@@ -197,7 +197,7 @@ public class BlockElectricGrinder extends BlockScreenBlockEntity<BlockElectricGr
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
@@ -206,7 +206,7 @@ public class BlockElectricGrinder extends BlockScreenBlockEntity<BlockElectricGr
 				output.save(sub);
 				compound.put("assemblylinemachines:output", sub);
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

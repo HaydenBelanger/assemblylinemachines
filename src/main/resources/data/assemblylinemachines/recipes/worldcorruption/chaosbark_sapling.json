@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "minecraft:saplings"
+	},
+	"output":{
+		"item": "assemblylinemachines:chaosbark_sapling"
+	}
+}

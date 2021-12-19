@@ -97,11 +97,11 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putFloat("assemblylinemachines:maxburntime", maxBurnTime);
 			compound.putFloat("assemblylinemachines:burntime", burnTime);
 			compound.putInt("assemblylinemachines:prevtimer", nTimer);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

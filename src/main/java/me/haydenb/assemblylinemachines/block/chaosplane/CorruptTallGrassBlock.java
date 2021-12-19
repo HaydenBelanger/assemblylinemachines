@@ -1,38 +1,56 @@
 package me.haydenb.assemblylinemachines.block.chaosplane;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.stream.Stream;
 
 import com.mojang.authlib.GameProfile;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.world.DimensionChaosPlane.ChaosbarkTreeGrower;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
+import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class CorruptTallGrassBlock extends TallGrassBlock {
 
 	public static final PlantType CORRUPT_GRASS = PlantType.get("corrupt_grass");
 	public static final PlantType BRAIN_CACTUS = PlantType.get("brain_cactus");
-	
+
 	public CorruptTallGrassBlock() {
 		super(Block.Properties.of(Material.REPLACEABLE_PLANT).noCollission().instabreak().sound(SoundType.GRASS));
 	}
@@ -49,7 +67,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 			DoublePlantBlock.placeAt(pLevel, dpb.defaultBlockState(), pPos, 2);
 		}
 	}
-	
+
 	@Override
 	public PlantType getPlantType(BlockGetter world, BlockPos pos) {
 		return CORRUPT_GRASS;
@@ -90,14 +108,60 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		public PlantType getPlantType(BlockGetter world, BlockPos pos) {
 			return CORRUPT_GRASS;
 		}
+
+		@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
+		public static class ChaosbarkTreeGrower extends AbstractTreeGrower{
+
+			public static ConfiguredFeature<?, ?> chaosbarkTree;
+
+
+
+			@Override
+			protected ConfiguredFeature<?, ?> getConfiguredFeature(Random p_60014_, boolean p_60015_) {
+				return chaosbarkTree;
+			}
+
+			public static void registerTreeGen() {
+				BlockStateProvider bspTrunk = BlockStateProvider.simple(Registry.getBlock("chaosbark_log").defaultBlockState());
+				TrunkPlacer trunkPlacer = new StraightTrunkPlacer(4, 2, 0);
+				BlockStateProvider bspLeaves = BlockStateProvider.simple(Registry.getBlock("chaosbark_leaves").defaultBlockState());
+
+				FoliagePlacer foliagePlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
+				FeatureSize size = new TwoLayersFeatureSize(1, 0, 1);
+				BlockStateProvider bspDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
+
+				chaosbarkTree = new TreeFeature(TreeConfiguration.CODEC).configured(new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
+			}
+
+
+			@SubscribeEvent
+			public static void patchStrippables(FMLCommonSetupEvent event) {
+
+				AssemblyLineMachines.LOGGER.info("Patching Strippable Logs to include Chaosbark...");
+
+				HashMap<Block, Block> strippableMap = new HashMap<>();
+
+				for(Block b : AxeItem.STRIPPABLES.keySet()) {
+					strippableMap.put(b, AxeItem.STRIPPABLES.get(b));
+				}
+
+				strippableMap.put(Registry.getBlock("chaosbark_log"), Registry.getBlock("stripped_chaosbark_log"));
+
+				AxeItem.STRIPPABLES = strippableMap;
+
+				ChaosbarkTreeGrower.registerTreeGen();
+			}
+
+
+		}
 	}
 
 	public static class BrainCactusBlock extends CactusBlock {
 
 		public static final BooleanProperty CAP = BooleanProperty.create("cap");
-		
+
 		private static final GameProfile BRAIN_CACTUS_PROFILE = new GameProfile(null, "Brain Cactus");
-		
+
 		private static final VoxelShape NO_CAP_SHAPE = Block.box(2, 0, 2, 14, 16, 14);
 		private static final VoxelShape CAP_SHAPE = Stream.of(
 				Block.box(2, 0, 2, 14, 10, 14),
@@ -105,7 +169,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 				Block.box(3, 10, 3, 13, 14, 13),
 				Block.box(4, 14, 4, 12, 15, 12)
 				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
-		
+
 		public BrainCactusBlock() {
 			super(Block.Properties.of(Material.CACTUS).randomTicks().strength(3f, 9f).sound(SoundType.WOOL));
 			this.registerDefaultState(this.stateDefinition.any().setValue(CactusBlock.AGE, Integer.valueOf(0)).setValue(CAP, false));
@@ -115,17 +179,17 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
 			return plantable.getPlantType(world, pos) == BRAIN_CACTUS;
 		}
-		
+
 		@Override
 		public PlantType getPlantType(BlockGetter world, BlockPos pos) {
 			return BRAIN_CACTUS;
 		}
-		
+
 		@Override
 		public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
 			return pState.getValue(CAP) ? CAP_SHAPE : NO_CAP_SHAPE;
 		}
-		
+
 		@Override
 		public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
 			super.randomTick(pState, pLevel, pPos, pRandom);
@@ -157,21 +221,21 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 			super.createBlockStateDefinition(pBuilder);
 			pBuilder.add(CAP);
 		}
-		
+
 		@Override
 		public BlockState getStateForPlacement(BlockPlaceContext pContext) {
 			return pContext.getLevel().isEmptyBlock(pContext.getClickedPos().relative(pContext.getClickedFace().getOpposite()).above()) ? this.defaultBlockState().setValue(CAP, true) : this.defaultBlockState();
 		}
-		
+
 		@Override
 		public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
 			if(!pLevel.isClientSide) {
 				if(!(pEntity instanceof ExperienceOrb) && !(pEntity instanceof ItemEntity)) {
 					pEntity.hurt(DamageSource.playerAttack(FakePlayerFactory.get((ServerLevel) pLevel, BRAIN_CACTUS_PROFILE)), 4.0f);
 				}
-				
+
 			}
-			
+
 		}
 	}
 

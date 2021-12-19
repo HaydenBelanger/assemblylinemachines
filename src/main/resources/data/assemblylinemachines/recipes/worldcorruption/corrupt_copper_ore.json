@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "minecraft:copper_ores"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_copper_ore"
+	}
+}

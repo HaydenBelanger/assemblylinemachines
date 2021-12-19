@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.item.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.world.DimensionChaosPlane;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -36,7 +35,7 @@ public class FluidCondensedVoid extends ALMFluid {
 	
 	@Override	
 	protected void randomTick(Level world, BlockPos pos, FluidState state, Random randomom) {
-		if(!world.dimension().location().equals(DimensionChaosPlane.CHAOS_PLANE_LOCATION.location())) {
+		/*if(!world.dimension().location().equals(DimensionChaosPlane.CHAOS_PLANE_LOCATION.location())) {*/
 			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
 			while(iter.hasNext()) {
 				BlockPos cor = iter.next();
@@ -58,7 +57,7 @@ public class FluidCondensedVoid extends ALMFluid {
 				}
 					
 			}
-		}
+		//}
 		
 		
 		super.randomTick(world, pos, state, randomom);

@@ -265,7 +265,7 @@ public class BlockElectricPurifier extends BlockScreenBlockEntity<BlockElectricP
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
@@ -276,7 +276,7 @@ public class BlockElectricPurifier extends BlockScreenBlockEntity<BlockElectricP
 				compound.put("assemblylinemachines:output", sub);
 				
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 	}
 	

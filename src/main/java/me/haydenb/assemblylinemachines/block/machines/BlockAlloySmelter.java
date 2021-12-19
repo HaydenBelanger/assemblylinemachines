@@ -223,7 +223,7 @@ public class BlockAlloySmelter extends BlockScreenBlockEntity<BlockAlloySmelter.
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
@@ -236,7 +236,7 @@ public class BlockAlloySmelter extends BlockScreenBlockEntity<BlockAlloySmelter.
 			}else {
 				compound.remove("assemblylinemachines:output");
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		public int getUpgradeAmount(Upgrades upgrade) {

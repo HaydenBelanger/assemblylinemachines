@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:fern"
+	},
+	"output":{
+		"item": "assemblylinemachines:mandelbloom"
+	}
+}

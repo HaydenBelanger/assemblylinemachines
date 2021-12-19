@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "minecraft:small_flowers"
+	},
+	"output":{
+		"item": "assemblylinemachines:prism_rose"
+	}
+}

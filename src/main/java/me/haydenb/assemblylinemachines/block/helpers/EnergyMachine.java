@@ -104,10 +104,10 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
 		compound.putInt("assemblylinemachines:stored", amount);
 		compound.putFloat("assemblylinemachines:fept", fept);
-		return super.save(compound);
+		super.saveAdditional(compound);
 	}
 	
 	@Override

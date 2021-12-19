@@ -75,6 +75,10 @@ public class JEICategoryRegistry implements IModPlugin{
 					.background("gui_set_a", 147, 119, 90, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_a", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 42, 8)
 					.itemSlots(1, Pair.of(21, 4), Pair.of(0, 4), Pair.of(68, 4)).build(MetalCrafting.class));
 			
+			CATEGORY_REGISTRY.put(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("world_corruption").title("World Corruption")
+					.background("gui_set_b", 0, 10, 90, 26).icon(Registry.getBlock("corrupt_diamond_ore")).progressBar("gui_set_b", 50, 0, 19, 10, 200, StartDirection.LEFT, false, 42, 8)
+					.build(WorldCorruptionCrafting.class));
+			
 			CATEGORY_REGISTRY.put(EntropyReactorCrafting.ERO_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("entropy_reactor_output").title("Entropy Reactor Waste")
 					.background("gui_set_a", 130, 24, 85, 41).icon(Registry.getBlock("entropy_reactor_core")).progressBar("gui_set_a", 199, 10, 16, 14, 100, StartDirection.LEFT, false, 42, 13)
 					.draw(new TriConsumer<Recipe<?>, PoseStack, Pair<Double,Double>>() {
@@ -174,6 +178,8 @@ public class JEICategoryRegistry implements IModPlugin{
 							return List.of(pP2.getDisplayName(), new TextComponent("§b" + Formatting.GENERAL_FORMAT.format(pP2.getAmount()) + " mB"));
 						}
 					}).build(RefiningCrafting.class));
+			
+			
 			
 			registration.addRecipeCategories(CATEGORY_REGISTRY.values().toArray(new IRecipeCategory<?>[CATEGORY_REGISTRY.size()]));
 			AssemblyLineMachines.LOGGER.info("JEI plugin for Assembly Line Machines loaded.");

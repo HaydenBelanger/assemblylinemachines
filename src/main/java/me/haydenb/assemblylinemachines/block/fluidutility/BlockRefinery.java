@@ -666,9 +666,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
-			super.save(compound);
-
+		public void saveAdditional(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:progress", progress);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
@@ -689,7 +687,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 			tankoutb.writeToNBT(suboutb);
 			compound.put("assemblylinemachines:tankoutb", suboutb);
 
-			return compound;
+			super.saveAdditional(compound);
 		}
 
 		@Override

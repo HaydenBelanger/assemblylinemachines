@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.item;
 
+import java.awt.Color;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -299,10 +300,23 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	}
 	
 	@Override
+	public int getBarColor(ItemStack stack) {
+		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
+		int dmg = compound.getInt(ptt.keyName);
+		if(dmg == 0) {
+			return super.getBarColor(stack);
+		}else {
+			float v = (float) dmg / (float) getMaxPower(stack);
+			return new Color(v, v, 1f).getRGB();
+		}
+		
+	}
+	
+	@Override
 	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
-		return dmg == 0 ? super.getBarWidth(stack) : Math.round((((compound.getInt(ptt.keyName) - getMaxPower(stack)) * -1) / (float) getMaxPower(stack)) * 13f);
+		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
 	
 	public static class EnchantmentOverclock extends Enchantment{

@@ -1,27 +1,8 @@
 package me.haydenb.assemblylinemachines.mixins;
 
-import java.util.Optional;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import com.mojang.serialization.Lifecycle;
-
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.world.DimensionChaosPlane.SeededNoiseBasedChunkGenerator;
-import net.minecraft.Util;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
-import net.minecraft.world.level.storage.PrimaryLevelData;
-
 public class ChaosPlaneMixins {
 
+	/*
 	//This Mixin will redirect calls to the Minecraft warning logger for out-of-range generation, as they cannot be avoided.
 	@Mixin(WorldGenRegion.class)
 	private static final class BlockEditErrorSuppressor {
@@ -71,6 +52,7 @@ public class ChaosPlaneMixins {
 		}
 		
 	}
+	*/
 	
 	
 }

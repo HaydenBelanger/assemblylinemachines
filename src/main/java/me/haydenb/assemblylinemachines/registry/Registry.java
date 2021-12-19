@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.registry;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -81,9 +82,9 @@ import me.haydenb.assemblylinemachines.item.ItemPowerTool.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ArmorTiers;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
+import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.TagMaster.DataProviderContainer;
-import me.haydenb.assemblylinemachines.world.DimensionChaosPlane.ChaosPlaneCarver;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
 import me.haydenb.assemblylinemachines.world.effects.*;
@@ -111,6 +112,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.*;
@@ -118,8 +120,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.carver.CaveCarverConfiguration;
-import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
@@ -140,6 +140,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 public class Registry {
@@ -160,6 +161,7 @@ public class Registry {
 	private static final HashMap<String, SoundEvent> MOD_SOUND_REGISTRY = new HashMap<>();
 	private static final HashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new HashMap<>();
 	private static final HashMap<String, Enchantment> MOD_ENCHANTMENT_REGISTRY = new HashMap<>();
+	private static final HashMap<String, Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>>> MOD_CRAFTING_REGISTRY = new HashMap<>();
 	
 	//MOD CREATIVE TAB & DEFAULT PROPERTIES
 	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
@@ -169,11 +171,9 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
-		/*
 		if(PluginPatchouli.get().isPatchouliInstalled()) {
 			createItem("guidebook", new ItemGuidebook());
 		}
-		*/
 		createItem("titanium_ingot", "titanium_nugget", "raw_titanium");
 		
 		createItem("titanium_blade_piece", "pure_gold_blade_piece", "steel_blade_piece");
@@ -295,6 +295,7 @@ public class Registry {
 		createItem("entropy_reactor_upgrade_capacity", new ItemUpgrade(true, "Entropy Reactor has a higher capacity."));
 		createItem("entropy_reactor_upgrade_cycle_delayer", new ItemUpgrade(true, "Entropy Reactor waits longer to clear capacity."));
 		createItem("entropy_reactor_upgrade_variety", new ItemUpgrade(false, "Higher Variety has greater performance.", "Lower Variety has worsened performance."));
+		createItem("entropy_reactor_upgrade_entropic_harnesser", new ItemUpgrade(false, new String[] {"Most Entropy effects are prevented."}, new String[] {"Frequency & range for Entropy effects is greater.", "Entropy is generated instead of FE."}));
 		
 		createItem("semi_dense_neutron_matter", new ItemReactorOutput("§7Low-Quality"));
 		createItem("quark_matter", new ItemReactorOutput("§9Medium-Quality"));
@@ -318,6 +319,7 @@ public class Registry {
 		createItem("chaotic_reduction_goggles", new ItemChaoticReductionGoggles());
 		
 		createItem("overclocked_convection_component", "overclocked_conduction_component");
+		
 		for(String i : MOD_ITEM_REGISTRY.keySet()) {
 			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
 		}
@@ -486,9 +488,9 @@ public class Registry {
 		createBlock("attuned_titanium_fluid_tank", new BlockFluidTank(5000000, TemperatureResistance.HOT), true);
 		
 		createBlock("novasteel_fluid_tank", new BlockFluidTank(50000000, TemperatureResistance.HOT), true);
-		
-		createBlock("teleportation_pad", new BlockTeleportationPad(), true);
+		createBlock("silt_mystium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("prism_glass", new Block(Block.Properties.of(Material.GLASS).sound(SoundType.GLASS).lightLevel((state) -> 15).noOcclusion()), true);
+		
 		registerFluids(null);
 		
 		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
@@ -652,43 +654,32 @@ public class Registry {
 	
 	@SubscribeEvent
 	public static void registerCrafting(RegistryEvent.Register<RecipeSerializer<?>> event) {
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(GrinderCrafting.GRINDER_RECIPE.toString()), GrinderCrafting.GRINDER_RECIPE);
-		event.getRegistry().register(GrinderCrafting.SERIALIZER.setRegistryName("grinder"));
 		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(BathCrafting.BATH_RECIPE.toString()), BathCrafting.BATH_RECIPE);
-		event.getRegistry().register(BathCrafting.SERIALIZER.setRegistryName("bath"));
+		createRecipe(GrinderCrafting.GRINDER_RECIPE, GrinderCrafting.SERIALIZER);
+		createRecipe(BathCrafting.BATH_RECIPE, BathCrafting.SERIALIZER);
+		createRecipe(PurifierCrafting.PURIFIER_RECIPE, PurifierCrafting.SERIALIZER);
+		createRecipe(AlloyingCrafting.ALLOYING_RECIPE, AlloyingCrafting.SERIALIZER);
+		createRecipe(FluidInGroundRecipe.FIG_RECIPE, FluidInGroundRecipe.SERIALIZER);
+		createRecipe(RefiningCrafting.REFINING_RECIPE, RefiningCrafting.SERIALIZER);
+		createRecipe(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, EnchantmentBookCrafting.SERIALIZER);
+		createRecipe(LumberCrafting.LUMBER_RECIPE, LumberCrafting.SERIALIZER);
+		createRecipe(MetalCrafting.METAL_RECIPE, MetalCrafting.SERIALIZER);
+		createRecipe(EntropyReactorCrafting.ERO_RECIPE, EntropyReactorCrafting.SERIALIZER);
+		createRecipe(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, WorldCorruptionCrafting.SERIALIZER);
 		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(PurifierCrafting.PURIFIER_RECIPE.toString()), PurifierCrafting.PURIFIER_RECIPE);
-		event.getRegistry().register(PurifierCrafting.SERIALIZER.setRegistryName("purifier"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(AlloyingCrafting.ALLOYING_RECIPE.toString()), AlloyingCrafting.ALLOYING_RECIPE);
-		event.getRegistry().register(AlloyingCrafting.SERIALIZER.setRegistryName("alloying"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(FluidInGroundRecipe.FIG_RECIPE.toString()), FluidInGroundRecipe.FIG_RECIPE);
-		event.getRegistry().register(FluidInGroundRecipe.SERIALIZER.setRegistryName("fluid_in_ground"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(RefiningCrafting.REFINING_RECIPE.toString()), RefiningCrafting.REFINING_RECIPE);
-		event.getRegistry().register(RefiningCrafting.SERIALIZER.setRegistryName("refining"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE.toString()), EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE);
-		event.getRegistry().register(EnchantmentBookCrafting.SERIALIZER.setRegistryName("enchantment_book"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(LumberCrafting.LUMBER_RECIPE.toString()), LumberCrafting.LUMBER_RECIPE);
-		event.getRegistry().register(LumberCrafting.SERIALIZER.setRegistryName("lumber"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(MetalCrafting.METAL_RECIPE.toString()), MetalCrafting.METAL_RECIPE);
-		event.getRegistry().register(MetalCrafting.SERIALIZER.setRegistryName("metal"));
-		
-		net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(EntropyReactorCrafting.ERO_RECIPE.toString()), EntropyReactorCrafting.ERO_RECIPE);
-		event.getRegistry().register(EntropyReactorCrafting.SERIALIZER.setRegistryName("entropy_reactor"));
-		
+		for(String name : MOD_CRAFTING_REGISTRY.keySet()) {
+			Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>> recipe = MOD_CRAFTING_REGISTRY.get(name);
+			net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(recipe.getFirst().toString()), recipe.getFirst());
+			event.getRegistry().register(recipe.getSecond().setRegistryName(name));
+		}
 	}
 	
+	/*
 	@SubscribeEvent
 	public static void registerCarvers(RegistryEvent.Register<WorldCarver<?>> event) {
 		event.getRegistry().register(new ChaosPlaneCarver(CaveCarverConfiguration.CODEC).setRegistryName("chaos_plane_cave"));
 		
-	}
+	}*/
 	
 	@SubscribeEvent
 	public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
@@ -849,6 +840,11 @@ public class Registry {
 	
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) throws Exception {
+		
+		new File("logs/almdatagen").mkdirs();
+		
+		//DimensionChaosPlane.generateSurfaceRuleJSONFile();
+		
 		DataProviderContainer dpc = new DataProviderContainer(event);
 		event.getGenerator().run();
 		dpc.writer.close();
@@ -1100,5 +1096,10 @@ public class Registry {
 				}
 			}
 		});
+	}
+	
+	//CRAFTING
+	public static void createRecipe(RecipeType<?> type, ForgeRegistryEntry<RecipeSerializer<?>> serializer) {
+		MOD_CRAFTING_REGISTRY.put(type.toString().split(":")[1], Pair.of(type, serializer));
 	}
 }

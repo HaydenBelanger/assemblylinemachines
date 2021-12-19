@@ -251,7 +251,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 
 			if (storedItem != null && internalStored != 0) {
 				compound.putString("assemblylinemachines:storeditem", storedItem.getRegistryName().toString());
@@ -259,7 +259,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			}
 
 			
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 	}
 

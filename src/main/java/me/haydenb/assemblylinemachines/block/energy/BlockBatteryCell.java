@@ -159,11 +159,11 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:fptout", fept);
 			compound.putBoolean("assemblylinemachines:in", autoIn);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

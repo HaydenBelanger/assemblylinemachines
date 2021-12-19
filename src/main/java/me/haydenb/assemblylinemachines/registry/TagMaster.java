@@ -212,7 +212,7 @@ public class TagMaster {
 		public final PrintWriter writer;
 		
 		public DataProviderContainer(GatherDataEvent event) throws Exception {
-			this.writer = new PrintWriter("logs/almdatagen.txt", "UTF-8");
+			this.writer = new PrintWriter("logs/almdatagen/blocktagging.log", "UTF-8");
 			writer.println("[SYSTEM]: Commencing ALM Tag data generation...");
 			this.event = event;
 			this.container = this;

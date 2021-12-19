@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:smelting",
+	"ingredient":{
+		"item": "assemblylinemachines:silt_mystium"
+	},
+	"result": "assemblylinemachines:mystium_ingot",
+	"cookingtime": 400
+}

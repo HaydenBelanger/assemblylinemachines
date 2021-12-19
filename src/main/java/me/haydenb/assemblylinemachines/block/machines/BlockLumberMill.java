@@ -242,7 +242,7 @@ public class BlockLumberMill extends BlockScreenBlockEntity<BlockLumberMill.TELu
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putFloat("assemblylinemachines:cycles", cycles);
 			compound.putFloat("assemblylinemachines:progress", progress);
@@ -257,7 +257,7 @@ public class BlockLumberMill extends BlockScreenBlockEntity<BlockLumberMill.TELu
 				outputb.save(sub);
 				compound.put("assemblylinemachines:outputb", sub);
 			}
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

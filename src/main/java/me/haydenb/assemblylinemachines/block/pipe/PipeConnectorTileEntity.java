@@ -151,7 +151,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
 
 		if(this.transType != TransmissionType.OMNI) {
 			compound.putBoolean("assemblylinemachines:input", inputMode);
@@ -175,7 +175,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		
 		
 		
-		return super.save(compound);
+		super.saveAdditional(compound);
 	}
 
 	@Override

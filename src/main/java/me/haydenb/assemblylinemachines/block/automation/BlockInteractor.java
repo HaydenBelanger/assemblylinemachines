@@ -317,7 +317,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			compound.putInt("assemblylinemachines:mode", mode);
 
@@ -326,7 +326,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 			}
 
 			compound.putBoolean("assemblylinemachines:ordered", ordered);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 
 		@Override

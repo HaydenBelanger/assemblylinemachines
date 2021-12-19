@@ -371,7 +371,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			
 			compound.putInt("assemblylinemachines:selected", selectedRecipe);
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
@@ -385,7 +385,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			
 			compound.putByteArray("assemblylinemachines:outputmodes", outputMode);
 			compound.putByteArray("assemblylinemachines:slottargets", slotTargets);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override

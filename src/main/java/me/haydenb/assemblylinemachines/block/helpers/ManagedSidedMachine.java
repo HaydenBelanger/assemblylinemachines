@@ -87,14 +87,14 @@ public class ManagedSidedMachine<A extends AbstractContainerMenu> extends Abstra
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
 		compound.putBoolean("assemblylinemachines:up", enabledSides.getOrDefault(Direction.UP, true));
 		compound.putBoolean("assemblylinemachines:down", enabledSides.getOrDefault(Direction.DOWN, true));
 		compound.putBoolean("assemblylinemachines:north", enabledSides.getOrDefault(Direction.NORTH, true));
 		compound.putBoolean("assemblylinemachines:south", enabledSides.getOrDefault(Direction.SOUTH, true));
 		compound.putBoolean("assemblylinemachines:east", enabledSides.getOrDefault(Direction.EAST, true));
 		compound.putBoolean("assemblylinemachines:west", enabledSides.getOrDefault(Direction.WEST, true));
-		return super.save(compound);
+		super.saveAdditional(compound);
 	}
 
 

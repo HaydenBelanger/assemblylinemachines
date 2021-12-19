@@ -251,7 +251,7 @@ public class BlockPump extends BlockTileEntity {
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			if (!extracted.isEmpty()) {
 				CompoundTag sub = new CompoundTag();
 				extracted.writeToNBT(sub);
@@ -259,7 +259,7 @@ public class BlockPump extends BlockTileEntity {
 			}
 
 			compound.putInt("assemblylinemachines:amount", amount);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		private void forceState(boolean status) {

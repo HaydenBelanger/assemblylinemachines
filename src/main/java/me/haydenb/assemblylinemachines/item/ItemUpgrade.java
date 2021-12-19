@@ -80,7 +80,7 @@ public class ItemUpgrade extends Item {
 		
 		E_R_CAPACITY(Registry.getItem("entropy_reactor_upgrade_capacity")), E_R_CYCLE_DELAY(Registry.getItem("entropy_reactor_upgrade_cycle_delayer")),
 		
-		E_R_VARIETY(Registry.getItem("entropy_reactor_upgrade_variety")),
+		E_R_VARIETY(Registry.getItem("entropy_reactor_upgrade_variety")), E_R_ENTROPIC_HARNESSER(Registry.getItem("entropy_reactor_upgrade_entropic_harnesser")),
 		
 		NONE(null);
 		

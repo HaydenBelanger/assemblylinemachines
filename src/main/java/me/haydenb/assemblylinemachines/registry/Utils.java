@@ -84,6 +84,8 @@ public class Utils {
 		return stack;
 	}
 
+	
+
 
 	public static interface IToolWithCharge{
 		default public int getMaxPower(ItemStack stack) {
@@ -279,6 +281,7 @@ public class Utils {
 			
 			renderScaledText(fr, xpos, ypos, scale, text, false, 0xffffff);
 		}
+		
 		
 	}
 	

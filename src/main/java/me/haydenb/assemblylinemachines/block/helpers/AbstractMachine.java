@@ -88,7 +88,9 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	//Synchronizes data on world load between client and server.
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(super.getUpdateTag());
+		CompoundTag tag = this.save(super.getUpdateTag());
+		this.saveAdditional(tag);
+		return tag;
 	}
 	
 	@Override
@@ -195,7 +197,12 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public final CompoundTag save(CompoundTag compound) {
+		return super.save(compound);
+	}
+	
+	@Override
+	protected void saveAdditional(CompoundTag compound) {
 		if (!this.trySaveLootTable(compound)) {
 			ContainerHelper.saveAllItems(compound, contents);
 		}
@@ -204,7 +211,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			compound.putUUID("assemblylinemachines:lock:slmakeruuid", secureLockMaker);
 			compound.putString("assemblylinemachines:lock:slcode", secureLock);
 		}
-		return super.save(compound);
+		super.saveAdditional(compound);
 	}
 
 	@Override

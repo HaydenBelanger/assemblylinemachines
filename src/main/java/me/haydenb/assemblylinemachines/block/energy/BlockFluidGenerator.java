@@ -417,7 +417,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
+		public void saveAdditional(CompoundTag compound) {
 			CompoundTag sub = new CompoundTag();
 			burnTank.writeToNBT(sub);
 			compound.put("assemblylinemachines:burntank", sub);
@@ -427,7 +427,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			
 			compound.putInt("assemblylinemachines:burntimeleft", burnTimeLeft);
 			compound.putFloat("assemblylinemachines:cost", increasedCost);
-			return super.save(compound);
+			super.saveAdditional(compound);
 		}
 		
 		@Override
