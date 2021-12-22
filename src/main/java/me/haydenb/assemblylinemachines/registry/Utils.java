@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import me.haydenb.assemblylinemachines.item.ItemPowerTool.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -89,7 +90,11 @@ public class Utils {
 
 	public static interface IToolWithCharge{
 		default public int getMaxPower(ItemStack stack) {
-			return stack.isEnchanted() ? Math.round(this.getPowerToolType().getMaxCharge() * (1 + (EnchantmentHelper.getItemEnchantmentLevel(Registry.getEnchantment("overclock"), stack) * 0.2f))) : this.getPowerToolType().getMaxCharge();
+			if(stack.isEnchanted()) {
+				EnchantmentOverclock enchantment = (EnchantmentOverclock) Registry.getEnchantment("overclock");
+				return Math.round(this.getPowerToolType().getMaxCharge() * (1 + (EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack) * enchantment.getMultiplier())));
+			}
+			return this.getPowerToolType().getMaxCharge();
 		}
 		
 		default public ItemStack damageItem(ItemStack stack, int amount) {

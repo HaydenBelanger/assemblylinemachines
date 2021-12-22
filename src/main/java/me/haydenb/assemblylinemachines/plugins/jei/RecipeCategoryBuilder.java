@@ -51,78 +51,84 @@ public class RecipeCategoryBuilder {
 	//More advanced concept functions and consumers - optional.
 	private TriConsumer<Recipe<?>, PoseStack, Pair<Double, Double>> draw = null;
 	private TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>> fluidTooltip = null;
+	private TriFunction<Recipe<?>, ItemStack, TooltipFlag, List<Component>> itemTooltip = null;
 	private BiFunction<Recipe<?>, List<Ingredient>, List<List<ItemStack>>> stackModifier = null;
 	
 	RecipeCategoryBuilder(IGuiHelper helper) {
 		this.helper = helper;
 	}
 	
-	public RecipeCategoryBuilder uid(ResourceLocation uid) {
+	RecipeCategoryBuilder uid(ResourceLocation uid) {
 		this.uid = uid;
 		return this;
 	}
 	
-	public RecipeCategoryBuilder uid(String uid) {
+	RecipeCategoryBuilder uid(String uid) {
 		this.uid = new ResourceLocation(AssemblyLineMachines.MODID, uid);
 		return this;
 	}
 	
-	public RecipeCategoryBuilder title(Component title) {
+	RecipeCategoryBuilder title(Component title) {
 		this.title = title;
 		return this;
 	}
 	
-	public RecipeCategoryBuilder title(String title) {
+	RecipeCategoryBuilder title(String title) {
 		return this.title(new TextComponent(title));
 	}
 	
-	public RecipeCategoryBuilder background(ResourceLocation guiPath, int u, int v, int width, int height) {
+	RecipeCategoryBuilder background(ResourceLocation guiPath, int u, int v, int width, int height) {
 		this.background = helper.createDrawable(guiPath, u, v, width, height);
 		return this;
 	}
 	
-	public RecipeCategoryBuilder background(String guiPath, int u, int v, int width, int height) {
+	RecipeCategoryBuilder background(String guiPath, int u, int v, int width, int height) {
 		return this.background(getGUIPath(guiPath), u, v, width, height);
 	}
 	
-	public RecipeCategoryBuilder icon(Block b) {
+	RecipeCategoryBuilder icon(Block b) {
 		this.icon = helper.createDrawableIngredient(new ItemStack(b));
 		return this;
 	}
 	
-	public RecipeCategoryBuilder progressBar(ResourceLocation guiPath, int u, int v, int width, int height, int frameTime, StartDirection dir, boolean inverted, int drawX, int drawY) {
+	RecipeCategoryBuilder progressBar(ResourceLocation guiPath, int u, int v, int width, int height, int frameTime, StartDirection dir, boolean inverted, int drawX, int drawY) {
 		this.progressBar = Pair.of(helper.drawableBuilder(guiPath, u, v, width, height).buildAnimated(frameTime, dir, inverted), Pair.of(drawX, drawY));
 		return this;
 	}
 	
-	public RecipeCategoryBuilder progressBar(String guiPath, int u, int v, int width, int height, int frameTime, StartDirection dir, boolean inverted, int drawX, int drawY) {
+	RecipeCategoryBuilder progressBar(String guiPath, int u, int v, int width, int height, int frameTime, StartDirection dir, boolean inverted, int drawX, int drawY) {
 		return this.progressBar(getGUIPath(guiPath), u, v, width, height, frameTime, dir, inverted, drawX, drawY);
 	}
 	
-	public RecipeCategoryBuilder draw(TriConsumer<Recipe<?>, PoseStack, Pair<Double, Double>> triConsumer) {
+	RecipeCategoryBuilder draw(TriConsumer<Recipe<?>, PoseStack, Pair<Double, Double>> triConsumer) {
 		this.draw = triConsumer;
 		return this;
 	}
 	
-	public RecipeCategoryBuilder fluidTooltip(TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>> tooltipFunction) {
+	RecipeCategoryBuilder fluidTooltip(TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>> tooltipFunction) {
 		this.fluidTooltip = tooltipFunction;
 		return this;
 	}
 	
-	public RecipeCategoryBuilder itemStackModifier(BiFunction<Recipe<?>, List<Ingredient>, List<List<ItemStack>>> stackModifier) {
+	RecipeCategoryBuilder itemTooltip(TriFunction<Recipe<?>, ItemStack, TooltipFlag, List<Component>> tooltipFunction) {
+		this.itemTooltip = tooltipFunction;
+		return this;
+	}
+	
+	RecipeCategoryBuilder itemStackModifier(BiFunction<Recipe<?>, List<Ingredient>, List<List<ItemStack>>> stackModifier) {
 		this.stackModifier = stackModifier;
 		return this;
 	}
 	
 	@SafeVarargs
-	public final RecipeCategoryBuilder itemSlots(int numberOfItemInputs, Pair<Integer, Integer>... slots) {
+	final RecipeCategoryBuilder itemSlots(int numberOfItemInputs, Pair<Integer, Integer>... slots) {
 		this.numberOfItemInputs = numberOfItemInputs - 1;
 		this.itemSlots = Arrays.asList(slots);
 		return this;
 	}
 	
 	@SafeVarargs
-	public final RecipeCategoryBuilder fluidSlots(int numberOfFluidInputs, Pair<Integer, Integer>... slots) {
+	final RecipeCategoryBuilder fluidSlots(int numberOfFluidInputs, Pair<Integer, Integer>... slots) {
 		this.numberOfFluidInputs = numberOfFluidInputs - 1;
 		this.fluidSlots = Arrays.asList(slots);
 		return this;
@@ -131,9 +137,7 @@ public class RecipeCategoryBuilder {
 	
 	
 	//Build
-	public <R extends Recipe<?> & IRecipeCategoryBuilder> IRecipeCategory<R> build(Class<R> clazz){
-		
-		if(fluidTooltip == null) fluidTooltip = RecipeCategoryBuilder::defaultFluidRenderer;
+	<R extends Recipe<?> & IRecipeCategoryBuilder> IRecipeCategory<R> build(Class<R> clazz){
 		
 		class ALMRecipeCategory implements IRecipeCategory<R>{
 
@@ -190,6 +194,8 @@ public class RecipeCategoryBuilder {
 				
 				if(recipe.getJEIItemOutputs() != null) {
 					ingredients.setOutputs(VanillaTypes.ITEM, recipe.getJEIItemOutputs());
+				}else if(recipe.getJEIItemOutputLists() != null) {
+					ingredients.setOutputLists(VanillaTypes.ITEM, recipe.getJEIItemOutputLists());
 				}
 				
 				if(recipe.getJEIFluidOutputs() != null) {
@@ -204,26 +210,38 @@ public class RecipeCategoryBuilder {
 				IGuiFluidStackGroup fgui = recipeLayout.getFluidStacks();
 				int i = 0;
 				if(itemSlots != null) {
+					
+					IIngredientRenderer<ItemStack> renderer = null;
+					if(itemTooltip != null) renderer = getBasicRenderer(recipe);
+					
 					for(Pair<Integer, Integer> pair : itemSlots) {
-						igui.init(i, i <= numberOfItemInputs, pair.getFirst(), pair.getSecond());
+						if(renderer == null) {
+							igui.init(i, i <= numberOfItemInputs, pair.getFirst(), pair.getSecond());
+						}else {
+							igui.init(i, i <= numberOfItemInputs, renderer, pair.getFirst(), pair.getSecond(), 18, 18, 1, 1);
+						}
+						
 						i++;
 					}
 				}
 				if(fluidSlots != null) {
 					i = 0;
 					
+					IIngredientRenderer<FluidStack> renderer = null;
+					if(fluidTooltip != null) renderer = getBasicRenderer(recipe);
+					
 					for(Pair<Integer, Integer> pair : fluidSlots) {
-						if(fluidTooltip != null) {
-							fgui.init(i, i <= numberOfFluidInputs, getBasicFluidStackRenderer(recipe), pair.getFirst(), pair.getSecond(), 16, 16, 0, 0);
+						if(renderer == null) {
+							fgui.init(i, i <= numberOfFluidInputs, pair.getFirst(), pair.getSecond(), 16, 16, 1, false, null);
 						}else {
-							fgui.init(i, i <= numberOfFluidInputs, pair.getFirst(), pair.getSecond());
+							fgui.init(i, i <= numberOfFluidInputs, renderer, pair.getFirst(), pair.getSecond(), 16, 16, 0, 0);
 						}
 						
 						i++;
 					}
 				}
 				
-				recipe.setupSlots(recipeLayout, helper, Optional.of(getBasicFluidStackRenderer(recipe)));
+				recipe.setupSlots(recipeLayout, helper, RecipeCategoryBuilder.this);
 				
 				i = 0;
 				for(List<ItemStack> it : Stream.of(ingredients.getInputs(VanillaTypes.ITEM), ingredients.getOutputs(VanillaTypes.ITEM)).flatMap(List::stream).collect(Collectors.toList())) {
@@ -245,26 +263,37 @@ public class RecipeCategoryBuilder {
 		return new ALMRecipeCategory();
 	}
 	
-	private IIngredientRenderer<FluidStack> getBasicFluidStackRenderer(Recipe<?> recipe){
-		return new IIngredientRenderer<FluidStack>() {
+	public <T> IIngredientRenderer<T> getBasicRenderer(Recipe<?> recipe){
+		return new IIngredientRenderer<T>() {
 			@Override
-			public void render(PoseStack stack, int xPosition, int yPosition, FluidStack ingredient) {
-				FluidStack modIngredient = ingredient.copy();
-				modIngredient.setAmount(1000);
-				helper.createDrawableIngredient(modIngredient).draw(stack, xPosition, yPosition);
+			public void render(PoseStack stack, int xPosition, int yPosition, T object) {
+				if(object instanceof FluidStack) {
+					FluidStack ingredient = (FluidStack) object;
+					FluidStack modIngredient = ingredient.copy();
+					modIngredient.setAmount(1000);
+					helper.createDrawableIngredient(modIngredient).draw(stack, xPosition, yPosition);
+				}else if(object instanceof ItemStack){
+					helper.createDrawableIngredient((ItemStack) object).draw(stack, xPosition, yPosition);
+				}else {
+					throw new IllegalAccessError("Basic ingredient renderer was used to render an unsupported type.");
+				}
+				
 			}
 			@Override
-			public List<Component> getTooltip(FluidStack ingredient, TooltipFlag tooltipFlag) {
-				return fluidTooltip.apply(recipe, ingredient, tooltipFlag);
+			public List<Component> getTooltip(T object, TooltipFlag tooltipFlag) {
+				if(object instanceof FluidStack) {
+					return fluidTooltip.apply(recipe, (FluidStack) object, tooltipFlag);
+				}else if(object instanceof ItemStack) {
+					return itemTooltip.apply(recipe, (ItemStack) object, tooltipFlag);
+				}else {
+					throw new IllegalAccessError("Basic ingredient renderer was used to render an unsupported type.");
+				}
+				
 			}
 		};
 	}
 	
-	private static List<Component> defaultFluidRenderer(Recipe<?> p1, FluidStack p2, TooltipFlag p3) {
-		return List.of(p2.getDisplayName());
-	}
-	
-	public static ResourceLocation getGUIPath(String name) {
+	static ResourceLocation getGUIPath(String name) {
 		return new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/jei/" + name + ".png");
 	}
 

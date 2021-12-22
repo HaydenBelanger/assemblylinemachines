@@ -1,11 +1,9 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.fluids.FluidStack;
@@ -24,13 +22,20 @@ public interface IRecipeCategoryBuilder {
 		return null;
 	}
 	
+	default public List<List<ItemStack>> getJEIItemOutputLists(){
+		return null;
+	}
+	
 	default public List<FluidStack> getJEIFluidOutputs(){
 		return null;
 	}
 	
 	
-	default public void setupSlots(IRecipeLayout layout, IGuiHelper helper, Optional<IIngredientRenderer<FluidStack>> renderer) {
+	default public void setupSlots(IRecipeLayout layout, IGuiHelper helper, RecipeCategoryBuilder category) {
 		return;
 	}
 	
+	default public Optional<Integer> getOutputCount(){
+		return Optional.empty();
+	}
 }

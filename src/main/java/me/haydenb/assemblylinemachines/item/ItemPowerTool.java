@@ -322,9 +322,11 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	public static class EnchantmentOverclock extends Enchantment{
 
 		public static final EnchantmentCategory POWER_TOOLS = EnchantmentCategory.create("POWER_TOOLS", (item) -> item instanceof IToolWithCharge);
+		private final float multiplier;
 		
 		public EnchantmentOverclock() {
 			super(Rarity.RARE, POWER_TOOLS, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
+			this.multiplier = ConfigHolder.COMMON.overclockEnchantmentMultiplier.get().floatValue();
 		}
 		
 		@Override
@@ -340,6 +342,10 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		@Override
 		public int getMaxCost(int level) {
 			return getMinCost(level) + 100;
+		}
+		
+		public float getMultiplier() {
+			return this.multiplier;
 		}
 		
 	}

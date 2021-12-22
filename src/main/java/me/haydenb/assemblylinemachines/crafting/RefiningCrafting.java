@@ -1,16 +1,17 @@
 package me.haydenb.assemblylinemachines.crafting;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -136,11 +137,10 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	
 	@Override
-	public void setupSlots(IRecipeLayout supplier, IGuiHelper helper, Optional<IIngredientRenderer<FluidStack>> optional) {
+	public void setupSlots(IRecipeLayout supplier, IGuiHelper helper, RecipeCategoryBuilder category) {
 		List<Object> allInputs = List.of(Ingredient.of(attachmentBlock), Ingredient.of(Registry.getBlock("refinery")), itemInput.getFirst(), fluidInput.getFirst());
 		List<Object> allOutputs = List.of(itemOutput.getFirst(), fluidOutputA.getFirst(), fluidOutputB.getFirst());
 		
-		IIngredientRenderer<FluidStack> renderer = optional.orElseThrow();
 		int itemSlotNum, fluidSlotNum, i;
 		itemSlotNum = fluidSlotNum = i = 0;
 		boolean isInput = true;
@@ -154,7 +154,7 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 				}
 				
 				if(o instanceof FluidStack && !((FluidStack) o).isEmpty()) {
-					supplier.getFluidStacks().init(fluidSlotNum, isInput, renderer, SLOTS.get(i).getFirst(), SLOTS.get(i).getSecond(), 18, 18, 1, 1);
+					supplier.getFluidStacks().init(fluidSlotNum, isInput, SLOTS.get(i).getFirst() + 1, SLOTS.get(i).getSecond() + 1, 16, 16, 1, false, null);
 					fluidSlotNum++;
 					i++;
 				}

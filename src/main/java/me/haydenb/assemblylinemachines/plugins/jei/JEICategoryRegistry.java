@@ -17,7 +17,6 @@ import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -77,11 +76,26 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("world_corruption").title("World Corruption")
 					.background("gui_set_b", 0, 10, 90, 26).icon(Registry.getBlock("corrupt_diamond_ore")).progressBar("gui_set_b", 50, 0, 19, 10, 200, StartDirection.LEFT, false, 42, 8)
+					.itemTooltip(new TriFunction<>() {
+						@Override
+						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
+							if(pP1 instanceof WorldCorruptionCrafting) {
+								WorldCorruptionCrafting recipe = (WorldCorruptionCrafting) pP1;
+								if(recipe.hasOptionalResults()) {
+									Optional<Float> amount = recipe.getChanceOfSubdrop(pP2.getItem());
+									if(amount.isPresent()) {
+										return List.of(pP2.getHoverName(), new TextComponent("§b" + String.format("%.0f%%", (amount.get() * 100f)) + " Chance"));
+									}
+								}
+							}
+							return List.of(pP2.getHoverName());
+						}
+					})
 					.build(WorldCorruptionCrafting.class));
 			
 			CATEGORY_REGISTRY.put(EntropyReactorCrafting.ERO_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("entropy_reactor_output").title("Entropy Reactor Waste")
 					.background("gui_set_a", 130, 24, 85, 41).icon(Registry.getBlock("entropy_reactor_core")).progressBar("gui_set_a", 199, 10, 16, 14, 100, StartDirection.LEFT, false, 42, 13)
-					.draw(new TriConsumer<Recipe<?>, PoseStack, Pair<Double,Double>>() {
+					.draw(new TriConsumer<>() {
 						@Override
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
 							if(k instanceof EntropyReactorCrafting) {
@@ -95,7 +109,7 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(BathCrafting.BATH_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("bathing").title("Fluid Bath Crafting")
 					.background("gui_set_a", 0, 197, 87, 41).icon(Registry.getBlock("electric_fluid_mixer"))
-					.draw(new TriConsumer<Recipe<?>, PoseStack, Pair<Double,Double>>() {
+					.draw(new TriConsumer<>() {
 						private HashMap<BathCraftingFluids, IDrawableAnimated> progressBars = new HashMap<>();
 						@Override
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
@@ -111,11 +125,11 @@ public class JEICategoryRegistry implements IModPlugin{
 							}
 							
 						}
-					}).itemSlots(2, Pair.of(0, 4), Pair.of(21, 4), Pair.of(41, 23), Pair.of(65, 4)).build(BathCrafting.class));
+					}).itemSlots(2, Pair.of(0, 4), Pair.of(21, 4), Pair.of(0, 23), Pair.of(65, 4)).fluidSlots(1, Pair.of(42, 24)).build(BathCrafting.class));
 			
 			CATEGORY_REGISTRY.put(FluidInGroundRecipe.FIG_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("fig").title("Pump Output")
 					.background("gui_set_oil", 0, 0, 132, 99).icon(Registry.getBlock("pump"))
-					.draw(new TriConsumer<Recipe<?>, PoseStack, Pair<Double,Double>>() {
+					.draw(new TriConsumer<>() {
 						HashMap<FluidInGroundCriteria, IDrawable> drawables = new HashMap<>();
 						@Override
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
@@ -129,7 +143,7 @@ public class JEICategoryRegistry implements IModPlugin{
 								drawable.draw(v, 49, 57);
 							}
 						}
-					}).fluidTooltip(new TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>>() {
+					}).fluidTooltip(new TriFunction<>() {
 						@Override
 						public List<Component> apply(Recipe<?> pP1, FluidStack pP2, TooltipFlag pP3) {
 							if(pP1 instanceof FluidInGroundRecipe) {
@@ -143,7 +157,7 @@ public class JEICategoryRegistry implements IModPlugin{
 			CATEGORY_REGISTRY.put(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("enchantment_book").title("Enchantment Crafting")
 					.background("gui_set_a", 172, 198, 84, 58).icon(Registry.getBlock("experience_mill")).progressBar("gui_set_a", 228, 189, 28, 9, 120, StartDirection.LEFT, false, 24, 20)
 					.itemSlots(2, Pair.of(1, 1), Pair.of(1, 30), Pair.of(61, 39), Pair.of(61, 16))
-					.itemStackModifier(new BiFunction<Recipe<?>, List<Ingredient>, List<List<ItemStack>>>() {
+					.itemStackModifier(new BiFunction<>() {
 						@Override
 						public List<List<ItemStack>> apply(Recipe<?> t, List<Ingredient> u) {
 							List<List<ItemStack>> result = new ArrayList<>();
@@ -160,10 +174,9 @@ public class JEICategoryRegistry implements IModPlugin{
 						}
 					}).build(EnchantmentBookCrafting.class));
 			
-			
 			CATEGORY_REGISTRY.put(RefiningCrafting.REFINING_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("refining").title("Refinery Crafting")
 					.background("gui_set_a", 41, 24, 82, 41).icon(Registry.getBlock("refinery"))
-					.draw(new TriConsumer<Recipe<?>, PoseStack, Pair<Double,Double>>() {
+					.draw(new TriConsumer<>() {
 						IDrawableAnimated progBar = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), 123, 24, 7, 3).buildAnimated(400, StartDirection.TOP, false);
 						@Override
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
@@ -171,11 +184,6 @@ public class JEICategoryRegistry implements IModPlugin{
 							progBar.draw(v, 44, 19);
 							progBar.draw(v, 55, 19);
 							progBar.draw(v, 64, 19);
-						}
-					}).fluidTooltip(new TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>>() {
-						@Override
-						public List<Component> apply(Recipe<?> pP1, FluidStack pP2, TooltipFlag pP3) {
-							return List.of(pP2.getDisplayName(), new TextComponent("§b" + Formatting.GENERAL_FORMAT.format(pP2.getAmount()) + " mB"));
 						}
 					}).build(RefiningCrafting.class));
 			

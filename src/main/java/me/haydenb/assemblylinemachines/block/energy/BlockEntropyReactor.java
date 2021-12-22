@@ -39,9 +39,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.Explosion.BlockInteraction;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -973,9 +972,15 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 					BlockPos posx = new BlockPos(new Vec3(x, y, z));
 					if(!this.getLevel().isEmptyBlock(posx) || !this.getLevel().getFluidState(posx).getType().equals(Fluids.EMPTY)) {
 						for(WorldCorruptionCrafting recipe : this.getLevel().getRecipeManager().getRecipesFor(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, null, this.getLevel())) {
-							Optional<Block> res = recipe.testBlock(this.getLevel().getBlockState(posx).getBlock());
+							Optional<Block> res = recipe.testBlock(this.getLevel().getRandom(), this.getLevel().getBlockState(posx).getBlock());
 							if(res.isPresent()) {
-								this.getLevel().setBlockAndUpdate(posx, res.get().defaultBlockState());
+								Block block = res.get();
+								//Special processing for DoublePlantBlock
+								if(block instanceof ISpecialEntropyPlacement) {
+									((ISpecialEntropyPlacement) block).place(this.getLevel(), block.defaultBlockState(), posx);
+								}else {
+									this.getLevel().setBlockAndUpdate(posx, block.defaultBlockState());
+								}
 								entropy -= 0.00025f;
 								i++;
 							}
@@ -1277,6 +1282,15 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		public String getSerializedName() {
 			return this.toString().toLowerCase();
 		}
+	}
+	
+	public static interface ISpecialEntropyPlacement{
+		
+		default public void place(LevelAccessor level, BlockState state, BlockPos pos) {
+			this.place(level, state, pos, 3);
+		}
+		
+		public void place(LevelAccessor level, BlockState state, BlockPos pos, int flag);
 	}
 
 }

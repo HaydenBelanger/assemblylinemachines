@@ -162,7 +162,7 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 						Optional<WorldCorruptionCrafting> rOpt = this.getLevel().getRecipeManager().getRecipeFor(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, this, this.getLevel());
 						if(rOpt.isPresent() && tank.getAmount() >= 100) {
 							WorldCorruptionCrafting wcc = rOpt.get();
-							output = wcc.assemble(this);
+							output = wcc.getRandom(this.getLevel().getRandom()).asItem().getDefaultInstance().copy();
 							cycles = 16;
 							tank.shrink(100);
 							contents.get(2).shrink(1);
@@ -206,8 +206,8 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 		}
 		
 		@Override
-		public boolean canBeExtracted(ItemStack stack) {
-			return stack.getItem() == Registry.getItem("corrupted_shard");
+		public boolean canBeExtracted(ItemStack stack, int slot) {
+			return slot < 2;
 		}
 		
 		@Override

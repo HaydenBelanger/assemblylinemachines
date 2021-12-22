@@ -1,0 +1,29 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:grass"
+	},
+	"output":{
+		"item": "assemblylinemachines:chaosweed"
+	},
+	"additionalOutputs":[
+		{
+			"output":{
+				"item": "assemblylinemachines:blooming_chaosweed"
+			},
+			"chance": 0.15
+		},
+		{
+			"output":{
+				"item": "assemblylinemachines:tall_chaosweed"
+			},
+			"chance": 0.15
+		},
+		{
+			"output":{
+				"item": "assemblylinemachines:tall_blooming_chaosweed"
+			},
+			"chance": 0.05
+		}
+	]
+}

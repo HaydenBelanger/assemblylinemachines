@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
@@ -173,9 +174,16 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	}
 	
 	@Override
+	public List<FluidStack> getJEIFluidInputs() {
+		return List.of(new FluidStack(fluid.getAssocFluid(), percent.getMB()));
+	}
+	
+	@Override
 	public List<ItemStack> getJEIItemOutputs() {
 		return List.of(output);
 	}
+	
+	
 	
 	public BathCraftingFluids getFluid() {
 		return fluid;

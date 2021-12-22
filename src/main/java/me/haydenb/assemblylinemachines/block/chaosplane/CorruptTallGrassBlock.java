@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import com.mojang.authlib.GameProfile;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.ISpecialEntropyPlacement;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -73,7 +74,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		return CORRUPT_GRASS;
 	}
 
-	public static class CorruptDoubleTallGrassBlock extends DoublePlantBlock {
+	public static class CorruptDoubleTallGrassBlock extends DoublePlantBlock implements ISpecialEntropyPlacement {
 
 		public CorruptDoubleTallGrassBlock() {
 			super(Block.Properties.of(Material.REPLACEABLE_PLANT).noCollission().instabreak().sound(SoundType.GRASS));
@@ -82,6 +83,11 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		@Override
 		public PlantType getPlantType(BlockGetter world, BlockPos pos) {
 			return CORRUPT_GRASS;
+		}
+
+		@Override
+		public void place(LevelAccessor level, BlockState state, BlockPos pos, int flag) {
+			DoublePlantBlock.placeAt(level, state, pos, flag);			
 		}
 	}
 

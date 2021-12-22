@@ -55,6 +55,9 @@ public class ConfigHandler {
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
 		
+		//GENERAL TOOLS
+		public final ConfigValue<Double> overclockEnchantmentMultiplier;
+		
 		//TITANIUM TOOLS
 		public final ConfigValue<Double> titaniumToolAttack;
 		public final ConfigValue<Double> titaniumToolHarvestSpeed;
@@ -99,6 +102,7 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> titaniumFrequency;
 		public final ConfigValue<Integer> titaniumMinHeight;
 		public final ConfigValue<Integer> titaniumMaxHeight;
+		public final EnumValue<OreGenOptions> titaniumOreGenStyle;
 		
 		//CHROMIUM
 		public final ConfigValue<Integer> chromiumVeinSize;
@@ -123,20 +127,23 @@ public class ConfigHandler {
 		public ASMConfig(final ForgeConfigSpec.Builder builder) {
 			
 			builder.push("Machine Options");
-			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps? Higher number means lower chance. Set to -1 to disable snapping completely.").define("crankSnapChance", 100);
-			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?").define("interactorInteractMode", true);
-			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
+			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").define("crankSnapChance", 100);
+			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?", "For example, attempting to \"interact with\" a block with a GUI will cause an exception.").define("interactorInteractMode", true);
+			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?",
+					"NONE - Interact Mode exceptions are completely silenced.", "BASIC - The first line of the exception, a simple description, is placed in the console. (If unsure, use this!)",
+					"COMPLETE - Full stack traces are placed in the console, useful for debugging.").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
 			reactorExplosions = builder.comment("If the Entropy Reactor reaches higher than 98% Entropy, should it explode?").define("reactorExplosions", true);
-			toolChargerChargeRate = builder.comment("What is the maximum amount of FE the Tool Charger can place into an item per cycle? The Tool Charger runs at 2.5 cycles per second.").define("toolChargerChargeRate", 10000);
+			toolChargerChargeRate = builder.comment("What is the maximum amount of FE the Tool Charger can place into an item per cycle?", "The Tool Charger runs one cycle every 2.5 seconds.").define("toolChargerChargeRate", 10000);
 			toolChargerMaxEnergyStorage = builder.comment("What should the FE capacity of the Tool Charger be?").define("toolChargerMaxEnergyStorage", 100000);
 			
 			Predicate<Object> fluidTestPredicate = (object) -> true;
 			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 115000), Pair.of("assemblylinemachines:naphtha", 650000)), fluidTestPredicate);
 			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:liquid_carbon", 300000), Pair.of("assemblylinemachines:gasoline", 600000), Pair.of("assemblylinemachines:diesel", 1050000)), fluidTestPredicate);
-			coolantFluidsRaw = builder.comment("What fluids should be valid for use as coolant in Combustion and Geothermal Generators? Value is multiplier on burn time.").defineList("coolantFluids", getFluidDefaultConfig(Pair.of("minecraft:water", 2), Pair.of("assemblylinemachines:condensed_void", 4)), fluidTestPredicate);
+			coolantFluidsRaw = builder.comment("What fluids should be valid for use as coolant in Combustion and Geothermal Generators?", "Value is multiplier on burn time, for example \"2\" will multiply the total FE by 2.").defineList("coolantFluids", getFluidDefaultConfig(Pair.of("minecraft:water", 2), Pair.of("assemblylinemachines:condensed_void", 4)), fluidTestPredicate);
 			builder.pop();
 			
 			builder.push("Tools and Armor");
+			overclockEnchantmentMultiplier = builder.comment("What multiplier should each level of the Overclock enchantment give?", "For example, the default of \"0.2\" is a 20% increase per enchantment level.").define("overclockEnchantmentMultiplier", 0.2);
 			builder.push("Titanium");
 			titaniumToolAttack = builder.comment("What is the base damage Titanium Tools should do?").define("titaniumToolAttack", 5d);
 			titaniumToolHarvestSpeed = builder.comment("What is the base harvest speed Titanium Tools should do?").define("titaniumToolHarvestSpeed", 7d);
@@ -179,8 +186,9 @@ public class ConfigHandler {
 			novasteelToolEnchantability = builder.comment("What should the enchantability of Novasteel Tools be?").define("novasteelToolEnchantability", 37);
 			novasteelToolDurability = builder.comment("What should the base physical durability of Novasteel Tools be?").define("novasteelToolDurability", 300);
 			novasteelToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Novasteel Tools be?").define("novasteelToolMaxFE", 20000000);
-			
 			builder.pop();
+			builder.pop();
+			
 			builder.push("World");
 			mystiumFarmlandDeath = builder.comment("Should Mystium Farmland get exhausted over time and stop performing grow operations?").define("mystiumFarmlandDeath", true);
 			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
@@ -188,36 +196,33 @@ public class ConfigHandler {
 			guideBook = builder.comment("When Patchouli is installed, should players be automatically given the Guidebook when they first connect?").define("guideBook", true);
 			
 			builder.push("Titanium Generation");
-			titaniumVeinSize = builder.comment("What should the maximum size per vein of Standard/Deepslate/Corrupt Titanium Ore be? Set to 0 to disable completely.").define("titaniumVeinSize", 6);
-			titaniumFrequency = builder.comment("How many veins of Standard/Deepslate/Corrupt Titanium Ore should generate per chunk? Set to 0 to disable completely.").define("titaniumFrequency", 3);
-			titaniumMinHeight = builder.comment("What is the minimum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld?").define("titaniumMinHeight", -64);
-			titaniumMaxHeight = builder.comment("What is the maximum Y value Standard/Deepslate/Corrupt Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", -32);
+			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").define("titaniumVeinSize", 6);
+			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").define("titaniumFrequency", 13);
+			titaniumMinHeight = builder.comment("What is the minimum Y value Titanium Ore should spawn at in the overworld?", 
+					"This can (and by default, does) go below the minimum world limit to change the TRIANGLE-style weighting of generation.").define("titaniumMinHeight", -112);
+			titaniumMaxHeight = builder.comment("What is the maximum Y value Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", -16);
+			titaniumOreGenStyle = builder.comment("What style of ore generation should Titanium Ore use?", "TRIANGLE - Most generation occurs in center of min-max range - Akin to Coal Ore at most altitudes.", 
+					"UNIFORM - All generation is equal between min-max range - Akin to Redstone Ore at most altitudes.").defineEnum("titaniumOreGenStyle", OreGenOptions.TRIANGLE);
 			builder.pop();
 			
 			builder.push("Black Granite Generation");
-			blackGraniteSpawnsWithNaturalTag = builder.comment("Should generated Black Granite have the 'natural' tag, requiring progression to Crank-Powered Pickaxe as intended?").define("blackGraniteSpawnsWithNaturalTag", true);
-			blackGraniteVeinSize = builder.comment("What should the maximum size per vein of Black Granite be? Set to 0 to disable completely.").define("blackGraniteVeinSize", 37);
-			blackGraniteFrequency = builder.comment("How many veins of Black Granite should generate per chunk? Set to 0 to disable completely.").define("blackGraniteFrequency", 7);
+			blackGraniteSpawnsWithNaturalTag = builder.comment("Should generated Black Granite have the \"natural\" tag?", "This tag, if present, will only allow Black Granite to be dropped if mined with a Crank-Powered Pickaxe.", 
+					"This is the intended progression, but can be disabled in order to make all Pickaxes mine it.").define("blackGraniteSpawnsWithNaturalTag", true);
+			blackGraniteVeinSize = builder.comment("What should the maximum size per vein of Black Granite be?", "Set to 0 to disable Black Granite generation.").define("blackGraniteVeinSize", 37);
+			blackGraniteFrequency = builder.comment("How many veins of Black Granite should generate per chunk?", "Set to 0 to disable Black Granite generation.").define("blackGraniteFrequency", 7);
 			builder.pop();
 			
 			builder.push("Chromium Generation");
-			chromiumVeinSize = builder.comment("What should the maximum size per vein of Chromium Ore be? Set to 0 to disable completely.").define("chromiumVeinSize", 10);
-			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk? Set to 0 to disable completely.").define("chromiumFrequency", 4);
-			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?").define("chromiumOnDragonIsland", false);
+			chromiumVeinSize = builder.comment("What should the maximum size per vein of Chromium Ore be?", "Set to 0 to disable Chromium Ore generation.").define("chromiumVeinSize", 10);
+			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk?", "Set to 0 to disable Chromium Ore generation.").define("chromiumFrequency", 4);
+			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?", "If false, Chromium Ore will only generate on the outer End islands accessed by the End Gateway.").define("chromiumOnDragonIsland", false);
 			builder.pop();
 			builder.pop();
 			
 			builder.push("Client-Side-Only Options");
-			coolDudeMode = builder.comment("Do you want to enable 'Cool Dude Mode', enabling easter-egg/meme effects?").define("coolDudeMode", false);
+			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
 			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
 			builder.pop();
-			
-			/*builder.push("Experimental Mixin Settings");
-			experimentalWorldScreenDisable = builder.comment("Should Assembly Line Machines suppress the World Experimental Settings screen? This will have no effect if another mod performs the same task.").define("experimentalWorldScreenDisable", true);
-			farBlockPosGeneratorSuppressed = builder.comment("Should Assembly Line Machines suppress the warning related to far-away block generation error, an artifact of Mojang debug code? This will suppress ALL INSTANCES of this debug log being outputted.").define("farBlockPosGeneratorSuppressed", true);
-			seedUnification = builder.comment("Should Assembly Line Machines attempt to unify the world seed between the Vanilla dimensions and the Chaos Plane? Otherwise, the world will use seed '0'.").define("seedUnification", true);
-			builder.pop();
-			*/
 			
 			
 		}
@@ -236,7 +241,6 @@ public class ConfigHandler {
 			
 			checkFluidLists(Pair.of(geothermalFluidsRaw.get().iterator(), geothermalFluids), Pair.of(combustionFluidsRaw.get().iterator(), combustionFluids), Pair.of(coolantFluidsRaw.get().iterator(), coolantFluids));
 			
-			oreGenVerification();
 			toolsVerification();
 			
 			
@@ -313,45 +317,14 @@ public class ConfigHandler {
 				mystiumToolEnchantability.set(0);
 			}
 		}
-		
-		private void oreGenVerification() {
-			if(titaniumVeinSize.get() < 0) {
-				titaniumVeinSize.set(0);
-			}
-			if(titaniumFrequency.get() < 0) {
-				titaniumFrequency.set(0);
-			}
-			if(titaniumMinHeight.get() < 0) {
-				titaniumMinHeight.set(0);
-			}else if(titaniumMinHeight.get() > 255) {
-				titaniumMinHeight.set(255);
-			}
-			if(titaniumMaxHeight.get() < titaniumMinHeight.get()) {
-				titaniumMaxHeight.set(titaniumMinHeight.get());
-			}else if(titaniumMaxHeight.get() < 0) {
-				titaniumMaxHeight.set(0);
-			}else if(titaniumMaxHeight.get() > 255) {
-				titaniumMaxHeight.set(255);
-			}
-			
-			if(blackGraniteFrequency.get() < 0) {
-				blackGraniteFrequency.set(0);
-			}
-			if(blackGraniteVeinSize.get() < 0) {
-				blackGraniteVeinSize.set(0);
-			}
-			
-			if(chromiumFrequency.get() < 0) {
-				chromiumFrequency.set(0);
-			}
-			if(chromiumVeinSize.get() < 0) {
-				chromiumVeinSize.set(0);
-			}
-		}
 	}
 	
 	public static enum DebugOptions{
 		NONE, BASIC, COMPLETE;
+	}
+	
+	public static enum OreGenOptions{
+		UNIFORM, TRIANGLE;
 	}
 	
 	private static Supplier<Map<String, Object>> getFluidSupplier(String fluid, int burnTime){

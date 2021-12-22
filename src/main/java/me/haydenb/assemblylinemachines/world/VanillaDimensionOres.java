@@ -6,10 +6,10 @@ import com.google.common.collect.ImmutableList;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ASMConfig;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.data.worldgen.features.OreFeatures;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,7 +57,8 @@ public class VanillaDimensionOres {
 				ImmutableList<TargetBlockState> targetList = ImmutableList.of(OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, Registry.getBlock("titanium_ore").defaultBlockState()),
 						OreConfiguration.target(OreFeatures.DEEPSLATE_ORE_REPLACEABLES, Registry.getBlock("deepslate_titanium_ore").defaultBlockState()),
 						OreConfiguration.target(new BlockMatchTest(Registry.getBlock("corrupt_stone")), Registry.getBlock("corrupt_titanium_ore").defaultBlockState()));
-				titaniumOre = getFeature(targetList, cfg.titaniumVeinSize.get(), VerticalAnchor.absolute(cfg.titaniumMinHeight.get()), VerticalAnchor.absolute(cfg.titaniumMaxHeight.get()), cfg.titaniumFrequency.get());
+				
+				titaniumOre = getFeature(targetList, cfg.titaniumVeinSize.get(), getAbsolute(cfg.titaniumOreGenStyle.get(), cfg.titaniumMinHeight.get(), cfg.titaniumMaxHeight.get()), cfg.titaniumFrequency.get());
 			}
 			
 			//Black Granite
@@ -72,17 +73,21 @@ public class VanillaDimensionOres {
 				chromiumOre = getFeature(getBasicList(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState()), cfg.chromiumVeinSize.get(), cfg.chromiumFrequency.get());
 			}
 			
-		}
+		}	
 		
 		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, int freq) {
-			return getFeature(targets, veinsize, VerticalAnchor.bottom(), VerticalAnchor.top(), freq);
+			return getFeature(targets, veinsize, (HeightRangePlacement) PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT, freq);
 		}
-		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, VerticalAnchor min, VerticalAnchor max, int freq) {
-			return Feature.ORE.configured(new OreConfiguration(targets, veinsize)).placed(HeightRangePlacement.uniform(min, max), InSquarePlacement.spread(), CountPlacement.of(freq));
+		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, HeightRangePlacement range, int freq) {
+			return Feature.ORE.configured(new OreConfiguration(targets, veinsize)).placed(range, InSquarePlacement.spread(), CountPlacement.of(freq), BiomeFilter.biome());
 		}
 		
 		private static List<TargetBlockState> getBasicList(RuleTest target, BlockState result){
 			return ImmutableList.of(OreConfiguration.target(target, result));
+		}
+		
+		private static HeightRangePlacement getAbsolute(OreGenOptions ogo, int min, int max) {
+			return ogo == OreGenOptions.TRIANGLE ? HeightRangePlacement.triangle(VerticalAnchor.absolute(min), VerticalAnchor.absolute(max)) : HeightRangePlacement.uniform(VerticalAnchor.absolute(min), VerticalAnchor.absolute(max));
 		}
 	}
 	

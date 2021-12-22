@@ -47,7 +47,7 @@ public abstract class SimpleMachine<A extends AbstractContainerMenu> extends Abs
 		}
 	}
 	
-	public boolean canBeExtracted(ItemStack stack) {
+	public boolean canBeExtracted(ItemStack stack, int slot) {
 		return true;
 	}
 
@@ -72,7 +72,7 @@ public abstract class SimpleMachine<A extends AbstractContainerMenu> extends Abs
 		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
 			
-			if(supp == false || slot != 0 || !canBeExtracted(getItem(slot))) {
+			if(supp == false || slot != 0 || !canBeExtracted(getItem(slot), slot)) {
 				return ItemStack.EMPTY;
 			}else {
 				return super.extractItem(slot, amount, simulate);

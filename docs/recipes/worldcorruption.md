@@ -16,16 +16,29 @@ Recipe namespace: `assemblylinemachines:world_corruption`.
 - `output`: ItemStack, *optional*  
 *The output block of the recipe. Quantity has no effect, and this recipe will always result in a single output.*  
 - `fluidOutput`: Namespace, *optional*  
-*The fluid ResourceLocation for the output fluid of the recipe.*
+*The fluid ResourceLocation for the output fluid of the recipe.*  
 
-!!! warning
+??? warning "Proper Field Selection"
     One, but not both, of `input` or `fluidInput` must be specified, or the recipe will not load. If `input` or `fluidInput` is set, then the corresponding output field must be set as well.
 
     If the ItemStack provided for `output` is not a BlockItem, but just an Item, then the recipe will fail to load. If `input`'s Ingredient, whether a tag or a single item, is set, the recipe will successfully load, but the recipe will be effectively worthless as the recipe is only compatible with BlockItems.
 
+??? info "Additional Outputs"
+	**1.18-1.3.2+ only:** You can add field `additionalOutputs` to your recipe. This is a JSON Array of JSON Objects. This allows for one recipe to output a selection of various options, based on a chance. This type is only functional with the block-replacing, and will not work with the `fluid` or `fluidOutput` fields. You can include as many additional outputs as you wish. The objects contained in the array must have the following fields:
+
+	`output`: ItemStack, the block output of the additional output. Just like with the standard output field, the item returned here must be of type BlockItem, or the recipe will fail to load.  
+	`chance`: Decimal between 0 and 1, this is the chance, represented as a percentage likelihood, that this additional output is chosen to be the true output.
+
+	The Corrupting Basin or the Entropy Reactor will cycle through all additional outputs in increasing chance order. It will test the chance given, and if met, that will be the output of the recipe. If the required chance is not met, it will output the standard `output` from the main JSON Object as a fallback.
+
+	For an example, please see below Example #3.
+
+??? tip "Special Block Placement"
+	**1.18-1.3.2+ only:** Certain blocks, which implement Java interface `ISpecialEntropyPlacement`, can have special placement behavior. For example, the Tall Chaosweed and Tall Blooming Chaosweed implement this interface, allowing replaced 1-block-tall Grass blocks to be double-height when placed in the world. In the base mod, these is the only two blocks that implement this interface, but if you are a mod developer, you can implement it, too.
+
 ## Examples
 
-Below are examples of some World Corruption recipes. Both examples are from real operations performable in the base mod. The first example is to create Corrupt Diamond Ore from Diamond Ore.
+Below are examples of some World Corruption recipes. All examples are from real operations performable in the base mod. The first example is to create Corrupt Diamond Ore from Diamond Ore.
 
 ``` json
 {
@@ -46,5 +59,39 @@ And the second example, to demonstrate the fluid version of the recipe, is to co
 	"type": "assemblylinemachines:world_corruption",
 	"fluidInput": "minecraft:water",
 	"fluidOutput": "assemblylinemachines:dark_energy"
+}
+```
+
+**1.18-1.3.2+ only:** Finally, the last example demonstrates the capability of the `additionalOutputs` field. This will select a random type of Chaosweed from one of four options in order to replace Tall Grass.
+
+``` json
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:grass"
+	},
+	"output":{
+		"item": "assemblylinemachines:chaosweed"
+	},
+	"additionalOutputs":[
+		{
+			"output":{
+				"item": "assemblylinemachines:blooming_chaosweed"
+			},
+			"chance": 0.15
+		},
+		{
+			"output":{
+				"item": "assemblylinemachines:tall_chaosweed"
+			},
+			"chance": 0.15
+		},
+		{
+			"output":{
+				"item": "assemblylinemachines:tall_blooming_chaosweed"
+			},
+			"chance": 0.05
+		}
+	]
 }
 ```
