@@ -2,8 +2,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.PurifierCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
@@ -57,8 +55,8 @@ public class PurifierRecipeCategory implements IRecipeCategory<PurifierCrafting>
 	}
 	
 	@Override
-	public void draw(PurifierCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
-		progbar.draw(mx, 41, 6);
+	public void draw(PurifierCrafting recipe, double mouseX, double mouseY) {
+		progbar.draw(41, 6);
 	}
 
 	@Override

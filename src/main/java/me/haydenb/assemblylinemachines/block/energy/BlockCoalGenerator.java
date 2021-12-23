@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
@@ -29,7 +28,8 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -102,9 +102,9 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
 			if(genper == 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§cIdle").text("0 FE/t");
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Math.round((float)genper / 2f) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§aGenerating...").text("§a+" + Math.round((float)genper / 2f) + " FE/t");
 			}
 			
 			
@@ -127,7 +127,6 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 			compound.putBoolean("assemblylinemachines:naphtha", naphthaActive);
 			return super.write(compound);
 		}
-		@SuppressWarnings("deprecation")
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(ForgeHooks.getBurnTime(stack) != 0) {
@@ -154,7 +153,6 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 							}else {
 								naphthaActive = false;
 							}
-							@SuppressWarnings("deprecation")
 							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0)) * 2f);
 							if(burnTime != 0) {
 								contents.get(0).shrink(1);
@@ -225,13 +223,12 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 		
 		
 		@Override
-		protected void renderTooltip(MatrixStack mx, ItemStack stack, int mouseX, int mouseY) {
+		protected void renderTooltip(ItemStack stack, int mouseX, int mouseY) {
 			int x = (this.width - this.xSize) / 2;
 			int y = (this.height - this.ySize) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
-				List<ITextComponent> tt = getTooltipFromItem(stack);
+				List<String> tt = getTooltipFromItem(stack);
 				
-				@SuppressWarnings("deprecation")
 				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack) * 2f);
 				float mul;
 				if(tsfm.naphthaActive) {
@@ -239,12 +236,12 @@ public class BlockCoalGenerator extends BlockScreenTileEntity<BlockCoalGenerator
 				}else {
 					mul = 60f;
 				}
-				tt.add(1, new StringTextComponent("Approx. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total").deepCopy().mergeStyle(TextFormatting.YELLOW));
-				tt.add(1, new StringTextComponent(Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t").deepCopy().mergeStyle(TextFormatting.GREEN));
-				super.func_243308_b(mx, tt, mouseX, mouseY);
+				tt.add(1, "§eApprox. " + Formatting.GENERAL_FORMAT.format((((float)burnTime * 3f) / 90f) * mul) + " FE Total");
+				tt.add(1, "§a" + Formatting.GENERAL_FORMAT.format(Math.round((float)(burnTime * 3) / 180f)) + " FE/t");
+				super.renderTooltip(tt, mouseX, mouseY);
 				return;
 			}
-			super.renderTooltip(mx, stack, mouseX, mouseY);
+			super.renderTooltip(stack, mouseX, mouseY);
 		}
 		
 		@Override

@@ -18,26 +18,21 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.*;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -56,6 +51,21 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		this.parent = parent;
 		this.maxPower = maxPower;
 		this.item = new ItemStack(parent);
+		
+		this.addPropertyOverride(new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
+			
+			@Override
+			public float call(ItemStack stack, World p_call_2_, LivingEntity p_call_3_) {
+				if(stack.hasTag()) {
+					CompoundNBT compound = stack.getTag();
+					if(compound.contains("assemblylinemachines:secondarystyle") && compound.contains("assemblylinemachines:fe") && compound.getInt("assemblylinemachines:fe") > 0) {
+						return 1f;
+					}
+				}
+				
+				return 0f;
+			}
+		});
 		
 	}
 
@@ -80,25 +90,6 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 		}
 
 		return super.damageItem(stack, amount, entity, onBroken);
-	}
-	
-	//Called from Registry
-	@OnlyIn(Dist.CLIENT)
-	public void connectItemProperties() {
-		ItemModelsProperties.registerProperty(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new IItemPropertyGetter() {
-			
-			@Override
-			public float call(ItemStack stack, ClientWorld cliWorld, LivingEntity entity) {
-				if(stack.hasTag()) {
-					CompoundNBT compound = stack.getTag();
-					if(compound.contains("assemblylinemachines:secondarystyle") && compound.contains("assemblylinemachines:fe") && compound.getInt("assemblylinemachines:fe") > 0) {
-						return 1f;
-					}
-				}
-				
-				return 0f;
-			}
-		});
 	}
 
 	// Use A (Sword, Pickaxe, Hoe, Shovel, Axe)
@@ -166,7 +157,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				
 				ServerWorld sw = null;
 				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.getDimensionKey());
+					sw = world.getServer().getWorld(world.getDimension().getType());
 				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
@@ -204,7 +195,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 				int cost = 0;
 				ServerWorld sw = null;
 				if(!world.isRemote) {
-					sw = world.getServer().getWorld(world.getDimensionKey());
+					sw = world.getServer().getWorld(world.getDimension().getType());
 				}
 				while (iter.hasNext()) {
 					BlockPos posx = iter.next();
@@ -248,14 +239,13 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 	}
 
 	private void performDrops(BlockState bs, BlockPos pos, LivingEntity player, ServerWorld sw) {
-		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.ORIGIN, new Vector3d(pos.getX(), pos.getY(), pos.getZ())));
+		List<ItemStack> drops = bs.getDrops(new LootContext.Builder(sw).withParameter(LootParameters.TOOL, player.getHeldItemMainhand()).withParameter(LootParameters.POSITION, pos));
 		InventoryHelper.dropItems(sw.getWorld(), pos, NonNullList.from(ItemStack.EMPTY, drops.toArray(new ItemStack[drops.size()])));
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		return parent.getAttributeModifiers(equipmentSlot);
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
+		return parent.getAttributeModifiers(slot, stack);
 	}
 
 	
@@ -272,7 +262,6 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 				BlockPos blockpos = context.getPos();
 				World world = context.getWorld();
-				@SuppressWarnings("deprecation")
 				int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
 				if (hook != 0) return hook > 0 ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 				if (context.getFace() != Direction.DOWN && world.isAirBlock(blockpos.up())) {
@@ -291,7 +280,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 							}
 						}
 
-						return ActionResultType.func_233537_a_(world.isRemote);
+						return world.isRemote ? ActionResultType.SUCCESS : ActionResultType.PASS;
 					}
 				}
 
@@ -305,7 +294,7 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).deepCopy().mergeStyle(TextFormatting.DARK_PURPLE);
+		return super.getDisplayName(stack).deepCopy().applyTextStyles(TextFormatting.DARK_PURPLE);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -447,10 +436,10 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 
 			if (nbt.contains("assemblylinemachines:secondarystyle")) {
 				nbt.remove("assemblylinemachines:secondarystyle");
-				player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").deepCopy().mergeStyle(TextFormatting.RED), true);
+				player.sendStatusMessage(new StringTextComponent("Disabled Secondary Ability.").deepCopy().applyTextStyles(TextFormatting.RED), true);
 			} else {
 				nbt.putBoolean("assemblylinemachines:secondarystyle", true);
-				player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").deepCopy().mergeStyle(TextFormatting.AQUA), true);
+				player.sendStatusMessage(new StringTextComponent("Enabled Secondary Ability.").deepCopy().applyTextStyles(TextFormatting.AQUA), true);
 			}
 
 			stack.setTag(nbt);
@@ -468,18 +457,18 @@ public class ItemMystiumTool<A extends TieredItem> extends TieredItem implements
 			if (compound.contains("assemblylinemachines:fe")) {
 				tooltip.add(new StringTextComponent(
 						Formatting.GENERAL_FORMAT.format(compound.getInt("assemblylinemachines:fe")) + "/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE")
-						.deepCopy().mergeStyle(TextFormatting.DARK_PURPLE));
+						.deepCopy().applyTextStyles(TextFormatting.DARK_PURPLE));
 			} else {
-				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").deepCopy().mergeStyle(TextFormatting.DARK_RED));
+				tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").deepCopy().applyTextStyles(TextFormatting.DARK_RED));
 			}
 
 			if (compound.contains("assemblylinemachines:secondarystyle")) {
-				tooltip.add(new StringTextComponent("Secondary Ability Enabled").deepCopy().mergeStyle(TextFormatting.AQUA));
+				tooltip.add(new StringTextComponent("Secondary Ability Enabled").deepCopy().applyTextStyles(TextFormatting.AQUA));
 			}
 			return;
 		}
 
-		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").deepCopy().mergeStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("0/" + Formatting.GENERAL_FORMAT.format(getMaxPower()) + " FE").deepCopy().applyTextStyles(TextFormatting.DARK_RED));
 
 	}
 	

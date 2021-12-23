@@ -3,13 +3,10 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.util.Formatting;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -26,7 +23,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.*;
 import net.minecraftforge.fluids.FluidStack;
 
 public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting> {
@@ -68,11 +64,11 @@ public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting>
 	}
 	
 	@Override
-	public void draw(RefiningCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
-		progbar.draw(mx, 35, 19);
-		progbar.draw(mx, 44, 19);
-		progbar.draw(mx, 55, 19);
-		progbar.draw(mx, 64, 19);
+	public void draw(RefiningCrafting recipe, double mouseX, double mouseY) {
+		progbar.draw(35, 19);
+		progbar.draw(44, 19);
+		progbar.draw(55, 19);
+		progbar.draw(64, 19);
 	}
 
 	@Override
@@ -173,16 +169,16 @@ public class RefineryRecipeCategory implements IRecipeCategory<RefiningCrafting>
 	private class RefineryFluidIngredientRenderer implements IIngredientRenderer<FluidStack>{
 
 		@Override
-		public void render(MatrixStack mx, int xPosition, int yPosition, FluidStack ingredient) {
-			helper.createDrawableIngredient(new FluidStack(ingredient.getFluid(), 1000)).draw(mx, xPosition, yPosition);
+		public void render(int xPosition, int yPosition, FluidStack ingredient) {
+			helper.createDrawableIngredient(new FluidStack(ingredient.getFluid(), 1000)).draw(xPosition, yPosition);
 			
 		}
 
 		@Override
-		public List<ITextComponent> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
-			List<ITextComponent> tooltip = new ArrayList<>();
-			tooltip.add(ingredient.getDisplayName().deepCopy());
-			tooltip.add(new StringTextComponent(Formatting.GENERAL_FORMAT.format(ingredient.getAmount()) + " mB").deepCopy().mergeStyle(TextFormatting.AQUA));
+		public List<String> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
+			List<String> tooltip = new ArrayList<>();
+			tooltip.add(ingredient.getDisplayName().getString());
+			tooltip.add("§b" + ingredient.getAmount() + " mB");
 			
 			
 			return tooltip;

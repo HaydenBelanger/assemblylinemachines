@@ -386,7 +386,7 @@ public class BlockFluidRouter extends BlockScreenTileEntity<BlockFluidRouter.TEF
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			this.font.drawText(mx, new StringTextComponent("Hotbar"), invTextLoc.getFirst(),
+			this.font.drawString("Hotbar", invTextLoc.getFirst(),
 					invTextLoc.getSecond(), 4210752);
 			
 			int x = (this.width - this.xSize) / 2;

@@ -7,7 +7,7 @@ import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
-import net.minecraft.tags.ITag.INamedTag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
@@ -45,17 +45,17 @@ public class FluidRegistration {
 		buildAndRegister(name, source, flowing, bucketitem, block);
 	}
 	
-	public static void buildAndRegister(String name, ForgeFlowingFluid source, ForgeFlowingFluid flowing, boolean bucket, INamedTag<Fluid> tag, Material material) {
+	public static void buildAndRegister(String name, ForgeFlowingFluid source, ForgeFlowingFluid flowing, boolean bucket, Tag<Fluid> tag, Material material) {
 		
 		FlowingFluidBlock block = null;
 		if(tag != null && material != null) {
 			block = new ALMFluidBlock(name, tag, material);
-		}
+		}	
 		
 		buildAndRegister(name, source, flowing, bucket, block);
 	}
 	
-	public static void buildAndRegister(String name, int temperature, boolean gaseous, boolean bucket, INamedTag<Fluid> tag, Material material) {
+	public static void buildAndRegister(String name, int temperature, boolean gaseous, boolean bucket, Tag<Fluid> tag, Material material) {
 		
 		boolean block = false;
 		

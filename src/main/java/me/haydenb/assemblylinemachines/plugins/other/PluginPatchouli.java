@@ -11,7 +11,6 @@ public class PluginPatchouli {
 
 	private static PatchouliInterface pInt = null;
 	
-	@SuppressWarnings("deprecation")
 	public static PatchouliInterface get() {
 		
 		if(pInt == null) {
@@ -43,7 +42,6 @@ public class PluginPatchouli {
 	
 	static class PatchouliPresent implements PatchouliInterface{
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void openBook(ServerPlayerEntity player, World world) {
 			

@@ -231,9 +231,9 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
 			
 			if(fept == 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§cIdle").text("0 FE/t");
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aGenerating...")).text(new StringTextComponent("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§aGenerating...").text("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t");
 			}
 			
 		}
@@ -245,7 +245,7 @@ public class BlockFluidGenerator extends BlockScreenTileEntity<TEFluidGenerator>
 					name = new TranslationTextComponent(world.getBlockState(pos).getBlock().getTranslationKey());
 					return name;
 				}catch(NullPointerException e) {
-					return ITextComponent.getTextComponentOrEmpty("Generator");
+					return new StringTextComponent("Generator");
 				}
 			}
 			

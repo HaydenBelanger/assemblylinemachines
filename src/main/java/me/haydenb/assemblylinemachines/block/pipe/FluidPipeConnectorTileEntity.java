@@ -51,8 +51,8 @@ public class FluidPipeConnectorTileEntity extends BasicTileEntity implements ITi
 	}
 	
 	@Override
-	public void read(BlockState p_230337_1_, CompoundNBT compound) {
-		super.read(p_230337_1_, compound);
+	public void read(CompoundNBT compound) {
+		super.read(compound);
 		
 		if(compound.contains("assemblylinemachines:output")) {
 			outputMode = compound.getBoolean("assemblylinemachines:output");

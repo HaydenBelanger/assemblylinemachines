@@ -3,8 +3,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.LumberCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
@@ -59,8 +57,8 @@ public class LumberRecipeCategory implements IRecipeCategory<LumberCrafting> {
 	}
 	
 	@Override
-	public void draw(LumberCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
-		progbar.draw(mx, 23, 13);
+	public void draw(LumberCrafting recipe, double mouseX, double mouseY) {
+		progbar.draw(23, 13);
 	}
 
 	@Override

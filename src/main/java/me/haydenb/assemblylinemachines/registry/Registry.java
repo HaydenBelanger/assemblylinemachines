@@ -84,7 +84,6 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntitySpawnPlacementRegistry.PlacementType;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
@@ -101,7 +100,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.ILightReader;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -149,7 +148,6 @@ public class Registry {
 	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
 	
 	//EVENTS
-	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
@@ -452,10 +450,10 @@ public class Registry {
 		createBlock("entropy_reactor_block", new BlockEntropyReactor());
 		createBlock("entropy_reactor_core", Material.IRON, 3f, 15f, 0, ToolType.PICKAXE, SoundType.METAL);
 		
-		createBlock("corrupt_dirt", new CorruptBlock(AbstractBlock.Properties.create(Material.EARTH).harvestTool(ToolType.SHOVEL).sound(SoundType.GROUND)));
+		createBlock("corrupt_dirt", new CorruptBlock(Block.Properties.create(Material.EARTH).harvestTool(ToolType.SHOVEL).sound(SoundType.GROUND)));
 		createBlock("corrupt_grass", new CorruptGrassBlock());
 		createBlock("corrupt_sand", new CorruptSandBlock());
-		createBlock("corrupt_stone", new CorruptBlock(AbstractBlock.Properties.create(Material.ROCK).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
+		createBlock("corrupt_stone", new CorruptBlock(Block.Properties.create(Material.ROCK).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE)));
 		
 		createBlock("corrupting_basin", new BlockCorruptingBasin());
 		
@@ -579,13 +577,11 @@ public class Registry {
 		
 	}
 	
-	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
 		
 		event.getRegistry().register(EntityCorruptShell.CORRUPT_SHELL.setRegistryName("corrupt_shell"));
 		EntitySpawnPlacementRegistry.register(EntityCorruptShell.CORRUPT_SHELL, PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::canSpawnOn);
-		GlobalEntityTypeAttributes.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().create());
 	}
 	
 	@SubscribeEvent
@@ -657,13 +653,6 @@ public class Registry {
 		
 		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
 		
-		((ItemMystiumTool<?>) Registry.getItem("mystium_pickaxe")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_axe")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_sword")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_shovel")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_hoe")).connectItemProperties();
-		((ItemMystiumTool<?>) Registry.getItem("mystium_hammer")).connectItemProperties();
-		
 		RenderingRegistry.registerEntityRenderingHandler(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
 	
@@ -706,7 +695,7 @@ public class Registry {
 		event.getBlockColors().register(new IBlockColor() {
 
 			@Override
-			public int getColor(BlockState state, IBlockDisplayReader reader, BlockPos pos, int tint) {
+			public int getColor(BlockState state, ILightReader reader, BlockPos pos, int tint) {
 				if(reader != null && pos != null && reader.getTileEntity(pos) instanceof TEFluidBath) {
 					
 					TEFluidBath te = (TEFluidBath) reader.getTileEntity(pos);
@@ -842,7 +831,6 @@ public class Registry {
 		return teRegistry.get(name);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static <T extends TileEntity> void createTileEntity(String name, Class<T> clazz, Block... blocks){
 		teRegistry.put(name, TileEntityType.Builder.create(() -> {
 			T inst;

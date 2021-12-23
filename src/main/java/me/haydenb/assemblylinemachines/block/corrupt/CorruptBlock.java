@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
@@ -17,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class CorruptBlock extends Block {
 
-	public CorruptBlock(AbstractBlock.Properties properties) {
+	public CorruptBlock(Block.Properties properties) {
 		super(properties.hardnessAndResistance(13f, 30f).harvestLevel(0));
 
 	}

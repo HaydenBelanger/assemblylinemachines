@@ -99,15 +99,15 @@ public class ItemKey extends Item {
 		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:lockcode")) {
 			String s = stack.getTag().getString("assemblylinemachines:boundtranskey");
 			if(s.trim().equals("")) {
-				tooltip.add(1, new StringTextComponent("This Key is cut to a machine.").deepCopy().mergeStyle(TextFormatting.DARK_GRAY));
+				tooltip.add(1, new StringTextComponent("This Key is cut to a machine.").deepCopy().applyTextStyles(TextFormatting.DARK_GRAY));
 			}else {
-				tooltip.add(1, new StringTextComponent("This Key is cut to " + new TranslationTextComponent(s).getString() + ".").deepCopy().mergeStyle(TextFormatting.DARK_GRAY));
+				tooltip.add(1, new StringTextComponent("This Key is cut to " + new TranslationTextComponent(s).getString() + ".").deepCopy().applyTextStyles(TextFormatting.DARK_GRAY));
 			}
 			
-			tooltip.add(2, new StringTextComponent("SHIFT-RIGHT CLICK again to reset the Key.").deepCopy().mergeStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(2, new StringTextComponent("SHIFT-RIGHT CLICK again to reset the Key.").deepCopy().applyTextStyles(TextFormatting.DARK_GRAY));
 		}else {
-			tooltip.add(1, new StringTextComponent("This Key is not cut.").deepCopy().mergeStyle(TextFormatting.DARK_GRAY));
-			tooltip.add(2, new StringTextComponent("SHIFT-RIGHT CLICK a machine to cut the Key to the machine.").deepCopy().mergeStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(1, new StringTextComponent("This Key is not cut.").deepCopy().applyTextStyles(TextFormatting.DARK_GRAY));
+			tooltip.add(2, new StringTextComponent("SHIFT-RIGHT CLICK a machine to cut the Key to the machine.").deepCopy().applyTextStyles(TextFormatting.DARK_GRAY));
 		}
 	}
 }

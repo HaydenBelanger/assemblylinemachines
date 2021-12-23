@@ -5,9 +5,6 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.model.AbstractZombieModel;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.EffectInstance;
@@ -22,10 +19,6 @@ public class EntityCorruptShell extends ZombieEntity{
 	
 	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, World worldIn) {
 		super(type, worldIn);
-	}
-
-	public static AttributeModifierMap.MutableAttribute registerAttributeMap(){
-		return MonsterEntity.func_234295_eP_().createMutableAttribute(Attributes.MAX_HEALTH, 32d).createMutableAttribute(Attributes.FOLLOW_RANGE, 40d).createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.38d).createMutableAttribute(Attributes.ATTACK_DAMAGE, 4.5d).createMutableAttribute(Attributes.ZOMBIE_SPAWN_REINFORCEMENTS, 1d);
 	}
 	
 	@Override

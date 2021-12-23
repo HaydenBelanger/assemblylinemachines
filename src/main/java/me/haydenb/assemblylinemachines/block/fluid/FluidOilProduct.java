@@ -9,7 +9,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
@@ -29,7 +29,7 @@ public class FluidOilProduct extends ALMFluid {
 	}
 	
 	@Override
-	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
+	protected void randomTick(World world, BlockPos pos, IFluidState state, Random random) {
 		
 		if(source) {
 			Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.add(-3, -1, -3).north().west(), pos.add(3, 1, 3)).iterator();
@@ -48,7 +48,7 @@ public class FluidOilProduct extends ALMFluid {
 		}
 	}
 	
-	private float breakAndBreakConnected(World world, FluidState origState, BlockPos posx) {
+	private float breakAndBreakConnected(World world, IFluidState origState, BlockPos posx) {
 		world.setBlockState(posx, Blocks.AIR.getDefaultState());
 		
 		Iterator<BlockPos> iter = BlockPos.getAllInBox(posx.down().north().west(), posx.up().south().east()).iterator();
@@ -57,7 +57,7 @@ public class FluidOilProduct extends ALMFluid {
 		while(iter.hasNext()) {
 			BlockPos posq = iter.next();
 			
-			FluidState fs = world.getFluidState(posq);
+			IFluidState fs = world.getFluidState(posq);
 			if(fs.getFluid() == origState.getFluid()) {
 				pow = pow + breakAndBreakConnected(world, origState, posq);
 			}

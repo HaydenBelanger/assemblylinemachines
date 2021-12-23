@@ -14,7 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -98,10 +97,9 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 		return parent.onBlockDestroyed(stack, worldIn, state, pos, entityLiving);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		return parent.getAttributeModifiers(equipmentSlot);
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
+		return parent.getAttributeModifiers(slot, stack);
 	}
 	
 	@Override
@@ -134,12 +132,12 @@ public class ItemCrankTool<A extends TieredItem> extends TieredItem implements I
 			CompoundNBT compound = stack.getTag();
 			
 			if(compound.contains("assemblylinemachines:cranks")) {
-				tooltip.add(new StringTextComponent("Cranks: " + compound.getInt("assemblylinemachines:cranks") + "/" + getMaxCranks()).deepCopy().mergeStyle(TextFormatting.DARK_GREEN));
+				tooltip.add(new StringTextComponent("Cranks: " + compound.getInt("assemblylinemachines:cranks") + "/" + getMaxCranks()).deepCopy().applyTextStyles(TextFormatting.DARK_GREEN));
 				return;
 			}
 		}
 		
-		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).deepCopy().mergeStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("Cranks: 0/" + getMaxCranks()).deepCopy().applyTextStyles(TextFormatting.DARK_RED));
 	}
 	/**
 	 * Returns a CrankTool version of A.

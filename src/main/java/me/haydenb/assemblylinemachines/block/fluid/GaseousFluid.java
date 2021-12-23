@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.block.fluid;
 
-import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
 import me.haydenb.assemblylinemachines.registry.FluidRegistration;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -12,10 +11,6 @@ public class GaseousFluid extends ALMFluid{
 		super(FluidRegistration.buildProperties(name, 0, true, false, false), source);
 		
 		this.color = color;
-		
-		if(source && PluginMekanism.get().isMekanismInstalled()) {
-			PluginMekanism.get().registerGas(this, name);
-		}
 	}
 	
 	@Override

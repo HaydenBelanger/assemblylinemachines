@@ -1,11 +1,10 @@
 package me.haydenb.assemblylinemachines.helpers;
 
-import java.util.*;
+import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -13,8 +12,6 @@ import me.haydenb.assemblylinemachines.block.machines.crank.BlockSimpleFluidMixe
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.rendering.GUIHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,7 +25,8 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class AbstractMachine<A extends Container> extends LockableLootTileEntity {
 
@@ -77,7 +75,7 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(world.getBlockState(pos), pkt.getNbtCompound());
+		handleUpdateTag(pkt.getNbtCompound());
 	}
 
 	public void sendUpdates() {
@@ -190,11 +188,6 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
-		this.read(compound);
-	}
-
 	public void read(CompoundNBT compound) {
 		this.contents = NonNullList.withSize(getSizeInventory(), ItemStack.EMPTY);
 
@@ -368,7 +361,6 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 		protected final Pair<Integer, Integer> invTextLoc;
 		protected boolean renderTitleText;
 		protected boolean renderInventoryText;
-		protected MatrixStack mx;
 
 		public ScreenALMBase(T screenContainer, PlayerInventory inv, ITextComponent titleIn, Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc,
 				Pair<Integer, Integer> invTextLoc, String guipath, boolean hasCool) {
@@ -393,20 +385,13 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 
 		// render
 		@Override
-		public void render(MatrixStack mx, final int mousex, final int mousey, final float partialTicks) {
-			this.mx = mx;
-			this.renderBackground(mx);
-			super.render(mx, mousex, mousey, partialTicks);
-			this.renderHoveredTooltip(mx, mousex, mousey);
+		public void render(final int mousex, final int mousey, final float partialTicks) {
+			this.renderBackground();
+			super.render(mousex, mousey, partialTicks);
+			this.renderHoveredToolTip(mousex, mousey);
 		}
-
-		// drawGuiContainerBackgroundLayer - Wrapped without Matrix Stack
+		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack p_230450_1_, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
-
-			this.drawGuiContainerBackgroundLayer(p_230450_2_, p_230450_3_, p_230450_4_);
-
-		}
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			GL11.glColor4f(1f, 1f, 1f, 1f);
 			this.minecraft.getTextureManager().bindTexture(bg);
@@ -414,26 +399,16 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 			int y = (this.height - this.ySize) / 2;
 			this.blit(x, y, 0, 0, this.xSize, this.ySize);
 		}
-
-		// drawGuiContainerForegroundLayer - Wrapped without Matrix Stack
+		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack p_230451_1_, int p_230451_2_, int p_230451_3_) {
-			
-			this.drawGuiContainerForegroundLayer(p_230451_2_, p_230451_3_);
-		}
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			if (renderTitleText == true) {
-				this.font.drawText(mx, this.title, titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
+				this.font.drawString(this.title.getString(), titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
 				
 			}
 			if(renderInventoryText == true) {
-				this.font.drawText(mx, this.playerInventory.getDisplayName(), invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
+				this.font.drawString(this.playerInventory.getDisplayName().getString(), invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
 			}
-		}
-		
-		// BELOW ARE UTILITY METHODS TO WRAP OLD MAPPINGS
-		protected void blit(int a, int b, int c, int d, int e, int f) {
-			super.blit(mx, a, b, c, d, e, f);
 		}
 
 		protected void blit(int x, int y, int w, int h, TextureAtlasSprite tas) {
@@ -441,27 +416,8 @@ public abstract class AbstractMachine<A extends Container> extends LockableLootT
 			GUIHelper.fillAreaWithIcon(tas, x, y, w, h);
 		}
 		
-		protected void blit(int x, int y, int w, int h, int v, TextureAtlasSprite tas) {
+		protected void blitTas(int x, int y, int w, int h, int v, TextureAtlasSprite tas) {
 			this.blit(x, y, w, h, tas);
-		}
-
-		protected void renderTooltip(String a, int b, int c) {
-			List<ITextComponent> list = new ArrayList<>();
-			list.add(new StringTextComponent(a));
-			super.func_243308_b(mx, list, b, c);
-		}
-
-		public void renderTooltip(List<String> a, int b, int c) {
-			List<ITextComponent> list = new ArrayList<>();
-			for (String s : a) {
-				list.add(new StringTextComponent(s));
-			}
-			super.func_243308_b(mx, list, b, c);
-
-		}
-
-		public void drawCenteredString(FontRenderer a, String b, int c, int d, int e) {
-			super.drawCenteredString(mx, a, new StringTextComponent(b), c, d, e);
 		}
 
 	}

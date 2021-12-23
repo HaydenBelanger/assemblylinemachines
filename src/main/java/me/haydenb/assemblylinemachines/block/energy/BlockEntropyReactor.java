@@ -35,7 +35,6 @@ import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.*;
 import net.minecraft.world.Explosion.Mode;
 import net.minecraft.world.IBlockReader;
@@ -106,10 +105,10 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 
 
 						if(i != 14 && !world.getBlockState(checkPos).getBlock().equals(Registry.getBlock("entropy_reactor_block"))) {
-							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Block.").deepCopy().mergeStyle(TextFormatting.RED), true);
+							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Block.").deepCopy().applyTextStyles(TextFormatting.RED), true);
 							return ActionResultType.CONSUME;
 						}else if(i == 14 && !world.getBlockState(checkPos).getBlock().equals(Registry.getBlock("entropy_reactor_core"))) {
-							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Core.").deepCopy().mergeStyle(TextFormatting.RED), true);
+							player.sendStatusMessage(new StringTextComponent("Block @ " + checkPos.getX() + ", " + checkPos.getY() + ", " + checkPos.getZ() + " was not an Entropy Reactor Core.").deepCopy().applyTextStyles(TextFormatting.RED), true);
 							return ActionResultType.CONSUME;
 						}
 
@@ -438,14 +437,14 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 		}
 
 		@Override
-		public void read(BlockState state, CompoundNBT compound) {
+		public void read(CompoundNBT compound) {
 
 			assigned = compound.getBoolean("assemblylinemachines:assigned");
 			master_x = compound.getInt("assemblylinemachines:master_x");
 			master_y = compound.getInt("assemblylinemachines:master_y");
 			master_z = compound.getInt("assemblylinemachines:master_z");
 
-			super.read(state, compound);
+			super.read(compound);
 		}
 
 		private void connectMaster(TEEntropyReactor reactor) {
@@ -536,18 +535,18 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData data) {
 			
 			if(cyclesRemaining != 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§aDischarging...")).text(new StringTextComponent("§a+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§aDischarging...").text("§a+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t");
 			}else {
 				if(shardMap.isEmpty()) {
-					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§cIdle")).text(new StringTextComponent("0 FE/t"));
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§cIdle").text("0 FE/t");
 				}else {
-					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new StringTextComponent("§dWarming Up...")).text(new StringTextComponent("0 FE/t"));
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text("§dWarming Up...").text("0 FE/t");
 				}
 			}
 			
-			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text(new StringTextComponent("§dShards")).progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
-			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new StringTextComponent("§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
-			probeInfo.horizontal().item(new ItemStack(Registry.getItem("poor_strange_matter"))).vertical().text(new StringTextComponent("§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text("§dShards").progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
+			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text("§eVariety").progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Registry.getItem("poor_strange_matter"))).vertical().text("§cEntropy").progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
 		}
 
 		@Override
@@ -809,7 +808,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 				if((General.RAND.nextFloat() * 0.5f) < entropy) {
 					
 					if(sw == null) {
-						sw = world.getServer().getWorld(world.getDimensionKey());
+						sw = world.getServer().getWorld(world.getDimension().getType());
 					}
 					
 					int count = Math.round(entropy * 4f);
@@ -824,7 +823,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 						EntityType<?> type = EntityCorruptShell.CORRUPT_SHELL;
 						for(int j = 0; j < 10; j++) {
 							
-							if(world.hasNoCollisions(type.getBoundingBoxWithSizeApplied(d0, d1, d2)) && EntitySpawnPlacementRegistry.canSpawnEntity(type, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
+							if(world.hasNoCollisions(type.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(type, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
 								Entity entity = type.create(world);
 								entity.setLocationAndAngles(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
 								
@@ -856,7 +855,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 					double y = pos.getY() + ((General.RAND.nextDouble() * 10) - 10);
 					double z = pos.getZ() + ((General.RAND.nextDouble() * 20) - 10);
 					
-					BlockPos posx = new BlockPos(new Vector3d(x, y, z));
+					BlockPos posx = new BlockPos(new Vec3d(x, y, z));
 					BlockState bs = null;
 					Block obs = world.getBlockState(posx).getBlock();
 					
@@ -1162,7 +1161,7 @@ public class BlockEntropyReactor extends BlockScreenTileEntity<BlockEntropyReact
 
 
 		@Override
-		public String getString() {
+		public String getName() {
 			return this.toString().toLowerCase();
 		}
 		

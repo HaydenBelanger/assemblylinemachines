@@ -201,8 +201,8 @@ public class BlockHandGrinder extends Block {
 		}
 		
 		@Override
-		public void read(BlockState p_230337_1_, CompoundNBT compound) {
-			super.read(p_230337_1_, compound);
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			if(compound.contains("assemblylinemachines:blade")) {
 				blade = ItemStack.read(compound.getCompound("assemblylinemachines:blade"));
@@ -253,7 +253,7 @@ public class BlockHandGrinder extends Block {
 		}
 
 		@Override
-		public String getString() {
+		public String getName() {
 			return toString().toLowerCase();
 		}
 	}

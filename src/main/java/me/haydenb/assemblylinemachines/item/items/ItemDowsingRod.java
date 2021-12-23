@@ -26,7 +26,7 @@ public class ItemDowsingRod extends ItemBasicFormattedName {
 		if(!world.isRemote) {
 			FluidStack fs = FluidLevelManager.getOrCreateFluidStack(context.getPos(), world);
 			if(fs != FluidStack.EMPTY && fs.getFluid() != Fluids.EMPTY) {
-				context.getPlayer().sendStatusMessage(new StringTextComponent("There is " + Formatting.GENERAL_FORMAT.format(fs.getAmount()) + " mB of " + fs.getDisplayName().deepCopy().getString() + " in this chunk.").deepCopy().mergeStyle(TextFormatting.GOLD), true);
+				context.getPlayer().sendStatusMessage(new StringTextComponent("There is " + Formatting.GENERAL_FORMAT.format(fs.getAmount()) + " mB of " + fs.getDisplayName().deepCopy().getString() + " in this chunk.").deepCopy().applyTextStyles(TextFormatting.GOLD), true);
 			}else {
 				context.getPlayer().sendStatusMessage(new StringTextComponent("There is no reservoir in this chunk."), true);
 			}

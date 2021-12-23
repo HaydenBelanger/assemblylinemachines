@@ -2,8 +2,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.MetalCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
@@ -58,8 +56,8 @@ public class MetalShaperRecipeCategory implements IRecipeCategory<MetalCrafting>
 	}
 	
 	@Override
-	public void draw(MetalCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
-		progbar.draw(mx, 42, 8);
+	public void draw(MetalCrafting recipe, double mouseX, double mouseY) {
+		progbar.draw(42, 8);
 	}
 
 	@Override

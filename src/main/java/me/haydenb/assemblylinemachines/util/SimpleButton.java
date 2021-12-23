@@ -1,9 +1,6 @@
 package me.haydenb.assemblylinemachines.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.StringTextComponent;
 
 public class SimpleButton extends Button {
 	public final int blitx;
@@ -13,7 +10,7 @@ public class SimpleButton extends Button {
 	public final int sizey;
 
 	public SimpleButton(int widthIn, int heightIn, int blitx, int blity, int sizex, int sizey, String text, IPressable onPress) {
-		super(widthIn, heightIn, sizex, sizey, new StringTextComponent(text), onPress);
+		super(widthIn, heightIn, sizex, sizey, text, onPress);
 		this.blitx = blitx;
 		this.blity = blity;
 		this.sizex = sizex;
@@ -38,6 +35,6 @@ public class SimpleButton extends Button {
 	}
 	
 	@Override
-	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
+	public void render(int p_230430_2_, int p_230430_3_, float p_230430_4_) {
 	}
 }

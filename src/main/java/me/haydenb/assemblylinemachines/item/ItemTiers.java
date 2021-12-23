@@ -29,12 +29,10 @@ public enum ItemTiers {
 	private int[] damageReduction;
 	private String armorSetName;
 	private float toughness;
-	private float armorKnockbackResistance;
 	private LazyValue<Ingredient> ingredient;	
 	ItemTiers(float attack, float efficiency, int enchantability, int harvestLevel, int durability, int armorDurabilityBase, float armorKnockbackResistance, int[] damageReduction, String armorSetName, float toughness, Supplier<Ingredient> ingredient) {
 		
 		
-		this.armorKnockbackResistance = armorKnockbackResistance;
 		this.attack = attack;
 		this.efficiency = efficiency;
 		this.enchantability = enchantability;
@@ -53,11 +51,6 @@ public enum ItemTiers {
 		private final ItemTiers baseTier;
 		ArmorTiers(ItemTiers base){
 			this.baseTier = base;
-		}
-
-		@Override
-		public float getKnockbackResistance() {
-			return baseTier.armorKnockbackResistance;
 		}
 
 		@Override

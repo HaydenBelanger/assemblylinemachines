@@ -173,8 +173,8 @@ public class BlockToolCharger extends BlockTileEntity{
 		}
 		
 		@Override
-		public void read(BlockState p_230337_1_, CompoundNBT compound) {
-			super.read(p_230337_1_, compound);
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			amount = compound.getInt("assemblylinemachines:amount");
 		}

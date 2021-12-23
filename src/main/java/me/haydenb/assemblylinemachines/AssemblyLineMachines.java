@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.*;
-import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
 import me.haydenb.assemblylinemachines.plugins.other.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraftforge.fml.*;
@@ -27,10 +26,6 @@ public final class AssemblyLineMachines{
 		
 		
 		HashPacketImpl.INSTANCE.registerMessage(HashPacketImpl.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
-		
-		if(PluginMekanism.get().isMekanismInstalled()) {
-			PluginMekanism.get().registerAllGas();
-		}
 		
 		PluginTOP.register();
 	}

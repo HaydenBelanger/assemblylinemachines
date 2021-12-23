@@ -19,7 +19,7 @@ public class ItemCorruptedShard extends ItemBasicFormattedName implements IGearb
 	public ITextComponent getDisplayName(ItemStack stack) {
 		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:internalitem")) {
 			ItemStack intStack = ItemStack.read(stack.getTag().getCompound("assemblylinemachines:internalitem"));
-			return intStack.getDisplayName().deepCopy().mergeStyle(formats);
+			return intStack.getDisplayName().deepCopy().applyTextStyles(formats);
 		}else {
 			return super.getDisplayName(stack);
 		}

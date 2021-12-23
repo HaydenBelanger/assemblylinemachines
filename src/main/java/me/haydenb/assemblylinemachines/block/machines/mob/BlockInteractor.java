@@ -22,7 +22,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
@@ -36,7 +35,6 @@ import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.*;
@@ -175,7 +173,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 					
 					if(fp == null) {
 						if(origPlayerUUID != null) {
-							fp = FakePlayerFactory.get(world.getServer().getWorld(world.getDimensionKey()), world.getServer().getPlayerProfileCache().getProfileByUUID(origPlayerUUID));
+							fp = FakePlayerFactory.get(world.getServer().getWorld(world.getDimension().getType()), world.getServer().getPlayerProfileCache().getProfileByUUID(origPlayerUUID));
 						}
 					}
 					if(fp != null && stack != null) {
@@ -213,7 +211,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 								}
 								if(checkInteractMode) {
 									try {
-										fp.interactionManager.func_219441_a(fp, world, stack, Hand.MAIN_HAND, new BlockRayTraceResult(new Vector3d(0.5d, 0.5d, 0.5d), getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).getOpposite(), offsetPos, false));
+										fp.interactionManager.func_219441_a(fp, world, stack, Hand.MAIN_HAND, new BlockRayTraceResult(new Vec3d(0.5d, 0.5d, 0.5d), getBlockState().get(HorizontalBlock.HORIZONTAL_FACING).getOpposite(), offsetPos, false));
 									}catch(Exception e) {
 										
 										DebugOptions db = ConfigHolder.COMMON.interactorInteractDebug.get();
@@ -275,7 +273,7 @@ public class BlockInteractor extends BlockScreenTileEntity<BlockInteractor.TEInt
 										float amt = 0.5f;
 										
 										if(!stack.isEmpty()) {
-											for(AttributeModifier am : stack.getAttributeModifiers(EquipmentSlotType.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
+											for(AttributeModifier am : stack.getAttributeModifiers(EquipmentSlotType.MAINHAND).get("ATTACK_DAMAGE")) {
 												amt += am.getAmount();
 											}
 										}

@@ -19,7 +19,7 @@ public class CorruptGrassBlock extends Block{
 
 	
 	public CorruptGrassBlock() {
-		super(AbstractBlock.Properties.create(Material.EARTH).hardnessAndResistance(13f, 30f).harvestLevel(0).harvestTool(ToolType.SHOVEL).sound(SoundType.GROUND));
+		super(Block.Properties.create(Material.EARTH).hardnessAndResistance(13f, 30f).harvestLevel(0).harvestTool(ToolType.SHOVEL).sound(SoundType.GROUND));
 		
 	}
 	
@@ -52,7 +52,7 @@ public class CorruptGrassBlock extends Block{
 	private static boolean checkIfDead(BlockState p_220257_0_, IWorldReader p_220257_1_, BlockPos p_220257_2_) {
 	      BlockPos blockpos = p_220257_2_.up();
 	      BlockState blockstate = p_220257_1_.getBlockState(blockpos);
-	      if (blockstate.matchesBlock(Blocks.SNOW) && blockstate.get(SnowBlock.LAYERS) == 1) {
+	      if (blockstate.getBlock().equals(Blocks.SNOW) && blockstate.get(SnowBlock.LAYERS) == 1) {
 	         return true;
 	      } else if (blockstate.getFluidState().getLevel() == 8) {
 	         return false;

@@ -9,7 +9,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -25,7 +25,7 @@ public class FluidNaphtha extends ALMFluid {
 	}
 
 	@Override
-	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
+	protected void randomTick(World world, BlockPos pos, IFluidState state, Random random) {
 		Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.up().north().east(), pos.down().south().west()).iterator();
 		while(iter.hasNext()) {
 			
@@ -69,7 +69,7 @@ public class FluidNaphtha extends ALMFluid {
 	public static class FluidNaphthaBlock extends ALMFluidBlock {
 
 		public FluidNaphthaBlock() {
-			super("naphtha", ALMFluid.NAPHTHA, Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).setLightLevel((state) -> 11).noDrops());
+			super("naphtha", ALMFluid.NAPHTHA, Block.Properties.create(Material.LAVA).hardnessAndResistance(100f).lightValue(11).noDrops());
 		}
 		
 		@Override

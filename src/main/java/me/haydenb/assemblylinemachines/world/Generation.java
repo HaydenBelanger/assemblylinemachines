@@ -1,66 +1,46 @@
 package me.haydenb.assemblylinemachines.world;
 
-import java.util.*;
-import java.util.function.Supplier;
-
-import com.google.common.collect.Lists;
+import java.util.Map.Entry;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.BlockBlackGranite;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.GenerationStage.Decoration;
 import net.minecraft.world.gen.feature.*;
-import net.minecraft.world.gen.feature.template.BlockMatchRuleTest;
-import net.minecraft.world.gen.feature.template.RuleTest;
+import net.minecraft.world.gen.feature.OreFeatureConfig.FillerBlockType;
+import net.minecraft.world.gen.placement.CountRangeConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 public class Generation {
 
-	private static final RuleTest END_RULE_TEST = new BlockMatchRuleTest(Blocks.END_STONE);
+	private static final FillerBlockType END_RULE_TEST = FillerBlockType.create("end_stone", "end_stone", (bs) -> bs.getBlock().equals(Blocks.END_STONE));
 	
 	@SubscribeEvent
 	public static void completeLoad(FMLLoadCompleteEvent e) {
 
-		Block titanium = Registry.getBlock("titanium_ore");
-		Block black_granite = Registry.getBlock("black_granite");
-		Block chromium = Registry.getBlock("chromium_ore");
+		ConfiguredFeature<?, ?>[] features = new ConfiguredFeature<?, ?>[3];
+		features[0] = Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NETHERRACK, Registry.getBlock("black_granite").getDefaultState().with(BlockBlackGranite.NATURAL_GRANITE, true), 37))
+				.withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(7, 0, 0, 255)));
+		features[1] = Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, Registry.getBlock("titanium_ore").getDefaultState(), 8))
+				.withPlacement((Placement.COUNT_RANGE.configure(new CountRangeConfig(3, 0, 0, 16))));
+		features[2] = Feature.ORE.withConfiguration(new OreFeatureConfig(END_RULE_TEST, Registry.getBlock("chromium_ore").getDefaultState(), 10))
+				.withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(10, 0, 0, 255)));
 		
-		register(black_granite.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_NETHER, black_granite.getDefaultState().with(BlockBlackGranite.NATURAL_GRANITE, true), 37)).range(126).square().count(7));
-		register(titanium.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, titanium.getDefaultState(), 8)).range(16).square().count(3));
-		register(chromium.getRegistryName(), Feature.ORE.withConfiguration(new OreFeatureConfig(END_RULE_TEST, chromium.getDefaultState(), 10)).range(255).square());
-	}
-	
-	@SuppressWarnings("deprecation")
-	private static void register(ResourceLocation rl, ConfiguredFeature<?, ?> feature) {
-		net.minecraft.util.registry.Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, rl.toString(), feature);
-
-		for (Map.Entry<RegistryKey<Biome>, Biome> biome : WorldGenRegistries.BIOME.getEntries()) {
-			addFeatureToBiome(biome.getValue(), GenerationStage.Decoration.UNDERGROUND_ORES, WorldGenRegistries.CONFIGURED_FEATURE.getOrDefault(rl));
+		for(Entry<ResourceLocation, Biome> biome : ForgeRegistries.BIOMES.getEntries()) {
+			
+			Biome b = biome.getValue();
+			for(ConfiguredFeature<?, ?> feature : features) {
+				b.addFeature(Decoration.UNDERGROUND_ORES, feature);
+			}
 		}
-	}
-
-	public static void addFeatureToBiome(Biome biome, GenerationStage.Decoration decoration, ConfiguredFeature<?, ?> configuredFeature) {
-		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = new ArrayList<>(biome.getGenerationSettings().getFeatures());
-
-		while (biomeFeatures.size() <= decoration.ordinal()) {
-			biomeFeatures.add(Lists.newArrayList());
-		}
-
-		List<Supplier<ConfiguredFeature<?, ?>>> features = new ArrayList<>(biomeFeatures.get(decoration.ordinal()));
-		features.add(() -> configuredFeature);
-		biomeFeatures.set(decoration.ordinal(), features);
-
-		//Mapping change requires use of accesstransformer.
-		biome.getGenerationSettings().features = biomeFeatures;
 	}
 }

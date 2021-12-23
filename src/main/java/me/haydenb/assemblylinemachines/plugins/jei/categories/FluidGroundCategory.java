@@ -2,8 +2,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 
 import java.util.*;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
@@ -22,7 +20,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.*;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe> {
@@ -72,7 +69,7 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 	}
 	
 	@Override
-	public void draw(FluidInGroundRecipe recipe, MatrixStack mx, double mouseX, double mouseY) {
+	public void draw(FluidInGroundRecipe recipe, double mouseX, double mouseY) {
 		
 		IDrawable draw;
 		if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD || recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD) {
@@ -87,7 +84,7 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 			draw = progbardirt;
 		}
 		
-		draw.draw(mx, 49, 57);
+		draw.draw(49, 57);
 	}
 
 	@Override
@@ -106,35 +103,35 @@ public class FluidGroundCategory implements IRecipeCategory<FluidInGroundRecipe>
 		fgui.init(0, false, new IIngredientRenderer<FluidStack>() {
 			
 			@Override
-			public void render(MatrixStack mx, int xPosition, int yPosition, FluidStack ingredient) {
+			public void render(int xPosition, int yPosition, FluidStack ingredient) {
 				
-				helper.createDrawableIngredient(ingredient).draw(mx, xPosition, yPosition);
+				helper.createDrawableIngredient(ingredient).draw(xPosition, yPosition);
 			}
 			
 			@Override
-			public List<ITextComponent> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
+			public List<String> getTooltip(FluidStack ingredient, ITooltipFlag tooltipFlag) {
 				
-				ArrayList<ITextComponent> arr = new ArrayList<>();
+				ArrayList<String> arr = new ArrayList<>();
 				
-				arr.add(ingredient.getDisplayName().deepCopy());
+				arr.add(ingredient.getDisplayName().getString());
 				if(recipe.getCriteria() == FluidInGroundCriteria.END) {
-					arr.add(new StringTextComponent("Found in The End.").deepCopy().mergeStyle(TextFormatting.DARK_PURPLE));
+					arr.add("§5Found in The End.");
 				}else if(recipe.getCriteria() == FluidInGroundCriteria.NETHER) {
-					arr.add(new StringTextComponent("Found in The Nether.").deepCopy().mergeStyle(TextFormatting.DARK_RED));
+					arr.add("§4Found in The Nether.");
 				}else {
-					arr.add(new StringTextComponent("Found in The Overworld.").deepCopy().mergeStyle(TextFormatting.DARK_GREEN));
+					arr.add("§2Found in the Overworld.");
 					if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYCOLD) {
-						arr.add(new StringTextComponent("Only in very cold biomes.").deepCopy().mergeStyle(TextFormatting.BLUE));
+						arr.add("§9Only in very cold biomes.");
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFCOLD) {
-						arr.add(new StringTextComponent("Favors very cold biomes.").deepCopy().mergeStyle(TextFormatting.BLUE));
+						arr.add("§9Favors very cold biomes.");
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_PREFHOT) {
-						arr.add(new StringTextComponent("Favors very hot biomes.").deepCopy().mergeStyle(TextFormatting.RED));
+						arr.add("§cFavors very hot biomes.");
 					}else if(recipe.getCriteria() == FluidInGroundCriteria.OVERWORLD_ONLYHOT) {
-						arr.add(new StringTextComponent("Only in very hot biomes.").deepCopy().mergeStyle(TextFormatting.RED));
+						arr.add("§cOnly in very hot biomes.");
 					}
 				}
 				
-				arr.add(new StringTextComponent(recipe.getChance() + "% chance to generate.").deepCopy().mergeStyle(TextFormatting.YELLOW));
+				arr.add("§e" + recipe.getChance() + "% chance to generate.");
 				
 				return arr;
 			}

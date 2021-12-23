@@ -15,7 +15,7 @@ public class CorruptSandBlock extends SandBlock {
 
 	
 	public CorruptSandBlock() {
-		super(0x4287f5, AbstractBlock.Properties.create(Material.SAND).hardnessAndResistance(13f, 30f).harvestLevel(0).harvestTool(ToolType.SHOVEL).sound(SoundType.SAND));
+		super(0x4287f5, Block.Properties.create(Material.SAND).hardnessAndResistance(13f, 30f).harvestLevel(0).harvestTool(ToolType.SHOVEL).sound(SoundType.SAND));
 		
 	}
 	

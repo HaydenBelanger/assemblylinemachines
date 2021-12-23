@@ -188,7 +188,7 @@ public class Events {
 				if(result.status == Status.BETA_OUTDATED || result.status == Status.OUTDATED) {
 					TextComponent tc = new StringTextComponent("[§aAssemblyLineMachines§f] Update available, version §e" + result.target.getCanonical() + ",§f you're using §e" + imi.getVersion().toString() + ". §2Click to Update!");
 					tc.setStyle(tc.getStyle().setClickEvent(new ClickEvent(Action.OPEN_URL, result.url)));
-					player.sendMessage(tc, null);
+					player.sendMessage(tc);
 				}
 			}
 		}

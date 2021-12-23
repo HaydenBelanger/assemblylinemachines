@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:sawdust"
+	},
+	"input_b":{
+		"item": "minecraft:ender_eye"
+	},
+	"output":{
+		"item": "assemblylinemachines:warped_sawdust"
+	},
+	"stirs": 7,
+	"fluid": "condensed_void",
+	"mix_color": "0",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "QUARTER"
+}

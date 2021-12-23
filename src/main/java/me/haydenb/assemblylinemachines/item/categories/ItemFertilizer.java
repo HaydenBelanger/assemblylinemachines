@@ -46,7 +46,7 @@ public class ItemFertilizer extends Item{
 		if(shrnk) {
 			context.getItem().shrink(1);
 		}
-		return ActionResultType.func_233537_a_(world.isRemote);
+		return world.isRemote ? ActionResultType.SUCCESS : ActionResultType.PASS;
 	}
 
 

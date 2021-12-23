@@ -2,8 +2,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
@@ -57,8 +55,8 @@ public class AlloyingRecipeCategory implements IRecipeCategory<AlloyingCrafting>
 	}
 	
 	@Override
-	public void draw(AlloyingCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
-		progbar.draw(mx, 42, 13);
+	public void draw(AlloyingCrafting recipe, double mouseX, double mouseY) {
+		progbar.draw(42, 13);
 	}
 	
 

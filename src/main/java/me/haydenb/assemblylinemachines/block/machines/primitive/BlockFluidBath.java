@@ -257,8 +257,8 @@ public class BlockFluidBath extends Block {
 		}
 		
 		@Override
-		public void read(BlockState p_230337_1_, CompoundNBT compound) {
-			super.read(p_230337_1_, compound);
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			if (compound.contains("assemblylinemachines:stirs")) {
 				stirsRemaining = compound.getInt("assemblylinemachines:stirs");
@@ -368,7 +368,7 @@ public class BlockFluidBath extends Block {
 		public void setInventorySlotContents(int arg0, ItemStack arg1) {
 		}
 		
-		public int getFluidColor(IBlockDisplayReader reader, BlockPos pos) {
+		public int getFluidColor(ILightReader reader, BlockPos pos) {
 			
 			
 			if(output != null && fluidColor != 0) {

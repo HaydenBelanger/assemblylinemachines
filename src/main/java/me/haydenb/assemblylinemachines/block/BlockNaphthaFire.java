@@ -10,7 +10,6 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -18,17 +17,11 @@ import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.ForgeEventFactory;
 
-public class BlockNaphthaFire extends AbstractFireBlock {
+public class BlockNaphthaFire extends FireBlock {
 	public BlockNaphthaFire() {
 		super(Block.Properties.create(Material.FIRE, MaterialColor.TNT).doesNotBlockMovement().tickRandomly()
-				.hardnessAndResistance(0f).setLightLevel((state) -> 15).sound(SoundType.CLOTH).noDrops(), 1f);
+				.hardnessAndResistance(0f).lightValue(15).sound(SoundType.CLOTH).noDrops());
 		this.setDefaultState(this.stateContainer.getBaseState().with(FireBlock.AGE, 0));
-	}
-
-
-	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(FireBlock.AGE);
 	}
 
 	@Override
@@ -73,6 +66,7 @@ public class BlockNaphthaFire extends AbstractFireBlock {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entity) {
 
@@ -97,7 +91,7 @@ public class BlockNaphthaFire extends AbstractFireBlock {
 	}
 
 	@Override
-	protected boolean canBurn(BlockState p_196446_1_) {
+	public boolean canBurn(BlockState p_196446_1_) {
 		return true;
 	}
 

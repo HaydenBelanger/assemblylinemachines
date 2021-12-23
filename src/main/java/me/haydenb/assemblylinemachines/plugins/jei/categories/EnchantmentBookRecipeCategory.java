@@ -2,8 +2,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 
 import java.util.*;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.EnchantmentBookCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
@@ -57,8 +55,8 @@ public class EnchantmentBookRecipeCategory implements IRecipeCategory<Enchantmen
 	}
 	
 	@Override
-	public void draw(EnchantmentBookCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
-		progbar.draw(mx, 24, 20);
+	public void draw(EnchantmentBookCrafting recipe, double mouseX, double mouseY) {
+		progbar.draw(24, 20);
 	}
 	
 

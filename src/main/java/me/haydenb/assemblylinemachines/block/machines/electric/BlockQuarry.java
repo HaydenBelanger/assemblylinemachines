@@ -18,8 +18,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
@@ -28,11 +26,12 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.*;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
@@ -239,13 +238,13 @@ public class BlockQuarry extends BlockScreenTileEntity<BlockQuarry.TEQuarry>{
 									
 									
 									if(serverWorld == null) {
-										serverWorld = world.getServer().getWorld(world.getDimensionKey());
+										serverWorld = world.getServer().getWorld(world.getDimension().getType());
 									}
 									
 									ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
 									pick.addEnchantment(Enchantments.FORTUNE, fortune);
 									
-									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.ORIGIN, new Vector3d(mpos.getX(), mpos.getY(), mpos.getZ())));
+									List<ItemStack> stackList = bs.getDrops(new LootContext.Builder(serverWorld).withParameter(LootParameters.TOOL, pick).withParameter(LootParameters.POSITION, mpos));
 									
 									for(ItemStack stack : stackList) {
 										pending = General.attemptDepositIntoAllSlots(stack, handler);

@@ -58,7 +58,7 @@ public class StateProperties {
 		}
 		
 		@Override
-		public String getString() {
+		public String getName() {
 			return toString().toLowerCase();
 		}
 		

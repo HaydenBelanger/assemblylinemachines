@@ -19,7 +19,7 @@ public class BlockMystiumFarmland extends FarmlandBlock {
 	private static final IntegerProperty AGE = IntegerProperty.create("exhaustion", 0, 32);
 	
 	public BlockMystiumFarmland() {
-		super(AbstractBlock.Properties.create(Material.EARTH).hardnessAndResistance(0.6F).sound(SoundType.GROUND).tickRandomly());
+		super(Block.Properties.create(Material.EARTH).hardnessAndResistance(0.6F).sound(SoundType.GROUND).tickRandomly());
 		this.setDefaultState(this.stateContainer.getBaseState().with(MOISTURE, 7).with(AGE, 0));
 		
 	}
@@ -71,7 +71,7 @@ public class BlockMystiumFarmland extends FarmlandBlock {
 	
 	@Override
 	public boolean canSustainPlant(BlockState state, IBlockReader world, BlockPos pos, Direction facing, IPlantable plantable) {
-		if(plantable.getPlantType(world, pos) == PlantType.CROP) {
+		if(plantable.getPlantType(world, pos) == PlantType.Crop) {
 			return true;
 		}
 		

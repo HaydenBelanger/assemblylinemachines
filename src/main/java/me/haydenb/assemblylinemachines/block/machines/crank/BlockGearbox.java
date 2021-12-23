@@ -100,7 +100,6 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 				nTimer = compound.getInt("assemblylinemachines:prevtimer");
 			}
 		}
-		@SuppressWarnings("deprecation")
 		@Override
 		public void tick() {
 			
@@ -192,7 +191,6 @@ public class BlockGearbox extends BlockScreenTileEntity<BlockGearbox.TEGearbox> 
 			
 		}
 		
-		@SuppressWarnings("deprecation")
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(slot == 0) {

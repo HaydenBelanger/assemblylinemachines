@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 public class ItemUpgrade extends Item {
 
 	
-	private static final ITextComponent CAN_STACK = new StringTextComponent("This upgrade's effect can be stacked.").deepCopy().mergeStyle(TextFormatting.DARK_GRAY);
+	private static final ITextComponent CAN_STACK = new StringTextComponent("This upgrade's effect can be stacked.").deepCopy().applyTextStyles(TextFormatting.DARK_GRAY);
 	
 	final String[] positives;
 	final String[] negatives;
@@ -47,12 +47,12 @@ public class ItemUpgrade extends Item {
 			tooltip.add(CAN_STACK);
 		}
 		for(String s : positives) {
-			tooltip.add(new StringTextComponent(s).deepCopy().mergeStyle(TextFormatting.GREEN));
+			tooltip.add(new StringTextComponent(s).deepCopy().applyTextStyles(TextFormatting.GREEN));
 		}
 		
 		if(negatives != null) {
 			for(String s : negatives) {
-				tooltip.add(new StringTextComponent(s).deepCopy().mergeStyle(TextFormatting.DARK_RED));
+				tooltip.add(new StringTextComponent(s).deepCopy().applyTextStyles(TextFormatting.DARK_RED));
 			}
 			super.addInformation(stack, worldIn, tooltip, flagIn);
 		}

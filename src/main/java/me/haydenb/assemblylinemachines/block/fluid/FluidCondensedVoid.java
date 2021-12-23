@@ -11,13 +11,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
@@ -33,7 +33,7 @@ public class FluidCondensedVoid extends ALMFluid {
 	}
 	
 	@Override
-	protected void randomTick(World world, BlockPos pos, FluidState state, Random random) {
+	protected void randomTick(World world, BlockPos pos, IFluidState state, Random random) {
 		Iterator<BlockPos> iter = BlockPos.getAllInBox(pos.up().north().east(), pos.down().south().west()).iterator();
 		while(iter.hasNext()) {
 			BlockPos cor = iter.next();
@@ -92,7 +92,7 @@ public class FluidCondensedVoid extends ALMFluid {
 				player.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 100));
 				player.addPotionEffect(new EffectInstance(Effects.WITHER, 40, 6));
 				
-				entity.setMotionMultiplier(state, new Vector3d(0.02D, 0.02D, 0.02D));
+				entity.setMotionMultiplier(state, new Vec3d(0.02D, 0.02D, 0.02D));
 			}
 			super.onEntityCollision(state, worldIn, pos, entity);
 		}

@@ -22,6 +22,6 @@ public class ItemBasicFormattedName extends Item{
 	
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).deepCopy().mergeStyle(formats);
+		return super.getDisplayName(stack).deepCopy().applyTextStyles(formats);
 	}
 }

@@ -108,7 +108,7 @@ public class BlockFluidTank extends Block {
 			if(stack.hasTag()) {
 				CompoundNBT nbt = stack.getTag();
 				if(nbt.contains("assemblylinemachines:fluidstack")) {
-					tooltip.add(1, new StringTextComponent("This Tank has a fluid stored!").deepCopy().mergeStyle(TextFormatting.GREEN));
+					tooltip.add(1, new StringTextComponent("This Tank has a fluid stored!").deepCopy().applyTextStyles(TextFormatting.GREEN));
 				}
 			}
 			super.addInformation(stack, worldIn, tooltip, flagIn);
@@ -187,8 +187,8 @@ public class BlockFluidTank extends Block {
 		}
 
 		@Override
-		public void read(BlockState p_230337_1_, CompoundNBT compound) {
-			super.read(p_230337_1_, compound);
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			if (compound.contains("assemblylinemachines:capacity")) {
 				capacity = compound.getInt("assemblylinemachines:capacity");

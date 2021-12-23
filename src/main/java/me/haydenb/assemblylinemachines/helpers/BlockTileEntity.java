@@ -71,7 +71,7 @@ public abstract class BlockTileEntity extends Block{
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		if(shape != null) {
-			if(shouldRotate == true && state.hasProperty(HorizontalBlock.HORIZONTAL_FACING)) {
+			if(shouldRotate == true && state.has(HorizontalBlock.HORIZONTAL_FACING)) {
 				return General.rotateShape(dir, state.get(HorizontalBlock.HORIZONTAL_FACING), shape);
 			}else {
 				return shape;

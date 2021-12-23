@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.5-1.1.3'
+version = '1.15.2-1.1.3'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -23,7 +23,7 @@ compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
 accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'snapshot', version: '20200514-1.15.1'
     runs {
         client {
             workingDirectory project.file('run')
@@ -84,7 +84,7 @@ accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.21'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.0'
     
 	repositories{
         maven {
@@ -111,22 +111,18 @@ dependencies {
     }
 
 	//FTB GUI LIBRARY
-	compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
-	runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
+	//compileOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
+	//runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	
 	//JEI
-    compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.117:api")
- 	runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.117")
+    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.3.16:api")
+ 	runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.3.16")
  	
  	//PATCHOULI
- 	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
-    
-	//MEKANISM
-	compileOnly fg.deobf("mekanism:Mekanism:1.16.5-10.1.0.455:all")
-    runtimeOnly fg.deobf("mekanism:Mekanism:1.16.5-10.1.0.455:all")
+ 	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.15.2-1.2-35.2")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.15.2-1.2-35.2")
     
     //TOP
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
-    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.0-3")
+    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.0-3")
 }

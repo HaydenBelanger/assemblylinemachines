@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:alloying",
 	"part_a":{
-		"item": "minecraft:netherite_scrap"
+		"item": "minecraft:diamond"
 	},
 	"part_b":{
 		"item": "assemblylinemachines:polished_rock"

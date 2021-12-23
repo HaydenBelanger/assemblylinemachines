@@ -3,8 +3,6 @@ package me.haydenb.assemblylinemachines.plugins.jei.categories;
 import java.util.HashMap;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.plugins.jei.JEIHelper;
@@ -63,14 +61,14 @@ public class FluidBathRecipeCategory implements IRecipeCategory<BathCrafting> {
 	}
 	
 	@Override
-	public void draw(BathCrafting recipe, MatrixStack mx, double mouseX, double mouseY) {
+	public void draw(BathCrafting recipe, double mouseX, double mouseY) {
 		IDrawableAnimated anim = bars.get(recipe.getFluid());
 		if(anim == null) {
 			anim = helper.drawableBuilder(JEIHelper.getGUIPath("gui_set_a"), recipe.getFluid().getJeiBlitPiece().getFirst(), recipe.getFluid().getJeiBlitPiece().getSecond(), 15, 16).buildAnimated(200, StartDirection.LEFT, false);
 			
 			bars.put(recipe.getFluid(), anim);
 		}
-		anim.draw(mx, 42, 5);
+		anim.draw(42, 5);
 		
 	}
 

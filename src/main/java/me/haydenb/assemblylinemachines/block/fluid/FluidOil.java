@@ -5,7 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +20,7 @@ public class FluidOil extends ALMFluid {
 	}
 
 	@Override
-	public int getLevel(FluidState state) {
+	public int getLevel(IFluidState state) {
 		if(!source) {
 			return state.get(LEVEL_1_8);
 		}else {

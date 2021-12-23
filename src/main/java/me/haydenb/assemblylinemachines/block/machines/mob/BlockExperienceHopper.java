@@ -117,8 +117,8 @@ public class BlockExperienceHopper extends BlockTileEntity {
 		}
 		
 		@Override
-		public void read(BlockState p_230337_1_, CompoundNBT compound) {
-			super.read(p_230337_1_, compound);
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			internalStoredXp = compound.getInt("assemblylinemachines:internalxp");
 		}

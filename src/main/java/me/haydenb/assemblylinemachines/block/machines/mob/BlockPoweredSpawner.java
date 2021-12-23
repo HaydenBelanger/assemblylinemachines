@@ -131,7 +131,7 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 						int spamt = 0;
 						
 						if(sw == null) {
-							sw = world.getServer().getWorld(world.getDimensionKey());
+							sw = world.getServer().getWorld(world.getDimension().getType());
 						}
 						for(int i = 0; i < rand; i++) {
 							
@@ -147,7 +147,7 @@ public class BlockPoweredSpawner extends BlockScreenTileEntity<BlockPoweredSpawn
 							
 							for(int j = 0; j < 10; j++) {
 								
-								if(world.hasNoCollisions(spawnType.getBoundingBoxWithSizeApplied(d0, d1, d2)) && EntitySpawnPlacementRegistry.canSpawnEntity(spawnType, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
+								if(world.hasNoCollisions(spawnType.func_220328_a(d0, d1, d2)) && EntitySpawnPlacementRegistry.func_223515_a(spawnType, sw, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())) {
 									Entity entity = spawnType.create(world);
 									entity.setLocationAndAngles(d0, d1, d2, General.RAND.nextFloat() * 360f, 0f);
 									

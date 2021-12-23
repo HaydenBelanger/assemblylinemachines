@@ -22,6 +22,6 @@ public class ItemBlockFormattedName extends BlockItem{
 	
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
-		return super.getDisplayName(stack).deepCopy().mergeStyle(formats);
+		return super.getDisplayName(stack).deepCopy().applyTextStyles(formats);
 	}
 }

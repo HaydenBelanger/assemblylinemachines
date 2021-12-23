@@ -86,7 +86,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenTileEntity<BlockBotto
 				
 				CompoundNBT nbt = stack.getTag();
 				if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem")) {
-					tooltip.add(1, new StringTextComponent("This BSU has items stored inside!").deepCopy().mergeStyle(TextFormatting.GREEN));
+					tooltip.add(1, new StringTextComponent("This BSU has items stored inside!").deepCopy().applyTextStyles(TextFormatting.GREEN));
 				}
 				
 			}

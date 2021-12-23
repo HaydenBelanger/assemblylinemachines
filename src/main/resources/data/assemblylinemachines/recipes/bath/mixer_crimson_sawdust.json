@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:sawdust"
+	},
+	"input_b":{
+		"item": "minecraft:redstone"
+	},
+	"output":{
+		"item": "assemblylinemachines:crimson_sawdust"
+	},
+	"stirs": 7,
+	"fluid": "lava",
+	"mix_color": "0",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "QUARTER"
+}

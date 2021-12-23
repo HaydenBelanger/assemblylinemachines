@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.HopperTileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
@@ -43,7 +44,7 @@ public class QuantumLinkManager extends WorldSavedData{
 		
 		
 		if(manager == null) {
-			csw = server.getWorld(ServerWorld.OVERWORLD);
+			csw = server.getWorld(DimensionType.OVERWORLD);
 			DimensionSavedDataManager dsdm = csw.getSavedData();
 			manager = dsdm.getOrCreate(QuantumLinkManager::new, DATA_PATH);
 			

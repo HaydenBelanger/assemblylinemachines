@@ -388,7 +388,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 			this.minecraft.keyboardListener.enableRepeatEvents(true);
 
-			idField = new TextFieldWidget(this.font, x + 138, y + 9, 20, 9, new StringTextComponent("ID"));
+			idField = new TextFieldWidget(this.font, x + 138, y + 9, 20, 9, "ID");
 			idField.setCanLoseFocus(true);
 			idField.setEnableBackgroundDrawing(false);
 			idField.setMaxStringLength(3);
@@ -406,7 +406,7 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 				return StringUtils.isNumeric(string);
 			});
 
-			pinField = new TextFieldWidget(this.font, x + 138, y + 24, 32, 9, new StringTextComponent("PIN"));
+			pinField = new TextFieldWidget(this.font, x + 138, y + 24, 32, 9, "PIN");
 			pinField.setCanLoseFocus(true);
 			pinField.setEnableBackgroundDrawing(false);
 			pinField.setMaxStringLength(4);
@@ -494,8 +494,8 @@ public class BlockQuantumLink extends BlockScreenTileEntity<BlockQuantumLink.TEQ
 
 			}
 
-			this.idField.renderWidget(mx, mouseX, mouseY, partialTicks);
-			this.pinField.renderWidget(mx, mouseX, mouseY, partialTicks);
+			this.idField.render(mouseX, mouseY, partialTicks);
+			this.pinField.render(mouseX, mouseY, partialTicks);
 
 
 		}

@@ -94,7 +94,7 @@ public class BlockElectricPurifier extends BlockScreenTileEntity<BlockElectricPu
 		FALSE, TRUE, ENHANCEDFALSE, ENHANCEDTRUE;
 
 		@Override
-		public String getString() {
+		public String getName() {
 			return toString().toLowerCase();
 		}
 		

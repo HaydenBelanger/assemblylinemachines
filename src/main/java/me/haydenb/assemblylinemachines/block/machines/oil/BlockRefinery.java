@@ -19,7 +19,6 @@ import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.categories.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl;
 import me.haydenb.assemblylinemachines.packets.HashPacketImpl.PacketData;
-import me.haydenb.assemblylinemachines.plugins.other.PluginMekanism;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.util.*;
 import me.haydenb.assemblylinemachines.util.StateProperties.BathCraftingFluids;
@@ -90,7 +89,7 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 
 		BlockState bs = context.getWorld().getBlockState(context.getPos().up());
-		if (bs.getBlock() instanceof BlockRefineryAddon && bs.hasProperty(HorizontalBlock.HORIZONTAL_FACING)) {
+		if (bs.getBlock() instanceof BlockRefineryAddon && bs.has(HorizontalBlock.HORIZONTAL_FACING)) {
 			return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, bs.get(HorizontalBlock.HORIZONTAL_FACING));
 		} else {
 			return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
@@ -648,13 +647,6 @@ public class BlockRefinery extends BlockScreenTileEntity<TERefinery> {
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
 				return fhandler.cast();
-			}
-			
-			if(PluginMekanism.get().isMekanismInstalled()) {
-				LazyOptional<T> lO = PluginMekanism.get().getRefineryCapability(cap, this);
-				if(lO != null) {
-					return lO;
-				}
 			}
 			return super.getCapability(cap, side);
 		}

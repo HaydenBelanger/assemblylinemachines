@@ -230,8 +230,8 @@ public class BlockPump extends BlockTileEntity {
 		}
 		
 		@Override
-		public void read(BlockState p_230337_1_, CompoundNBT compound) {
-			super.read(p_230337_1_, compound);
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			if (compound.contains("assemblylinemachines:fluid")) {
 				extracted = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:fluid"));
@@ -255,7 +255,7 @@ public class BlockPump extends BlockTileEntity {
 		private void forceState(boolean status) {
 			
 			BlockState bs = world.getBlockState(pos.down());
-			if(bs.hasProperty(StateProperties.MACHINE_ACTIVE)) {
+			if(bs.has(StateProperties.MACHINE_ACTIVE)) {
 				
 				if(bs.get(StateProperties.MACHINE_ACTIVE) != status) {
 					world.setBlockState(pos.down(), bs.with(StateProperties.MACHINE_ACTIVE, status));

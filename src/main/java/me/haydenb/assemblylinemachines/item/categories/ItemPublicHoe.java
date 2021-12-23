@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 
 public class ItemPublicHoe extends ToolItem{
 
-	private static final Set<Block> field_234683_c_ = ImmutableSet.of(Blocks.NETHER_WART_BLOCK, Blocks.WARPED_WART_BLOCK, Blocks.HAY_BLOCK, Blocks.DRIED_KELP_BLOCK, Blocks.TARGET, Blocks.SHROOMLIGHT, Blocks.SPONGE, Blocks.WET_SPONGE, Blocks.JUNGLE_LEAVES, Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.ACACIA_LEAVES, Blocks.BIRCH_LEAVES);
+	private static final Set<Block> field_234683_c_ = ImmutableSet.of(Blocks.NETHER_WART_BLOCK, Blocks.HAY_BLOCK, Blocks.DRIED_KELP_BLOCK, Blocks.SPONGE, Blocks.WET_SPONGE, Blocks.JUNGLE_LEAVES, Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.ACACIA_LEAVES, Blocks.BIRCH_LEAVES);
 	   public static final Map<Block, BlockState> HOE_LOOKUP = Maps.newHashMap(ImmutableMap.of(Blocks.GRASS_BLOCK, Blocks.FARMLAND.getDefaultState(), Blocks.GRASS_PATH, Blocks.FARMLAND.getDefaultState(), Blocks.DIRT, Blocks.FARMLAND.getDefaultState(), Blocks.COARSE_DIRT, Blocks.DIRT.getDefaultState()));
 
 	   public ItemPublicHoe(IItemTier tier, float speed, Item.Properties properties) {
@@ -27,7 +27,6 @@ public class ItemPublicHoe extends ToolItem{
 	   public ActionResultType onItemUse(ItemUseContext context) {
 	      World world = context.getWorld();
 	      BlockPos blockpos = context.getPos();
-	      @SuppressWarnings("deprecation")
 		int hook = net.minecraftforge.event.ForgeEventFactory.onHoeUse(context);
 	      if (hook != 0) return hook > 0 ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	      if (context.getFace() != Direction.DOWN && world.isAirBlock(blockpos.up())) {
@@ -44,7 +43,7 @@ public class ItemPublicHoe extends ToolItem{
 	               }
 	            }
 
-	            return ActionResultType.func_233537_a_(world.isRemote);
+	            return world.isRemote ? ActionResultType.SUCCESS : ActionResultType.PASS;
 	         }
 	      }
 
