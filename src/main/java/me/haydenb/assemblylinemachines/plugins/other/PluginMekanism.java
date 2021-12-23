@@ -22,6 +22,7 @@ public class PluginMekanism {
 	
 	private static MekanismInterface mInt = null;
 	
+	@SuppressWarnings("deprecation")
 	public static MekanismInterface get() {
 		if(mInt == null) {
 			if(ModList.get().isLoaded("mekanism")) {

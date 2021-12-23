@@ -149,6 +149,7 @@ public class Registry {
 	public static final ModCreativeTab creativeTab = new ModCreativeTab("assemblylinemachines");
 	
 	//EVENTS
+	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
@@ -841,6 +842,7 @@ public class Registry {
 		return teRegistry.get(name);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static <T extends TileEntity> void createTileEntity(String name, Class<T> clazz, Block... blocks){
 		teRegistry.put(name, TileEntityType.Builder.create(() -> {
 			T inst;

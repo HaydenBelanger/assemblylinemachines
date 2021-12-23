@@ -11,6 +11,7 @@ public class PluginPatchouli {
 
 	private static PatchouliInterface pInt = null;
 	
+	@SuppressWarnings("deprecation")
 	public static PatchouliInterface get() {
 		
 		if(pInt == null) {

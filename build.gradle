@@ -84,7 +84,7 @@ accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.0'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.21'
     
 	repositories{
         maven {
@@ -115,16 +115,16 @@ dependencies {
 	runtimeOnly fg.deobf("com.feed_the_beast.mods:ftb-gui-library:1.0.0.18")
 	
 	//JEI
-    compileOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44:api")
- 	runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.44")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.117:api")
+ 	runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.117")
  	
  	//PATCHOULI
  	compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
     
 	//MEKANISM
-	compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
-    runtimeOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
+	compileOnly fg.deobf("mekanism:Mekanism:1.16.5-10.1.0.455:all")
+    runtimeOnly fg.deobf("mekanism:Mekanism:1.16.5-10.1.0.455:all")
     
     //TOP
     compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
