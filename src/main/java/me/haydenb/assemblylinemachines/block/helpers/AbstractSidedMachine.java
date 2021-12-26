@@ -198,6 +198,8 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 			
 			if(getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
 				int fx = (int) Math.floor(((double) amount / (double) properties.getCapacity()) * 4d);
+				if(fx > 4) fx = 4;
+				if(fx < 0) fx = 0;
 				if(getBlockState().getValue(StateProperties.BATTERY_PERCENT_STATE) != fx) {
 					getLevel().setBlockAndUpdate(getBlockPos(), getBlockState().setValue(StateProperties.BATTERY_PERCENT_STATE, fx));
 				}
