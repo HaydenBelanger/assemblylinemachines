@@ -30,6 +30,7 @@ public class TagMaster {
 	public static final Named<Block> NEEDS_NETHERITE_TOOL = ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation("forge", "needs_netherite_tool"));
 	public static final Named<Block> NEEDS_MYSTIUM_TOOL = ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
 	
+	
 	private static final HashMap<Material, Optional<Named<Block>>> MATERIAL_TOOL = new HashMap<>();
 	static {
 		MATERIAL_TOOL.put(Material.AMETHYST, Optional.of(BlockTags.MINEABLE_WITH_PICKAXE));
@@ -88,7 +89,7 @@ public class TagMaster {
 				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"), 
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
 				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"),
-				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust")));
+				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust"), Pair.of("chromium", "ground_chromium")));
 		forgeTags.putAll("gears", List.of(Pair.of("copper", "copper_gear"), Pair.of("gold", "gold_gear"), Pair.of("iron", "iron_gear"),
 				Pair.of("steel", "steel_gear"), Pair.of("titanium", "titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
 		forgeTags.putAll("ingots", List.of(Pair.of("attuned_titanium", "attuned_titanium_ingot"), Pair.of("chromium", "chromium_ingot"),
@@ -104,7 +105,8 @@ public class TagMaster {
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));
 		forgeTags.putAll("ores", List.of(Pair.of("chromium", "chromium_ore"), Pair.of("titanium", "titanium_ore;deepslate_titanium_ore"), Pair.of("flerovium", "flerovium_ore")));
 		forgeTags.putAll("storage_blocks", List.of(Pair.of("chromium", "chromium_block"), Pair.of("titanium", "titanium_block"), Pair.of("mystium", "mystium_block"), Pair.of("steel", "steel_block"),
-				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block"), Pair.of("novasteel", "novasteel_block")));
+				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block"), Pair.of("novasteel", "novasteel_block"), 
+				Pair.of("raw_chromium", "raw_chromium_block"), Pair.of("raw_titanium", "raw_titanium_block")));
 		
 		//Blocks get special treatment since they need to have both a block and item tag
 		List<String> forgeBlockTypes = List.of("ores", "storage_blocks");
@@ -209,11 +211,10 @@ public class TagMaster {
 		private final ItemDataProvider itemProvider;
 		private final GatherDataEvent event;
 		private final DataProviderContainer container;
-		public final PrintWriter writer;
+		private final PrintWriter writer;
 		
-		public DataProviderContainer(GatherDataEvent event) throws Exception {
-			this.writer = new PrintWriter("logs/almdatagen/blocktagging.log", "UTF-8");
-			writer.println("[SYSTEM]: Commencing ALM Tag data generation...");
+		public DataProviderContainer(PrintWriter pw, GatherDataEvent event) throws Exception {
+			this.writer = pw;
 			this.event = event;
 			this.container = this;
 			

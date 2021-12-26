@@ -19,16 +19,16 @@ Recipe namespace: `assemblylinemachines:grinder`
     For the *Simple Grinder*, 1 is equal to a minimum of 2 seconds of processing time, depending on the regularity of a Crank/Gearbox use. For example, `grinds: 8` would last for 16 seconds, as long as the block is supplied with Crank power at least once a second.  
     For the *Electric Grinder*, 1 is equal to 2.875 seconds of processing time. For example, `stirs: 8` would last for 23 seconds of processing. Every Speed Upgrade in the machine will cut the processing time in half.
 
-!!! tip inline end
-    The Electric Grinder does not have a blade slot, so it will always pass the check for correct blade regardless of the recipe.
-
 - `bladetype`: String, required  
 *The blade required to allow processing of the recipe. This, and all blades in tiers above this blade, will work. Options include `TITANIUM`, `PUREGOLD`, and `STEEL`, in ascending tier-order.*
 
-
+!!! tip
+    The Electric Grinder does not have a blade slot, so it will always pass the check for correct blade regardless of the recipe.
 
 - `machine_required`: Boolean, *optional*  
-*If this is set to true, the recipe will not work in the Manual Grinder, and will only work in the Simple or Electric Grinder.*
+*If this is set to true, the recipe will not work in the Manual Grinder, and will only work in the Simple or Electric Grinder.*  
+- `chanceToDouble`: Decimal between 0 and 1, **1.18-1.3.3+ only,** *optional*  
+*If set, this will be the percentage likelihood that the output is doubled when the operation is completed. If unset, the chance is 0%.*
 
 ## Example
 
@@ -47,5 +47,23 @@ Below is an example of a Grinding recipe. This will take Chromium Ore and produc
 	"grinds": 8,
 	"bladetype": "TITANIUM",
 	"machine_required": true
+}
+```
+
+**1.18-1.3.3+ only:** This recipe is a demonstration of the `chanceToDouble` parameter. 15% of the time, the recipe will produce 8 Blaze Powder instead of 4.
+
+``` json
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "forge:rods/blaze"
+	},
+	"output":{
+		"item": "minecraft:blaze_powder",
+		"count": 4
+	},
+	"grinds": 7,
+	"chanceToDouble": 0.15,
+	"bladetype": "PUREGOLD"
 }
 ```

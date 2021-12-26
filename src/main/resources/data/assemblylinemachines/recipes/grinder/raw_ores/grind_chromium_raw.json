@@ -7,6 +7,7 @@
 		"item": "assemblylinemachines:ground_chromium"
 	},
 	"grinds": 3,
+	"chanceToDouble": 0.5,
 	"bladetype": "TITANIUM",
 	"machine_required": true
 }

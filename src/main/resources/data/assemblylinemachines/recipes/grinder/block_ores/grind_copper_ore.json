@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"item": "minecraft:copper_ore"
+		"tag": "minecraft:copper_ores"
 	},
 	"output":{
 		"item": "assemblylinemachines:ground_copper",

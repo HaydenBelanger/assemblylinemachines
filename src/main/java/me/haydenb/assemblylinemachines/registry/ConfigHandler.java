@@ -196,8 +196,8 @@ public class ConfigHandler {
 			guideBook = builder.comment("When Patchouli is installed, should players be automatically given the Guidebook when they first connect?").define("guideBook", true);
 			
 			builder.push("Titanium Generation");
-			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").define("titaniumVeinSize", 6);
-			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").define("titaniumFrequency", 13);
+			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").define("titaniumVeinSize", 5);
+			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").define("titaniumFrequency", 7);
 			titaniumMinHeight = builder.comment("What is the minimum Y value Titanium Ore should spawn at in the overworld?", 
 					"This can (and by default, does) go below the minimum world limit to change the TRIANGLE-style weighting of generation.").define("titaniumMinHeight", -112);
 			titaniumMaxHeight = builder.comment("What is the maximum Y value Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", -16);

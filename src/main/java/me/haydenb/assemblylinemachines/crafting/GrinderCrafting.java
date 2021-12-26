@@ -1,6 +1,6 @@
 package me.haydenb.assemblylinemachines.crafting;
 
-import java.util.List;
+import java.util.*;
 
 import com.google.gson.JsonObject;
 
@@ -25,21 +25,26 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	public static final RecipeType<GrinderCrafting> GRINDER_RECIPE = new TypeGrinderCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
+	private static final Random RAND = new Random();
+	
 	private final Ingredient input;
 	private final ItemStack output;
 	private final int grinds;
 	private final Blade tier;
 	private final ResourceLocation id;
 	private final boolean machineReqd;
+	private final float chanceToDouble;
 	
-	public GrinderCrafting(ResourceLocation id, Ingredient input, ItemStack output, int grinds, Blade tier, boolean machineReqd) {
+	public GrinderCrafting(ResourceLocation id, Ingredient input, ItemStack output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
 		this.input = input;
 		this.output = output;
 		this.grinds = grinds;
 		this.tier = tier;
 		this.id = id;
 		this.machineReqd = machineReqd;
+		this.chanceToDouble = chanceToDouble;
 	}
+	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
@@ -68,7 +73,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	@Override
 	public ItemStack assemble(Container inv) {
-		return this.output.copy();
+		ItemStack stack = this.output.copy();
+		if(chanceToDouble != 0f && RAND.nextFloat() <= chanceToDouble) {
+			stack.setCount(stack.getCount() * 2);
+		}
+		return stack;
 	}
 
 	@Override
@@ -101,8 +110,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	}
 	
 	@Override
-	public List<ItemStack> getJEIItemOutputs() {
-		return List.of(output);
+	public List<List<ItemStack>> getJEIItemOutputLists() {
+		List<ItemStack> stacks = new ArrayList<>();
+		stacks.add(output);
+		if(chanceToDouble != 0f) stacks.add(new ItemStack(output.getItem(), output.getCount() * 2));
+		return List.of(stacks);
 	}
 
 	@Override
@@ -128,6 +140,10 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		return grinds;
 	}
 	
+	public float getChanceToDouble() {
+		return chanceToDouble;
+	}
+	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GrinderCrafting>{
 
 		@Override
@@ -149,7 +165,9 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 					machineReqd = false;
 				}
 				
-				return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd);
+				final float chanceToDouble = GsonHelper.isValidNode(json, "chanceToDouble") ? GsonHelper.getAsFloat(json, "chanceToDouble") : 0f;
+				
+				return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd, chanceToDouble);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Grinder Crafting Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
@@ -166,8 +184,9 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			final int grinds = buffer.readInt();
 			final Blade tier = buffer.readEnum(Blade.class);
 			final boolean machineReqd = buffer.readBoolean();
+			final float chanceToDouble = buffer.readFloat();
 			
-			return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd);
+			return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd, chanceToDouble);
 		}
 
 		@Override
@@ -177,6 +196,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			buffer.writeInt(recipe.grinds);
 			buffer.writeEnum(recipe.tier);
 			buffer.writeBoolean(recipe.machineReqd);
+			buffer.writeFloat(recipe.chanceToDouble);
 			
 		}
 		

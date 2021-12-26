@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"item": "assemblylinemachines:silt_mystium"
+	},
+	"result": "assemblylinemachines:mystium_blend",
+	"cookingtime": 200
+}

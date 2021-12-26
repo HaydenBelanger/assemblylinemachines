@@ -79,7 +79,7 @@
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/plates/iron_plate",
-			"recipe2": "assemblylinemachines:crafting/gears/iron_gear_base"
+			"recipe2": "assemblylinemachines:crafting/gears/iron_gear"
 		},
 		{
 			"type": "text",

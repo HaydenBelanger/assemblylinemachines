@@ -1,0 +1,8 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"tag": "forge:dusts/chromium"
+	},
+	"result": "assemblylinemachines:chromium_ingot",
+	"cookingtime": 100
+}

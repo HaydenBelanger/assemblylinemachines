@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:bone_block"
+	},
+	"output":{
+		"item": "minecraft:bone_meal",
+		"count": 54
+	},
+	"grinds": 27,
+	"bladetype": "TITANIUM"
+}

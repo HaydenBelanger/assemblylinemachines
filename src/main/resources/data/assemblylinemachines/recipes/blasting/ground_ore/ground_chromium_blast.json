@@ -1,8 +1,0 @@
-{
-	"type": "minecraft:blasting",
-	"ingredient":{
-		"item": "assemblylinemachines:ground_chromium"
-	},
-	"result": "assemblylinemachines:chromium_ingot",
-	"cookingtime": 100
-}

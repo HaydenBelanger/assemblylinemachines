@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"tag": "forge:ores/flerovium"
+	},
+	"result": "assemblylinemachines:flerovium_ingot",
+	"experience": 1,
+	"cookingtime": 100
+}

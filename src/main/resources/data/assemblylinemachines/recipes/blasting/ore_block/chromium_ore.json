@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"ingredient":{
+		"tag": "forge:ores/chromium"
+	},
+	"result": "assemblylinemachines:chromium_ingot",
+	"experience": 1,
+	"cookingtime": 100
+}

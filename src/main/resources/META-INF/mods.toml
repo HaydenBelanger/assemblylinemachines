@@ -4,7 +4,7 @@ loaderVersion="[38,)"
 issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[mods]]
 	modId="assemblylinemachines"
-	version="1.18-1.3.2"
+	version="1.18-1.3.3"
 	displayName="Assembly Line Machines"
 	updateJSONURL="https://haydenb.me/api/versionhistory.json"
 	logoFile="banner-compressed.png" #optional

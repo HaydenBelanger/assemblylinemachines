@@ -182,6 +182,7 @@
 	"item.assemblylinemachines.overclocked_convection_component":"Overclocked Convection Component",
 	"item.assemblylinemachines.overclocked_conduction_component":"Overclocked Conduction Component",
 	"item.assemblylinemachines.entropy_reactor_upgrade_entropic_harnesser":"Entropy Reactor Upgrade: Entropic Harnesser",
+	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",
 	"block.assemblylinemachines.titanium_block":"Titanium Block",
@@ -313,6 +314,9 @@
 	"block.assemblylinemachines.chaosbark_fence_gate":"Chaosbark Fence Gate",
 	"block.assemblylinemachines.chaosbark_trapdoor":"Chaosbark Trapdoor",
 	"block.assemblylinemachines.silt_mystium":"Mystium Silt",
+	"block.assemblylinemachines.raw_chromium_block":"Block of Raw Chromium",
+	"block.assemblylinemachines.raw_titanium_block":"Block of Raw Titanium",
+	
 	"fluid.assemblylinemachines.oil":"Oil",
 	"fluid.assemblylinemachines.condensed_void":"Condensed Void",
 	"fluid.assemblylinemachines.naphtha":"Naphtha",
@@ -325,14 +329,19 @@
 	"fluid.assemblylinemachines.liquid_experience":"Liquid Experience",
 	"fluid.assemblylinemachines.dark_energy":"Dark Energy",
 	"fluid.assemblylinemachines.liquid_carbon":"Liquid Carbon",
+	
 	"gas.assemblylinemachines.ethane":"Ethane",
 	"gas.assemblylinemachines.propane":"Propane",
 	"gas.assemblylinemachines.ethylene":"Ethylene",
 	"gas.assemblylinemachines.propylene":"Propylene",
+	
 	"itemGroup.assemblylinemachines":"Assembly Line Machines",
+	
 	"enchantment.assemblylinemachines.overclock":"Overclock",
+	
 	"death.attack.interactor":"%1$s was killed by %2$s's Interactor",
 	"death.attack.interactor.item":"%1$s was killed by %2$s's Interactor using %3$s",
+	
 	"tileEntity.assemblylinemachines.entropy_reactor":"Entropy Reactor",
 	"tileEntity.assemblylinemachines.item_pipe":"Items",
 	"tileEntity.assemblylinemachines.fluid_pipe":"Fluids",
@@ -340,10 +349,12 @@
 	"tileEntity.assemblylinemachines.omnipipe":"Omni",
 	"tileEntity.assemblylinemachines.inventory_shortened":"Inv.",
 	"tileEntity.assemblylinemachines.hotbar":"Hotbar",
+	
 	"effect.assemblylinemachines.entropy_poisoning":"Entropy",
 	"effect.assemblylinemachines.deep_burn":"Deep Burn",
 	"effect.assemblylinemachines.dark_expulsion":"Dark Expulsion",
 	"entity.assemblylinemachines.corrupt_shell":"Corrupt Shell",
+	
 	"sound.assemblylinemachines.corrupt_shell_ambient":"Corrupt Shell groans",
 	"sound.assemblylinemachines.corrupt_shell_hurt":"Hurt Corrupt Shell",
 	"sound.assemblylinemachines.corrupt_shell_death":"Killed Corrupt Shell",

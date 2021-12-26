@@ -128,7 +128,7 @@ public class BlockElectricGrinder extends BlockScreenBlockEntity<BlockElectricGr
 						Optional<GrinderCrafting> rOpt = this.getLevel().getRecipeManager().getRecipeFor(GrinderCrafting.GRINDER_RECIPE, this, this.getLevel());
 						GrinderCrafting recipe = rOpt.orElse(null);
 						if(recipe != null) {
-							output = recipe.getResultItem().copy();
+							output = recipe.assemble(null);
 							cycles = ((float) recipe.getGrinds() * 2.3F);
 							
 							contents.get(1).shrink(1);

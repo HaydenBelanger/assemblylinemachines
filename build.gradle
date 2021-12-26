@@ -15,7 +15,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18-1.3.2'
+version = '1.18-1.3.3'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -75,7 +75,7 @@ minecraft {
         	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
         	arg '-mixin.config=mixins.assemblylinemachines.json'
         	//Datagen-required args (4)
-            args '--mod', 'assemblylinemachines', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'assemblylinemachines', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--input', file('src/main/resources/')
 
             mods {
                 examplemod {

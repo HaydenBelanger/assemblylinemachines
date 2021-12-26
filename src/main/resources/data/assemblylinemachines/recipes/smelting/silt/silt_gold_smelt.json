@@ -1,8 +1,0 @@
-{
-	"type": "minecraft:smelting",
-	"ingredient":{
-		"item": "assemblylinemachines:silt_gold"
-	},
-	"result": "assemblylinemachines:pure_gold",
-	"cookingtime": 400
-}

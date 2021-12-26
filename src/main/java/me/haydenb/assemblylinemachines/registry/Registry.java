@@ -1,6 +1,6 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.io.File;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -491,6 +491,9 @@ public class Registry {
 		createBlock("silt_mystium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("prism_glass", new Block(Block.Properties.of(Material.GLASS).sound(SoundType.GLASS).lightLevel((state) -> 15).noOcclusion()), true);
 		
+		createBlock("raw_chromium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_NETHERITE_TOOL, true);
+		createBlock("raw_titanium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		
 		registerFluids(null);
 		
 		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
@@ -841,13 +844,13 @@ public class Registry {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) throws Exception {
 		
-		new File("logs/almdatagen").mkdirs();
+		PrintWriter pw = new PrintWriter("logs/almdatagen.log", "UTF-8");
+		pw.println("[SYSTEM]: Commencing ALM data generation...");
 		
-		//DimensionChaosPlane.generateSurfaceRuleJSONFile();
-		
-		DataProviderContainer dpc = new DataProviderContainer(event);
+		new DataProviderContainer(pw, event);
+		new AutoRecipeGenerator(event, pw);
 		event.getGenerator().run();
-		dpc.writer.close();
+		pw.close();
 	}
 	
 	

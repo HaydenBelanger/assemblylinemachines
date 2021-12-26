@@ -172,7 +172,7 @@ public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> 
 										isb.shrink(1);
 										isb = null;
 										isa = null;
-										output = crafting.getResultItem().copy();
+										output = crafting.assemble(null);
 										cycles = crafting.getGrinds() * 2;
 										progress = 0;
 										pendingOutput = false;

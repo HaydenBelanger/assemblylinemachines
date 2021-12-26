@@ -1,8 +1,0 @@
-{
-	"type": "minecraft:smelting",
-	"ingredient":{
-		"item": "assemblylinemachines:ground_chromium"
-	},
-	"result": "assemblylinemachines:chromium_ingot",
-	"cookingtime": 200
-}

@@ -1,8 +1,0 @@
-{
-	"type": "minecraft:blasting",
-	"ingredient":{
-		"item": "assemblylinemachines:ground_gold"
-	},
-	"result": "minecraft:gold_ingot",
-	"cookingtime": 100
-}

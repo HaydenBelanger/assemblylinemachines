@@ -181,12 +181,12 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 						}
 					}
 					
-					if(fpRef.get() == null) {
+					if(fpRef == null || fpRef.get() == null) {
 						if(origPlayerUUID != null) {
 							fpRef = new WeakReference<>(FakePlayerFactory.get(this.getLevel().getServer().getLevel(this.getLevel().dimension()), this.getLevel().getServer().getProfileCache().get(origPlayerUUID).orElse(null)));
 						}
 					}
-					if(fpRef.get() != null && stack != null) {
+					if(fpRef != null && fpRef.get() != null && stack != null) {
 						FakePlayer fp = fpRef.get();
 						BlockPos offsetPos = this.getBlockPos().relative(getBlockState().getValue(HorizontalDirectionalBlock.FACING));
 						BlockState bs = this.getLevel().getBlockState(offsetPos);

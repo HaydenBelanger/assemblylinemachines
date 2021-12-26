@@ -1,8 +1,0 @@
-{
-	"type": "minecraft:smelting",
-	"ingredient":{
-		"item": "assemblylinemachines:ground_flerovium"
-	},
-	"result": "assemblylinemachines:flerovium_ingot",
-	"cookingtime": 200
-}

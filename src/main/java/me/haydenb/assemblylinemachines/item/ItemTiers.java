@@ -143,7 +143,7 @@ public enum ItemTiers {
 	
 	public static enum ToolTiers implements Tier{
 		
-		TITANIUM(ItemTiers.TITANIUM, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)), STEEL(ItemTiers.STEEL, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)),
+		TITANIUM(ItemTiers.TITANIUM, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)), STEEL(ItemTiers.STEEL, List.of(Tiers.IRON), List.of(Tiers.DIAMOND)),
 		CRANK(ItemTiers.CRANK, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE)),
 		MYSTIUM(ItemTiers.MYSTIUM, List.of(Tiers.NETHERITE), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool")),
 		NOVASTEEL(ItemTiers.NOVASTEEL, List.of(ToolTiers.MYSTIUM), List.of(), new ResourceLocation(AssemblyLineMachines.MODID, "needs_novasteel_tool"));

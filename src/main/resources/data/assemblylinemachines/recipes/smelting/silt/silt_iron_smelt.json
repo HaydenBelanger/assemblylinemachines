@@ -1,8 +1,0 @@
-{
-	"type": "minecraft:smelting",
-	"ingredient":{
-		"item": "assemblylinemachines:silt_iron"
-	},
-	"result": "assemblylinemachines:pure_iron",
-	"cookingtime": 400
-}

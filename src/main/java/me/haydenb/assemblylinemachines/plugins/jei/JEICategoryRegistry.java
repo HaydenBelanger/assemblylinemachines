@@ -64,7 +64,22 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(GrinderCrafting.GRINDER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("grinding").title("Grinding Crafting")
 					.background("gui_set_a", 166, 145, 90, 44).icon(Registry.getBlock("electric_grinder")).progressBar("gui_set_a", 237, 131, 19, 14, 200, StartDirection.LEFT, false, 42, 24)
-					.itemSlots(1, Pair.of(21, 22), Pair.of(0, 22), Pair.of(0, 0), Pair.of(68, 22)).build(GrinderCrafting.class));
+					.itemSlots(1, Pair.of(21, 22), Pair.of(0, 22), Pair.of(0, 0), Pair.of(68, 22))
+					.itemTooltip(new TriFunction<>() {
+						@Override
+						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
+							List<Component> text = new ArrayList<>();
+							text.add(pP2.getHoverName());
+							if(pP1 instanceof GrinderCrafting) {
+								GrinderCrafting recipe = (GrinderCrafting) pP1;
+								if(recipe.getChanceToDouble() != 0 && pP2.getCount() == recipe.getResultItem().getCount() * 2) {
+									text.add(new TextComponent("§b" + String.format("%.0f%%", (recipe.getChanceToDouble() * 100f)) + " Chance"));
+								}
+							}
+							return text;
+						}
+			
+					}).build(GrinderCrafting.class));
 			
 			CATEGORY_REGISTRY.put(PurifierCrafting.PURIFIER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("purifying").title("Purifier Crafting")
 					.background("gui_set_a", 0, 153, 111, 44).icon(Registry.getBlock("electric_purifier")).progressBar("gui_set_a", 111, 153, 43, 32, 200, StartDirection.LEFT, false, 41, 6)

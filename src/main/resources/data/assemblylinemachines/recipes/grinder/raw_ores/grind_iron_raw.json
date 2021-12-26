@@ -7,5 +7,6 @@
 		"item": "assemblylinemachines:ground_iron"
 	},
 	"grinds": 5,
+	"chanceToDouble": 0.5,
 	"bladetype": "TITANIUM"
 }

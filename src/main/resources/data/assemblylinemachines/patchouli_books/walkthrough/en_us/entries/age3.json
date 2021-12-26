@@ -40,7 +40,7 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/mystium/mystium_dowsing_rod",
+			"recipe": "assemblylinemachines:crafting/mystium_dowsing_rod",
 			"text": "Now that we have Mystium, we can make a neat tool: The $(item)Mystium Dowsing Rod.$()$(p)This handy tool will help you find $(l)Oil$() in the Overworld. You will also need to go to The End to find Chromium Ore."
 		},
 		{

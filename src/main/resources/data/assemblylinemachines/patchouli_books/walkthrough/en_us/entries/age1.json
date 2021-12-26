@@ -20,7 +20,7 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/wooden_stirring_stick",
+			"recipe": "assemblylinemachines:crafting/wooden_stirring_stick",
 			"recipe2": "assemblylinemachines:crafting/fluid_bath",
 			"title": "Fluid Bath"
 		},
@@ -50,14 +50,14 @@
 		},
 		{
 			"type": "smelting",
-			"recipe": "assemblylinemachines:smelting/silt/silt_iron_smelt",
-			"recipe2": "assemblylinemachines:smelting/silt/silt_gold_smelt",
+			"recipe": "assemblylinemachines:smelting/silt/silt_iron",
+			"recipe2": "assemblylinemachines:smelting/silt/silt_gold",
 			"title": "Ore Silt",
 			"text": "$(o)$(7)This process can also be performed on Titanium, but it is not required to progress through this Age."
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/pure_iron_stirring_stick",
+			"recipe": "assemblylinemachines:crafting/pure_iron_stirring_stick",
 			"title": "Metal Stirring Stick",
 			"text": "Combine a Titanium Blade Piece with Pure Gold and Lava, stir with a $(thing)Pure Iron Stirring Stick$(), and get a $(item)Pure Gold-Dipped Blade Piece."
 		},
@@ -75,7 +75,7 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/tools/steel/steel_stirring_stick",
+			"recipe": "assemblylinemachines:crafting/steel_stirring_stick",
 			"recipe2": "assemblylinemachines:crafting/steel_blade"
 		}
 		

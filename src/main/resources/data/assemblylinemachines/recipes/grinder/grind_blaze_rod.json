@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "forge:rods/blaze"
+	},
+	"output":{
+		"item": "minecraft:blaze_powder",
+		"count": 4
+	},
+	"grinds": 7,
+	"chanceToDouble": 0.15,
+	"bladetype": "PUREGOLD"
+}
