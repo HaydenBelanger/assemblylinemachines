@@ -14,9 +14,6 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -36,8 +33,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -60,7 +55,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		this.ptt = PowerToolType.TIER_CONVERT.get(parent.getTier());
 		this.parent = parent;
 		this.type = parent.getClass().getSimpleName();
-
+		
 	}
 
 	@Override
@@ -77,26 +72,6 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	@Override
 	public String getToolType() {
 		return type;
-	}
-	
-	//Called from Registry
-	@OnlyIn(Dist.CLIENT)
-	public void connectItemProperties() {
-		if(ptt.hasSecondaryAbilities) {
-			ItemProperties.register(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new ItemPropertyFunction() {
-				@Override
-				public float call(ItemStack stack, ClientLevel p_174677_, LivingEntity p_174678_, int p_174679_) {
-					if(stack.hasTag()) {
-						CompoundTag compound = stack.getTag();
-						if(compound.contains("assemblylinemachines:secondarystyle")) {
-							return 1f;
-						}
-					}
-					return 0f;
-				}
-			});
-		}
-		
 	}
 	
 	@Override
@@ -454,5 +429,10 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 				}
 			}
 		}
+	}
+
+	@Override
+	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
+		return ptt.hasSecondaryAbilities && stack.hasTag() && stack.getTag().contains("assemblylinemachines:secondarystyle") ? 1f : 0f;
 	}
 }

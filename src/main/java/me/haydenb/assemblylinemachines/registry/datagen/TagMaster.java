@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.registry;
+package me.haydenb.assemblylinemachines.registry.datagen;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -10,6 +10,7 @@ import com.google.common.collect.ListMultimap;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.data.tags.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -136,10 +137,9 @@ public class TagMaster {
 				if(x instanceof String) {
 					String[] split = ((String) x).split(":");
 					if(split.length == 1) {
-						x = wn.type == TagType.BLOCK ? Registry.getBlock(split[0]) : Registry.getItem(split[0]);
-					}else {
-						x = wn.type == TagType.BLOCK ? ForgeRegistries.BLOCKS.getValue(new ResourceLocation(split[0], split[1])) : ForgeRegistries.ITEMS.getValue(new ResourceLocation(split[0], split[1]));
+						split = new String[] {AssemblyLineMachines.MODID, split[0]};
 					}
+					x = wn.type == TagType.BLOCK ? ForgeRegistries.BLOCKS.getValue(new ResourceLocation(split[0], split[1])) : ForgeRegistries.ITEMS.getValue(new ResourceLocation(split[0], split[1]));
 				}
 				switch(wn.type){
 				case BLOCK:
@@ -237,7 +237,7 @@ public class TagMaster {
 				TagMaster.tagAllInMaster(container, TagType.BLOCK);
 				
 				writer.println("[SYSTEM]: Starting Mining Level and Tool Type tagging...");
-				for(Block b : Registry.getAllBlocks()) {
+				for(Block b : Registry.getAllBlocksUnmodifiable()) {
 					Optional<Pair<Optional<Named<Block>>, Optional<Named<Block>>>> result = getTagsForMiningLevel(b);
 					if(result == null) {
 						writer.println("[WARNING]: For " + b.getRegistryName() + ", a default tool was not exposed.");

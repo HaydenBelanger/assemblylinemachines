@@ -84,7 +84,9 @@ import me.haydenb.assemblylinemachines.item.ItemTiers.ArmorTiers;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.TagMaster.DataProviderContainer;
+import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
+import me.haydenb.assemblylinemachines.registry.datagen.*;
+import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
 import me.haydenb.assemblylinemachines.world.effects.*;
@@ -93,9 +95,12 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -772,11 +777,15 @@ public class Registry {
 		registerScreen("entropy_reactor", ContainerEntropyReactor.class, ScreenEntropyReactor.class);
 		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
 		
-		for(String s : new String[] {"mystium_axe", "mystium_pickaxe", "mystium_sword", "mystium_shovel", "mystium_hoe", "mystium_hammer",
-				"novasteel_axe", "novasteel_pickaxe", "novasteel_sword", "novasteel_shovel", "novasteel_hoe", "novasteel_hammer"}) {
-			((ItemPowerTool<?>) Registry.getItem(s)).connectItemProperties();
-		}
-		((ItemAEFG) Registry.getItem("aefg")).connectItemProperties();
+		ItemProperties.registerGeneric(new ResourceLocation(AssemblyLineMachines.MODID, "active"), new ClampedItemPropertyFunction() {
+			@Override
+			public float unclampedCall(ItemStack stack, ClientLevel level, LivingEntity entity, int p_174567_) {
+				if(stack.getItem() instanceof IToolWithCharge) {
+					return ((IToolWithCharge) stack.getItem()).getActivePropertyState(stack, entity);
+				}
+				return 0f;
+			}
+		});
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -849,6 +858,8 @@ public class Registry {
 		
 		new DataProviderContainer(pw, event);
 		new AutoRecipeGenerator(event, pw);
+		new LootTableGenerator(event);
+		
 		event.getGenerator().run();
 		pw.close();
 	}
@@ -954,8 +965,12 @@ public class Registry {
 		return MOD_BLOCK_REGISTRY.get(name);
 	}
 	
-	public static Collection<Block> getAllBlocks(){
-		return MOD_BLOCK_REGISTRY.values();
+	public static Collection<Block> getAllBlocksUnmodifiable(){
+		return Collections.unmodifiableCollection(MOD_BLOCK_REGISTRY.values());
+	}
+	
+	public static List<Block> getAllBlocksModifiable(){
+		return new ArrayList<>(MOD_BLOCK_REGISTRY.values());
 	}
 	
 	//FLUIDS

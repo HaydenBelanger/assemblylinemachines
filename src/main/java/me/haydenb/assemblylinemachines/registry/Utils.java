@@ -148,6 +148,8 @@ public class Utils {
 		
 		public String getToolType();
 		
+		public float getActivePropertyState(ItemStack stack, LivingEntity entity);
+		
 		default public int getCurrentCharge(ItemStack stack) {
 			return stack.hasTag() ? stack.getTag().getInt(this.getPowerToolType().getKeyName()) : 0;
 		}

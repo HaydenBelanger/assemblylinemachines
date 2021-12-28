@@ -1,11 +1,13 @@
 package me.haydenb.assemblylinemachines.block.machines;
 
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.world.FluidLevelManager;
+import me.haydenb.assemblylinemachines.world.FluidCapability;
+import me.haydenb.assemblylinemachines.world.FluidCapability.IChunkFluidCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -168,7 +170,7 @@ public class BlockPump extends BlockTileEntity {
 		}
 
 		@Override
-		public void tick() {
+		public void tick(){
 			if (!level.isClientSide) {
 				if (timer++ == 20) {
 					timer = 0;
@@ -183,15 +185,25 @@ public class BlockPump extends BlockTileEntity {
 						if (extracted.isEmpty()) {
 							
 							if (amount - 1800 >= 0) {
-								FluidStack xfs = FluidLevelManager.drain(this.getBlockPos(), this.getLevel(), 2000);
-								if (!xfs.isEmpty() && xfs.getAmount() != 0) {
-
-									amount = amount - 1800;
-									extracted = xfs;
-
-								} else {
-									prevStatusMessage = "No fluid could be extracted from chunk.";
-									forceState(false);
+								boolean success = false;
+								try {
+									LazyOptional<IChunkFluidCapability> lazy = FluidCapability.getChunkFluidCapability(this.getLevel().getChunkAt(this.getBlockPos()));
+									if(lazy.isPresent()) {
+										IChunkFluidCapability capability = lazy.orElseThrow(null);
+										FluidStack xfs = capability.drain(2000, false);
+										if(!xfs.isEmpty() && xfs.getAmount() != 0) {
+											success = true;
+											amount = amount - 1800;
+											extracted = xfs;
+										}
+									}
+								}catch(ExecutionException e) {
+									e.printStackTrace();
+								}finally {
+									if(!success) {
+										prevStatusMessage = "Could not connect to reservoir in chunk.";
+										forceState(false);
+									}
 								}
 							} else {
 								prevStatusMessage = "Not enough power for operation.";

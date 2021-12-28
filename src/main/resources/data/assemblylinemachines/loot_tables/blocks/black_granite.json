@@ -51,6 +51,27 @@
 					"name": "assemblylinemachines:black_granite",
 					"conditions":[
 						{
+							"condition": "match_tool",
+							"predicate":{
+								"item": "assemblylinemachines:novasteel_pickaxe",
+								"nbt": "{\"assemblylinemachines:canbreakblackgranite\": true}"
+							}
+						},
+						{
+							"condition": "block_state_property",
+							"block": "assemblylinemachines:black_granite",
+							"properties":{
+								"natural": true
+							}
+						}
+						
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "assemblylinemachines:black_granite",
+					"conditions":[
+						{
 							"condition": "block_state_property",
 							"block": "assemblylinemachines:black_granite",
 							"properties":{

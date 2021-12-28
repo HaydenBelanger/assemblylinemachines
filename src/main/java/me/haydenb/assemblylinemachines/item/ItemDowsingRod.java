@@ -1,8 +1,11 @@
 package me.haydenb.assemblylinemachines.item;
 
+import java.util.concurrent.ExecutionException;
+
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.world.FluidLevelManager;
+import me.haydenb.assemblylinemachines.world.FluidCapability;
+import me.haydenb.assemblylinemachines.world.FluidCapability.IChunkFluidCapability;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionResult;
@@ -10,7 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class ItemDowsingRod extends Item {
 
@@ -25,11 +28,22 @@ public class ItemDowsingRod extends Item {
 		
 		Level world = context.getLevel();
 		if(!world.isClientSide) {
-			FluidStack fs = FluidLevelManager.getOrCreateFluidStack(context.getClickedPos(), world);
-			if(fs != FluidStack.EMPTY && fs.getFluid() != Fluids.EMPTY) {
-				context.getPlayer().displayClientMessage(new TextComponent("There is " + Formatting.GENERAL_FORMAT.format(fs.getAmount()) + " mB of " + fs.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
-			}else {
-				context.getPlayer().displayClientMessage(new TextComponent("There is no reservoir in this chunk."), true);
+			boolean success = false;
+			try {
+				LazyOptional<IChunkFluidCapability> lazy = FluidCapability.getChunkFluidCapability(world.getChunkAt(context.getClickedPos()));
+				if(lazy.isPresent()) {
+					IChunkFluidCapability capability = lazy.orElseThrow(null);
+					if(!capability.getChunkFluid().equals(Fluids.EMPTY)){
+						success = true;
+						context.getPlayer().displayClientMessage(new TextComponent("There is " + Formatting.GENERAL_FORMAT.format(capability.getFluidAmount()) + " mB of " + capability.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
+					}
+				}
+			}catch(ExecutionException e) {
+				e.printStackTrace();
+			}finally {
+				if(!success) {
+					context.getPlayer().displayClientMessage(new TextComponent("There is no reservoir in this chunk."), true);
+				}
 			}
 		}
 		

@@ -3,23 +3,16 @@ package me.haydenb.assemblylinemachines.item;
 import java.awt.Color;
 import java.util.List;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -40,16 +33,6 @@ public class ItemAEFG extends Item implements IToolWithCharge {
 	@Override
 	public String getToolType() {
 		return "Item";
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public void connectItemProperties() {
-		ItemProperties.register(this, new ResourceLocation(AssemblyLineMachines.MODID, "active"), new ClampedItemPropertyFunction() {
-			@Override
-			public float unclampedCall(ItemStack stack, ClientLevel level, LivingEntity entity, int val) {
-				return isConsideredActive(stack, entity) ? 1f : 0f;
-			}
-		});
 	}
 	
 	@Override
@@ -135,8 +118,9 @@ public class ItemAEFG extends Item implements IToolWithCharge {
 	public boolean isEnchantable(ItemStack pStack) {
 		return true;
 	}
-	
-	private boolean isConsideredActive(ItemStack stack, LivingEntity entity) {
-		return getCurrentCharge(stack) > 0 && (entity.hasEffect(Registry.getEffect("entropy_poisoning")) || entity.hasEffect(Registry.getEffect("dark_expulsion")));
+
+	@Override
+	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
+		return getCurrentCharge(stack) > 0 && (entity.hasEffect(Registry.getEffect("entropy_poisoning")) || entity.hasEffect(Registry.getEffect("dark_expulsion"))) ? 1f : 0f;
 	}
 }

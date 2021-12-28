@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.block.chaosplane;
 import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.TagMaster;
+import me.haydenb.assemblylinemachines.registry.datagen.TagMaster;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

@@ -3,8 +3,8 @@ package me.haydenb.assemblylinemachines.block.chaosplane;
 import java.util.*;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.TagMaster;
-import me.haydenb.assemblylinemachines.registry.TagMaster.IMiningLevelDataGenProvider;
+import me.haydenb.assemblylinemachines.registry.datagen.TagMaster;
+import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.IMiningLevelDataGenProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.registry;
+package me.haydenb.assemblylinemachines.registry.datagen;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.MetalCrafting;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

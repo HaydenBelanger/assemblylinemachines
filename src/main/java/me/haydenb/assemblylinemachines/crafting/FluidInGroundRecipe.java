@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines.crafting;
 import java.util.List;
 
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
@@ -15,7 +16,9 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -114,6 +117,72 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 	
 	public Fluid getFluid() {
 		return fluid;
+	}
+	
+	public static FluidStack assemble(ChunkPos pos, Level world) {
+		List<FluidInGroundRecipe> recipes = world.getRecipeManager().getRecipesFor(FluidInGroundRecipe.FIG_RECIPE, null, world);
+		
+		float tc = world.getBiome(pos.getMiddleBlockPosition(63)).getBaseTemperature();
+		ResourceLocation currentDim = world.dimension().location();
+		
+		for (FluidInGroundRecipe recipe : recipes) {
+
+			boolean canProcess = false;
+			boolean notPreferredBiome = false;
+			
+			switch(recipe.getCriteria()) {
+			case CHAOS_PLANE:
+				break;
+			case END:
+				if(currentDim.equals(DimensionType.END_LOCATION.location())) canProcess = true;
+				break;
+			case NETHER:
+				if(currentDim.equals(DimensionType.NETHER_LOCATION.location())) canProcess = true;
+				break;
+			case OVERWORLD_ANY:
+			case OVERWORLD_ONLYCOLD:
+			case OVERWORLD_ONLYHOT:
+			case OVERWORLD_PREFCOLD:
+			case OVERWORLD_PREFHOT:
+				Pair<Boolean, Boolean> pair = getAllowanceForOverworld(recipe.getCriteria(), currentDim, tc);
+				if(pair.getFirst()) canProcess = true;
+				if(pair.getSecond()) notPreferredBiome = true;
+			}
+			if(canProcess) {
+				if (world.getRandom().nextInt(100) <= recipe.getChance()) {
+					int amt = (recipe.getMinimum() + world.getRandom().nextInt(recipe.getMaximum() - recipe.getMinimum())) * 10000;
+					if (notPreferredBiome) amt = Math.round((float) amt / 2f);
+					return new FluidStack(recipe.getFluid(), amt);
+				}
+			}
+		}
+
+		return FluidStack.EMPTY;
+	}
+	
+	private static Pair<Boolean, Boolean> getAllowanceForOverworld(FluidInGroundCriteria criteria, ResourceLocation currentDim, float temperature){
+		if(!currentDim.equals(DimensionType.OVERWORLD_LOCATION.location())) return Pair.of(false, false);
+		switch(criteria) {
+		case OVERWORLD_ONLYCOLD:
+		case OVERWORLD_PREFCOLD:
+			float maximumTempOffset = criteria == FluidInGroundCriteria.OVERWORLD_ONLYCOLD ? 0f : 1f;
+			if(temperature > maximumTempOffset) {
+				return Pair.of(false, false);
+			}else if(criteria == FluidInGroundCriteria.OVERWORLD_PREFCOLD && temperature > 0f) {
+				return Pair.of(true, true);
+			}
+			break;
+		case OVERWORLD_ONLYHOT:
+		case OVERWORLD_PREFHOT:
+			float minimumTempOffset = criteria == FluidInGroundCriteria.OVERWORLD_ONLYHOT ? 1f : 0f;
+			if(temperature < minimumTempOffset) {
+				return Pair.of(false, false);
+			}else if(criteria == FluidInGroundCriteria.OVERWORLD_PREFHOT && temperature < 1f) {
+				return Pair.of(true, true);
+			}
+		default:
+		}
+		return Pair.of(true, false);
 	}
 	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<FluidInGroundRecipe>{
