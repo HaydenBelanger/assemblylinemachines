@@ -333,7 +333,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state,
 				IProbeHitData data) {
 			ItemStack stack = !this.fluid.isEmpty() && this.fluid.getFluid().getBucket() != null ? this.fluid.getFluid().getBucket().getDefaultInstance() : Items.BUCKET.getDefaultInstance();
-			Component text = this.fluid.isEmpty() ? new TextComponent("§bEmpty") : this.fluid.getDisplayName().plainCopy().withStyle(ChatFormatting.AQUA);
+			Component text = this.fluid.isEmpty() ? new TextComponent("§bEmpty") : new TextComponent("§b" + this.fluid.getDisplayName().getString());
 			probeInfo.horizontal().item(stack).vertical().text(text).progress(this.fluid.getAmount(), this.block.capacity, probeInfo.defaultProgressStyle().filledColor(this.block.topProgressColor).alternateFilledColor(this.block.topProgressColor).suffix("mB").numberFormat(NumberFormat.COMMAS));
 		}
 
