@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.item;
 
-import java.awt.Color;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -8,6 +7,7 @@ import java.util.function.Consumer;
 import com.google.common.collect.Multimap;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -22,6 +22,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -44,7 +45,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @SuppressWarnings("deprecation")
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
-public class ItemPowerTool<A extends TieredItem> extends TieredItem implements IToolWithCharge {
+public class ItemPowerTool<A extends TieredItem> extends TieredItem implements IToolWithCharge, ISpecialTooltip {
 
 	private final A parent;
 	private final PowerToolType ptt;
@@ -282,7 +283,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 			return super.getBarColor(stack);
 		}else {
 			float v = (float) dmg / (float) getMaxPower(stack);
-			return new Color(v, v, 1f).getRGB();
+			return ARGB32.color(255, Math.round(v * 255f), Math.round(v * 255f), 255);
 		}
 		
 	}
@@ -292,6 +293,21 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
+	}
+	
+	@Override
+	public ResourceLocation getTexture() {
+		return ptt.borderTexturePath;
+	}
+
+	@Override
+	public int getTopColor() {
+		return ptt.argbBorderColor;
+	}
+	
+	@Override
+	public int getBottomColor() {
+		return ptt == PowerToolType.MYSTIUM ? 0xffb81818 : ISpecialTooltip.super.getBottomColor();
 	}
 	
 	public static class EnchantmentOverclock extends Enchantment{
@@ -326,9 +342,10 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	}
 	
 	public static enum PowerToolType{
-		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.COMMON.crankToolMaxCranks.get()), MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.COMMON.mystiumToolMaxFE.get()),
-		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.COMMON.novasteelToolMaxFE.get()),
-		AEFG("assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000);
+		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.COMMON.crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.COMMON.mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.COMMON.novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
+		AEFG("assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000, 0x0, null);
 		
 		private final String keyName;
 		private final int costMultiplier;
@@ -339,6 +356,8 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		private final String nameOfSecondaryFarmland;
 		private final int configMaxCharge;
 		private final float chanceToDropMobCrystal;
+		private final int argbBorderColor;
+		private final ResourceLocation borderTexturePath;
 		
 		private static final HashMap<Tier, PowerToolType> TIER_CONVERT = new HashMap<>();
 		static {
@@ -347,7 +366,8 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 			TIER_CONVERT.put(ToolTiers.NOVASTEEL, NOVASTEEL);
 		}
 		
-		PowerToolType(String keyName, int costMultiplier, int chargeMultiplier, boolean hasSecondaryAbilities, String friendlyNameOfUnit, boolean hasEnergyCapability, String nameOfSecondaryFarmland, float chanceToDropMobCrystal, int configMaxCharge) {
+		PowerToolType(String keyName, int costMultiplier, int chargeMultiplier, boolean hasSecondaryAbilities, String friendlyNameOfUnit, 
+				boolean hasEnergyCapability, String nameOfSecondaryFarmland, float chanceToDropMobCrystal, int configMaxCharge, int argbBorderColor, ResourceLocation borderTexturePath) {
 			this.keyName = keyName;
 			this.costMultiplier = costMultiplier;
 			this.chargeMultiplier = chargeMultiplier;
@@ -357,6 +377,8 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 			this.nameOfSecondaryFarmland = nameOfSecondaryFarmland;
 			this.configMaxCharge = configMaxCharge;
 			this.chanceToDropMobCrystal = chanceToDropMobCrystal;
+			this.argbBorderColor = argbBorderColor;
+			this.borderTexturePath = borderTexturePath;
 			
 		}
 		
@@ -394,6 +416,14 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		
 		public String getFriendlyNameOfUnit() {
 			return friendlyNameOfUnit;
+		}
+		
+		public int getARGBBorderColor() {
+			return argbBorderColor;
+		}
+		
+		public ResourceLocation getBorderTexturePath() {
+			return borderTexturePath;
 		}
 	}
 	

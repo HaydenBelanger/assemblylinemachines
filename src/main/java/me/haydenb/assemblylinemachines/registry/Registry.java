@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines.registry;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -159,14 +160,14 @@ public class Registry {
 		}
 	});
 		
-	private static final HashMap<String, Block> MOD_BLOCK_REGISTRY = new HashMap<>();
-	private static final HashMap<String, BlockEntityType<?>> MOD_BLOCKENTITY_REGISTRY = new HashMap<>();
-	private static final HashMap<String, Pair<MenuType<?>, Integer>> MOD_CONTAINER_REGISTRY = new HashMap<>();
-	private static final HashMap<String, MobEffect> MOD_EFFECT_REGISTRY = new HashMap<>();
-	private static final HashMap<String, SoundEvent> MOD_SOUND_REGISTRY = new HashMap<>();
-	private static final HashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new HashMap<>();
-	private static final HashMap<String, Enchantment> MOD_ENCHANTMENT_REGISTRY = new HashMap<>();
-	private static final HashMap<String, Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>>> MOD_CRAFTING_REGISTRY = new HashMap<>();
+	private static final ConcurrentHashMap<String, Block> MOD_BLOCK_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, BlockEntityType<?>> MOD_BLOCKENTITY_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Pair<MenuType<?>, Integer>> MOD_CONTAINER_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, MobEffect> MOD_EFFECT_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, SoundEvent> MOD_SOUND_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Enchantment> MOD_ENCHANTMENT_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>>> MOD_CRAFTING_REGISTRY = new ConcurrentHashMap<>();
 	
 	//MOD CREATIVE TAB & DEFAULT PROPERTIES
 	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
@@ -353,8 +354,8 @@ public class Registry {
 			createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true);
 		}
 		
-		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT), true);
-		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD), true);
+		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT, 0xff545454), true);
+		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD, 0xff826a4a), true);
 		
 		createBlock("silt", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
@@ -399,7 +400,7 @@ public class Registry {
 		
 		createBlock("mystium_block", Material.METAL, 11f, 80f, SoundType.METAL, false, true);
 		
-		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT), true);
+		createBlock("mystium_fluid_tank", new BlockFluidTank(250000, TemperatureResistance.HOT, 0xff1616b8), true);
 		
 		createBlock("tool_charger", new BlockToolCharger(), true);
 		
@@ -418,8 +419,7 @@ public class Registry {
 		createBlock("interactor", new BlockInteractor(), true);
 		createBlock("vacuum_hopper", new BlockVacuumHopper(), true);
 		
-		createBlock("bottomless_storage_unit", new BlockBottomlessStorageUnit(), false);
-		createItem("bottomless_storage_unit", new BlockItemBottomlessStorageUnit(Registry.getBlock("bottomless_storage_unit")));
+		createBlock("bottomless_storage_unit", new BlockBottomlessStorageUnit(), true);
 		
 		createBlock("combustion_generator", new BlockFluidGenerator(FluidGeneratorTypes.COMBUSTION), true);
 		createBlock("geothermal_generator", new BlockFluidGenerator(FluidGeneratorTypes.GEOTHERMAL), true);
@@ -490,14 +490,15 @@ public class Registry {
 		
 		createBlock("ultimate_battery_cell", new BlockBatteryCell(BatteryCellStats.ULTIMATE), true);
 		
-		createBlock("attuned_titanium_fluid_tank", new BlockFluidTank(5000000, TemperatureResistance.HOT), true);
+		createBlock("attuned_titanium_fluid_tank", new BlockFluidTank(5000000, TemperatureResistance.HOT, 0xffe69ee6), true);
 		
-		createBlock("novasteel_fluid_tank", new BlockFluidTank(50000000, TemperatureResistance.HOT), true);
+		createBlock("novasteel_fluid_tank", new BlockFluidTank(50000000, TemperatureResistance.HOT, 0xff111d63), true);
 		createBlock("silt_mystium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("prism_glass", new Block(Block.Properties.of(Material.GLASS).sound(SoundType.GLASS).lightLevel((state) -> 15).noOcclusion()), true);
 		
 		createBlock("raw_chromium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_NETHERITE_TOOL, true);
 		createBlock("raw_titanium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
+		createBlock("raw_flerovium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL, true);
 		
 		registerFluids(null);
 		
@@ -858,7 +859,7 @@ public class Registry {
 		
 		new DataProviderContainer(pw, event);
 		new AutoRecipeGenerator(event, pw);
-		new LootTableGenerator(event);
+		new LootTableGenerator(event, pw);
 		
 		event.getGenerator().run();
 		pw.close();

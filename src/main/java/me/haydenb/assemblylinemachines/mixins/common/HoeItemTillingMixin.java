@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.mixins;
+package me.haydenb.assemblylinemachines.mixins.common;
 
 import java.util.function.Consumer;
 

@@ -22,6 +22,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -287,6 +288,16 @@ public class Utils {
 		public static void renderScaledText(Font fr, int xpos, int ypos, float scale, String text) {
 			
 			renderScaledText(fr, xpos, ypos, scale, text, false, 0xffffff);
+		}
+		
+		public static int multiplyARGBColor(int argb, float multiplier) {
+			int[] argbSplit = new int[] {ARGB32.alpha(argb), ARGB32.red(argb), ARGB32.green(argb), ARGB32.blue(argb)};
+			
+			for(int i = 0; i < argbSplit.length; i++) {
+				argbSplit[i] = Math.round((float) argbSplit[i] * multiplier);
+			}
+			
+			return ARGB32.color(argbSplit[0], argbSplit[1], argbSplit[2], argbSplit[3]);
 		}
 		
 		

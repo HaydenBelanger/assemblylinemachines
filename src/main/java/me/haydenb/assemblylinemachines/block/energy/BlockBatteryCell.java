@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
@@ -16,14 +17,17 @@ import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
 import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.*;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -100,6 +104,34 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.BATTERY_PERCENT_STATE);
+	}
+	
+	@Override
+	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer,
+			ItemStack stack) {
+		if(stack.hasTag()) {
+			
+			CompoundTag nbt = stack.getTag();
+			
+			if(level.getBlockEntity(pos) instanceof TEBatteryCell && nbt.contains("assemblylinemachines:stored")) {
+				TEBatteryCell cell = (TEBatteryCell) level.getBlockEntity(pos);
+				cell.amount = nbt.getInt("assemblylinemachines:stored");
+				cell.sendUpdates();
+			}
+		}
+		super.setPlacedBy(level, pos, state, placer, stack);
+	}
+	
+	@Override
+	public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip,
+			TooltipFlag flag) {
+		if(stack.hasTag()) {
+			CompoundTag nbt = stack.getTag();
+			if(nbt.contains("assemblylinemachines:stored")) {
+				tooltip.add(1, new TextComponent("This Cell has " + Formatting.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
+			}
+		}
+		super.appendHoverText(stack, level, tooltip, flag);
 	}
 	
 	public static enum BatteryCellStats{

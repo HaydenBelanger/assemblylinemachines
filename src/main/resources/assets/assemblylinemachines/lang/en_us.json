@@ -316,6 +316,7 @@
 	"block.assemblylinemachines.silt_mystium":"Mystium Silt",
 	"block.assemblylinemachines.raw_chromium_block":"Block of Raw Chromium",
 	"block.assemblylinemachines.raw_titanium_block":"Block of Raw Titanium",
+	"block.assemblylinemachines.raw_flerovium_block":"Block of Raw Flerovium",
 	
 	"fluid.assemblylinemachines.oil":"Oil",
 	"fluid.assemblylinemachines.condensed_void":"Condensed Void",

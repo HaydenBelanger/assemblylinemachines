@@ -3,7 +3,10 @@
 	"package": "me.haydenb.assemblylinemachines.mixins",
 	"refmap": "mixins.assemblylinemachines.refmap.json",
 	"mixins": [
-		"HoeItemTillingMixin"
+		"common.HoeItemTillingMixin"
+	],
+	"client":[
+		"client.TooltipMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

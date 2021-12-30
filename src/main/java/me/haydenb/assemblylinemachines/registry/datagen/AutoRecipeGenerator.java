@@ -84,7 +84,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 						JsonObject json = JsonParser.parseReader(new FileReader(file)).getAsJsonObject();
 						BlastingRecipe recipe = RecipeSerializer.BLASTING_RECIPE.fromJson(new ResourceLocation(AssemblyLineMachines.MODID, "blasting/" + rlPath), json);
 						
-						consumer.accept(new AdvancementlessSmeltingResult(new ResourceLocation(AssemblyLineMachines.MODID, "smelting/" + rlPath), recipe.getIngredients().get(0), recipe.assemble(null).getItem(), recipe.getExperience(), recipe.getCookingTime() * 2));
+						consumer.accept(new AdvancementlessResult(new ResourceLocation(AssemblyLineMachines.MODID, "smelting/" + rlPath), recipe.getIngredients().get(0), recipe.assemble(null).getItem(), recipe.getExperience(), recipe.getCookingTime() * 2));
 						writer.println("[FURNACE RECIPES]: Copied blasting recipe " + rlPath + ".");
 					}catch(Exception e) {
 						
@@ -108,7 +108,8 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		ENERGIZED_GOLD(true, false, false, false, Triple.of(true, false, 4), Triple.of(false, false, 0)), RAW_CHROMIUM(() -> Ingredient.of(Registry.getItem("raw_chromium")), null, false),
 		NOVASTEEL(true, false, true, false, Triple.of(true, false, 1), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/graphene")), 
 		CRANK(false, false, true, false, Triple.of(false, false, 0), Triple.of(false, false, 0), getItemTagIngredient(AssemblyLineMachines.MODID, "crafting/gears/precious"), getItemTagIngredient("forge", "rods/steel")),
-		CRAFTING_TABLE(() -> Ingredient.of(Blocks.CRAFTING_TABLE), () -> Ingredient.of(Registry.getBlock("compressed_crafting_table")), false), RAW_TITANIUM(() -> Ingredient.of(Registry.getItem("raw_titanium")), null, false);
+		CRAFTING_TABLE(() -> Ingredient.of(Blocks.CRAFTING_TABLE), () -> Ingredient.of(Registry.getBlock("compressed_crafting_table")), false), RAW_TITANIUM(() -> Ingredient.of(Registry.getItem("raw_titanium")), null, false),
+		RAW_FLEROVIUM(() -> Ingredient.of(Registry.getItem("raw_flerovium")), null, false);
 		
 		private static final HashMap<String, List<String>> ARMOR_PATTERNS = new HashMap<>();
 		private static final HashMap<String, List<String>> TOOL_PATTERNS = new HashMap<>();
@@ -191,14 +192,14 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			if(this.hasArmor) {
 				for(String piece : ARMOR_PATTERNS.keySet()) {
 					String pieceResultName = typeName + "_" + piece;
-					consumer.accept(new AdvancementlessShapedCraftingResult(getRecipeLoc("tools/" + typeName + "/" + pieceResultName), Registry.getItem(pieceResultName), 1, ARMOR_PATTERNS.get(piece), getShapedKey(this.toolMaterial)));
+					consumer.accept(new AdvancementlessResult(getRecipeLoc("tools/" + typeName + "/" + pieceResultName), Registry.getItem(pieceResultName), 1, ARMOR_PATTERNS.get(piece), getShapedKey(this.toolMaterial)));
 				}
 				logText = logText + "Armor, ";
 			}
 			if(this.hasTools) {
 				for(String piece : TOOL_PATTERNS.keySet()) {
 					String pieceResultName = typeName + "_" + piece;
-					consumer.accept(new AdvancementlessShapedCraftingResult(getRecipeLoc("tools/" + typeName + "/" + pieceResultName), Registry.getItem(pieceResultName), 1, TOOL_PATTERNS.get(piece), getShapedKey(this.toolMaterial, this.toolRod)));
+					consumer.accept(new AdvancementlessResult(getRecipeLoc("tools/" + typeName + "/" + pieceResultName), Registry.getItem(pieceResultName), 1, TOOL_PATTERNS.get(piece), getShapedKey(this.toolMaterial, this.toolRod)));
 				}
 				logText = logText + "Tools, ";
 			}
@@ -206,25 +207,25 @@ public class AutoRecipeGenerator extends RecipeProvider {
 				Item resultBlock = specialStorageBlock == null ? Registry.getItem(typeName + "_block") : specialStorageBlock.get().getItems()[0].getItem();
 				Item resultIngot = specialStorageBlock == null ? addIngot ? Registry.getItem(typeName + "_ingot") : Registry.getItem(typeName) : toolMaterial.get().getItems()[0].getItem();
 				Ingredient inputBlock = specialStorageBlock == null ? getItemTagIngredient("forge", "storage_blocks/" + typeName).get() : specialStorageBlock.get();
-				consumer.accept(new AdvancementlessShapedCraftingResult(getRecipeLoc("conversion/ingot_to_block/" + typeName), resultBlock, 1, BLOCK_PATTERN, getShapedKey(this.toolMaterial)));
-				consumer.accept(new AdvancementlessShapelessCraftingResult(getRecipeLoc("conversion/block_to_ingot/" + typeName), resultIngot, 9, List.of(inputBlock)));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/ingot_to_block/" + typeName), resultBlock, 1, BLOCK_PATTERN, getShapedKey(this.toolMaterial)));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/block_to_ingot/" + typeName), resultIngot, 9, List.of(inputBlock)));
 				logText = logText + "Storage Block, ";
 			}
 			if(this.hasNugget) {
-				consumer.accept(new AdvancementlessShapedCraftingResult(getRecipeLoc("conversion/nugget_to_ingot/" + typeName), Registry.getItem(typeName + "_ingot"), 1, BLOCK_PATTERN, getShapedKey(getItemTagIngredient("forge", "nuggets/" + typeName))));
-				consumer.accept(new AdvancementlessShapelessCraftingResult(getRecipeLoc("conversion/ingot_to_nugget/" + typeName), Registry.getItem(typeName + "_nugget"), 9, List.of(this.toolMaterial.get())));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/nugget_to_ingot/" + typeName), Registry.getItem(typeName + "_ingot"), 1, BLOCK_PATTERN, getShapedKey(getItemTagIngredient("forge", "nuggets/" + typeName))));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/ingot_to_nugget/" + typeName), Registry.getItem(typeName + "_nugget"), 9, List.of(this.toolMaterial.get())));
 				logText = logText + "Nugget, ";
 			}
 			if(this.hasPlate.getLeft()) {
 				Ingredient metalInput = this.hasPlate.getMiddle() ? getItemTagIngredient("forge", "ingots/pure_" + typeName).get() : toolMaterial.get();
 				String type = this.isSheetInsteadOfPlate ? "_sheet" : "_plate";
-				consumer.accept(new AdvancementlessShapelessCraftingResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.getRight(), List.of(metalInput, getItemTagIngredient(AssemblyLineMachines.MODID, "crafting/hammers").get())));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.getRight(), List.of(metalInput, getItemTagIngredient(AssemblyLineMachines.MODID, "crafting/hammers").get())));
 				consumer.accept(new MetalShaperResult(getRecipeLoc("metalshaper", typeName + type), metalInput, new ItemStack(Registry.getItem(typeName + type), this.hasPlate.getRight()), 6));
 				logText = logText + "Plate, ";
 			}
 			if(this.hasGear.getLeft()) {
 				Supplier<Ingredient> stickType = this.hasGear.getMiddle() ? getItemTagIngredient("forge", "rods/steel") : getItemTagIngredient("forge", "rods/wooden");
-				consumer.accept(new AdvancementlessShapedCraftingResult(getRecipeLoc("gears/" + typeName + "_gear"), Registry.getItem(typeName + "_gear"), this.hasGear.getRight(), GEAR_PATTERN, getShapedKey(getItemTagIngredient("forge", "plates/" + typeName), stickType)));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("gears/" + typeName + "_gear"), Registry.getItem(typeName + "_gear"), this.hasGear.getRight(), GEAR_PATTERN, getShapedKey(getItemTagIngredient("forge", "plates/" + typeName), stickType)));
 			}
 			
 			if(!logText.isEmpty()) {
@@ -259,59 +260,47 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		}
 	}
 	
-	public static class AdvancementlessSmeltingResult extends SimpleCookingRecipeBuilder.Result{
-		
-		public AdvancementlessSmeltingResult(ResourceLocation rl, Ingredient input, Item result, float experience, int processingTime) {
-			super(rl, "", input, result, experience, processingTime, null, null, RecipeSerializer.SMELTING_RECIPE);
-		}
-		
-		@Override
-		public JsonObject serializeAdvancement() {
-			return null;
-		}
-		
-		@Override
-		public ResourceLocation getAdvancementId() {
-			return null;
-		}
-		
-	}
-	
-	public static class AdvancementlessShapedCraftingResult extends ShapedRecipeBuilder.Result{
+	public static class AdvancementlessResult implements FinishedRecipe{
 
-		public AdvancementlessShapedCraftingResult(ResourceLocation rl, Item result, int numberOfResult,
-				List<String> pattern, Map<Character, Ingredient> key) {
-			super(rl, result, numberOfResult, "", pattern, key, null, null);
+		private final FinishedRecipe recipe;
+		
+		public AdvancementlessResult(ResourceLocation rl, Ingredient input, Item result, float experience, int processingTime) {
+			this.recipe = new SimpleCookingRecipeBuilder.Result(rl, "", input, result, experience, processingTime, null, null, RecipeSerializer.SMELTING_RECIPE);
+		}
+		
+		public AdvancementlessResult(ResourceLocation rl, Item result, int numberOfResult, List<String> pattern, Map<Character, Ingredient> key) {
+			this.recipe = new ShapedRecipeBuilder.Result(rl, result, numberOfResult, "", pattern, key, null, null);
+		}
+		
+		public AdvancementlessResult(ResourceLocation rl, Item result, int numberOfResult, List<Ingredient> ingredients) {
+			this.recipe = new ShapelessRecipeBuilder.Result(rl, result, numberOfResult, "", ingredients, null, null);
 		}
 		
 		@Override
-		public JsonObject serializeAdvancement() {
-			return null;
+		public void serializeRecipeData(JsonObject json) {
+			recipe.serializeRecipeData(json);
 		}
-		
-		@Override
-		public ResourceLocation getAdvancementId() {
-			return null;
-		}
-		
-	}
-	
-	public static class AdvancementlessShapelessCraftingResult extends ShapelessRecipeBuilder.Result{
 
-		public AdvancementlessShapelessCraftingResult(ResourceLocation rl, Item result, int numberOfResult, 
-				List<Ingredient> ingredients) {
-			super(rl, result, numberOfResult, "", ingredients, null, null);
+		@Override
+		public ResourceLocation getId() {
+			return recipe.getId();
 		}
-		
+
+		@Override
+		public RecipeSerializer<?> getType() {
+			return recipe.getType();
+		}
+
 		@Override
 		public JsonObject serializeAdvancement() {
 			return null;
 		}
-		
+
 		@Override
 		public ResourceLocation getAdvancementId() {
 			return null;
 		}
+		
 	}
 	
 	public static class MetalShaperResult implements FinishedRecipe{

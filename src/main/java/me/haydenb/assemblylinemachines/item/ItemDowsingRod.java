@@ -2,12 +2,15 @@ package me.haydenb.assemblylinemachines.item;
 
 import java.util.concurrent.ExecutionException;
 
+import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
+import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.world.FluidCapability;
 import me.haydenb.assemblylinemachines.world.FluidCapability.IChunkFluidCapability;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
@@ -15,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class ItemDowsingRod extends Item {
+public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 	
 	public ItemDowsingRod() {
@@ -48,5 +51,15 @@ public class ItemDowsingRod extends Item {
 		}
 		
 		return InteractionResult.CONSUME;
+	}
+
+	@Override
+	public ResourceLocation getTexture() {
+		return PowerToolType.MYSTIUM.getBorderTexturePath();
+	}
+
+	@Override
+	public int getTopColor() {
+		return PowerToolType.MYSTIUM.getARGBBorderColor();
 	}
 }

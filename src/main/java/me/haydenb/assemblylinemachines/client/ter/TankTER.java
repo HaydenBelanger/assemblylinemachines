@@ -1,7 +1,5 @@
 package me.haydenb.assemblylinemachines.client.ter;
 
-import java.awt.Color;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector4f;
@@ -12,6 +10,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
@@ -82,8 +81,6 @@ public class TankTER implements BlockEntityRendererProvider<TEFluidTank> {
 	
 	private static Vector4f getColorVec(int color) {
 		
-		Color c = new Color(color);
-		
-		return new Vector4f((float)c.getRed()/255f, (float)c.getGreen()/255f, (float)c.getBlue()/255f, 1f);
+		return new Vector4f((float)ARGB32.red(color)/255f, (float)ARGB32.green(color)/255f, (float)ARGB32.blue(color)/255f, 1f);
 	}
 }

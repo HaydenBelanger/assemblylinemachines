@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -66,36 +67,29 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			
 			CompoundTag nbt = stack.getTag();
 			
-			if(world.getBlockEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored")) {
+			if(world.getBlockEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storedprettyname")) {
 				
 				TEBottomlessStorageUnit te = (TEBottomlessStorageUnit) world.getBlockEntity(pos);
 				te.internalStored = nbt.getLong("assemblylinemachines:stored");
 				te.storedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(nbt.getString("assemblylinemachines:storeditem")));
+				te.storedItemPrettyName = nbt.getString("assemblylinemachines:storedprettyname");
 				te.sendUpdates();
 			}
 		}
 		super.setPlacedBy(world, pos, state, placer, stack);
 	}
 	
-	public static class BlockItemBottomlessStorageUnit extends BlockItem{
-
-		public BlockItemBottomlessStorageUnit(Block blockIn) {
-			super(blockIn, new Item.Properties().tab(Registry.CREATIVE_TAB));
-		}
-		
-		@Override
-		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-			if(stack.hasTag()) {
-				
-				CompoundTag nbt = stack.getTag();
-				if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem")) {
-					tooltip.add(1, new TextComponent("This BSU has items stored inside!").withStyle(ChatFormatting.GREEN));
-				}
-				
+	@Override
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		if(stack.hasTag()) {
+			
+			CompoundTag nbt = stack.getTag();
+			if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:storedprettyname")) {
+				tooltip.add(1, new TextComponent("This BSU has " + Formatting.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + nbt.getString("assemblylinemachines:storedprettyname") + " stored.").withStyle(ChatFormatting.GREEN));
 			}
-			super.appendHoverText(stack, worldIn, tooltip, flagIn);
+			
 		}
-		
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 	}
 	
 	public static class TEBottomlessStorageUnit extends AbstractMachine<ContainerBottomlessStorageUnit> implements ALMTicker<TEBottomlessStorageUnit> {
@@ -111,6 +105,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 		private long internalStored = 0;
 		private Item storedItem = null;
+		private String storedItemPrettyName = null;
 
 		protected InternalStoredExtractHandler items = new InternalStoredExtractHandler(this);
 		protected LazyOptional<InternalStoredExtractHandler> itemHandler = LazyOptional.of(() -> items);
@@ -158,6 +153,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 							if (internalStored <= 0) {
 								storedItem = null;
+								storedItemPrettyName = null;
 							}
 
 							sendUpdates();
@@ -213,6 +209,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 				if (internalStored == 0) {
 					storedItem = null;
+					storedItemPrettyName = null;
 					sendUpdates = true;
 				}
 
@@ -221,6 +218,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 						internalStored = Math.addExact(internalStored, contents.get(1).getCount());
 						if (storedItem == null) {
 							storedItem = contents.get(1).getItem();
+							storedItemPrettyName = storedItem.getDefaultInstance().getHoverName().getString();
 						}
 						contents.set(1, ItemStack.EMPTY);
 						sendUpdates = true;
@@ -239,9 +237,10 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-			if (compound.contains("assemblylinemachines:storeditem") && compound.contains("assemblylinemachines:stored")) {
+			if (compound.contains("assemblylinemachines:storeditem") && compound.contains("assemblylinemachines:stored") && compound.contains("assemblylinemachines:storedprettyname")) {
 				storedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("assemblylinemachines:storeditem")));
 				internalStored = compound.getLong("assemblylinemachines:stored");
+				storedItemPrettyName = compound.getString("assemblylinemachines:storedprettyname");
 			} else {
 				storedItem = null;
 				internalStored = 0l;
@@ -253,9 +252,10 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		@Override
 		public void saveAdditional(CompoundTag compound) {
 
-			if (storedItem != null && internalStored != 0) {
+			if (storedItem != null && internalStored != 0 && storedItemPrettyName != null) {
 				compound.putString("assemblylinemachines:storeditem", storedItem.getRegistryName().toString());
 				compound.putLong("assemblylinemachines:stored", internalStored);
+				compound.putString("assemblylinemachines:storedprettyname", storedItemPrettyName);
 			}
 
 			
@@ -327,6 +327,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 			if (tileEntity.internalStored <= 0) {
 				tileEntity.storedItem = null;
+				tileEntity.storedItemPrettyName = null;
 			}
 
 			tileEntity.sendUpdates();

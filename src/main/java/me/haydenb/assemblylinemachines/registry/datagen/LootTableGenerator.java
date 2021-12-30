@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.registry.datagen;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.*;
@@ -35,15 +36,16 @@ import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 public class LootTableGenerator extends LootTableProvider {
 
+	private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> providers = ImmutableList.of(Pair.of(GeneratedBlockLoot::new, LootContextParamSets.BLOCK));
 	private final Collection<Path> inputFolders;
+	private final PrintWriter pw;
 	
-	public LootTableGenerator(GatherDataEvent event) {
+	public LootTableGenerator(GatherDataEvent event, PrintWriter pw) {
 		super(event.getGenerator());
 		event.getGenerator().addProvider(this);
 		this.inputFolders = event.getGenerator().getInputFolders();
+		this.pw = pw;
 	}
-
-	private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> providers = ImmutableList.of(Pair.of(GeneratedBlockLoot::new, LootContextParamSets.BLOCK));
 	
 	@Override
 	protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootContextParamSet>> getTables() {
@@ -60,6 +62,7 @@ public class LootTableGenerator extends LootTableProvider {
 	private class GeneratedBlockLoot extends BlockLoot{
 		
 		private static final List<String> BLOCK_ONLY_EXCEPTIONS = List.of("mystium_farmland", "nova_farmland");
+		private final List<String> existingLootTables = getExistingLootTables();
 		
 		private static final HashMap<String, Triple<Supplier<Item>, Float, Float>> ORE_DROPS = new HashMap<>();
 		static {
@@ -86,7 +89,11 @@ public class LootTableGenerator extends LootTableProvider {
 			for(String str : new String[] {"novasteel", "attuned_titanium", "mystium", "steel", "wooden"}) {
 				NBT_COPYING_KEYS.put(str + "_fluid_tank", List.of("fluidstack"));
 			}
-			NBT_COPYING_KEYS.put("bottomless_storage_unit", List.of("stored", "storeditem"));
+			for(String str : new String[] {"basic", "advanced", "ultimate"}) {
+				NBT_COPYING_KEYS.put(str + "_battery_cell", List.of("stored"));
+			}
+			NBT_COPYING_KEYS.put("bottomless_storage_unit", List.of("stored", "storeditem", "storedprettyname"));
+			
 			NBT_COPYING_KEYS.replaceAll(new BiFunction<String, List<String>, List<String>>() {
 				@Override
 				public List<String> apply(String t, List<String> u) {
@@ -100,9 +107,20 @@ public class LootTableGenerator extends LootTableProvider {
 			
 		}
 		
+		
+		
 		@Override
 		protected void addTables() {
+			pw.println("[SYSTEM]: Starting block loot table generation...");
+			
 			Iterator<Block> knownBlocks = getKnownBlocks().iterator();
+			
+			
+			for(String str : existingLootTables) {
+				pw.println("[WARNING]: Skipping " + str + " as an existing file is in an input directory.");
+			}
+			
+			int i = 0;
 			while(knownBlocks.hasNext()) {
 				Block b = knownBlocks.next();
 				switch(b.getRegistryName().getPath()) {
@@ -126,6 +144,9 @@ public class LootTableGenerator extends LootTableProvider {
 				case("mystium_fluid_tank"):
 				case("steel_fluid_tank"):
 				case("wooden_fluid_tank"):
+				case("basic_battery_cell"):
+				case("advanced_battery_cell"):
+				case("ultimate_battery_cell"):
 				case("bottomless_storage_unit"):
 					//NBT-copying loot tables - copys required NBT data from BlockEntity to Item.
 					CopyNbtFunction.Builder nbtFunction = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY);
@@ -188,6 +209,13 @@ public class LootTableGenerator extends LootTableProvider {
 						this.dropSelf(b);
 					}
 				}
+				i++;
+			}
+			
+			pw.println("[LOOT TABLES]: Processed and generated loot tables for " + i + " block(s).");
+			int diff = Registry.getAllBlocksUnmodifiable().size() - i;
+			if(diff > 0) {
+				pw.println("[WARNING]: " + diff + " block(s) were skipped as they do not have a BlockItem, most likely Fluids and other fringe blocks.");
 			}
 			
 		}
@@ -196,13 +224,12 @@ public class LootTableGenerator extends LootTableProvider {
 		protected Iterable<Block> getKnownBlocks() {
 			List<Block> recipesToApply = Registry.getAllBlocksModifiable();
 			recipesToApply.removeIf((b) -> b.asItem().equals(Items.AIR) && !BLOCK_ONLY_EXCEPTIONS.contains(b.getRegistryName().getPath()));
-			List<String> existing = getExistingRecipes();
-			recipesToApply.removeIf((b) -> existing.contains(b.getRegistryName().getPath()));
+			recipesToApply.removeIf((b) -> existingLootTables.contains(b.getRegistryName().getPath()));
 			
 			return recipesToApply;
 		}
 		
-		private List<String> getExistingRecipes(){
+		private List<String> getExistingLootTables(){
 			List<File> files = new ArrayList<>();
 			for(Path p : inputFolders) {
 				File f = new File(p.toString() + "/data/" + AssemblyLineMachines.MODID + "/loot_tables/blocks/");

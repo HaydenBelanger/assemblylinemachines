@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"item": "assemblylinemachines:basic_battery"
+	},
+	"amount": 1,
+	"enchantment": "assemblylinemachines:overclock",
+	"cost": 200
+}
