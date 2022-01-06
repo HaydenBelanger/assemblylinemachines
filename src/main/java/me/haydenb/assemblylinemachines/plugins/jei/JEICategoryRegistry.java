@@ -7,16 +7,19 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.ibm.icu.text.DecimalFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
+import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.GeneratorFluidTypes;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -31,8 +34,7 @@ import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -51,7 +53,7 @@ public class JEICategoryRegistry implements IModPlugin{
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void registerCategories(IRecipeCategoryRegistration registration) {
-		if(ConfigHolder.COMMON.jeiSupport.get() == true) {
+		if(ConfigHolder.getClientConfig().jeiSupport.get() == true) {
 			IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
 			
 			CATEGORY_REGISTRY.put(LumberCrafting.LUMBER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("lumber").title("Lumber Mill Crafting")
@@ -107,6 +109,21 @@ public class JEICategoryRegistry implements IModPlugin{
 						}
 					})
 					.build(WorldCorruptionCrafting.class));
+			
+			CATEGORY_REGISTRY.put(GeneratorFluidCrafting.GENFLUID_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("generator_fluid").title("Generator Fluids").background("gui_set_b", 0, 36, 90, 26)
+					.icon(Items.WATER_BUCKET).itemSlots(0, Pair.of(0, 4)).fluidSlots(1, Pair.of(22, 5)).draw(new TriConsumer<>() {
+						private final DecimalFormat df = new DecimalFormat("#.0");
+						@Override
+						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+							if(k instanceof GeneratorFluidCrafting) {
+								GeneratorFluidCrafting recipe = (GeneratorFluidCrafting) k;
+								TextComponent l1 = recipe.getFluidType() == GeneratorFluidTypes.COOLANT ? new TextComponent("Coolant") : new TextComponent("Fuel");
+								TextComponent l2 = recipe.getFluidType() == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.checkCoolantFluid(recipe.getFluid())) + "x") : new TextComponent(Formatting.formatToSuffix(recipe.checkBurnableFluid(recipe.getFluid())) + " FE");
+								Utils.drawCenteredStringWithoutShadow(v, l1, 64, 6);
+								Utils.drawCenteredStringWithoutShadow(v, l2, 64, 15);
+							}
+						}
+					}).build(GeneratorFluidCrafting.class));
 			
 			CATEGORY_REGISTRY.put(EntropyReactorCrafting.ERO_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("entropy_reactor_output").title("Entropy Reactor Waste")
 					.background("gui_set_a", 130, 24, 85, 41).icon(Registry.getBlock("entropy_reactor_core")).progressBar("gui_set_a", 199, 10, 16, 14, 100, StartDirection.LEFT, false, 42, 13)
@@ -203,7 +220,6 @@ public class JEICategoryRegistry implements IModPlugin{
 					}).build(RefiningCrafting.class));
 			
 			
-			
 			registration.addRecipeCategories(CATEGORY_REGISTRY.values().toArray(new IRecipeCategory<?>[CATEGORY_REGISTRY.size()]));
 			AssemblyLineMachines.LOGGER.info("JEI plugin for Assembly Line Machines loaded.");
 		}
@@ -212,8 +228,9 @@ public class JEICategoryRegistry implements IModPlugin{
 	}
 	
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void registerRecipes(IRecipeRegistration registration) {
-		if(ConfigHolder.COMMON.jeiSupport.get() == true) {
+		if(ConfigHolder.getClientConfig().jeiSupport.get() == true) {
 			
 			ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = getRecipes();
 			for(RecipeType<?> type : CATEGORY_REGISTRY.keySet()) {

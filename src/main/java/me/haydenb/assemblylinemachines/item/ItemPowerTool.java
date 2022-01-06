@@ -14,12 +14,12 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.FastColor.ARGB32;
@@ -34,6 +34,10 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -70,6 +74,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		return ptt;
 	}
 	
+	//Use A to mimic type action.
 	@Override
 	public String getToolType() {
 		return type;
@@ -90,7 +95,6 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		return parent.canApplyAtEnchantingTable(stack, enchantment);
 	}
 
-	// Use A (Sword, Pickaxe, Hoe, Shovel, Axe)
 	@Override
 	public boolean isCorrectToolForDrops(BlockState blockIn) {
 		return parent.isCorrectToolForDrops(blockIn);
@@ -149,7 +153,15 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 				BlockState statex = world.getBlockState(posx);
 				if (func.apply(statex, posx)) {
 					cost = cost + 2;
-					world.destroyBlock(posx, true, player);
+					if(!world.isClientSide) {
+						NonNullList<ItemStack> drops = NonNullList.create();
+						for(ItemStack dropStack : statex.getDrops(new LootContext.Builder((ServerLevel) world).withParameter(LootContextParams.TOOL, stack).withParameter(LootContextParams.ORIGIN, new Vec3(posx.getX(), posx.getY(), posx.getZ())))) {
+							drops.add(dropStack);
+						}
+						Containers.dropContents(world, posx, drops);
+					}
+					
+					world.destroyBlock(posx, false);
 				}
 			}
 			stack.hurtAndBreak(cost, player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
@@ -188,6 +200,12 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	public ItemStack getContainerItem(ItemStack itemStack) {
 		return parent.getContainerItem(itemStack);
 	}
+	
+	@Override
+	public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
+		return parent.canPerformAction(stack, toolAction);
+	}
+	
 	// End Use A
 
 	@Override
@@ -317,7 +335,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		
 		public EnchantmentOverclock() {
 			super(Rarity.RARE, POWER_TOOLS, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
-			this.multiplier = ConfigHolder.COMMON.overclockEnchantmentMultiplier.get().floatValue();
+			this.multiplier = ConfigHolder.getServerConfig().overclockEnchantmentMultiplier.get().floatValue();
 		}
 		
 		@Override
@@ -342,9 +360,9 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	}
 	
 	public static enum PowerToolType{
-		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.COMMON.crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
-		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.COMMON.mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
-		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.COMMON.novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
+		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.getServerConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getServerConfig().mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.getServerConfig().novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
 		AEFG("assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000, 0x0, null);
 		
 		private final String keyName;

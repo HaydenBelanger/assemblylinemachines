@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "minecraft:glowstone"
+	},
+	"input_b":{
+		"tag": "assemblylinemachines:crafting/mushroom_blocks"
+	},
+	"output":{
+		"item": "minecraft:shroomlight"
+	},
+	"stirs": 6,
+	"fluid": "lava",
+	"mix_color": "#e0e86d",
+	"drain_percent": "QUARTER"
+}

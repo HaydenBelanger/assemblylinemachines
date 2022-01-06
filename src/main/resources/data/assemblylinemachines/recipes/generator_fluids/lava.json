@@ -1,0 +1,6 @@
+{
+	"type": "assemblylinemachines:generator_fluid",
+	"generator": "GEOTHERMAL", 
+	"fluid":"minecraft:lava",
+	"fe":115000
+}

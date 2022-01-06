@@ -51,7 +51,7 @@ public class BlockMystiumFarmland extends FarmBlock {
 							world.levelEvent(2005, pos.above(), 0);
 							if(canGetExhausted && random.nextInt(2) == 0) {
 								
-								if(ConfigHolder.COMMON.mystiumFarmlandDeath.get()) {
+								if(ConfigHolder.getServerConfig().mystiumFarmlandDeath.get()) {
 									world.setBlockAndUpdate(pos, state.setValue(AGE, age + 1));
 								}
 								

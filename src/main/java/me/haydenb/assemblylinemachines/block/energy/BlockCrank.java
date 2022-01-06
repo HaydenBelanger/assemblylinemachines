@@ -82,7 +82,7 @@ public class BlockCrank extends Block {
 					if(crankable.perform()) {
 						world.playSound(null, pos, SoundEvents.WOOD_STEP, SoundSource.BLOCKS, 0.7f, 1f + getPitchNext(world.getRandom()));
 					}else {
-						int chance = ConfigHolder.COMMON.crankSnapChance.get();
+						int chance = ConfigHolder.getServerConfig().crankSnapChance.get();
 						if(chance != -1 && world.getRandom().nextInt(chance) == 0) {
 							world.playSound(null, pos, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.BLOCKS, 1f, 1f);
 							world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

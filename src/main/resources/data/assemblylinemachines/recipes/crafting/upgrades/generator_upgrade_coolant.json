@@ -10,7 +10,7 @@
 			"tag": "forge:plates/stainless_steel"
 		},
 		"p":{
-			"item": "minecraft:packed_ice"
+			"item": "minecraft:blue_ice"
 		},
 		"x":{
 			"item": "assemblylinemachines:temperature_regulator"

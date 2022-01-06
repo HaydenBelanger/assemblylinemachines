@@ -401,7 +401,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			this.invTextLoc = invTextLoc;
 			this.inventoryText = () -> this.playerInventoryTitle;
 			String a = "";
-			if (hasCool == true && ConfigHolder.COMMON.coolDudeMode.get() == true) {
+			if (hasCool == true && ConfigHolder.getClientConfig().coolDudeMode.get() == true) {
 				a = "cool/";
 				renderTitleText = false;
 				renderInventoryText = false;

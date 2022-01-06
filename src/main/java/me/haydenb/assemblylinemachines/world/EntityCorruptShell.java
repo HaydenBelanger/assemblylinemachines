@@ -20,15 +20,16 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class EntityCorruptShell extends Zombie{
 
 	public static final EntityType<EntityCorruptShell> CORRUPT_SHELL = EntityType.Builder.of(EntityCorruptShell::new, MobCategory.MONSTER).build(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell").toString());
-	
-	private SoundEvent ambient = null;
-	private SoundEvent hurt = null;
-	private SoundEvent death = null;
-	private SoundEvent step = null;
 
 	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, Level worldIn) {
 		super(type, worldIn);
@@ -40,40 +41,22 @@ public class EntityCorruptShell extends Zombie{
 
 	@Override
 	protected SoundEvent getAmbientSound() {
-		validateSoundEvents();
-		return ambient;
+		return Registry.getSound("corrupt_shell_ambient");
 	}
 
 	@Override
 	protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-		validateSoundEvents();
-		return hurt;
+		return Registry.getSound("corrupt_shell_death");
 	}
 
 	@Override
 	protected SoundEvent getDeathSound() {
-		validateSoundEvents();
-		return death;
-	}
-
-	private void validateSoundEvents() {
-		if(ambient == null || hurt == null || death == null || step == null) {
-			String cool = "";
-			if(ConfigHolder.COMMON.coolDudeMode.get()) {
-				cool = "_cool";
-			}
-			
-			ambient = Registry.getSound("corrupt_shell" + cool + "_ambient");
-			hurt = Registry.getSound("corrupt_shell" + cool + "_hurt");
-			death = Registry.getSound("corrupt_shell" + cool + "_death");
-			step = Registry.getSound("corrupt_shell" + cool + "_step");
-		}
+		return Registry.getSound("corrupt_shell_death");
 	}
 	
 	@Override
 	protected SoundEvent getStepSound() {
-		validateSoundEvents();
-		return step;
+		return Registry.getSound("corrupt_shell_step");
 	}
 	
 	@Override
@@ -91,6 +74,24 @@ public class EntityCorruptShell extends Zombie{
 			entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 140));
 		}
 	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@SubscribeEvent
+	public static void playSound(PlaySoundAtEntityEvent event) {
+		
+		if(ConfigHolder.getClientConfig().coolDudeMode.get()) {
+			String regLoc = event.getSound().getRegistryName().getPath();
+			if(regLoc.equals("corrupt_shell_ambient")) {
+				event.setSound(Registry.getSound("corrupt_shell_cool_ambient"));
+			}else if(regLoc.equals("corrupt_shell_hurt")) {
+				event.setSound(Registry.getSound("corrupt_shell_cool_hurt"));
+			}else if(regLoc.equals("corrupt_shell_death")) {
+				event.setSound(Registry.getSound("corrupt_shell_cool_death"));
+			}else if(regLoc.equals("corrupt_shell_step")) {
+				event.setSound(Registry.getSound("corrupt_shell_cool_step"));
+			}
+		}
+	}
 
 	public static class EntityCorruptShellRender extends LivingEntityRenderer<EntityCorruptShell, EntityCorruptShellModel>{
 
@@ -101,7 +102,7 @@ public class EntityCorruptShell extends Zombie{
 
 		@Override
 		public ResourceLocation getTextureLocation(EntityCorruptShell entity) {
-			if(ConfigHolder.COMMON.coolDudeMode.get()) {
+			if(ConfigHolder.getClientConfig().coolDudeMode.get()) {
 				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/shadow.png");
 			}else {
 				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/corrupt_shell.png");

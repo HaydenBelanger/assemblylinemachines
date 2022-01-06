@@ -1,0 +1,6 @@
+{
+	"type": "assemblylinemachines:generator_fluid",
+	"generator": "COMBUSTION", 
+	"fluid":"assemblylinemachines:liquid_carbon",
+	"fe":300000
+}

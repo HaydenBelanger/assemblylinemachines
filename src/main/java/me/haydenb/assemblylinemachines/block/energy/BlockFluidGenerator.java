@@ -1,12 +1,8 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import com.google.common.base.Supplier;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import mcjty.theoneprobe.api.*;
@@ -17,11 +13,11 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
+import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.client.Minecraft;
@@ -107,7 +103,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		private float increasedCost = 1f;
 		private FluidStack burnTank = FluidStack.EMPTY;
 		private FluidStack coolTank = FluidStack.EMPTY;
-		private FluidGeneratorTypes type = null;
+		public FluidGeneratorTypes type = null;
 		private TranslatableComponent name = null;
 		
 		private IFluidHandler fluids = new IFluidHandler() {
@@ -116,19 +112,17 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			public boolean isFluidValid(int tank, FluidStack stack) {
 				if(tank == 0) {
 					
-					if(type != null) {
-						
-						for(Pair<Fluid, Integer> v : type.supplier.get()) {
-							if(v.getLeft().equals(stack.getFluid())) {
-								return true;
-							}
+					for(GeneratorFluidCrafting recipe : level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE)) {
+						if(recipe.matches(TEFluidGenerator.this, level) && recipe.checkBurnableFluid(stack.getFluid()) != 0) {
+							return true;
 						}
 					}
+					
 				}else if(tank == 1) {
 					
 					if(getUpgradeAmount(Upgrades.GENERATOR_COOLANT) != 0) {
-						for(Pair<Fluid, Integer> v : ConfigHolder.COMMON.coolantFluids) {
-							if(v.getLeft().equals(stack.getFluid())) {
+						for(GeneratorFluidCrafting recipe : level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE)) {
+							if(recipe.checkCoolantFluid(stack.getFluid()) != 0f) {
 								return true;
 							}
 						}
@@ -287,14 +281,15 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 					if(burnTimeLeft == 0) {
 						if(burnTank.getAmount() >= 1000) {
 							int burnAmt = 0;
-							for(Pair<Fluid, Integer> v : type.supplier.get()) {
-								if(v.getLeft().equals(burnTank.getFluid())) {
-									burnAmt = v.getRight();
-									break;
+							List<GeneratorFluidCrafting> recipes = this.getLevel().getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE);
+							for(GeneratorFluidCrafting recipe : recipes) {
+								if(recipe.matches(this, level)) {
+									burnAmt = recipe.checkBurnableFluid(burnTank.getFluid());
+									if(burnAmt != 0) break;
 								}
 							}
 							if(burnAmt != 0) {
-								int cMult;
+								float cMult;
 								
 								boolean shrinkCoolant = false;
 								
@@ -302,18 +297,17 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 									cMult = 0;
 									shrinkCoolant = true;
 									if(coolTank.getAmount() >= 1000) {
-										for(Pair<Fluid, Integer> v : ConfigHolder.COMMON.coolantFluids) {
-											if(v.getLeft().equals(coolTank.getFluid())) {
-												cMult = v.getRight();
-												break;
-											}
+										for(GeneratorFluidCrafting recipe : recipes) {
+											cMult = recipe.checkCoolantFluid(coolTank.getFluid());
+											if(cMult != 0f) break;
+											
 										}
 									}
 								}else {
 									cMult = 1;
 								}
 								if(cMult != 0) {
-									burnTimeLeft = burnAmt * cMult;
+									burnTimeLeft = Math.round((float)burnAmt * cMult);
 									burnTank.shrink(1000);
 									if(shrinkCoolant) {
 										coolTank.shrink(1000);
@@ -625,7 +619,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 				Block.box(0, 3, 4, 3, 7, 5),Block.box(0, 3, 6, 3, 7, 7),
 				Block.box(0, 3, 9, 3, 7, 10),Block.box(0, 3, 11, 3, 7, 12),
 				Block.box(13, 4, 3, 15, 6, 13),Block.box(1, 4, 3, 3, 6, 13)
-				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true, null, ManagedDirection.TOP, () -> ConfigHolder.COMMON.combustionFluids, 350),
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true, null, ManagedDirection.TOP, 350),
 		GEOTHERMAL(Stream.of(
 				Block.box(0, 0, 0, 16, 2, 16),Block.box(5, 6, 0, 11, 16, 16),Block.box(2, 2, 1, 14, 5, 16),Block.box(5, 5, 1, 11, 6, 16),
 				Block.box(14, 2, 0, 16, 5, 16),Block.box(14, 5, 0, 16, 6, 2),Block.box(0, 5, 0, 2, 6, 2),Block.box(11, 5, 1, 14, 6, 2),
@@ -636,7 +630,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 				Block.box(0, 5, 5, 5, 11, 6),Block.box(11, 5, 5, 16, 11, 6),Block.box(0, 10, 6, 5, 11, 11),Block.box(11, 10, 6, 16, 11, 11),
 				Block.box(0, 12, 5, 5, 13, 11),Block.box(11, 12, 5, 16, 13, 11),Block.box(2, 2, 1, 14, 6, 1),Block.box(11, 2, 0, 12, 6, 1),
 				Block.box(9, 2, 0, 10, 6, 1),Block.box(6, 2, 0, 7, 6, 1),Block.box(4, 2, 0, 5, 6, 1)
-				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true, null, null, () -> ConfigHolder.COMMON.geothermalFluids, 200);
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true, null, null, 200);
 		
 		private final VoxelShape shapeN;
 		private final VoxelShape shapeS;
@@ -645,13 +639,11 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		private final int basefept;
 		public final ManagedDirection inputSide;
 		public final ManagedDirection outputSide;
-		public final Supplier<ArrayList<Pair<Fluid, Integer>>> supplier;
-		FluidGeneratorTypes(VoxelShape NShape, boolean supportsCoolant, ManagedDirection inputSide, ManagedDirection outputSide, Supplier<ArrayList<Pair<Fluid, Integer>>> validFluids, int basefept){
+		FluidGeneratorTypes(VoxelShape NShape, boolean supportsCoolant, ManagedDirection inputSide, ManagedDirection outputSide, int basefept){
 			shapeN = NShape;
 			shapeS = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, shapeN);
 			shapeW = Utils.rotateShape(Direction.NORTH, Direction.WEST, shapeN);
 			shapeE = Utils.rotateShape(Direction.NORTH, Direction.EAST, shapeN);
-			supplier = validFluids;
 			this.inputSide = inputSide;
 			this.outputSide = outputSide;
 			this.basefept = basefept;

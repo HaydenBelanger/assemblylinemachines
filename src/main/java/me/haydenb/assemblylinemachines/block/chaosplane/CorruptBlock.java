@@ -14,6 +14,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.*;
 
 public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGenProvider {
 
@@ -157,6 +158,16 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		public BlockState getStateForPlacement(BlockPlaceContext pContext) {
 			return this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, pContext.getClickedFace().getAxis());
 			
+		}
+		
+		@Override
+		public BlockState getToolModifiedState(BlockState state, Level world, BlockPos pos, Player player,
+				ItemStack stack, ToolAction toolAction) {
+			if(this.getRegistryName().toString().equals("assemblylinemachines:chaosbark_log") && toolAction.equals(ToolActions.AXE_STRIP)) {
+				return Registry.getBlock("stripped_chaosbark_log").defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS));
+			}
+			
+			return super.getToolModifiedState(state, world, pos, player, stack, toolAction);
 		}
 		
 	}

@@ -213,6 +213,12 @@ public class Utils {
 		pFont.draw(pPoseStack, formattedcharsequence, (float)(pX - pFont.width(formattedcharsequence) / 2), (float)pY, pColor);
 	}
 	
+	@OnlyIn(Dist.CLIENT)
+	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Component pText, int pX, int pY) {
+		Minecraft mc = Minecraft.getInstance();
+		drawCenteredStringWithoutShadow(pPoseStack, mc.font, pText, pX, pY, 4210752);
+	}
+	
 	public static class Formatting {
 
 		private static final NavigableMap<Long, String> SUFFIX = new TreeMap<>();

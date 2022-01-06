@@ -1,6 +1,10 @@
 package me.haydenb.assemblylinemachines.block.helpers;
 
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -21,27 +25,36 @@ import net.minecraftforge.network.NetworkHooks;
 
 public abstract class BlockTileEntity extends Block implements EntityBlock{
 
-	private final VoxelShape shape;
+	private final Cache<Direction, VoxelShape> shapes;
+	private final VoxelShape defaultShape;
+	private final Direction defaultDirection;
 	private final boolean shouldRotate;
-	private final Direction dir;
+	
 	private final String teName;
 	
 	private static final VoxelShape NO_SHAPE_CUBE = Shapes.block();
-	public BlockTileEntity(Properties properties, String teName) {
-		super(properties);
-		this.teName = teName;
-		this.shape = null;
-		this.shouldRotate = false;
-		this.dir = null;
-	}
 	
 	public BlockTileEntity(Properties properties, String teName, VoxelShape shape, boolean shouldRotate, Direction defaultDirection) {
 		super(properties);
 		this.teName = teName;
-		this.shape = shape;
+		this.defaultShape = shape;
+		this.defaultDirection = defaultDirection;
 		this.shouldRotate = shouldRotate;
-		this.dir = defaultDirection;
+		
+		this.shapes = shape != null && shouldRotate == true && defaultDirection != null ? CacheBuilder.newBuilder().build() : null;
 	}
+	
+	public BlockTileEntity(Properties properties, String teName, VoxelShape shape) {
+		this(properties, teName, shape, true, Direction.NORTH);
+	}
+
+	public BlockTileEntity(Properties properties, String teName) {
+		this(properties, teName, null, false, null);
+	}
+	
+	
+	
+	
 	
 	//GROUPED - return for newBlockEntity
 	@Override
@@ -101,11 +114,17 @@ public abstract class BlockTileEntity extends Block implements EntityBlock{
 	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-		if(shape != null) {
-			if(shouldRotate == true && state.hasProperty(HorizontalDirectionalBlock.FACING)) {
-				return Utils.rotateShape(dir, state.getValue(HorizontalDirectionalBlock.FACING), shape);
+		if(defaultShape != null) {
+			if(shouldRotate == true && defaultDirection != null && state.hasProperty(HorizontalDirectionalBlock.FACING)) {
+				try {
+					Direction facingDir = state.getValue(HorizontalDirectionalBlock.FACING);
+					return shapes.get(facingDir, () -> Utils.rotateShape(defaultDirection, facingDir, defaultShape));
+				}catch(ExecutionException e) {
+					e.printStackTrace();
+					return defaultShape;
+				}
 			}else {
-				return shape;
+				return defaultShape;
 			}
 		}else {
 			return NO_SHAPE_CUBE;

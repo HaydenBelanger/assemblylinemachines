@@ -731,7 +731,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 							entropy = 1f;
 						}
 						
-						List<EntropyReactorCrafting> recipes = level.getRecipeManager().getRecipesFor(EntropyReactorCrafting.ERO_RECIPE, null, level);
+						List<EntropyReactorCrafting> recipes = level.getRecipeManager().getAllRecipesFor(EntropyReactorCrafting.ERO_RECIPE);
 						Collections.sort(recipes, Comparator.comparing(EntropyReactorCrafting::getVarietyReqd));
 						Collections.reverse(recipes);
 						for(EntropyReactorCrafting erc : recipes) {
@@ -971,7 +971,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 					
 					BlockPos posx = new BlockPos(new Vec3(x, y, z));
 					if(!this.getLevel().isEmptyBlock(posx) || !this.getLevel().getFluidState(posx).getType().equals(Fluids.EMPTY)) {
-						for(WorldCorruptionCrafting recipe : this.getLevel().getRecipeManager().getRecipesFor(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, null, this.getLevel())) {
+						for(WorldCorruptionCrafting recipe : this.getLevel().getRecipeManager().getAllRecipesFor(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE)) {
 							Optional<Block> res = recipe.testBlock(this.getLevel().getRandom(), this.getLevel().getBlockState(posx).getBlock());
 							if(res.isPresent()) {
 								Block block = res.get();
@@ -996,7 +996,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				}
 			}
 			
-			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.COMMON.reactorExplosions.get()) {
+			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.getServerConfig().reactorExplosions.get()) {
 				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
 				entropy = 0f;
 			}

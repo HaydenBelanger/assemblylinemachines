@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
+	"input_fluid":{
+		"fluid": "minecraft:water",
+		"amount": 100
+	},
+	"proc_time": 8,
+	"output_item":{
+		"item": "minecraft:ice"
+	}
+}

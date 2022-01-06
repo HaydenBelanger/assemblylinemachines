@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:fluid_in_ground",
+	"fluid": "assemblylinemachines:glacier_water",
+	"chance": 3,
+	"min": 150,
+	"max": 600,
+	"criteria_set": "OVERWORLD_ONLYCOLD"
+}

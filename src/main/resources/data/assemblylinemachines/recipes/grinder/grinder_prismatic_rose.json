@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "assemblylinemachines:crafting/prism_roses"
+	},
+	"output":{
+		"item": "assemblylinemachines:prismatic_dust"
+	},
+	"grinds": 2,
+	"bladetype": "TITANIUM",
+	"machine_required": true
+}

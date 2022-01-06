@@ -33,7 +33,6 @@ public class AutoRecipeGenerator extends RecipeProvider {
 	public AutoRecipeGenerator(GatherDataEvent event, PrintWriter openPw) {
 		super(event.getGenerator());
 		
-		System.out.println(event.getGenerator().getOutputFolder().toAbsolutePath().toString());
 		this.inputFolders = event.getGenerator().getInputFolders();
 		this.writer = openPw;
 		event.getGenerator().addProvider(this);
@@ -103,7 +102,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		
 		COPPER(false, false, false, false, Triple.of(true, true, 3), Triple.of(true, false, 5)), IRON(false, false, false, false, Triple.of(true, true, 3), Triple.of(true, false, 4)), GOLD(false, false, false, false, Triple.of(true, true, 3), Triple.of(true, false, 1)),
 		TITANIUM(true, true, true, true, Triple.of(true, true, 5), Triple.of(true, false, 2)), STEEL(true, true, true, true, Triple.of(true, true, 8), Triple.of(true, false, 3)), CHROMIUM(true, true, false, false, Triple.of(true, false, 3), Triple.of(false, false, 0)),
-		ATTUNED_TITANIUM(true, false, false, false, Triple.of(true, false, 1), Triple.of(false, false, 0)), PLASTIC(3), RUBBER(4),
+		ATTUNED_TITANIUM(true, false, false, false, Triple.of(true, false, 3), Triple.of(false, false, 0)), PLASTIC(3), RUBBER(4),
 		MYSTIUM(true, false, true, false, Triple.of(true, false, 2), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/steel")), FLEROVIUM(true, true, false, false, Triple.of(true, false, 4), Triple.of(true, true, 1)), 
 		ENERGIZED_GOLD(true, false, false, false, Triple.of(true, false, 4), Triple.of(false, false, 0)), RAW_CHROMIUM(() -> Ingredient.of(Registry.getItem("raw_chromium")), null, false),
 		NOVASTEEL(true, false, true, false, Triple.of(true, false, 1), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/graphene")), 

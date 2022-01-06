@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:snowball"
+		"item": "minecraft:blue_ice"
 	},
-	"amount": 20,
+	"amount": 4,
 	"enchantment": "minecraft:frost_walker",
 	"cost": 100
 }

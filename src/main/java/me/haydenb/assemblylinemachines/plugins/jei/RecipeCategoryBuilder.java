@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,7 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.fluids.FluidStack;
 
 public class RecipeCategoryBuilder {
@@ -86,7 +87,7 @@ public class RecipeCategoryBuilder {
 		return this.background(getGUIPath(guiPath), u, v, width, height);
 	}
 	
-	RecipeCategoryBuilder icon(Block b) {
+	RecipeCategoryBuilder icon(ItemLike b) {
 		this.icon = helper.createDrawableIngredient(new ItemStack(b));
 		return this;
 	}

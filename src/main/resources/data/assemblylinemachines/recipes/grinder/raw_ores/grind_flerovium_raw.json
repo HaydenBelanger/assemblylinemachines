@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:raw_flerovium"
+	},
+	"output":{
+		"item": "assemblylinemachines:ground_flerovium"
+	},
+	"grinds": 5,
+	"chanceToDouble": 0.5,
+	"bladetype": "TITANIUM"
+}

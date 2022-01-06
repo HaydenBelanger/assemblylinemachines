@@ -1,12 +1,18 @@
 package me.haydenb.assemblylinemachines.crafting;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockElectricFluidMixer.TEElectricFluidMixer;
+import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath;
 import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -16,6 +22,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
@@ -29,6 +36,8 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	public static final RecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
+	private static final Supplier<List<Item>> ILLEGAL_RECIPE_ITEMS = Suppliers.memoize(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
+			Registry.getItem("steel_stirring_stick")).stream(), BlockFluidBath.VALID_FILL_ITEMS.stream()).collect(Collectors.toList()));
 	
 	private final Ingredient inputa;
 	private final Ingredient inputb;
@@ -208,6 +217,15 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			try {
 				final Ingredient ingredienta = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_a"));
 				final Ingredient ingredientb = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_b"));
+				
+				ItemStack[] ingredients = ArrayUtils.addAll(ingredienta.getItems(), ingredientb.getItems());
+				List<Item> illegalItems = ILLEGAL_RECIPE_ITEMS.get();
+				for(ItemStack is : ingredients) {
+					if(illegalItems.contains(is.getItem())) {
+						throw new IllegalArgumentException("Recipe used " + is.getItem().getRegistryName().toString() + ", which cannot be used for a Bath recipe.");
+					}
+				}
+				Arrays.asList(ingredienta.getItems(), ingredientb.getItems());
 				
 				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				final int stirs = GsonHelper.getAsInt(json, "stirs");

@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "assemblylinemachines:crafting/shulker_boxes"
+	},
+	"output":{
+		"item": "minecraft:shulker_shell",
+		"count": 2
+	},
+	"grinds": 11,
+	"bladetype": "TITANIUM"
+}

@@ -1,58 +1,82 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.InMemoryFormat;
+import com.google.common.base.Suppliers;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fml.config.ModConfig.Type;
 
 public class ConfigHandler {
 
 	public static class ConfigHolder{
-		public static final ForgeConfigSpec COMMON_SPEC;
-		public static final ASMConfig COMMON;
+		private static final ConcurrentHashMap<Type, Pair<Object, ForgeConfigSpec>> CONFIGS = new ConcurrentHashMap<>();
+		
+		private static final Supplier<ALMClientConfig> CLIENT = Suppliers.memoize(() -> (ALMClientConfig) CONFIGS.get(Type.CLIENT).getLeft());
+		private static final Supplier<ALMServerConfig> SERVER = Suppliers.memoize(() -> (ALMServerConfig) CONFIGS.get(Type.SERVER).getLeft());
 		
 		static {
 			{
-				final Pair<ASMConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ASMConfig::new);
-				COMMON = specPair.getLeft();
-				COMMON_SPEC = specPair.getRight();
+				CONFIGS.put(Type.CLIENT, new ForgeConfigSpec.Builder().configure(ALMClientConfig::new));
+				CONFIGS.put(Type.SERVER, new ForgeConfigSpec.Builder().configure(ALMServerConfig::new));
+				
 			}
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static ALMClientConfig getClientConfig() {
+			return CLIENT.get();
+		}
+		
+		public static ALMServerConfig getServerConfig() {
+			return SERVER.get();
+		}
+		
+		public static ForgeConfigSpec getSpec(Type type) {
+			return CONFIGS.get(type).getRight();
 		}
 	}
 	
-	public static class ASMConfig{
+	public static class ALMClientConfig{
 		
-		//MIXINS
-		//public final BooleanValue experimentalWorldScreenDisable;
-		//public final BooleanValue farBlockPosGeneratorSuppressed;
-		//public final BooleanValue seedUnification;
+		public final BooleanValue coolDudeMode;
+		public final BooleanValue jeiSupport;
+		public final BooleanValue customTooltipColors;
+		public final BooleanValue customTooltipFrames;
+		
+		public ALMClientConfig(final ForgeConfigSpec.Builder builder) {
+			
+			builder.push("Client Options");
+			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
+			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
+			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
+			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
+			builder.pop();
+			
+		}
+	}
+	
+	public static class ALMServerConfig{
 		
 		//MACHINE OPTIONS
-		public final BooleanValue coolDudeMode;
 		public final BooleanValue interactorInteractMode;
 		public final BooleanValue reactorExplosions;
 		public final EnumValue<DebugOptions> interactorInteractDebug;
 		public final ConfigValue<Integer> crankSnapChance;
 		public final ConfigValue<Integer> toolChargerChargeRate;
 		public final ConfigValue<Integer> toolChargerMaxEnergyStorage;
+		public final ConfigValue<Integer> experienceSiphonMaxDrain;
+		public final ConfigValue<Integer> coalGeneratorMultiplier;
+		public final ConfigValue<Integer> naphthaTurbineMultiplier;
 		
 		//MISC/WORLD
-		public final BooleanValue jeiSupport;
 		public final BooleanValue updateChecker;
-		public final BooleanValue customTooltipColors;
-		public final BooleanValue customTooltipFrames;
 		public final BooleanValue guideBook;
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
@@ -116,78 +140,67 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> blackGraniteVeinSize;
 		public final ConfigValue<Integer> blackGraniteFrequency;
 		
-		//FLUIDS
-		private final ConfigValue<List<? extends Config>> geothermalFluidsRaw;
-		private final ConfigValue<List<? extends Config>> combustionFluidsRaw;
-		private final ConfigValue<List<? extends Config>> coolantFluidsRaw;
-		public final ArrayList<Pair<Fluid, Integer>> geothermalFluids = new ArrayList<>();
-		public final ArrayList<Pair<Fluid, Integer>> combustionFluids = new ArrayList<>();
-		public final ArrayList<Pair<Fluid, Integer>> coolantFluids = new ArrayList<>();
-		
-		static ModConfig clientConfig;
-		
-		public ASMConfig(final ForgeConfigSpec.Builder builder) {
+		public ALMServerConfig(final ForgeConfigSpec.Builder builder) {
 			
 			builder.push("Machine Options");
-			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").define("crankSnapChance", 100);
+			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").defineInRange("crankSnapChance", 100, -1, 1000);
 			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?", "For example, attempting to \"interact with\" a block with a GUI will cause an exception.").define("interactorInteractMode", true);
 			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?",
 					"NONE - Interact Mode exceptions are completely silenced.", "BASIC - The first line of the exception, a simple description, is placed in the console. (If unsure, use this!)",
 					"COMPLETE - Full stack traces are placed in the console, useful for debugging.").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
 			reactorExplosions = builder.comment("If the Entropy Reactor reaches higher than 98% Entropy, should it explode?").define("reactorExplosions", true);
-			toolChargerChargeRate = builder.comment("What is the maximum amount of FE the Tool Charger can place into an item per cycle?", "The Tool Charger runs one cycle every 2.5 seconds.").define("toolChargerChargeRate", 10000);
-			toolChargerMaxEnergyStorage = builder.comment("What should the FE capacity of the Tool Charger be?").define("toolChargerMaxEnergyStorage", 100000);
-			
-			Predicate<Object> fluidTestPredicate = (object) -> true;
-			geothermalFluidsRaw = builder.comment("What fluids should be valid for use in the Geothermal Generator?").defineList("geothermalFluids", getFluidDefaultConfig(Pair.of("minecraft:lava", 115000), Pair.of("assemblylinemachines:naphtha", 650000)), fluidTestPredicate);
-			combustionFluidsRaw = builder.comment("What fluids should be valid for use in the Combustion Generator?").defineList("combustionFluids", getFluidDefaultConfig(Pair.of("assemblylinemachines:liquid_carbon", 300000), Pair.of("assemblylinemachines:gasoline", 600000), Pair.of("assemblylinemachines:diesel", 1050000)), fluidTestPredicate);
-			coolantFluidsRaw = builder.comment("What fluids should be valid for use as coolant in Combustion and Geothermal Generators?", "Value is multiplier on burn time, for example \"2\" will multiply the total FE by 2.").defineList("coolantFluids", getFluidDefaultConfig(Pair.of("minecraft:water", 2), Pair.of("assemblylinemachines:condensed_void", 4)), fluidTestPredicate);
+			toolChargerChargeRate = builder.comment("What is the maximum amount of FE the Tool Charger can place into an item per cycle?", "The Tool Charger runs one cycle every 2.5 seconds.").defineInRange("toolChargerChargeRate", 10000, 1, Integer.MAX_VALUE);
+			toolChargerMaxEnergyStorage = builder.comment("What should the FE capacity of the Tool Charger be?").defineInRange("toolChargerMaxEnergyStorage", 100000, 1, Integer.MAX_VALUE);
+			experienceSiphonMaxDrain = builder.comment("How many XP Points per half-second should the Experience Siphon drain?").defineInRange("experienceSiphonMaxDrain", 25, 1, 500);
+			coalGeneratorMultiplier = builder.comment("What should the base FE multiplier for burn-time-to-FE be for fuel in the Coal Generator?", "Every 1 is equal to 4 FE more per burn tick over the 60 seconds of operation.",
+					"For example, every 1 would increase the FE output of Charcoal by 3.2KFE.").defineInRange("coalGeneratorMultiplier", 2, 1, 100);
+			naphthaTurbineMultiplier = builder.comment("What should the base operating time multiplier be for when the Naphtha Turbine is placed on the Coal Generator?", "Every 1 is equal to 60 seconds.").defineInRange("naphthaTurbineMultiplier", 4, 1, 100);
 			builder.pop();
 			
 			builder.push("Tools and Armor");
-			overclockEnchantmentMultiplier = builder.comment("What multiplier should each level of the Overclock enchantment give?", "For example, the default of \"0.2\" is a 20% increase per enchantment level.").define("overclockEnchantmentMultiplier", 0.2);
+			overclockEnchantmentMultiplier = builder.comment("What multiplier should each level of the Overclock enchantment give?", "For example, the default of \"0.2\" is a 20% increase per enchantment level.").defineInRange("overclockEnchantmentMultiplier", 0.2d, 0.001d, 1d);
 			builder.push("Titanium");
-			titaniumToolAttack = builder.comment("What is the base damage Titanium Tools should do?").define("titaniumToolAttack", 5d);
-			titaniumToolHarvestSpeed = builder.comment("What is the base harvest speed Titanium Tools should do?").define("titaniumToolHarvestSpeed", 7d);
-			titaniumEnchantability = builder.comment("What should the enchantability of Titanium Tools and Armor be?").define("titaniumEnchantability", 8);
-			titaniumDurability = builder.comment("What should the base durability of Titanium Tools and Armor be?").define("titaniumDurability", 1150);
-			titaniumArmorKnockbackResistance = builder.comment("What should the knockback resistance of Titanium Armor be?").define("titaniumArmorKnockbackResistance", 0d);
-			titaniumArmorDamageReduction = builder.comment("What should the base damage reduction of Titanium Armor be?").define("titaniumArmorDamageReduction", 4);
-			titaniumArmorToughness = builder.comment("What should the toughness of Titanium Armor be?").define("titaniumArmorToughness", 0d);
+			titaniumToolAttack = builder.comment("What is the base damage Titanium Tools should do?").defineInRange("titaniumToolAttack", 5d, 0.1d, 1000d);
+			titaniumToolHarvestSpeed = builder.comment("What is the base harvest speed Titanium Tools should do?").defineInRange("titaniumToolHarvestSpeed", 7d, 0.1d, 100d);
+			titaniumEnchantability = builder.comment("What should the enchantability of Titanium Tools and Armor be?").defineInRange("titaniumEnchantability", 8, 0, 100);
+			titaniumDurability = builder.comment("What should the base durability of Titanium Tools and Armor be?").defineInRange("titaniumDurability", 1150, 10, 100000);
+			titaniumArmorKnockbackResistance = builder.comment("What should the knockback resistance of Titanium Armor be?").defineInRange("titaniumArmorKnockbackResistance", 0d, 0d, 1d);
+			titaniumArmorDamageReduction = builder.comment("What should the base damage reduction of Titanium Armor be?").defineInRange("titaniumArmorDamageReduction", 4, 2, 100);
+			titaniumArmorToughness = builder.comment("What should the toughness of Titanium Armor be?").defineInRange("titaniumArmorToughness", 0d, 0d, 1d);
 			builder.pop();
 			
 			builder.push("Steel");
-			steelToolAttack = builder.comment("What is the base damage Steel Tools should do?").define("steelToolAttack", 7d);
-			steelToolHarvestSpeed = builder.comment("What is the base harvest speed Steel Tools should do?").define("steelToolHarvestSpeed", 9d);
-			steelEnchantability = builder.comment("What should the enchantability of Steel Tools and Armor be?").define("steelEnchantability", 6);
-			steelDurability = builder.comment("What should the base durability of Steel Tools and Armor be?").define("steelDurability", 1800);
-			steelArmorKnockbackResistance = builder.comment("What should the knockback resistance of Steel Armor be?").define("steelArmorKnockbackResistance", 0.10d);
-			steelArmorDamageReduction = builder.comment("What should the base damage reduction of Steel Armor be?").define("steelArmorDamageReduction", 4);
-			steelArmorToughness = builder.comment("What should the toughness of Steel Armor be?").define("steelArmorToughness", 0.5d);
+			steelToolAttack = builder.comment("What is the base damage Steel Tools should do?").defineInRange("steelToolAttack", 7d, 0.1d, 1000d);
+			steelToolHarvestSpeed = builder.comment("What is the base harvest speed Steel Tools should do?").defineInRange("steelToolHarvestSpeed", 9d, 0.1d, 100d);
+			steelEnchantability = builder.comment("What should the enchantability of Steel Tools and Armor be?").defineInRange("steelEnchantability", 6, 0, 100);
+			steelDurability = builder.comment("What should the base durability of Steel Tools and Armor be?").defineInRange("steelDurability", 1800, 10, 100000);
+			steelArmorKnockbackResistance = builder.comment("What should the knockback resistance of Steel Armor be?").defineInRange("steelArmorKnockbackResistance", 0.10d, 0d, 1d);
+			steelArmorDamageReduction = builder.comment("What should the base damage reduction of Steel Armor be?").defineInRange("steelArmorDamageReduction", 4, 2, 100);
+			steelArmorToughness = builder.comment("What should the toughness of Steel Armor be?").defineInRange("steelArmorToughness", 0.5d, 0d, 1d);
 			builder.pop();
 			
 			builder.push("Crank-Powered");
-			crankToolAttack = builder.comment("What is the base damage Crank-Powered Tools should do?").define("crankToolAttack", 8d);
-			crankToolHarvestSpeed = builder.comment("What is the base harvest speed Crank-Powered Tools should do?").define("crankToolHarvestSpeed", 11d);
-			crankToolEnchantability = builder.comment("What should the enchantability of Crank-Powered Tools be?").define("crankToolEnchantability", 16);
-			crankToolDurability = builder.comment("What should the base physical durability of Crank-Powered Tools be?").define("crankToolDurability", 75);
-			crankToolMaxCranks = builder.comment("What should the base kinetic durability (Cranks) of Crank-Powered Tools be?").define("crankToolMaxCranks", 750);
+			crankToolAttack = builder.comment("What is the base damage Crank-Powered Tools should do?").defineInRange("crankToolAttack", 8d, 0.1d, 1000d);
+			crankToolHarvestSpeed = builder.comment("What is the base harvest speed Crank-Powered Tools should do?").defineInRange("crankToolHarvestSpeed", 11d, 0.1d, 100d);
+			crankToolEnchantability = builder.comment("What should the enchantability of Crank-Powered Tools be?").defineInRange("crankToolEnchantability", 16, 0, 100);
+			crankToolDurability = builder.comment("What should the base physical durability of Crank-Powered Tools be?").defineInRange("crankToolDurability", 75, 10, 100000);
+			crankToolMaxCranks = builder.comment("What should the base kinetic durability (Cranks) of Crank-Powered Tools be?").defineInRange("crankToolMaxCranks", 750, 1, Integer.MAX_VALUE);
 			builder.pop();
 			
 			builder.push("Mystium");
-			mystiumToolAttack = builder.comment("What is the base damage Mystium Tools should do?").define("mystiumToolAttack", 9d);
-			mystiumToolHarvestSpeed = builder.comment("What is the base harvest speed Mystium Tools should do?").define("mystiumToolHarvestSpeed", 19d);
-			mystiumToolEnchantability = builder.comment("What should the enchantability of Mystium Tools be?").define("mystiumToolEnchantability", 28);
-			mystiumToolDurability = builder.comment("What should the base physical durability of Mystium Tools be?").define("mystiumToolDurability", 150);
-			mystiumToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Mystium Tools be?").define("mystiumToolMaxFE", 1000000);
+			mystiumToolAttack = builder.comment("What is the base damage Mystium Tools should do?").defineInRange("mystiumToolAttack", 9d, 0.1d, 1000d);
+			mystiumToolHarvestSpeed = builder.comment("What is the base harvest speed Mystium Tools should do?").defineInRange("mystiumToolHarvestSpeed", 19d, 0.1d, 100d);
+			mystiumToolEnchantability = builder.comment("What should the enchantability of Mystium Tools be?").defineInRange("mystiumToolEnchantability", 28, 0, 100);
+			mystiumToolDurability = builder.comment("What should the base physical durability of Mystium Tools be?").defineInRange("mystiumToolDurability", 150, 10, 100000);
+			mystiumToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Mystium Tools be?").defineInRange("mystiumToolMaxFE", 1000000, 1, Integer.MAX_VALUE);
 			builder.pop();
 			
 			builder.push("Novasteel");
-			novasteelToolAttack = builder.comment("What is the base damage Novasteel Tools should do?").define("novasteelToolAttack", 10.5d);
-			novasteelToolHarvestSpeed = builder.comment("What is the base harvest speed Novasteel Tools should do?").define("novasteelToolHarvestSpeed", 23d);
+			novasteelToolAttack = builder.comment("What is the base damage Novasteel Tools should do?").defineInRange("novasteelToolAttack", 10.5d, 0.1d, 1000d);
+			novasteelToolHarvestSpeed = builder.comment("What is the base harvest speed Novasteel Tools should do?").defineInRange("novasteelToolHarvestSpeed", 23d, 0.1d, 100d);
 			novasteelToolEnchantability = builder.comment("What should the enchantability of Novasteel Tools be?").define("novasteelToolEnchantability", 37);
-			novasteelToolDurability = builder.comment("What should the base physical durability of Novasteel Tools be?").define("novasteelToolDurability", 300);
-			novasteelToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Novasteel Tools be?").define("novasteelToolMaxFE", 20000000);
+			novasteelToolDurability = builder.comment("What should the base physical durability of Novasteel Tools be?").defineInRange("novasteelToolDurability", 300, 10, 100000);
+			novasteelToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Novasteel Tools be?").defineInRange("novasteelToolMaxFE", 20000000, 1, Integer.MAX_VALUE);
 			builder.pop();
 			builder.pop();
 			
@@ -198,8 +211,8 @@ public class ConfigHandler {
 			guideBook = builder.comment("When Patchouli is installed, should players be automatically given the Guidebook when they first connect?").define("guideBook", true);
 			
 			builder.push("Titanium Generation");
-			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").define("titaniumVeinSize", 5);
-			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").define("titaniumFrequency", 7);
+			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumVeinSize", 5, 0, 1000);
+			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumFrequency", 7, 0, 1000);
 			titaniumMinHeight = builder.comment("What is the minimum Y value Titanium Ore should spawn at in the overworld?", 
 					"This can (and by default, does) go below the minimum world limit to change the TRIANGLE-style weighting of generation.").define("titaniumMinHeight", -112);
 			titaniumMaxHeight = builder.comment("What is the maximum Y value Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", -16);
@@ -215,111 +228,12 @@ public class ConfigHandler {
 			builder.pop();
 			
 			builder.push("Chromium Generation");
-			chromiumVeinSize = builder.comment("What should the maximum size per vein of Chromium Ore be?", "Set to 0 to disable Chromium Ore generation.").define("chromiumVeinSize", 10);
-			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk?", "Set to 0 to disable Chromium Ore generation.").define("chromiumFrequency", 4);
+			chromiumVeinSize = builder.comment("What should the maximum size per vein of Chromium Ore be?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumVeinSize", 10, 0, 1000);
+			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumFrequency", 4, 0, 1000);
 			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?", "If false, Chromium Ore will only generate on the outer End islands accessed by the End Gateway.").define("chromiumOnDragonIsland", false);
 			builder.pop();
 			builder.pop();
 			
-			builder.push("Client-Side-Only Options");
-			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
-			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
-			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
-			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
-			builder.pop();
-			
-			
-		}
-		
-		public void validateConfig() {
-			if(crankSnapChance.get() < 1 && crankSnapChance.get() != -1) {
-				crankSnapChance.set(100);
-			}
-			
-			if(toolChargerChargeRate.get() < 1) {
-				toolChargerChargeRate.set(10000);
-			}
-			if(toolChargerMaxEnergyStorage.get() < toolChargerChargeRate.get()) {
-				toolChargerMaxEnergyStorage.set(100000);
-			}
-			
-			checkFluidLists(Pair.of(geothermalFluidsRaw.get().iterator(), geothermalFluids), Pair.of(combustionFluidsRaw.get().iterator(), combustionFluids), Pair.of(coolantFluidsRaw.get().iterator(), coolantFluids));
-			
-			toolsVerification();
-			
-			
-		}
-		
-		private void toolsVerification() {
-			if(titaniumToolAttack.get() < 0.1d) {
-				titaniumToolAttack.set(0.1d);
-			}
-			if(titaniumToolHarvestSpeed.get() < 0.1d) {
-				titaniumToolHarvestSpeed.set(0.1d);
-			}
-			if(titaniumDurability.get() < 10) {
-				titaniumDurability.set(10);
-			}
-			if(titaniumEnchantability.get() < 0) {
-				titaniumEnchantability.set(0);
-			}
-			if(titaniumArmorKnockbackResistance.get() < 0d) {
-				titaniumArmorKnockbackResistance.set(0d);
-			}
-			if(titaniumArmorDamageReduction.get() < 2) {
-				titaniumArmorDamageReduction.set(2);
-			}
-			if(titaniumArmorToughness.get() < 0d) {
-				titaniumArmorToughness.set(0d);
-			}
-			
-			if(steelToolAttack.get() < 0.1d) {
-				steelToolAttack.set(0.1d);
-			}
-			if(steelToolHarvestSpeed.get() < 0.1d) {
-				steelToolHarvestSpeed.set(0.1d);
-			}
-			if(steelDurability.get() < 10) {
-				steelDurability.set(10);
-			}
-			if(steelEnchantability.get() < 0) {
-				steelEnchantability.set(0);
-			}
-			if(steelArmorKnockbackResistance.get() < 0d) {
-				steelArmorKnockbackResistance.set(0d);
-			}
-			if(steelArmorDamageReduction.get() < 2) {
-				steelArmorDamageReduction.set(2);
-			}
-			if(steelArmorToughness.get() < 0d) {
-				steelArmorToughness.set(0d);
-			}
-			
-			if(crankToolAttack.get() < 0.1d) {
-				crankToolAttack.set(0.1d);
-			}
-			if(crankToolHarvestSpeed.get() < 0.1d) {
-				crankToolHarvestSpeed.set(0.1d);
-			}
-			if(crankToolDurability.get() < 10) {
-				crankToolDurability.set(10);
-			}
-			if(crankToolEnchantability.get() < 0) {
-				crankToolEnchantability.set(0);
-			}
-			
-			if(mystiumToolAttack.get() < 0.1d) {
-				mystiumToolAttack.set(0.1d);
-			}
-			if(mystiumToolHarvestSpeed.get() < 0.1d) {
-				mystiumToolHarvestSpeed.set(0.1d);
-			}
-			if(mystiumToolDurability.get() < 10) {
-				mystiumToolDurability.set(10);
-			}
-			if(mystiumToolEnchantability.get() < 0) {
-				mystiumToolEnchantability.set(0);
-			}
 		}
 	}
 	
@@ -329,53 +243,5 @@ public class ConfigHandler {
 	
 	public static enum OreGenOptions{
 		UNIFORM, TRIANGLE;
-	}
-	
-	private static Supplier<Map<String, Object>> getFluidSupplier(String fluid, int burnTime){
-		return new Supplier<Map<String,Object>>() {
-			
-			@Override
-			public Map<String, Object> get() {
-				
-				HashMap<String, Object> nH = new HashMap<>();
-				
-				nH.put("fluid", fluid);
-				nH.put("value", burnTime);
-				
-				return nH;
-			}
-		};
-	}
-	
-	@SafeVarargs
-	private static ArrayList<Config> getFluidDefaultConfig(Pair<String, Integer>... sets) {
-		ArrayList<Config> cf = new ArrayList<Config>();
-		for(Pair<String, Integer> pairs : sets) {
-			cf.add(Config.of(getFluidSupplier(pairs.getLeft(), pairs.getRight()), InMemoryFormat.withUniversalSupport()));
-		}
-		return cf;
-	}
-	
-	@SafeVarargs
-	private static void checkFluidLists(Pair<Iterator<? extends Config>, ArrayList<Pair<Fluid, Integer>>>... iterators) {
-		for(Pair<Iterator<? extends Config>, ArrayList<Pair<Fluid, Integer>>> itp : iterators) {
-			Iterator<? extends Config> it = itp.getLeft();
-			ArrayList<Pair<Fluid, Integer>> set = itp.getRight();
-			while(it.hasNext()) {
-				Config c = it.next();
-				
-				if(c.contains("value") && c.contains("fluid")) {
-					Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(c.get("fluid")));
-					if(fluid != Fluids.EMPTY) {
-						
-						set.add(Pair.of(fluid, c.getInt("value")));
-					}else {
-						it.remove();
-					}
-				}else {
-					it.remove();
-				}
-			}
-		}
 	}
 }

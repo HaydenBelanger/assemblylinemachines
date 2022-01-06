@@ -120,8 +120,8 @@ public class BlockToolCharger extends BlockTileEntity{
 		
 		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
-			this.configMaxChargeRate = ConfigHolder.COMMON.toolChargerChargeRate.get();
-			this.configMaxCapacity = ConfigHolder.COMMON.toolChargerMaxEnergyStorage.get();
+			this.configMaxChargeRate = ConfigHolder.getServerConfig().toolChargerChargeRate.get();
+			this.configMaxCapacity = ConfigHolder.getServerConfig().toolChargerMaxEnergyStorage.get();
 		}
 
 		public TEToolCharger(BlockPos pos, BlockState state) {

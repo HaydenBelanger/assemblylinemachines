@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "minecraft:music_discs"
+	},
+	"input_b":{
+		"tag": "forge:ingots/titanium"
+	},
+	"output":{
+		"item": "assemblylinemachines:music_disc_assembly_required"
+	},
+	"stirs": 25,
+	"fluid": "lava",
+	"mix_color": "#b713ba",
+	"drain_percent": "FULL"
+}

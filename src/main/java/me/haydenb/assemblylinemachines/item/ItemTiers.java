@@ -18,14 +18,14 @@ import net.minecraftforge.common.TierSortingRegistry;
 
 public enum ItemTiers {
 	
-	TITANIUM(ConfigHolder.COMMON.titaniumToolAttack.get(), ConfigHolder.COMMON.titaniumToolHarvestSpeed.get(), ConfigHolder.COMMON.titaniumEnchantability.get(), ConfigHolder.COMMON.titaniumDurability.get(), 
-			ConfigHolder.COMMON.titaniumArmorKnockbackResistance.get(), ConfigHolder.COMMON.titaniumArmorDamageReduction.get(), "titanium", ConfigHolder.COMMON.titaniumArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("titanium_ingot"));}),
-	STEEL(ConfigHolder.COMMON.steelToolAttack.get(), ConfigHolder.COMMON.steelToolHarvestSpeed.get(), ConfigHolder.COMMON.steelEnchantability.get(), ConfigHolder.COMMON.steelDurability.get(), 
-			ConfigHolder.COMMON.steelArmorKnockbackResistance.get(), ConfigHolder.COMMON.steelArmorDamageReduction.get(), "steel", ConfigHolder.COMMON.steelArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
-	CRANK(ConfigHolder.COMMON.crankToolAttack.get(), ConfigHolder.COMMON.crankToolDurability.get(), ConfigHolder.COMMON.crankToolEnchantability.get(), ConfigHolder.COMMON.crankToolDurability.get(), 
+	TITANIUM(ConfigHolder.getServerConfig().titaniumToolAttack.get(), ConfigHolder.getServerConfig().titaniumToolHarvestSpeed.get(), ConfigHolder.getServerConfig().titaniumEnchantability.get(), ConfigHolder.getServerConfig().titaniumDurability.get(), 
+			ConfigHolder.getServerConfig().titaniumArmorKnockbackResistance.get(), ConfigHolder.getServerConfig().titaniumArmorDamageReduction.get(), "titanium", ConfigHolder.getServerConfig().titaniumArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("titanium_ingot"));}),
+	STEEL(ConfigHolder.getServerConfig().steelToolAttack.get(), ConfigHolder.getServerConfig().steelToolHarvestSpeed.get(), ConfigHolder.getServerConfig().steelEnchantability.get(), ConfigHolder.getServerConfig().steelDurability.get(), 
+			ConfigHolder.getServerConfig().steelArmorKnockbackResistance.get(), ConfigHolder.getServerConfig().steelArmorDamageReduction.get(), "steel", ConfigHolder.getServerConfig().steelArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
+	CRANK(ConfigHolder.getServerConfig().crankToolAttack.get(), ConfigHolder.getServerConfig().crankToolDurability.get(), ConfigHolder.getServerConfig().crankToolEnchantability.get(), ConfigHolder.getServerConfig().crankToolDurability.get(), 
 			()->{return Ingredient.of(ItemTags.getAllTags().getTag(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
-	MYSTIUM(ConfigHolder.COMMON.mystiumToolAttack.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ConfigHolder.COMMON.mystiumToolEnchantability.get(), ConfigHolder.COMMON.mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
-	NOVASTEEL(ConfigHolder.COMMON.novasteelToolAttack.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ConfigHolder.COMMON.novasteelToolEnchantability.get(), ConfigHolder.COMMON.novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
+	MYSTIUM(ConfigHolder.getServerConfig().mystiumToolAttack.get(), ConfigHolder.getServerConfig().mystiumToolDurability.get(), ConfigHolder.getServerConfig().mystiumToolEnchantability.get(), ConfigHolder.getServerConfig().mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
+	NOVASTEEL(ConfigHolder.getServerConfig().novasteelToolAttack.get(), ConfigHolder.getServerConfig().novasteelToolDurability.get(), ConfigHolder.getServerConfig().novasteelToolEnchantability.get(), ConfigHolder.getServerConfig().novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
 	CRG(750, 5, 0d, 3, "crg", 0d, () -> Ingredient.EMPTY);
 	
 	private float attack;

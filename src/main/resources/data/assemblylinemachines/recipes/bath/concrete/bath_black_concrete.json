@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "minecraft:black_concrete_powder"
+	},
+	"input_b":{
+		"item": "minecraft:black_concrete_powder"
+	},
+	"output":{
+		"item": "minecraft:black_concrete",
+		"count": 2
+	},
+	"stirs": 4,
+	"fluid": "water",
+	"mix_color": "#000000",
+	"drain_percent": "QUARTER"
+}

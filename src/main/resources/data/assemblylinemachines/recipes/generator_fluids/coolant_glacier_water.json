@@ -1,0 +1,6 @@
+{
+	"type": "assemblylinemachines:generator_fluid",
+	"generator": "COOLANT", 
+	"fluid":"assemblylinemachines:glacier_water",
+	"coolantstrength":3
+}

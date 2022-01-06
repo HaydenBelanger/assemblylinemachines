@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_separation",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:glacier_water",
+		"amount": 500
+	},
+	"input_item":{
+		"item": "minecraft:water_bucket"
+	},
+	"proc_time": 14,
+	"output_item":{
+		"item": "minecraft:powder_snow_bucket"
+	}
+}

@@ -1,0 +1,25 @@
+ {
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"g g",
+		"r r",
+		"sis"
+	],
+	"key":{
+		"g":{
+			"item": "minecraft:lime_concrete"
+		},
+		"r":{
+			"tag": "forge:rods/steel"
+		},
+		"s":{
+			"tag": "forge:ingots/steel"
+		},
+		"i":{
+			"item": "minecraft:iron_bars"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:experience_siphon"
+	}
+}

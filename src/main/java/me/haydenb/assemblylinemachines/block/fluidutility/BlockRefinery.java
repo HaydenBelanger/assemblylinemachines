@@ -409,7 +409,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 					//Below determines if the recipe is valid or not. If so, sets outputRecipe to not null.
 					if (outputRecipe == null) {
 
-						List<RefiningCrafting> rList = this.getLevel().getRecipeManager().getRecipesFor(RefiningCrafting.REFINING_RECIPE, this, this.getLevel());
+						List<RefiningCrafting> rList = this.getLevel().getRecipeManager().getAllRecipesFor(RefiningCrafting.REFINING_RECIPE);
 						Block b = this.getLevel().getBlockState(this.getBlockPos().above()).getBlock();
 						RefiningCrafting recipe = null;
 						for (RefiningCrafting r : rList) {

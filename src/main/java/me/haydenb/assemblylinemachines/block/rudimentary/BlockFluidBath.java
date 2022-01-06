@@ -1,6 +1,9 @@
 package me.haydenb.assemblylinemachines.block.rudimentary;
 
+import java.util.List;
 import java.util.stream.Stream;
+
+import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
@@ -15,11 +18,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.*;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -33,6 +37,8 @@ import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BlockFluidBath extends Block implements EntityBlock {
+	
+	public static final List<Item> VALID_FILL_ITEMS = List.of(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.POTION);
 	
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
@@ -111,109 +117,120 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 					} else {
 						ItemStack held = player.getMainHandItem();
-						if (entity.fluid == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE) {
-							if (held.getItem() == Items.LAVA_BUCKET || held.getItem() == Items.WATER_BUCKET) {
-								BathCraftingFluids f;
-								if (held.getItem() == Items.LAVA_BUCKET) {
-									f = BathCraftingFluids.LAVA;
-									world.playSound(null, pos, SoundEvents.BUCKET_FILL_LAVA, SoundSource.BLOCKS,
-											1f, 1f);
-								} else {
-									f = BathCraftingFluids.WATER;
-									world.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1f,
-											1f);
-								}
+						if (VALID_FILL_ITEMS.contains(held.getItem()) && (!held.getItem().equals(Items.POTION) || PotionUtils.getPotion(held) == Potions.WATER)) {
+							Pair<SoundEvent, BathCraftingFluids> fluids;
+							String rLoc = held.getItem().getRegistryName().toString();
+							int fillCount = 4;
+							switch(rLoc) {
+							case("minecraft:lava_bucket"):
+								fluids = Pair.of(SoundEvents.BUCKET_FILL_LAVA, BathCraftingFluids.LAVA);
+								break;
+							default:
+								fluids = Pair.of(SoundEvents.BUCKET_FILL, BathCraftingFluids.WATER);
+								fillCount = rLoc.equalsIgnoreCase("minecraft:potion") ? 1 : 4;
+							}
+							if(state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == fluids.getSecond()
+									&& state.getValue(STATUS) + fillCount <= 4) {
+								world.playSound(null, pos, fluids.getFirst(), SoundSource.BLOCKS, 1f,
+										1f);
 								if(!player.isCreative()) {
-									ItemHandlerHelper.giveItemToPlayer(player, held.getContainerItem());
+									if(rLoc.equalsIgnoreCase("minecraft:potion")) {
+										ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.GLASS_BOTTLE, 1));
+									}else {
+										ItemHandlerHelper.giveItemToPlayer(player, held.getContainerItem());
+									}
 									held.shrink(1);
 								}
-								world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, f).setValue(STATUS, 4));
-								entity.fluid = f;
+								world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, fluids.getSecond()).setValue(STATUS, fillCount + state.getValue(STATUS)));
+								entity.fluid = fluids.getSecond();
 								entity.sendUpdates();
 								player.displayClientMessage(new TextComponent("Filled basin."), true);
-							} else {
-								player.displayClientMessage(new TextComponent("The basin is empty."), true);
+							}else {
+								player.displayClientMessage(new TextComponent("You cannot insert this right now."), true);
 							}
-
+							
 						} else {
-							if (entity.inputa == null) {
-								Item i = held.getItem();
-								if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
-									entity.inputa = new ItemStack(held.getItem());
-									held.shrink(1);
-									entity.sendUpdates();
-									world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS,
-											1f, 1f);
-								}
-
-							} else if (entity.inputb == null) {
-								Item i = held.getItem();
-								if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
-									world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS,
-											1f, 1f);
-									entity.inputb = new ItemStack(held.getItem());
-									held.shrink(1);
-									BathCrafting crafting = world.getRecipeManager().getRecipeFor(BathCrafting.BATH_RECIPE, entity, world).orElse(null);
-									if (crafting != null && crafting.getFluid().equals(entity.fluid) && state.getValue(STATUS) - crafting.getPercentage().getDrop() >= 0) {
-										
-										
-										entity.output = crafting.getResultItem().copy();
-										entity.stirsRemaining = crafting.getStirs();
-										entity.fluidColor = crafting.getColor();
-										entity.drainAmt = crafting.getPercentage().getDrop();
+							if (entity.fluid == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE) {
+								player.displayClientMessage(new TextComponent("The basin is empty."), true);
+							}else {
+								if (entity.inputa == null) {
+									Item i = held.getItem();
+									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+										entity.inputa = new ItemStack(held.getItem());
+										held.shrink(1);
 										entity.sendUpdates();
-										
-										
-										
-									}else {
-										entity.sendUpdates();
-										world.setBlockAndUpdate(pos, state.setValue(STATUS, 5));
-									}
-								}
-
-							} else {
-								if (entity.output != null) {
-									if (entity.stirsRemaining <= 0) {
-										ItemHandlerHelper.giveItemToPlayer(player, entity.output);
-										int setDrain = state.getValue(STATUS) - entity.drainAmt;
-										BathCraftingFluids newFluid = entity.fluid;
-										if(setDrain <= 0) {
-											newFluid = BathCraftingFluids.NONE;
-										}
-										entity.fluid = newFluid;
-										entity.stirsRemaining = -1;
-										entity.fluidColor = 0;
-										entity.output = null;
-										entity.inputa = null;
-										entity.inputb = null;
-										entity.drainAmt = 0;
-										entity.sendUpdates();
-										world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS,
+										world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS,
 												1f, 1f);
-										world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, newFluid).setValue(STATUS, setDrain));
-									} else {
-
-										if(!(held.getItem() instanceof ItemStirringStick)) {
-											player.displayClientMessage(new TextComponent("Use a Stirring Stick to mix."), true);
-										}else {
-											ItemStirringStick tss = (ItemStirringStick) held.getItem();
-											if(entity.fluid == BathCraftingFluids.LAVA && tss.getStirringResistance() == TemperatureResistance.COLD) {
-												player.displayClientMessage(new TextComponent("You need a metal Stirring Stick to stir Lava."), true);
-											}else {
-												entity.stirsRemaining--;
-												tss.useStirStick(held);
-											}
-										}
-
 									}
+
+								} else if (entity.inputb == null) {
+									Item i = held.getItem();
+									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+										world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS,
+												1f, 1f);
+										entity.inputb = new ItemStack(held.getItem());
+										held.shrink(1);
+										BathCrafting crafting = world.getRecipeManager().getRecipeFor(BathCrafting.BATH_RECIPE, entity, world).orElse(null);
+										if (crafting != null && crafting.getFluid().equals(entity.fluid) && state.getValue(STATUS) - crafting.getPercentage().getDrop() >= 0) {
+											
+											
+											entity.output = crafting.getResultItem().copy();
+											entity.stirsRemaining = crafting.getStirs();
+											entity.fluidColor = crafting.getColor();
+											entity.drainAmt = crafting.getPercentage().getDrop();
+											entity.sendUpdates();
+											
+											
+											
+										}else {
+											entity.sendUpdates();
+											world.setBlockAndUpdate(pos, state.setValue(STATUS, 5));
+										}
+									}
+
 								} else {
-									player.displayClientMessage(
-											new TextComponent(
-													"This recipe is invalid. Shift + Right Click to drain basin."),
-											true);
+									if (entity.output != null) {
+										if (entity.stirsRemaining <= 0) {
+											ItemHandlerHelper.giveItemToPlayer(player, entity.output);
+											int setDrain = state.getValue(STATUS) - entity.drainAmt;
+											BathCraftingFluids newFluid = entity.fluid;
+											if(setDrain <= 0) {
+												newFluid = BathCraftingFluids.NONE;
+											}
+											entity.fluid = newFluid;
+											entity.stirsRemaining = -1;
+											entity.fluidColor = 0;
+											entity.output = null;
+											entity.inputa = null;
+											entity.inputb = null;
+											entity.drainAmt = 0;
+											entity.sendUpdates();
+											world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS,
+													1f, 1f);
+											world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, newFluid).setValue(STATUS, setDrain));
+										} else {
+
+											if(!(held.getItem() instanceof ItemStirringStick)) {
+												player.displayClientMessage(new TextComponent("Use a Stirring Stick to mix."), true);
+											}else {
+												ItemStirringStick tss = (ItemStirringStick) held.getItem();
+												if(entity.fluid == BathCraftingFluids.LAVA && tss.getStirringResistance() == TemperatureResistance.COLD) {
+													player.displayClientMessage(new TextComponent("You need a metal Stirring Stick to stir Lava."), true);
+												}else {
+													entity.stirsRemaining--;
+													tss.useStirStick(held);
+												}
+											}
+
+										}
+									} else {
+										player.displayClientMessage(
+												new TextComponent(
+														"This recipe is invalid. Shift + Right Click to drain basin."),
+												true);
+									}
 								}
 							}
-
 						}
 					}
 				}

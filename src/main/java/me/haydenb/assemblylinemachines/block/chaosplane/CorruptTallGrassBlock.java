@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.block.chaosplane;
 
-import java.util.HashMap;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -18,7 +17,6 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
@@ -127,7 +125,8 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 				return chaosbarkTree;
 			}
 
-			public static void registerTreeGen() {
+			@SubscribeEvent
+			public static void registerTreeGen(FMLCommonSetupEvent event) {
 				BlockStateProvider bspTrunk = BlockStateProvider.simple(Registry.getBlock("chaosbark_log").defaultBlockState());
 				TrunkPlacer trunkPlacer = new StraightTrunkPlacer(4, 2, 0);
 				BlockStateProvider bspLeaves = BlockStateProvider.simple(Registry.getBlock("chaosbark_leaves").defaultBlockState());
@@ -138,26 +137,6 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 
 				chaosbarkTree = new TreeFeature(TreeConfiguration.CODEC).configured(new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
 			}
-
-
-			@SubscribeEvent
-			public static void patchStrippables(FMLCommonSetupEvent event) {
-
-				AssemblyLineMachines.LOGGER.info("Patching Strippable Logs to include Chaosbark...");
-
-				HashMap<Block, Block> strippableMap = new HashMap<>();
-
-				for(Block b : AxeItem.STRIPPABLES.keySet()) {
-					strippableMap.put(b, AxeItem.STRIPPABLES.get(b));
-				}
-
-				strippableMap.put(Registry.getBlock("chaosbark_log"), Registry.getBlock("stripped_chaosbark_log"));
-
-				AxeItem.STRIPPABLES = strippableMap;
-
-				ChaosbarkTreeGrower.registerTreeGen();
-			}
-
 
 		}
 	}

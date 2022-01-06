@@ -32,5 +32,9 @@
 	"corrupt_shell_step":{
 		"subtitle": "sound.assemblylinemachines.corrupt_shell_step",
 		"sounds": ["assemblylinemachines:corrupt_shell/step1", "assemblylinemachines:corrupt_shell/step2", "assemblylinemachines:corrupt_shell/step3"]
+	},
+	"assembly_required":{
+		"subtitle": "sound.assemblylinemachines.assembly_required",
+		"sounds": ["assemblylinemachines:assembly_required"]
 	}
 }

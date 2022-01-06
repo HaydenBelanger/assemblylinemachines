@@ -1,0 +1,6 @@
+{
+	"type": "assemblylinemachines:generator_fluid",
+	"generator": "COOLANT", 
+	"fluid":"minecraft:water",
+	"coolantstrength":2
+}

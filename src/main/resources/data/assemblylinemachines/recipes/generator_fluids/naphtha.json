@@ -1,0 +1,6 @@
+{
+	"type": "assemblylinemachines:generator_fluid",
+	"generator": "GEOTHERMAL", 
+	"fluid":"assemblylinemachines:naphtha",
+	"fe":650000
+}

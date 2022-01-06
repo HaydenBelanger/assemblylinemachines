@@ -22,7 +22,7 @@ public class VersionCheck {
 	@SubscribeEvent
 	public static void join(PlayerLoggedInEvent event) {
 		Player player = event.getPlayer();
-		if(!player.getCommandSenderWorld().isClientSide() && ConfigHolder.COMMON.updateChecker.get()) {
+		if(!player.getCommandSenderWorld().isClientSide() && ConfigHolder.getServerConfig().updateChecker.get()) {
 			ModContainer mc = AssemblyLineMachines.getModContainer();
 			if(mc != null) {
 				IModInfo imi = mc.getModInfo();

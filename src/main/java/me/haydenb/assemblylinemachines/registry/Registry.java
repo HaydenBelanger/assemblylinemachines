@@ -32,12 +32,14 @@ import me.haydenb.assemblylinemachines.block.fluid.*;
 import me.haydenb.assemblylinemachines.block.fluid.ALMFluid.ALMFluidBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidDarkEnergy.FluidDarkEnergyBlock;
+import me.haydenb.assemblylinemachines.block.fluid.FluidGlacierWater.FluidGlacierWaterBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.BlockNaphthaFire;
 import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
 import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct.FluidOilProductBlock;
 import me.haydenb.assemblylinemachines.block.fluidutility.*;
 import me.haydenb.assemblylinemachines.block.fluidutility.BlockCorruptingBasin.*;
+import me.haydenb.assemblylinemachines.block.fluidutility.BlockExperienceSiphon.TEExperienceSiphon;
 import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidRouter.*;
 import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidTank.TEFluidTank;
 import me.haydenb.assemblylinemachines.block.fluidutility.BlockRefinery.*;
@@ -84,7 +86,6 @@ import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResista
 import me.haydenb.assemblylinemachines.item.ItemTiers.ArmorTiers;
 import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.datagen.*;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer;
@@ -140,8 +141,6 @@ import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.IContainerFactory;
@@ -326,6 +325,8 @@ public class Registry {
 		
 		createItem("overclocked_convection_component", "overclocked_conduction_component");
 		
+		createItem("music_disc_assembly_required", new RecordItem(1, () -> Registry.getSound("assembly_required"), new Item.Properties().tab(CREATIVE_TAB).stacksTo(1).rarity(Rarity.RARE)));
+		
 		for(String i : MOD_ITEM_REGISTRY.keySet()) {
 			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
 		}
@@ -500,6 +501,8 @@ public class Registry {
 		createBlock("raw_titanium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		createBlock("raw_flerovium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL, true);
 		
+		createBlock("experience_siphon", new BlockExperienceSiphon(), true);
+		
 		registerFluids(null);
 		
 		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
@@ -518,6 +521,7 @@ public class Registry {
 			createFluid("liquid_carbon", new FluidOilProduct("liquid_carbon", true), new FluidOilProduct("liquid_carbon", false), new FluidOilProductBlock(() -> Registry.getFluid("liquid_carbon"), "liquid_carbon"), true);
 			createFluid("liquid_experience", 35, false, true, true, 0, 184, 18);
 			createFluid("dark_energy", new FluidDarkEnergy(true), new FluidDarkEnergy(false), new FluidDarkEnergyBlock(() -> Registry.getFluid("dark_energy")), true);
+			createFluid("glacier_water", new FluidGlacierWater(true), new FluidGlacierWater(false), new FluidGlacierWaterBlock(() -> Registry.getFluid("glacier_water")), true);
 			
 			createFluid("ethane", 0, true, false, false, 0, 0, 0);
 			createFluid("ethylene", 0, true, false, false, 0, 0, 0);
@@ -585,6 +589,7 @@ public class Registry {
 		createBlockEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, MOD_BLOCK_REGISTRY.get("entropy_reactor_block"));
 		
 		createBlockEntity("corrupting_basin", TECorruptingBasin.class);
+		createBlockEntity("experience_siphon", TEExperienceSiphon.class);
 		
 		event.getRegistry().registerAll(MOD_BLOCKENTITY_REGISTRY.values().toArray(new BlockEntityType<?>[MOD_BLOCKENTITY_REGISTRY.size()]));
 	}
@@ -675,6 +680,7 @@ public class Registry {
 		createRecipe(MetalCrafting.METAL_RECIPE, MetalCrafting.SERIALIZER);
 		createRecipe(EntropyReactorCrafting.ERO_RECIPE, EntropyReactorCrafting.SERIALIZER);
 		createRecipe(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, WorldCorruptionCrafting.SERIALIZER);
+		createRecipe(GeneratorFluidCrafting.GENFLUID_RECIPE, GeneratorFluidCrafting.SERIALIZER);
 		
 		for(String name : MOD_CRAFTING_REGISTRY.keySet()) {
 			Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>> recipe = MOD_CRAFTING_REGISTRY.get(name);
@@ -702,6 +708,7 @@ public class Registry {
 		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_death")).setRegistryName("corrupt_shell_cool_death"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_step")).setRegistryName("corrupt_shell_cool_step"));
 		
+		MOD_SOUND_REGISTRY.put("assembly_required", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "assembly_required")).setRegistryName("assembly_required"));
 		
 		event.getRegistry().registerAll(MOD_SOUND_REGISTRY.values().toArray(new SoundEvent[MOD_SOUND_REGISTRY.size()]));
 	}
@@ -746,6 +753,8 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getFluid("dark_energy_flowing"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_carbon"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("liquid_carbon_flowing"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("glacier_water"), RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(getFluid("glacier_water_flowing"), RenderType.translucent());
 		
 		BlockEntityRenderers.register((BlockEntityType<TEFluidTank>)getBlockEntity("fluid_tank"), new TankTER());
 		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
@@ -842,14 +851,6 @@ public class Registry {
 	
 	
 	//CONFIG CREATOR/DATA GENERATOR
-	
-	@SubscribeEvent
-	public static void configEvent(ModConfigEvent event) {
-		final ModConfig cfg = event.getConfig();
-		if(cfg.getSpec() == ConfigHolder.COMMON_SPEC) {
-			ConfigHolder.COMMON.validateConfig();
-		}
-	}
 	
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) throws Exception {

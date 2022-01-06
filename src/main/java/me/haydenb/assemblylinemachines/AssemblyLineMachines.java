@@ -7,10 +7,9 @@ import me.haydenb.assemblylinemachines.plugins.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.*;
-import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.config.ModConfig.Type;
 
 @Mod(AssemblyLineMachines.MODID)
 public final class AssemblyLineMachines{
@@ -23,15 +22,14 @@ public final class AssemblyLineMachines{
 		
 		//Registers config to current installation.
 		ModLoadingContext mlc = ModLoadingContext.get();
-		mlc.registerConfig(ModConfig.Type.COMMON, ConfigHolder.COMMON_SPEC);
+		mlc.registerConfig(Type.CLIENT, ConfigHolder.getSpec(Type.CLIENT));
+		mlc.registerConfig(Type.SERVER, ConfigHolder.getSpec(Type.SERVER));
 		
 		//Registers PacketHandler.
 		PacketHandler.INSTANCE.registerMessage(PacketHandler.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
 		
 		//The One Probe plugin registration.
 		PluginTOP.register();
-		
-		SurfaceRuleData.overworldLike(false, false, false);
 	}
 	
 	public static ModContainer getModContainer() {

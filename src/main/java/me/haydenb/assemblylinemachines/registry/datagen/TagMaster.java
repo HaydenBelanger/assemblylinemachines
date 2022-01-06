@@ -13,7 +13,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.data.tags.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.*;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -69,8 +69,12 @@ public class TagMaster {
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/carbon_small"), List.of(Pair.of("minecraft", "coal_ores")));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/carbon_large"), List.of(Pair.of("forge", "storage_blocks/coal")));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/prism_roses"), List.of("prism_rose", "bright_prism_rose"));
+		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/mushroom_blocks"), List.of("minecraft:brown_mushroom_block", "minecraft:red_mushroom_block", "minecraft:mushroom_stem"));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.BLOCK, "world/gas_flammable"), List.of("naphtha_fire", "naphtha_block", "minecraft:torch", "minecraft:redstone_torch", "minecraft:soul_torch"));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.BLOCK, "world/gas_flammable"), List.of(Pair.of("minecraft", "campfires"), Pair.of("minecraft", "fire"), Pair.of("minecraft", "strider_warm_blocks")));
+		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "crafting/shulker_boxes"), List.of("minecraft:shulker_box", "minecraft:black_shulker_box", "minecraft:blue_shulker_box", "minecraft:brown_shulker_box",
+				"minecraft:cyan_shulker_box", "minecraft:gray_shulker_box", "minecraft:green_shulker_box", "minecraft:light_blue_shulker_box", "minecraft:light_gray_shulker_box", "minecraft:lime_shulker_box", "minecraft:magenta_shulker_box",
+				"minecraft:orange_shulker_box", "minecraft:pink_shulker_box", "minecraft:purple_shulker_box", "minecraft:red_shulker_box", "minecraft:white_shulker_box", "minecraft:yellow_shulker_box"));
 		
 		TAG_GROUP_MASTER.putAll(wrap(TagType.BLOCK, "world/mystium_axe_mineable"), List.of(Pair.of("minecraft", "logs")));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.BLOCK, "world/naphtha_fireproof"), List.of("smoldering_stone"));
