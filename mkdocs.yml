@@ -27,7 +27,9 @@ nav:
       - Purifying: recipes/purifying.md
       - Refining: recipes/refining.md
       - World Corruption: recipes/worldcorruption.md
+      - Generator Fluid: recipes/generatorfluid.md
     - Tags: miscdev/tags.md
+    - Reservoir Capability: miscdev/fluidreservoir.md
 
 
 theme:

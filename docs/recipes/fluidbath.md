@@ -30,6 +30,9 @@ Recipe namespace: `assemblylinemachines:bath`.
 !!! warning
     If the fluid is not `water` or `lava`, the only machine allowed for the recipe will be the Electric Fluid Mixer, as the other two early-game machines do not work with anything else.
 
+??? warning "1.18+ Warning"
+	**1.18-1.3.5+ only:** If you include any Stirring Stick, a Water Bucket, a Lava Bucket, or a Potion as one of the inputs, the recipe will fail to load.
+
 - `mix_color`: String hex code, required  
 *The color the liquid will show in the basin when crafted in the Fluid Bath. This option does not have an effect on the Simple or Electric Fluid Mixer, and can be set to 0 safely when using `mixer_type: MIXER_ONLY`.*
 

@@ -35,18 +35,4 @@ Fluid tags are automatically generated for all fluids within the mod with the sa
 
 ### Other
 
-*All tags below are niche and used primarily for specific recipes only.*
-
-| Tag Name (In `assemblylinemachines:`) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Type | Description |
-| -----------: | ----------- | ----------- |
-| `chaosbark_logs` | Block & Item | For types of Chaosbark Logs. |
-| `crafting/carbon_large` | Item | Allowed items in 900mB Liquid Carbon recipe. |
-| `crafting/carbon_small` | Item | Allowed items in 100mB Liquid Carbon recipe. |
-| `crafting/entropy_reactor_outputs` | Item | Used in some recipes as 'Matter' outputs from E. Reactor. |
-| `crafting/hammers` | Item | Items allowed to create plates as the hammer. |
-| `crafting/organics` | Item | Items that can be composted to make Sludge. |
-| `crafting/prism_roses` | Item | Items that can make Prismatic Dust. |
-| `crafting/sawdust` | Item | Items valid to make Fertilizer. |
-| `crafting/gears/precious` | Item | 'Precious Metal' gears used in some recipes. |
-| `crafting/gears/industrial` | Item | 'Industrial' gears used in some recipes. |
-| `crafting/gears/all` | Item | A combination of all 'Precious' and 'Industrial' gears. |
+There is a large number of other Item Tags specifically used for only one or two niche recipes. Therefore, they are not listed here, but can be viewed either by running the datagen for Assembly Line Machines, or you can also get an idea of what is added at [this GitHub page.](https://github.com/HaydenBelanger/assemblylinemachines/blob/bf25fc021755cc73774dda4610978f772b97bde5/src/main/java/me/haydenb/assemblylinemachines/registry/datagen/TagMaster.java#L59-L89) Note that this link is accurate as of commit `bf25fc0`, uploaded on January 6, 2022.
