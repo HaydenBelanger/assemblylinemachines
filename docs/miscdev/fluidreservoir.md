@@ -23,7 +23,7 @@ Returns an `int` for the mB value of the fluid contained within the chunk, or 0 
 Returns a `Component` of the friendly display name of the fluid stored within the chunk. Returns "Empty" if the chunk is empty or does not have a fluid.
 
 `IChunkFluidCapability#drain`:  
-- `maxDrainAmount (int)`: *The maximum amount of fluid to be extracted from the chunk. The actual amount extracted will be less, but it may not be more.*  
+- `maxDrainAmount (int)`: *The maximum amount of fluid to be extracted from the chunk. The actual amount extracted may be less, but it will not be more.*  
 - `simulate (boolean)`: *If this is true, the method will return an accurate result, but it will not impact and reduce the actual stored amount of fluid within the chunk. Good for testing to make sure the fluid can fit into a tank or something else.*
 
 This method, based on the parameters, will return a `FluidStack` of the stored fluid, as well as the amount of fluid successfully extracted, based on the parameters. Returns `FluidStack.EMPTY` if the chunk is empty or does not have a fluid.
