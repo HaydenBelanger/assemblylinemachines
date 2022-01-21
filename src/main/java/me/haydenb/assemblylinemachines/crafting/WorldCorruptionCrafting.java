@@ -9,7 +9,6 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.block.fluidutility.BlockCorruptingBasin.TECorruptingBasin;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.helpers.IGuiHelper;
 import net.minecraft.network.FriendlyByteBuf;
@@ -105,12 +104,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		List<Ingredient> list = new ArrayList<>();
-		if(!input.isEmpty()) {
-			list.add(input);
-		}
-		list.add(Ingredient.of(Registry.getItem("entropy_reactor_block"), Registry.getItem("entropy_reactor_core"), Registry.getItem("corrupting_basin")));
-		return list;
+		return !input.isEmpty() ? List.of(input) : null;
 	}
 	
 	@Override
@@ -139,13 +133,11 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	@Override
 	public void setupSlots(IRecipeLayout layout, IGuiHelper helper, RecipeCategoryBuilder category) {
 		if(!input.isEmpty()) {
-			layout.getItemStacks().init(0, false, 21, 4);
-			layout.getItemStacks().init(1, false, 0, 4);
-			layout.getItemStacks().init(2, false, category.getBasicRenderer(this), 68, 4, 18, 18, 1, 1);
-		}else if(!inputFluid.equals(Fluids.EMPTY)){
 			layout.getItemStacks().init(0, false, 0, 4);
-			layout.getFluidStacks().init(0, false, 22, 5, 16, 16, 1, false, null);
-			layout.getFluidStacks().init(1, false, 69, 5, 16, 16, 1, false, null);
+			layout.getItemStacks().init(1, false, category.getBasicRenderer(ItemStack.class, this), 47, 4, 18, 18, 1, 1);
+		}else if(!inputFluid.equals(Fluids.EMPTY)){
+			layout.getFluidStacks().init(0, false, 1, 5, 16, 16, 1, false, null);
+			layout.getFluidStacks().init(1, false, 48, 5, 16, 16, 1, false, null);
 		}else {
 			throw new IllegalArgumentException("Item Input and Fluid Input are both non-present!");
 		}

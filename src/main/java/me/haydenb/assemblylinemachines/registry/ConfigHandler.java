@@ -1,68 +1,26 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
-
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.google.common.base.Suppliers;
-
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
-import net.minecraftforge.fml.config.ModConfig.Type;
 
 public class ConfigHandler {
 
 	public static class ConfigHolder{
-		private static final ConcurrentHashMap<Type, Pair<Object, ForgeConfigSpec>> CONFIGS = new ConcurrentHashMap<>();
 		
-		private static final Supplier<ALMClientConfig> CLIENT = Suppliers.memoize(() -> (ALMClientConfig) CONFIGS.get(Type.CLIENT).getLeft());
-		private static final Supplier<ALMServerConfig> SERVER = Suppliers.memoize(() -> (ALMServerConfig) CONFIGS.get(Type.SERVER).getLeft());
+		private static final Pair<ALMCommonConfig, ForgeConfigSpec> COMMON = new ForgeConfigSpec.Builder().configure(ALMCommonConfig::new);
 		
-		static {
-			{
-				CONFIGS.put(Type.CLIENT, new ForgeConfigSpec.Builder().configure(ALMClientConfig::new));
-				CONFIGS.put(Type.SERVER, new ForgeConfigSpec.Builder().configure(ALMServerConfig::new));
-				
-			}
+		public static ALMCommonConfig getCommonConfig() {
+			return COMMON.getLeft();
 		}
 		
-		@OnlyIn(Dist.CLIENT)
-		public static ALMClientConfig getClientConfig() {
-			return CLIENT.get();
-		}
-		
-		public static ALMServerConfig getServerConfig() {
-			return SERVER.get();
-		}
-		
-		public static ForgeConfigSpec getSpec(Type type) {
-			return CONFIGS.get(type).getRight();
+		public static ForgeConfigSpec getCommonSpec() {
+			return COMMON.getRight();
 		}
 	}
 	
-	public static class ALMClientConfig{
-		
-		public final BooleanValue coolDudeMode;
-		public final BooleanValue jeiSupport;
-		public final BooleanValue customTooltipColors;
-		public final BooleanValue customTooltipFrames;
-		
-		public ALMClientConfig(final ForgeConfigSpec.Builder builder) {
-			
-			builder.push("Client Options");
-			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
-			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
-			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
-			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
-			builder.pop();
-			
-		}
-	}
-	
-	public static class ALMServerConfig{
+	public static class ALMCommonConfig{
 		
 		//MACHINE OPTIONS
 		public final BooleanValue interactorInteractMode;
@@ -140,7 +98,13 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> blackGraniteVeinSize;
 		public final ConfigValue<Integer> blackGraniteFrequency;
 		
-		public ALMServerConfig(final ForgeConfigSpec.Builder builder) {
+		//CLIENT
+		public final BooleanValue coolDudeMode;
+		public final BooleanValue jeiSupport;
+		public final BooleanValue customTooltipColors;
+		public final BooleanValue customTooltipFrames;
+		
+		public ALMCommonConfig(final ForgeConfigSpec.Builder builder) {
 			
 			builder.push("Machine Options");
 			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").defineInRange("crankSnapChance", 100, -1, 1000);
@@ -232,6 +196,13 @@ public class ConfigHandler {
 			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumFrequency", 4, 0, 1000);
 			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?", "If false, Chromium Ore will only generate on the outer End islands accessed by the End Gateway.").define("chromiumOnDragonIsland", false);
 			builder.pop();
+			builder.pop();
+			
+			builder.push("Client Options");
+			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
+			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
+			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
+			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
 			builder.pop();
 			
 		}

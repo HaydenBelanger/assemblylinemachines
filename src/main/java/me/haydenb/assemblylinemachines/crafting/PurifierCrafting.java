@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockElectricPurifier.TEElectricPurifier;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -119,7 +118,7 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(parta, partb, tobepurified, Ingredient.of(Registry.getItem("electric_purifier")));
+		return List.of(parta, partb, tobepurified);
 	}
 	
 	@Override

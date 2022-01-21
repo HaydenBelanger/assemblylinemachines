@@ -41,7 +41,7 @@ public class VanillaDimensionOres {
 		
 		if(titaniumOre != null) event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, titaniumOre);
 		if(blackGranite != null) event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, blackGranite);
-		if(chromiumOre != null && (ConfigHolder.getServerConfig().chromiumOnDragonIsland.get() || !event.getName().equals(Biomes.THE_END.location()))) event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, chromiumOre);
+		if(chromiumOre != null && (ConfigHolder.getCommonConfig().chromiumOnDragonIsland.get() || !event.getName().equals(Biomes.THE_END.location()))) event.getGeneration().addFeature(Decoration.UNDERGROUND_ORES, chromiumOre);
 	}
 	
 	//Where the features are initialized during setup.
@@ -50,7 +50,7 @@ public class VanillaDimensionOres {
 		
 		@SubscribeEvent
 		public static void initializeFeatures(FMLCommonSetupEvent event) {
-			ALMServerConfig cfg = ConfigHolder.getServerConfig();
+			ALMCommonConfig cfg = ConfigHolder.getCommonConfig();
 			
 			//Titanium, Deepslate Titanium, Corrupt Titanium
 			if(cfg.titaniumVeinSize.get() != 0 && cfg.titaniumFrequency.get() != 0) {

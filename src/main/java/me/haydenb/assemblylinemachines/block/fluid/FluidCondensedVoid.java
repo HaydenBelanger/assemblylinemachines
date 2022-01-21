@@ -41,18 +41,20 @@ public class FluidCondensedVoid extends ALMFluid {
 				BlockPos cor = iter.next();
 				if(randomom.nextInt(2) == 0) {
 					Block block = world.getBlockState(cor).getBlock();
-					if(block.getTags().contains(new ResourceLocation("minecraft", "leaves")) || block.getTags().contains(new ResourceLocation("minecraft", "logs"))
-							|| block.getTags().contains(new ResourceLocation("minecraft", "flowers")) || block.getTags().contains(new ResourceLocation("minecraft", "planks"))
-							|| block.getTags().contains(new ResourceLocation("minecraft", "wool"))
-							|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
-							|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
-						world.destroyBlock(cor, false);
-					}else if(block.defaultBlockState().getMaterial() == Material.STONE) {
-						world.setBlockAndUpdate(cor, Blocks.GRAVEL.defaultBlockState());
-					}else if(block == Blocks.WATER) {
-						world.setBlockAndUpdate(cor, Blocks.PACKED_ICE.defaultBlockState());
-					}else if(block == Blocks.LAVA) {
-						world.setBlockAndUpdate(cor, Blocks.OBSIDIAN.defaultBlockState());
+					if(world.getBlockState(cor).getDestroySpeed(world, cor) != -1f) {
+						if(block.getTags().contains(new ResourceLocation("minecraft", "leaves")) || block.getTags().contains(new ResourceLocation("minecraft", "logs"))
+								|| block.getTags().contains(new ResourceLocation("minecraft", "flowers")) || block.getTags().contains(new ResourceLocation("minecraft", "planks"))
+								|| block.getTags().contains(new ResourceLocation("minecraft", "wool"))
+								|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
+								|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
+							world.destroyBlock(cor, false);
+						}else if(block.defaultBlockState().getMaterial() == Material.STONE) {
+							world.setBlockAndUpdate(cor, Blocks.GRAVEL.defaultBlockState());
+						}else if(block == Blocks.WATER) {
+							world.setBlockAndUpdate(cor, Blocks.PACKED_ICE.defaultBlockState());
+						}else if(block == Blocks.LAVA) {
+							world.setBlockAndUpdate(cor, Blocks.OBSIDIAN.defaultBlockState());
+						}
 					}
 				}
 					

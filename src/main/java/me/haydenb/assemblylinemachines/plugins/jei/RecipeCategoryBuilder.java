@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,6 +11,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder.ICatalystProvider;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -23,6 +24,8 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.plugins.vanilla.ingredients.fluid.FluidStackRenderer;
+import mezz.jei.plugins.vanilla.ingredients.item.ItemStackRenderer;
 import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -52,8 +55,11 @@ public class RecipeCategoryBuilder {
 	//More advanced concept functions and consumers - optional.
 	private TriConsumer<Recipe<?>, PoseStack, Pair<Double, Double>> draw = null;
 	private TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>> fluidTooltip = null;
+	private Pair<Integer, Boolean> fluidTooltipCapacityOptions = null;
+	
 	private TriFunction<Recipe<?>, ItemStack, TooltipFlag, List<Component>> itemTooltip = null;
 	private BiFunction<Recipe<?>, List<Ingredient>, List<List<ItemStack>>> stackModifier = null;
+	private ItemStack[] catalysts = null;
 	
 	RecipeCategoryBuilder(IGuiHelper helper) {
 		this.helper = helper;
@@ -107,8 +113,14 @@ public class RecipeCategoryBuilder {
 	}
 	
 	RecipeCategoryBuilder fluidTooltip(TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>> tooltipFunction) {
+		return this.fluidTooltip(0, false, tooltipFunction);
+	}
+	
+	RecipeCategoryBuilder fluidTooltip(int capacityMb, boolean showCapacity, TriFunction<Recipe<?>, FluidStack, TooltipFlag, List<Component>> tooltipFunction) {
 		this.fluidTooltip = tooltipFunction;
+		this.fluidTooltipCapacityOptions = capacityMb == 0 && showCapacity == false ? null : Pair.of(capacityMb, showCapacity);
 		return this;
+		
 	}
 	
 	RecipeCategoryBuilder itemTooltip(TriFunction<Recipe<?>, ItemStack, TooltipFlag, List<Component>> tooltipFunction) {
@@ -135,12 +147,22 @@ public class RecipeCategoryBuilder {
 		return this;
 	}
 	
+	RecipeCategoryBuilder catalysts(ItemLike... catalysts) {
+		
+		this.catalysts = Utils.copy(catalysts, ItemStack.class, (item) -> item.asItem().getDefaultInstance());
+		return this;
+	}
+	
+	RecipeCategoryBuilder catalysts(ItemStack... catalysts) {
+		this.catalysts = catalysts;
+		return this;
+	}
 	
 	
 	//Build
 	<R extends Recipe<?> & IRecipeCategoryBuilder> IRecipeCategory<R> build(Class<R> clazz){
 		
-		class ALMRecipeCategory implements IRecipeCategory<R>{
+		class ALMRecipeCategory implements IRecipeCategory<R>, ICatalystProvider{
 
 			@Override
 			public ResourceLocation getUid() {
@@ -204,6 +226,8 @@ public class RecipeCategoryBuilder {
 				}
 				
 			}
+			
+			
 
 			@Override
 			public void setRecipe(IRecipeLayout recipeLayout, R recipe, IIngredients ingredients) {
@@ -213,7 +237,7 @@ public class RecipeCategoryBuilder {
 				if(itemSlots != null) {
 					
 					IIngredientRenderer<ItemStack> renderer = null;
-					if(itemTooltip != null) renderer = getBasicRenderer(recipe);
+					if(itemTooltip != null) renderer = getBasicRenderer(ItemStack.class, recipe);
 					
 					for(Pair<Integer, Integer> pair : itemSlots) {
 						if(renderer == null) {
@@ -229,7 +253,7 @@ public class RecipeCategoryBuilder {
 					i = 0;
 					
 					IIngredientRenderer<FluidStack> renderer = null;
-					if(fluidTooltip != null) renderer = getBasicRenderer(recipe);
+					if(fluidTooltip != null) renderer = getBasicRenderer(FluidStack.class, recipe);
 					
 					for(Pair<Integer, Integer> pair : fluidSlots) {
 						if(renderer == null) {
@@ -259,39 +283,72 @@ public class RecipeCategoryBuilder {
 				
 			}
 			
+			@Override
+			public ItemStack[] getCatalysts() {
+				return catalysts;
+			}
+			
 		}
 		
 		return new ALMRecipeCategory();
 	}
 	
-	public <T> IIngredientRenderer<T> getBasicRenderer(Recipe<?> recipe){
-		return new IIngredientRenderer<T>() {
-			@Override
-			public void render(PoseStack stack, int xPosition, int yPosition, T object) {
-				if(object instanceof FluidStack) {
-					FluidStack ingredient = (FluidStack) object;
-					FluidStack modIngredient = ingredient.copy();
-					modIngredient.setAmount(1000);
-					helper.createDrawableIngredient(modIngredient).draw(stack, xPosition, yPosition);
-				}else if(object instanceof ItemStack){
-					helper.createDrawableIngredient((ItemStack) object).draw(stack, xPosition, yPosition);
-				}else {
-					throw new IllegalAccessError("Basic ingredient renderer was used to render an unsupported type.");
+	@SuppressWarnings("unchecked")
+	public <T> IIngredientRenderer<T> getBasicRenderer(Class<T> clazz, Recipe<?> recipe){
+		
+		if(clazz.equals(ItemStack.class)) {
+			class DynamicItemStackRenderer extends ItemStackRenderer{
+				@Override
+				public List<Component> getTooltip(ItemStack ingredient, TooltipFlag tooltipFlag) {
+					List<Component> defTT = super.getTooltip(ingredient, tooltipFlag);
+					List<Component> addTT = itemTooltip.apply(recipe, ingredient, tooltipFlag);
+					
+					if(addTT != null && !addTT.isEmpty()) {
+						addTT = new ArrayList<>(addTT);
+						Collections.reverse(addTT);
+						for(Component tt : addTT) {
+							defTT.add(1, tt);
+						}
+					}
+					return defTT;
+				}
+			}
+			
+			return (IIngredientRenderer<T>) new DynamicItemStackRenderer();
+		}else if(clazz.equals(FluidStack.class)){
+			class DynamicFluidStackRenderer extends FluidStackRenderer{
+				
+				public DynamicFluidStackRenderer() {
+					super();
 				}
 				
-			}
-			@Override
-			public List<Component> getTooltip(T object, TooltipFlag tooltipFlag) {
-				if(object instanceof FluidStack) {
-					return fluidTooltip.apply(recipe, (FluidStack) object, tooltipFlag);
-				}else if(object instanceof ItemStack) {
-					return itemTooltip.apply(recipe, (ItemStack) object, tooltipFlag);
-				}else {
-					throw new IllegalAccessError("Basic ingredient renderer was used to render an unsupported type.");
+				public DynamicFluidStackRenderer(int capacityMb, boolean showCapacity) {
+					super(capacityMb, showCapacity, 16, 16, null);
 				}
 				
+				@Override
+				public List<Component> getTooltip(FluidStack fluidStack, TooltipFlag tooltipFlag) {
+					List<Component> defTT = super.getTooltip(fluidStack, tooltipFlag);
+					List<Component> addTT = fluidTooltip.apply(recipe, fluidStack, tooltipFlag);
+					
+					if(addTT != null && !addTT.isEmpty()) {
+						addTT = new ArrayList<>(addTT);
+						Collections.reverse(addTT);
+						for(Component tt : addTT) {
+							defTT.add(1, tt);
+						}
+					}
+					return defTT;
+				}
 			}
-		};
+			
+			
+			return this.fluidTooltipCapacityOptions != null ? (IIngredientRenderer<T>) new DynamicFluidStackRenderer(this.fluidTooltipCapacityOptions.getFirst(), 
+					this.fluidTooltipCapacityOptions.getSecond()) : (IIngredientRenderer<T>) new DynamicFluidStackRenderer();
+			
+		}else {
+			throw new IllegalAccessError("Basic ingredient renderer was used to render an unsupported type.");
+		}
 	}
 	
 	static ResourceLocation getGUIPath(String name) {

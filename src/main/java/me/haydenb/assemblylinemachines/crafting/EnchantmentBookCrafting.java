@@ -9,7 +9,6 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockExperienceMill.TEExperienceMill;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -128,7 +127,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(input, BOOK, Ingredient.of(Registry.getItem("experience_mill")));
+		return List.of(input, BOOK);
 	}
 	
 	@Override

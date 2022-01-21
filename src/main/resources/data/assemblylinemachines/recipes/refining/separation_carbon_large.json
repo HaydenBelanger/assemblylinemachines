@@ -3,7 +3,7 @@
 	"attachment": "assemblylinemachines:refinery_attachment_separation",
 	"input_fluid":{
 		"fluid": "minecraft:water",
-		"amount": 9000
+		"amount": 4000
 	},
 	"input_item":{
 		"tag": "assemblylinemachines:crafting/carbon_large"

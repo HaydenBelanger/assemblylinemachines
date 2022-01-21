@@ -42,7 +42,7 @@ public class ItemGuidebook extends Item {
 	@SubscribeEvent
 	public static void joinGiveBook(PlayerLoggedInEvent event) {
 		CompoundTag nbt = event.getPlayer().getPersistentData();
-		if(ConfigHolder.getServerConfig().guideBook.get() && (!nbt.contains("assemblylinemachines:book") || nbt.getBoolean("assemblylinemachines:book") == false)) {
+		if(ConfigHolder.getCommonConfig().guideBook.get() && (!nbt.contains("assemblylinemachines:book") || nbt.getBoolean("assemblylinemachines:book") == false)) {
 			
 			if(PluginPatchouli.get().isPatchouliInstalled()) {
 				nbt.putBoolean("assemblylinemachines:book", true);

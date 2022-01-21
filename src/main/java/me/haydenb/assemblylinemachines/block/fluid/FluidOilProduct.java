@@ -33,7 +33,7 @@ public class FluidOilProduct extends ALMFluid {
 	@Override
 	protected void randomTick(Level world, BlockPos pos, FluidState state, Random random) {
 		
-		if(source && ConfigHolder.getServerConfig().gasolineExplosions.get()) {
+		if(source && ConfigHolder.getCommonConfig().gasolineExplosions.get()) {
 			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.offset(-3, -1, -3).north().west(), pos.offset(3, 1, 3)).iterator();
 			
 			while(iter.hasNext()) {

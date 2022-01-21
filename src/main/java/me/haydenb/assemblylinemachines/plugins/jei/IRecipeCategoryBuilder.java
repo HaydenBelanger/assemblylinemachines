@@ -38,4 +38,11 @@ public interface IRecipeCategoryBuilder {
 	default public Optional<Integer> getOutputCount(){
 		return Optional.empty();
 	}
+	
+	public static interface ICatalystProvider{
+		
+		default public ItemStack[] getCatalysts() {
+			return null;
+		}
+	}
 }

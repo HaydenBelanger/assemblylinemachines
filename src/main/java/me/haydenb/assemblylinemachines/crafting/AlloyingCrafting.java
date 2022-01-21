@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockAlloySmelter.TEAlloySmelter;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -99,7 +98,7 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(parta, partb, Ingredient.of(Registry.getItem("alloy_smelter")));
+		return List.of(parta, partb);
 	}
 	
 	@Override

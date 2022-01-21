@@ -22,8 +22,7 @@ public final class AssemblyLineMachines{
 		
 		//Registers config to current installation.
 		ModLoadingContext mlc = ModLoadingContext.get();
-		mlc.registerConfig(Type.CLIENT, ConfigHolder.getSpec(Type.CLIENT));
-		mlc.registerConfig(Type.SERVER, ConfigHolder.getSpec(Type.SERVER));
+		mlc.registerConfig(Type.COMMON, ConfigHolder.getCommonSpec());
 		
 		//Registers PacketHandler.
 		PacketHandler.INSTANCE.registerMessage(PacketHandler.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());

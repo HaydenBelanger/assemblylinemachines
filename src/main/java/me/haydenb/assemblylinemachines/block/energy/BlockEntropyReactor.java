@@ -996,7 +996,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				}
 			}
 			
-			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.getServerConfig().reactorExplosions.get()) {
+			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.getCommonConfig().reactorExplosions.get()) {
 				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
 				entropy = 0f;
 			}

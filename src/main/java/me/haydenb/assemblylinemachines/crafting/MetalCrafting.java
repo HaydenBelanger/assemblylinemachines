@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockMetalShaper.TEMetalShaper;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -83,7 +82,7 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(input, Ingredient.of(Registry.getItem("metal_shaper")));
+		return List.of(input);
 	}
 	
 	@Override

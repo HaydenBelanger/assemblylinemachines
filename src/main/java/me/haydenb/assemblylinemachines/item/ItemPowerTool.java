@@ -335,7 +335,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		
 		public EnchantmentOverclock() {
 			super(Rarity.RARE, POWER_TOOLS, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
-			this.multiplier = ConfigHolder.getServerConfig().overclockEnchantmentMultiplier.get().floatValue();
+			this.multiplier = ConfigHolder.getCommonConfig().overclockEnchantmentMultiplier.get().floatValue();
 		}
 		
 		@Override
@@ -360,9 +360,9 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	}
 	
 	public static enum PowerToolType{
-		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.getServerConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
-		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getServerConfig().mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
-		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.getServerConfig().novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
+		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.getCommonConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getCommonConfig().mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.getCommonConfig().novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
 		AEFG("assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000, 0x0, null);
 		
 		private final String keyName;

@@ -1,8 +1,10 @@
 package me.haydenb.assemblylinemachines.registry;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -217,6 +219,15 @@ public class Utils {
 	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Component pText, int pX, int pY) {
 		Minecraft mc = Minecraft.getInstance();
 		drawCenteredStringWithoutShadow(pPoseStack, mc.font, pText, pX, pY, 4210752);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <O, I> O[] copy(I[] input, Class<O> outputClass, Function<I, O> converter) {
+		O[] output = (O[]) Array.newInstance(outputClass, input.length);
+		for(int i = 0; i < input.length; i++) {
+			output[i] = converter.apply(input[i]);
+		}
+		return output;
 	}
 	
 	public static class Formatting {

@@ -18,14 +18,14 @@ import net.minecraftforge.common.TierSortingRegistry;
 
 public enum ItemTiers {
 	
-	TITANIUM(ConfigHolder.getServerConfig().titaniumToolAttack.get(), ConfigHolder.getServerConfig().titaniumToolHarvestSpeed.get(), ConfigHolder.getServerConfig().titaniumEnchantability.get(), ConfigHolder.getServerConfig().titaniumDurability.get(), 
-			ConfigHolder.getServerConfig().titaniumArmorKnockbackResistance.get(), ConfigHolder.getServerConfig().titaniumArmorDamageReduction.get(), "titanium", ConfigHolder.getServerConfig().titaniumArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("titanium_ingot"));}),
-	STEEL(ConfigHolder.getServerConfig().steelToolAttack.get(), ConfigHolder.getServerConfig().steelToolHarvestSpeed.get(), ConfigHolder.getServerConfig().steelEnchantability.get(), ConfigHolder.getServerConfig().steelDurability.get(), 
-			ConfigHolder.getServerConfig().steelArmorKnockbackResistance.get(), ConfigHolder.getServerConfig().steelArmorDamageReduction.get(), "steel", ConfigHolder.getServerConfig().steelArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
-	CRANK(ConfigHolder.getServerConfig().crankToolAttack.get(), ConfigHolder.getServerConfig().crankToolDurability.get(), ConfigHolder.getServerConfig().crankToolEnchantability.get(), ConfigHolder.getServerConfig().crankToolDurability.get(), 
+	TITANIUM(ConfigHolder.getCommonConfig().titaniumToolAttack.get(), ConfigHolder.getCommonConfig().titaniumToolHarvestSpeed.get(), ConfigHolder.getCommonConfig().titaniumEnchantability.get(), ConfigHolder.getCommonConfig().titaniumDurability.get(), 
+			ConfigHolder.getCommonConfig().titaniumArmorKnockbackResistance.get(), ConfigHolder.getCommonConfig().titaniumArmorDamageReduction.get(), "titanium", ConfigHolder.getCommonConfig().titaniumArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("titanium_ingot"));}),
+	STEEL(ConfigHolder.getCommonConfig().steelToolAttack.get(), ConfigHolder.getCommonConfig().steelToolHarvestSpeed.get(), ConfigHolder.getCommonConfig().steelEnchantability.get(), ConfigHolder.getCommonConfig().steelDurability.get(), 
+			ConfigHolder.getCommonConfig().steelArmorKnockbackResistance.get(), ConfigHolder.getCommonConfig().steelArmorDamageReduction.get(), "steel", ConfigHolder.getCommonConfig().steelArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
+	CRANK(ConfigHolder.getCommonConfig().crankToolAttack.get(), ConfigHolder.getCommonConfig().crankToolDurability.get(), ConfigHolder.getCommonConfig().crankToolEnchantability.get(), ConfigHolder.getCommonConfig().crankToolDurability.get(), 
 			()->{return Ingredient.of(ItemTags.getAllTags().getTag(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
-	MYSTIUM(ConfigHolder.getServerConfig().mystiumToolAttack.get(), ConfigHolder.getServerConfig().mystiumToolDurability.get(), ConfigHolder.getServerConfig().mystiumToolEnchantability.get(), ConfigHolder.getServerConfig().mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
-	NOVASTEEL(ConfigHolder.getServerConfig().novasteelToolAttack.get(), ConfigHolder.getServerConfig().novasteelToolDurability.get(), ConfigHolder.getServerConfig().novasteelToolEnchantability.get(), ConfigHolder.getServerConfig().novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
+	MYSTIUM(ConfigHolder.getCommonConfig().mystiumToolAttack.get(), ConfigHolder.getCommonConfig().mystiumToolDurability.get(), ConfigHolder.getCommonConfig().mystiumToolEnchantability.get(), ConfigHolder.getCommonConfig().mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
+	NOVASTEEL(ConfigHolder.getCommonConfig().novasteelToolAttack.get(), ConfigHolder.getCommonConfig().novasteelToolDurability.get(), ConfigHolder.getCommonConfig().novasteelToolEnchantability.get(), ConfigHolder.getCommonConfig().novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
 	CRG(750, 5, 0d, 3, "crg", 0d, () -> Ingredient.EMPTY);
 	
 	private float attack;

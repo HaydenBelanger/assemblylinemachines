@@ -62,7 +62,7 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(Ingredient.of(Registry.getItem("corrupted_shard")), Ingredient.of(Registry.getItem("entropy_reactor_block"), Registry.getItem("entropy_reactor_core")));
+		return List.of(Ingredient.of(Registry.getItem("corrupted_shard")));
 	}
 	
 	@Override

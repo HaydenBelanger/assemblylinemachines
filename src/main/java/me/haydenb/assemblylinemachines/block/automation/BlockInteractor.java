@@ -217,14 +217,14 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 							if(mode == 1) {
 								
 								if(checkInteractMode == null) {
-									checkInteractMode = ConfigHolder.getServerConfig().interactorInteractMode.get();
+									checkInteractMode = ConfigHolder.getCommonConfig().interactorInteractMode.get();
 								}
 								if(checkInteractMode) {
 									try {
 										fp.gameMode.useItemOn(fp, this.getLevel(), stack, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(0.5d, 0.5d, 0.5d), getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite(), offsetPos, false));
 									}catch(Exception e) {
 										
-										DebugOptions db = ConfigHolder.getServerConfig().interactorInteractDebug.get();
+										DebugOptions db = ConfigHolder.getCommonConfig().interactorInteractDebug.get();
 										if(db == DebugOptions.BASIC) {
 											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + this.getBlockPos().getX() + ", " + this.getBlockPos().getY() + ", " + this.getBlockPos().getZ() + " triggered exception: " + e.getMessage() + ".");
 										}else if(db == DebugOptions.COMPLETE) {
@@ -456,7 +456,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 					if (te.mode == 3) {
 						te.mode = 0;
 					} else if(te.mode == 0) {
-						if(ConfigHolder.getServerConfig().interactorInteractMode.get() == true) {
+						if(ConfigHolder.getCommonConfig().interactorInteractMode.get() == true) {
 							te.mode++;
 						}else {
 							te.mode = 2;

@@ -57,7 +57,7 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 	
 	@Override
 	public String getDescriptionId() {
-		if(ConfigHolder.getClientConfig().coolDudeMode.get()) {
+		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
 			return super.getDescriptionId() + ".cool";
 		}
 		return super.getDescriptionId();
@@ -65,7 +65,7 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 	
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
-		if(ConfigHolder.getClientConfig().coolDudeMode.get()) {
+		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
 			tooltip.add(new TextComponent("§8XL+ Definitive Edition"));
 			tooltip.add(new TextComponent("§8With Sonic & Knuckles"));
 			tooltip.add(new TextComponent("§8Season Pass"));

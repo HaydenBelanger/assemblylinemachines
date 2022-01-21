@@ -79,7 +79,7 @@ public class EntityCorruptShell extends Zombie{
 	@SubscribeEvent
 	public static void playSound(PlaySoundAtEntityEvent event) {
 		
-		if(ConfigHolder.getClientConfig().coolDudeMode.get()) {
+		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
 			String regLoc = event.getSound().getRegistryName().getPath();
 			if(regLoc.equals("corrupt_shell_ambient")) {
 				event.setSound(Registry.getSound("corrupt_shell_cool_ambient"));
@@ -102,7 +102,7 @@ public class EntityCorruptShell extends Zombie{
 
 		@Override
 		public ResourceLocation getTextureLocation(EntityCorruptShell entity) {
-			if(ConfigHolder.getClientConfig().coolDudeMode.get()) {
+			if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
 				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/shadow.png");
 			}else {
 				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/corrupt_shell.png");

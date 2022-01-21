@@ -102,14 +102,14 @@ public class TooltipBorderHandler {
 	
 	public static boolean getColorsEnabled() {
 		if(colors == null) {
-			colors = ConfigHolder.getClientConfig().customTooltipColors.get();
+			colors = ConfigHolder.getCommonConfig().customTooltipColors.get();
 		}
 		return colors;
 	}
 	
 	public static boolean getFramesEnabled() {
 		if(frames == null) {
-			frames = getColorsEnabled() ? ConfigHolder.getClientConfig().customTooltipFrames.get() : false;
+			frames = getColorsEnabled() ? ConfigHolder.getCommonConfig().customTooltipFrames.get() : false;
 		}
 		return frames;
 	}
