@@ -133,8 +133,7 @@ dependencies {
   minecraft 'net.minecraftforge:forge:1.18-38.0.17'
 	
 	//JEI - Updated.
-    compileOnly fg.deobf("mezz.jei:jei-1.18:9.0.0.40:api")
- 	runtimeOnly fg.deobf("mezz.jei:jei-1.18:9.0.0.40")
+ 	implementation fg.deobf("mezz.jei:jei-1.18:9.0.0.40")
  	
  	//PATCHOULI - Updated.
     implementation fg.deobf("vazkii.patchouli:Patchouli:1.18-58-SNAPSHOT")
