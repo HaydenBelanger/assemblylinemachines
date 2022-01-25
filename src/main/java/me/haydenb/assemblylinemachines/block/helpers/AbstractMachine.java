@@ -196,9 +196,8 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 		}
 	}
 
-	@Override
 	public final CompoundTag save(CompoundTag compound) {
-		return super.save(compound);
+		return compound;
 	}
 	
 	@Override
@@ -211,6 +210,8 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			compound.putUUID("assemblylinemachines:lock:slmakeruuid", secureLockMaker);
 			compound.putString("assemblylinemachines:lock:slcode", secureLock);
 		}
+		
+		this.save(compound);
 		super.saveAdditional(compound);
 	}
 

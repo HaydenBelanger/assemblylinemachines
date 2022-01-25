@@ -93,6 +93,7 @@ public class RecipeCategoryBuilder {
 		return this.background(getGUIPath(guiPath), u, v, width, height);
 	}
 	
+	@SuppressWarnings("deprecation")
 	RecipeCategoryBuilder icon(ItemLike b) {
 		this.icon = helper.createDrawableIngredient(new ItemStack(b));
 		return this;

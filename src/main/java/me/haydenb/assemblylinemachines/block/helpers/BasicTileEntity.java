@@ -44,9 +44,14 @@ public class BasicTileEntity extends BlockEntity{
 		this.load(tag);
 	}
 	
-	@Override
 	public final CompoundTag save(CompoundTag compound) {
-		return super.save(compound);
+		return compound;
+	}
+	
+	@Override
+	protected void saveAdditional(CompoundTag compound) {
+		this.save(compound);
+		super.saveAdditional(compound);
 	}
 	
 	public void sendUpdates() {
