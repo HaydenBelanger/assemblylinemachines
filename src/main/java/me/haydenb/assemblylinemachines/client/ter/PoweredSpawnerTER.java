@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.client.ter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 
-import me.haydenb.assemblylinemachines.block.automation.BlockPoweredSpawner.TEPoweredSpawner;
+import me.haydenb.assemblylinemachines.block.machines.BlockPoweredSpawner.TEPoweredSpawner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;

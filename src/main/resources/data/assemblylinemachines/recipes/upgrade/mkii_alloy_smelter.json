@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:upgrade_kit",
+	"input_block":{
+		"item": "assemblylinemachines:alloy_smelter"
+	},
+	"upgrade_kit": "MKII",
+	"output_block": "assemblylinemachines:mkii_alloy_smelter",
+	"slot_copy":{
+		"0": 0,
+		"1": 2,
+		"2": 3,
+		"3": 6,
+		"4": 7,
+		"5": 8
+	}
+}

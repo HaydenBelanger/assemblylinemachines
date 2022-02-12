@@ -14,6 +14,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -129,6 +130,13 @@ public abstract class BlockTileEntity extends Block implements EntityBlock{
 		}else {
 			return NO_SHAPE_CUBE;
 		}
+	}
+	
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		BlockState state = super.getStateForPlacement(context);
+		if(state.hasProperty(HorizontalDirectionalBlock.FACING)) state = state.setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
+		return state;
 	}
 	
 	public static class BlockScreenBlockEntity<T extends AbstractMachine<?>> extends BlockTileEntity{

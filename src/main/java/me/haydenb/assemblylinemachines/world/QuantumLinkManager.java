@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.TEQuantumLink;
+import me.haydenb.assemblylinemachines.block.machines.BlockQuantumLink.TEQuantumLink;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector4f;
 
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;

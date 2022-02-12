@@ -11,7 +11,6 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.crafting.EnchantmentBookCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
@@ -36,19 +35,16 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.shapes.*;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
@@ -58,40 +54,16 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class BlockExperienceMill extends BlockScreenBlockEntity<BlockExperienceMill.TEExperienceMill> {
+public class BlockExperienceMill {
 
-
+	public static Block experienceMill() {
+		return MachineBuilder.block().voxelShape(Stream.of(
+				Block.box(0, 0, 0, 16, 7, 16),Block.box(6, 7, 6, 10, 10, 10),Block.box(3, 10, 3, 13, 13, 13)
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true).additionalProperties((state) -> state.setValue(EXP_MILL_PROP, 0), (builder) -> builder.add(EXP_MILL_PROP)).build("experience_mill", TEExperienceMill.class);
+	}
+	
 	//OFF, ENCHANTMENT, BOOK, ANVIL
 	private static final IntegerProperty EXP_MILL_PROP = IntegerProperty.create("display", 0, 3);
-
-	private static final VoxelShape SHAPE_N = Stream.of(
-			Block.box(0, 0, 0, 16, 7, 16),
-			Block.box(6, 7, 6, 10, 10, 10),
-			Block.box(3, 10, 3, 13, 13, 13)
-			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
-
-	public BlockExperienceMill() {
-		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "experience_mill",
-				BlockExperienceMill.TEExperienceMill.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(EXP_MILL_PROP, 0).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
-	}
-
-
-
-	@Override
-	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-		return SHAPE_N;
-	}
-
-	@Override
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(EXP_MILL_PROP).add(HorizontalDirectionalBlock.FACING);
-	}
-
-	@Override
-	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection());
-	}
 
 	public static class TEExperienceMill extends SimpleMachine<ContainerExperienceMill> implements ALMTicker<TEExperienceMill>{
 

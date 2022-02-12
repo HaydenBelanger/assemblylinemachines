@@ -1,11 +1,13 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
+import java.util.Random;
 
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.BlockLumberMill.TELumberMill;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -22,6 +24,8 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	
 	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new TypeLumberCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
+	
+	private static final Random RAND = new Random();
 	
 	private final Ingredient input;
 	private final ItemStack outputa;
@@ -40,21 +44,19 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			if(inv instanceof TELumberMill) {
-				if(input.test(inv.getItem(2))) {
-					return true;
-				}
-			}
-			
-			return false;
-		}else {
-			return true;
-		}
+		return input.test(inv.getItem(2));
 	}
 	
 	@Override
 	public ItemStack assemble(Container inv) {
+		if(inv instanceof IMachineDataBridge) {
+			inv.getItem(2).shrink(1);
+			if(!this.outputb.isEmpty()) {
+				if(RAND.nextFloat() < (opbchance * (1f + (0.5f * (float)((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
+					((IMachineDataBridge) inv).setSecondaryOutput(this.outputb.copy());
+			}
+			((IMachineDataBridge) inv).setCycles(time);
+		}
 		return this.outputa.copy();
 	}
 

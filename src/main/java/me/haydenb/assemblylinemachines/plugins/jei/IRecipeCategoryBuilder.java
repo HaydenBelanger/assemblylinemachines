@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.helpers.IGuiHelper;

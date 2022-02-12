@@ -5,7 +5,8 @@ import java.util.*;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockHandGrinder.Blade;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
+import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.NonNullList;
@@ -47,24 +48,20 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			if(inv instanceof Inventory) {
-				if(machineReqd == true) {
-					return false;
-				}
-				Inventory pinv = (Inventory) inv;
-				if(input.test(pinv.getItem(pinv.selected))) {
-					return true;
-				}
-			}else {
-				if(input.test(inv.getItem(1))) {
-					return true;
-				}
+		if(inv instanceof Inventory) {
+			if(machineReqd == true) {
+				return false;
 			}
-			return false;
+			Inventory pinv = (Inventory) inv;
+			if(input.test(pinv.getItem(pinv.selected))) {
+				return true;
+			}
 		}else {
-			return true;
+			if(input.test(inv.getItem(1))) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	public boolean getMachineReqd() {
@@ -73,10 +70,13 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	@Override
 	public ItemStack assemble(Container inv) {
-		ItemStack stack = this.output.copy();
-		if(chanceToDouble != 0f && RAND.nextFloat() <= chanceToDouble) {
-			stack.setCount(stack.getCount() * 2);
+		
+		if(inv instanceof IMachineDataBridge) {
+			inv.getItem(1).shrink(1);
+			((IMachineDataBridge) inv).setCycles(grinds * 2.3f);
 		}
+		ItemStack stack = this.output.copy();
+		if(chanceToDouble != 0f && RAND.nextFloat() <= chanceToDouble) stack.setCount(stack.getCount() * 2);
 		return stack;
 	}
 

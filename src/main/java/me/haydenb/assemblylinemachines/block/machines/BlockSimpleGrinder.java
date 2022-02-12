@@ -5,10 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.TESimpleGrinder;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockHandGrinder.Blade;
+import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.registry.*;
 import net.minecraft.core.BlockPos;
@@ -20,46 +17,23 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleGrinder extends BlockScreenBlockEntity<TESimpleGrinder> implements ICrankableBlock{
+public class BlockSimpleGrinder{
 	
 
-	public BlockSimpleGrinder() {
-		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_grinder", TESimpleGrinder.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
-	}
-	
-	@Override
-	public boolean validSide(BlockState state, Direction dir) {
-		return true;
-	}
-
-	@Override
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-
-		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
-	}
-	
-	@Override
-	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
-	}
-	
-	@Override
-	public boolean needsGearbox() {
-		return false;
+	public static Block simpleGrinder() {
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Shapes.block(), true).crankable(false, null).build("simple_grinder", TESimpleGrinder.class);
 	}
 	
 	public static class TESimpleGrinder extends SimpleMachine<ContainerSimpleGrinder> implements ALMTicker<TESimpleGrinder>, ICrankableMachine{

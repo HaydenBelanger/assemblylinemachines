@@ -108,6 +108,30 @@ public class BlockPump extends BlockTileEntity {
 	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
 		return InteractionResult.CONSUME;
 	}
+	
+	public static class BlockPumpshaft extends Block{
+		
+		private static final VoxelShape SHAFT = Stream.of(
+				Block.box(1, 5, 7, 3, 11, 9),Block.box(7, 5, 13, 9, 11, 15),
+				Block.box(4, 5, 4, 12, 11, 12),Block.box(13, 5, 7, 15, 11, 9),
+				Block.box(7, 5, 1, 9, 11, 3),Block.box(0, 0, 0, 16, 5, 16),Block.box(0, 11, 0, 16, 16, 16)
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
+		
+		public BlockPumpshaft() {
+			super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
+			this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false));
+		}
+		
+		@Override
+		protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+			builder.add(StateProperties.MACHINE_ACTIVE);
+		}
+		
+		@Override
+		public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+			return SHAFT;
+		}
+	}
 
 	public static class TEPump extends BasicTileEntity implements ALMTicker<TEPump> {
 

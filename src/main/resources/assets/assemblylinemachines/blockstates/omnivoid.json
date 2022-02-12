@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "assemblylinemachines:block/omnivoid" },
+        "facing=south": { "model": "assemblylinemachines:block/omnivoid", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/omnivoid", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/omnivoid", "y": 90 }
+    }
+}

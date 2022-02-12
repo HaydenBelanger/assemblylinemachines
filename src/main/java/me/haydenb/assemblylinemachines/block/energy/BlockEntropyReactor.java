@@ -16,7 +16,7 @@ import me.haydenb.assemblylinemachines.crafting.EntropyReactorCrafting;
 import me.haydenb.assemblylinemachines.crafting.WorldCorruptionCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -46,6 +46,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.*;
@@ -60,6 +61,21 @@ import net.minecraftforge.items.*;
 
 public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReactor.TEEntropyReactor>{
 
+	public static class BlockEntropyReactorCore extends Block {
+
+		public static final BooleanProperty CORE_CRITICAL = BooleanProperty.create("critical");
+		
+		public BlockEntropyReactorCore() {
+			super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL));
+
+			this.registerDefaultState(this.stateDefinition.any().setValue(CORE_CRITICAL, false));
+		}
+		
+		@Override
+		protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
+			pBuilder.add(CORE_CRITICAL);
+		}
+	}
 
 	private static final EnumProperty<EntropyReactorOptions> ENTROPY_REACTOR_PIECE = EnumProperty.create("part", EntropyReactorOptions.class);
 

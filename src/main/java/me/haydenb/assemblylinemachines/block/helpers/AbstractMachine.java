@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.client.GUIHelper;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -267,18 +268,32 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 
 	public static class SlotWithRestrictions extends Slot {
 
-		private final AbstractMachine<?> check;
+		private final AbstractMachine<?> checkMachine;
+		private final IMachineDataBridge checkDataBridge;
 		protected final int slot;
 		private final boolean outputSlot;
 
 		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, AbstractMachine<?> check, boolean outputSlot) {
 			super(inventoryIn, index, xPosition, yPosition);
 			this.slot = index;
-			this.check = check;
+			this.checkMachine = check;
+			this.checkDataBridge = null;
+			this.outputSlot = outputSlot;
+		}
+		
+		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, IMachineDataBridge check, boolean outputSlot) {
+			super(inventoryIn, index, xPosition, yPosition);
+			this.slot = index;
+			this.checkDataBridge = check;
+			this.checkMachine = null;
 			this.outputSlot = outputSlot;
 		}
 
 		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, AbstractMachine<?> check) {
+			this(inventoryIn, index, xPosition, yPosition, check, false);
+		}
+		
+		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, IMachineDataBridge check) {
 			this(inventoryIn, index, xPosition, yPosition, check, false);
 		}
 		
@@ -287,7 +302,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			if (outputSlot) {
 				return false;
 			}
-			return check.isAllowedInSlot(slot, pStack);
+			return checkMachine != null ? checkMachine.isAllowedInSlot(slot, pStack) : checkDataBridge.isAllowedInSlot(slot, pStack);
 		}
 
 	}

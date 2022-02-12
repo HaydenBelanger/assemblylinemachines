@@ -1,20 +1,20 @@
 {
     "variants": {
-        "facing=north,active=false": { "model": "assemblylinemachines:block/purifier/electric_purifier" },
-        "facing=south,active=false": { "model": "assemblylinemachines:block/purifier/electric_purifier", "y": 180 },
-        "facing=west,active=false":  { "model": "assemblylinemachines:block/purifier/electric_purifier", "y": 270 },
-        "facing=east,active=false":  { "model": "assemblylinemachines:block/purifier/electric_purifier", "y": 90 },
-		"facing=north,active=true": { "model": "assemblylinemachines:block/purifier/electric_purifier_active" },
-        "facing=south,active=true": { "model": "assemblylinemachines:block/purifier/electric_purifier_active", "y": 180 },
-        "facing=west,active=true":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active", "y": 270 },
-        "facing=east,active=true":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active", "y": 90 },
-		"facing=north,active=enhancedfalse": { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced" },
-        "facing=south,active=enhancedfalse": { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced", "y": 180 },
-        "facing=west,active=enhancedfalse":  { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced", "y": 270 },
-        "facing=east,active=enhancedfalse":  { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced", "y": 90 },
-		"facing=north,active=enhancedtrue": { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced" },
-        "facing=south,active=enhancedtrue": { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced", "y": 180 },
-        "facing=west,active=enhancedtrue":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced", "y": 270 },
-        "facing=east,active=enhancedtrue":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced", "y": 90 }
+        "facing=north,active=false,enhanced=false": { "model": "assemblylinemachines:block/purifier/electric_purifier" },
+        "facing=south,active=false,enhanced=false": { "model": "assemblylinemachines:block/purifier/electric_purifier", "y": 180 },
+        "facing=west,active=false,enhanced=false":  { "model": "assemblylinemachines:block/purifier/electric_purifier", "y": 270 },
+        "facing=east,active=false,enhanced=false":  { "model": "assemblylinemachines:block/purifier/electric_purifier", "y": 90 },
+		"facing=north,active=true,enhanced=false": { "model": "assemblylinemachines:block/purifier/electric_purifier_active" },
+        "facing=south,active=true,enhanced=false": { "model": "assemblylinemachines:block/purifier/electric_purifier_active", "y": 180 },
+        "facing=west,active=true,enhanced=false":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active", "y": 270 },
+        "facing=east,active=true,enhanced=false":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active", "y": 90 },
+		"facing=north,active=false,enhanced=true": { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced" },
+        "facing=south,active=false,enhanced=true": { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced", "y": 180 },
+        "facing=west,active=false,enhanced=true":  { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced", "y": 270 },
+        "facing=east,active=false,enhanced=true":  { "model": "assemblylinemachines:block/purifier/electric_purifier_enhanced", "y": 90 },
+		"facing=north,active=true,enhanced=true": { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced" },
+        "facing=south,active=true,enhanced=true": { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced", "y": 180 },
+        "facing=west,active=true,enhanced=true":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced", "y": 270 },
+        "facing=east,active=true,enhanced=true":  { "model": "assemblylinemachines:block/purifier/electric_purifier_active_enhanced", "y": 90 }
     }
 }

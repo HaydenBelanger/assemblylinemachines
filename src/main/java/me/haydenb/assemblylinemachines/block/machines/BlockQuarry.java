@@ -75,7 +75,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		for(Direction d : Direction.values()) {
 			
 			if(state.getValue(BlockQuarryAddon.getAddonProperty(d))) {
-				vx = Shapes.join(vx, BlockQuarryAddon.getConnectionShape(d), BooleanOp.OR);
+				vx = Shapes.join(vx, BlockQuarryAddon.MAIN_SHAPES.get(d), BooleanOp.OR);
 				
 			}
 			

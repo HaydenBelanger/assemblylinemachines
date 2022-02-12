@@ -4,8 +4,7 @@ import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -23,16 +22,21 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.FastColor.ARGB32;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
@@ -45,6 +49,8 @@ import net.minecraftforge.items.IItemHandler;
 public class Utils {
 
 	public static final Direction[] CARDINAL_DIRS = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+	
+	public static final BooleanProperty PURIFIER_STATES = BooleanProperty.create("enhanced");
 	
 	public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
 		VoxelShape[] buffer = new VoxelShape[] { shape, Shapes.empty() };
@@ -69,6 +75,10 @@ public class Utils {
 
 		return clazz.cast(posEntity);
 	}
+	
+	public static RandomizableContainerBlockEntity getBlockEntity(Inventory pInv, FriendlyByteBuf data) {
+		return getBlockEntity(pInv, data, RandomizableContainerBlockEntity.class);
+	}
 
 	public static void spawnItem(ItemStack stack, BlockPos pos, Level world) {
 		ItemEntity ent = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
@@ -88,7 +98,16 @@ public class Utils {
 		return stack;
 	}
 
-	
+	public static <T extends Recipe<Container>> BiFunction<BlockEntity, Container, Optional<Recipe<Container>>> recipeFunction(RecipeType<T> recipeType){
+		
+		return new BiFunction<>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public Optional<Recipe<Container>> apply(BlockEntity entity, Container container) {
+				return (Optional<Recipe<Container>>) entity.getLevel().getRecipeManager().getRecipeFor(recipeType, container, entity.getLevel());
+			}
+		};
+	}
 
 
 	public static interface IToolWithCharge{
@@ -307,6 +326,10 @@ public class Utils {
 			renderScaledText(fr, xpos, ypos, scale, text, false, 0xffffff);
 		}
 		
+		public static boolean isMouseBetween(int globalX, int globalY, int mouseX, int mouseY, int minX, int minY, int maxX, int maxY) {
+			return mouseX >= globalX + minX && mouseX <= globalX + maxX && mouseY >= globalY + minY && mouseY <= globalY + maxY;
+		}
+		
 		public static int multiplyARGBColor(int argb, float multiplier) {
 			int[] argbSplit = new int[] {ARGB32.alpha(argb), ARGB32.red(argb), ARGB32.green(argb), ARGB32.blue(argb)};
 			
@@ -387,24 +410,16 @@ public class Utils {
 			private final String trueText;
 			private final String falseText;
 			
-			public final Supplier<Boolean> supplier;
+			private final Supplier<Boolean> supplier;
 
 			public TrueFalseButtonSupplier(String trueText, String falseText, Supplier<Boolean> supplier) {
 				this.trueText = trueText;
 				this.falseText = falseText;
 				this.supplier = supplier;
-
-			}
-			
-			public TrueFalseButtonSupplier(String text, Supplier<Boolean> supplier) {
-				this.trueText = text;
-				this.falseText = text;
-				this.supplier = supplier;
-
 			}
 			
 			public boolean get() {
-				return supplier.get();
+				return supplier != null ? supplier.get() : false;
 			}
 			
 			public String getTrueText() {
@@ -423,10 +438,6 @@ public class Utils {
 					return falseText;
 				}
 			}
-			
-			
 		}
-
-		
 	}
 }

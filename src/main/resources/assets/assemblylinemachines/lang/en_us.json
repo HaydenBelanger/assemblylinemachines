@@ -185,6 +185,8 @@
 	"item.assemblylinemachines.glacier_water_bucket": "Glacier Water Bucket",
 	"item.assemblylinemachines.music_disc_assembly_required": "Music Disc",
 	"item.assemblylinemachines.music_disc_assembly_required.desc": "NinjaKittens - Assembly Required",
+	"item.assemblylinemachines.mkii_upgrade_kit": "MKII Upgrade Kit",
+	"item.assemblylinemachines.wrench_o_matic": "Wrench-O-Matic",
 	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",
@@ -321,6 +323,9 @@
 	"block.assemblylinemachines.raw_titanium_block":"Block of Raw Titanium",
 	"block.assemblylinemachines.raw_flerovium_block":"Block of Raw Flerovium",
 	"block.assemblylinemachines.experience_siphon":"Experience Siphon",
+	"block.assemblylinemachines.mkii_alloy_smelter": "MKII Alloy Smelter",
+	"block.assemblylinemachines.mkii_purifier": "MKII Purifier",
+	"block.assemblylinemachines.omnivoid": "Omnivoid",
 	
 	"fluid.assemblylinemachines.oil":"Oil",
 	"fluid.assemblylinemachines.condensed_void":"Condensed Void",

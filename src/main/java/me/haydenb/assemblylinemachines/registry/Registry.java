@@ -1,24 +1,17 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.automation.*;
-import me.haydenb.assemblylinemachines.block.automation.BlockAutocraftingTable.*;
-import me.haydenb.assemblylinemachines.block.automation.BlockExperienceHopper.TEExperienceHopper;
-import me.haydenb.assemblylinemachines.block.automation.BlockInteractor.*;
-import me.haydenb.assemblylinemachines.block.automation.BlockPoweredSpawner.*;
-import me.haydenb.assemblylinemachines.block.automation.BlockVacuumHopper.TEVacuumHopper;
-import me.haydenb.assemblylinemachines.block.chaosplane.*;
-import me.haydenb.assemblylinemachines.block.chaosplane.CorruptBlock.*;
-import me.haydenb.assemblylinemachines.block.chaosplane.CorruptTallGrassBlock.*;
 import me.haydenb.assemblylinemachines.block.energy.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockCoalGenerator.*;
@@ -28,55 +21,52 @@ import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockGearbox.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockSimpleCrankCharger.TESimpleCrankCharger;
 import me.haydenb.assemblylinemachines.block.energy.BlockToolCharger.TEToolCharger;
-import me.haydenb.assemblylinemachines.block.fluid.*;
-import me.haydenb.assemblylinemachines.block.fluid.ALMFluid.ALMFluidBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidCondensedVoid.FluidCondensedVoidBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidDarkEnergy.FluidDarkEnergyBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidGlacierWater.FluidGlacierWaterBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.BlockNaphthaFire;
-import me.haydenb.assemblylinemachines.block.fluid.FluidNaphtha.FluidNaphthaBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidOil.FluidOilBlock;
-import me.haydenb.assemblylinemachines.block.fluid.FluidOilProduct.FluidOilProductBlock;
-import me.haydenb.assemblylinemachines.block.fluidutility.*;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockCorruptingBasin.*;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockExperienceSiphon.TEExperienceSiphon;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidRouter.*;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidTank.TEFluidTank;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockRefinery.*;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockRefinery.BlockRefineryAddon.RefineryAddon;
+import me.haydenb.assemblylinemachines.block.fluids.*;
+import me.haydenb.assemblylinemachines.block.fluids.ALMFluid.ALMFluidBlock;
+import me.haydenb.assemblylinemachines.block.fluids.FluidCondensedVoid.FluidCondensedVoidBlock;
+import me.haydenb.assemblylinemachines.block.fluids.FluidDarkEnergy.FluidDarkEnergyBlock;
+import me.haydenb.assemblylinemachines.block.fluids.FluidGlacierWater.FluidGlacierWaterBlock;
+import me.haydenb.assemblylinemachines.block.fluids.FluidNaphtha.BlockNaphthaFire;
+import me.haydenb.assemblylinemachines.block.fluids.FluidNaphtha.FluidNaphthaBlock;
+import me.haydenb.assemblylinemachines.block.fluids.FluidOil.FluidOilBlock;
+import me.haydenb.assemblylinemachines.block.fluids.FluidOilProduct.FluidOilProductBlock;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine.Phases;
 import me.haydenb.assemblylinemachines.block.machines.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockAlloySmelter.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockElectricFluidMixer.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockElectricFurnace.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockElectricGrinder.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockElectricPurifier.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockAutocraftingTable.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockBottomlessStorageUnit.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockCorruptingBasin.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockExperienceHopper.TEExperienceHopper;
 import me.haydenb.assemblylinemachines.block.machines.BlockExperienceMill.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockLumberMill.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockMetalShaper.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockExperienceSiphon.TEExperienceSiphon;
+import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.block.machines.BlockFluidRouter.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
+import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.TEHandGrinder;
+import me.haydenb.assemblylinemachines.block.machines.BlockInteractor.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockOmnivoid.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockPoweredSpawner.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockPump.BlockPumpshaft;
 import me.haydenb.assemblylinemachines.block.machines.BlockPump.TEPump;
+import me.haydenb.assemblylinemachines.block.machines.BlockQuantumLink.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockQuarry.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockQuarryAddon.BlockFortuneVoidQuarryAddon;
-import me.haydenb.assemblylinemachines.block.machines.BlockQuarryAddon.BlockSpeedQuarryAddon;
+import me.haydenb.assemblylinemachines.block.machines.BlockQuarryAddon.QuarryAddonShapes;
+import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.*;
+import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.BlockRefineryAddon.RefineryAddon;
 import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.*;
-import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite;
+import me.haydenb.assemblylinemachines.block.machines.BlockVacuumHopper.TEVacuumHopper;
+import me.haydenb.assemblylinemachines.block.misc.*;
 import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite.BlockBlackGranitePillar;
-import me.haydenb.assemblylinemachines.block.misc.BlockMystiumFarmland;
-import me.haydenb.assemblylinemachines.block.pipe.BlockPipe;
-import me.haydenb.assemblylinemachines.block.pipe.PipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.pipe.PipeConnectorTileEntity.PipeConnectorContainer;
-import me.haydenb.assemblylinemachines.block.pipe.PipeConnectorTileEntity.PipeConnectorScreen;
-import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.PipeType;
-import me.haydenb.assemblylinemachines.block.pipe.PipeProperties.TransmissionType;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath.TEFluidBath;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockHandGrinder;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockHandGrinder.Blade;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockHandGrinder.TEHandGrinder;
-import me.haydenb.assemblylinemachines.block.utility.BlockBottomlessStorageUnit;
-import me.haydenb.assemblylinemachines.block.utility.BlockBottomlessStorageUnit.*;
-import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink;
-import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.*;
+import me.haydenb.assemblylinemachines.block.misc.CorruptBlock.*;
+import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.*;
+import me.haydenb.assemblylinemachines.block.pipes.BlockPipe;
+import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
+import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity.PipeConnectorContainer;
+import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity.PipeConnectorScreen;
+import me.haydenb.assemblylinemachines.block.pipes.PipeProperties.PipeType;
+import me.haydenb.assemblylinemachines.block.pipes.PipeProperties.TransmissionType;
 import me.haydenb.assemblylinemachines.client.ter.*;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.item.*;
@@ -167,6 +157,8 @@ public class Registry {
 	private static final ConcurrentHashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Enchantment> MOD_ENCHANTMENT_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>>> MOD_CRAFTING_REGISTRY = new ConcurrentHashMap<>();
+	
+	private static final ArrayListMultimap<Phases, Method> ANNOTATED_REGISTRATIONS = ArrayListMultimap.create();
 	
 	//MOD CREATIVE TAB & DEFAULT PROPERTIES
 	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
@@ -327,13 +319,30 @@ public class Registry {
 		
 		createItem("music_disc_assembly_required", new RecordItem(1, () -> Registry.getSound("assembly_required"), new Item.Properties().tab(CREATIVE_TAB).stacksTo(1).rarity(Rarity.RARE)));
 		
+		createItem("mkii_upgrade_kit", new ItemUpgradeKit());
+		
+		createItem("wrench_o_matic");
+		
 		for(String i : MOD_ITEM_REGISTRY.keySet()) {
 			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
 		}
 	}
 	
 	@SubscribeEvent
-	public static void registerBlocks(RegistryEvent.Register<Block> event) {
+	public static void registerBlocks(RegistryEvent.Register<Block> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		
+		//This pulls all auto-registered methods from BlockMachines.class and sets them up for initialization, here, because Block registry is guaranteed to fire first.
+		for(Method method : MethodUtils.getMethodsWithAnnotation(BlockMachines.class, RegisterableMachine.class)) {
+			if(!Modifier.isStatic(method.getModifiers()) || method.getParameterCount() != 0) {
+				throw new IllegalArgumentException("Method " + method.getName() + " annotated with @RegisterableMachine is not compatible with auto-registration. Must be static with 0 arguments.");
+			}
+			ANNOTATED_REGISTRATIONS.put(method.getAnnotation(RegisterableMachine.class).phase(), method);
+		}
+		
+		//ALL PIPES REGISTERED HERE - Using loop.
+				for(Triple<String, PipeType, TransmissionType> pipeData : TransmissionType.getPipeRegistryValues()) {
+					createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true);
+				}
 		
 		createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
@@ -347,13 +356,8 @@ public class Registry {
 		createBlock("gearbox", new BlockGearbox(), true);
 		
 		createBlock("simple_crank_charger", new BlockSimpleCrankCharger(), true);
-		createBlock("simple_fluid_mixer", new BlockSimpleFluidMixer(), true);
-		createBlock("simple_grinder", new BlockSimpleGrinder(), true);
-		
-		//ALL PIPES REGISTERED HERE - Using loop.
-		for(Triple<String, PipeType, TransmissionType> pipeData : TransmissionType.getPipeRegistryValues()) {
-			createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true);
-		}
+		createBlock("simple_fluid_mixer", BlockSimpleFluidMixer.simpleFluidMixer(), true);
+		createBlock("simple_grinder", BlockSimpleGrinder.simpleGrinder(), true);
 		
 		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT, 0xff545454), true);
 		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD, 0xff826a4a), true);
@@ -385,12 +389,6 @@ public class Registry {
 		
 		createBlock("chromium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_NETHERITE_TOOL, true);
 		createBlock("chromium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
-		
-		createBlock("electric_furnace", new BlockElectricFurnace(), true);
-		createBlock("electric_purifier", new BlockElectricPurifier(), true);
-		createBlock("electric_grinder", new BlockElectricGrinder(), true);
-		createBlock("electric_fluid_mixer", new BlockElectricFluidMixer(), true);
-		createBlock("alloy_smelter", new BlockAlloySmelter(), true);
 		
 		createBlock("autocrafting_table", new BlockAutocraftingTable(), true);
 		
@@ -427,19 +425,16 @@ public class Registry {
 		
 		createBlock("experience_hopper", new BlockExperienceHopper(), true);
 		createBlock("powered_spawner", new BlockPoweredSpawner(), true);
-		createBlock("experience_mill", new BlockExperienceMill(), true);
+		createBlock("experience_mill", BlockExperienceMill.experienceMill(), true);
 		
 		createBlock("quarry", new BlockQuarry(), true);
-		createBlock("quarry_speed_addon", new BlockSpeedQuarryAddon(), true);
-		createBlock("quarry_fortune_addon", new BlockFortuneVoidQuarryAddon(), true);
-		createBlock("quarry_void_addon", new BlockFortuneVoidQuarryAddon(), true);
+		createBlock("quarry_speed_addon", new BlockQuarryAddon(QuarryAddonShapes.SPEED), true);
+		createBlock("quarry_fortune_addon", new BlockQuarryAddon(QuarryAddonShapes.FORTUNE), true);
+		createBlock("quarry_void_addon", new BlockQuarryAddon(QuarryAddonShapes.VOID), true);
 		
 		createBlock("mystium_farmland", new BlockMystiumFarmland(true), false);
 		
-		createBlock("lumber_mill", new BlockLumberMill(), true);
-		
 		createBlock("quantum_link", new BlockQuantumLink(), true);
-		createBlock("metal_shaper", new BlockMetalShaper(), true);
 		
 		createBlock("entropy_reactor_block", new BlockEntropyReactor(), true);
 		createBlock("entropy_reactor_core", new BlockEntropyReactorCore(), true);
@@ -502,8 +497,13 @@ public class Registry {
 		createBlock("raw_flerovium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL, true);
 		
 		createBlock("experience_siphon", new BlockExperienceSiphon(), true);
+		createBlock("omnivoid", new BlockOmnivoid(), true);
 		
 		registerFluids(null);
+		
+		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.BLOCK)) {
+			createBlock(method.getAnnotation(RegisterableMachine.class).blockName(), (Block) method.invoke(null), true);
+		}
 		
 		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
 	}
@@ -534,37 +534,25 @@ public class Registry {
 	}
 	
 	@SubscribeEvent
-	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) {
-		createBlockEntity("hand_grinder", TEHandGrinder.class);
-		createBlockEntity("fluid_bath", TEFluidBath.class);
-		
-		createBlockEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
-		createBlockEntity("simple_grinder", TESimpleGrinder.class);
-		createBlockEntity("simple_crank_charger", TESimpleCrankCharger.class);
-		
-		createBlockEntity("gearbox", TEGearbox.class);
-		
-		createBlockEntity("fluid_tank", TEFluidTank.class, MOD_BLOCK_REGISTRY.get("wooden_fluid_tank"), MOD_BLOCK_REGISTRY.get("steel_fluid_tank"), MOD_BLOCK_REGISTRY.get("mystium_fluid_tank"),
-				MOD_BLOCK_REGISTRY.get("attuned_titanium_fluid_tank"), MOD_BLOCK_REGISTRY.get("novasteel_fluid_tank"));
-		
+	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		//ALL PIPES CONNECTED TO TE HERE - Using loop.
 		ArrayList<Block> pipes = new ArrayList<>();
 		for(Triple<String, PipeType, TransmissionType> pipeData : TransmissionType.getPipeRegistryValues()) {
 			pipes.add(MOD_BLOCK_REGISTRY.get(pipeData.getLeft()));
 		}
+		
 		createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, pipes.toArray(new Block[pipes.size()]));
-		
+		createBlockEntity("hand_grinder", TEHandGrinder.class);
+		createBlockEntity("fluid_bath", TEFluidBath.class);
+		createBlockEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
+		createBlockEntity("simple_grinder", TESimpleGrinder.class);
+		createBlockEntity("simple_crank_charger", TESimpleCrankCharger.class);
+		createBlockEntity("gearbox", TEGearbox.class);
+		createBlockEntity("fluid_tank", TEFluidTank.class, MOD_BLOCK_REGISTRY.get("wooden_fluid_tank"), MOD_BLOCK_REGISTRY.get("steel_fluid_tank"), MOD_BLOCK_REGISTRY.get("mystium_fluid_tank"),
+				MOD_BLOCK_REGISTRY.get("attuned_titanium_fluid_tank"), MOD_BLOCK_REGISTRY.get("novasteel_fluid_tank"));
 		createBlockEntity("battery_cell", TEBatteryCell.class, MOD_BLOCK_REGISTRY.get("basic_battery_cell"), MOD_BLOCK_REGISTRY.get("advanced_battery_cell"), MOD_BLOCK_REGISTRY.get("ultimate_battery_cell"));
-		
 		createBlockEntity("coal_generator", TECoalGenerator.class);
 		createBlockEntity("crankmill", TECrankmill.class);
-		
-		createBlockEntity("electric_furnace", TEElectricFurnace.class);
-		createBlockEntity("electric_purifier", TEElectricPurifier.class);
-		createBlockEntity("electric_grinder", TEElectricGrinder.class);
-		createBlockEntity("electric_fluid_mixer", TEElectricFluidMixer.class);
-		createBlockEntity("alloy_smelter", TEAlloySmelter.class);
-		
 		createBlockEntity("autocrafting_table", TEAutocraftingTable.class);
 		createBlockEntity("pump", TEPump.class);
 		createBlockEntity("tool_charger", TEToolCharger.class);
@@ -575,60 +563,52 @@ public class Registry {
 		createBlockEntity("bottomless_storage_unit", TEBottomlessStorageUnit.class);
 		createBlockEntity("fluid_generator", TEFluidGenerator.class, MOD_BLOCK_REGISTRY.get("geothermal_generator"), MOD_BLOCK_REGISTRY.get("combustion_generator"));
 		createBlockEntity("experience_hopper", TEExperienceHopper.class);
-		
 		createBlockEntity("powered_spawner", TEPoweredSpawner.class);
 		createBlockEntity("experience_mill", TEExperienceMill.class);
 		createBlockEntity("quarry", TEQuarry.class);
-		createBlockEntity("lumber_mill", TELumberMill.class);
-		
 		createBlockEntity("quantum_link", TEQuantumLink.class);
-		
-		createBlockEntity("metal_shaper", TEMetalShaper.class);
-		
 		createBlockEntity("entropy_reactor", TEEntropyReactor.class, MOD_BLOCK_REGISTRY.get("entropy_reactor_block"));
 		createBlockEntity("entropy_reactor_slave", TEEntropyReactorSlave.class, MOD_BLOCK_REGISTRY.get("entropy_reactor_block"));
-		
 		createBlockEntity("corrupting_basin", TECorruptingBasin.class);
 		createBlockEntity("experience_siphon", TEExperienceSiphon.class);
+		createBlockEntity("omnivoid", TEOmnivoid.class);
+		
+		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.BLOCK_ENTITY)) {
+			createBlockEntity(method.getAnnotation(RegisterableMachine.class).blockName(), (BlockEntityType<?>) method.invoke(null));
+		}
 		
 		event.getRegistry().registerAll(MOD_BLOCKENTITY_REGISTRY.values().toArray(new BlockEntityType<?>[MOD_BLOCKENTITY_REGISTRY.size()]));
 	}
 	
 	@SubscribeEvent
-	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
+	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		createContainer("simple_fluid_mixer", 1050, ContainerSimpleFluidMixer.class);
 		createContainer("simple_grinder", 1051, ContainerSimpleGrinder.class);
 		createContainer("gearbox", 1052, ContainerGearbox.class);
 		createContainer("pipe_connector", 1053, PipeConnectorContainer.class);
-		
 		createContainer("coal_generator", 1054, ContainerCoalGenerator.class);
 		createContainer("crankmill", 1055, ContainerCrankmill.class);
 		createContainer("battery_cell", 1056, ContainerBatteryCell.class);
-		
-		createContainer("electric_furnace", 1057, ContainerElectricFurnace.class);
-		createContainer("electric_purifier", 1058, ContainerElectricPurifier.class);
-		createContainer("electric_grinder", 1059, ContainerElectricGrinder.class);
-		createContainer("electric_fluid_mixer", 1060, ContainerElectricFluidMixer.class);
-		createContainer("alloy_smelter", 1062, ContainerAlloySmelter.class);
-		
 		createContainer("autocrafting_table", 1061, ContainerAutocraftingTable.class);
 		createContainer("refinery", 1063, ContainerRefinery.class);
 		createContainer("fluid_router", 1064, ContainerFluidRouter.class);
 		createContainer("interactor", 1065, ContainerInteractor.class);
 		createContainer("bottomless_storage_unit", 1066, ContainerBottomlessStorageUnit.class);
 		createContainer("fluid_generator", 1067, ContainerFluidGenerator.class);
-		
 		createContainer("powered_spawner", 1068, ContainerPoweredSpawner.class);
 		createContainer("experience_mill", 1069, ContainerExperienceMill.class);
 		createContainer("quarry", 1070, ContainerQuarry.class);
-		createContainer("lumber_mill", 1071, ContainerLumberMill.class);
-		
 		createContainer("quantum_link", 1072, ContainerQuantumLink.class);
-		
-		createContainer("metal_shaper", 1073, ContainerMetalShaper.class); 
 		createContainer("entropy_reactor", 1074, ContainerEntropyReactor.class);
-		
 		createContainer("corrupting_basin", 1075, ContainerCorruptingBasin.class);
+		createContainer("omnivoid", 1076, ContainerOmnivoid.class);
+		
+		int id = MOD_CONTAINER_REGISTRY.entrySet().stream().max((entry1, entry2) -> entry1.getValue().getSecond() > entry2.getValue().getSecond() ? 1 : -1).orElseThrow().getValue().getSecond() + 1;
+		
+		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.CONTAINER)) {
+			createContainer(method.getAnnotation(RegisterableMachine.class).blockName(), id, (MenuType<?>) method.invoke(null));
+			id++;
+		}
 		
 		Iterator<Pair<MenuType<?>, Integer>> iter = MOD_CONTAINER_REGISTRY.values().iterator();
 		while(iter.hasNext()) event.getRegistry().register(iter.next().getFirst());
@@ -681,6 +661,7 @@ public class Registry {
 		createRecipe(EntropyReactorCrafting.ERO_RECIPE, EntropyReactorCrafting.SERIALIZER);
 		createRecipe(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, WorldCorruptionCrafting.SERIALIZER);
 		createRecipe(GeneratorFluidCrafting.GENFLUID_RECIPE, GeneratorFluidCrafting.SERIALIZER);
+		createRecipe(UpgradeKitCrafting.UPGRADING_RECIPE, UpgradeKitCrafting.SERIALIZER);
 		
 		for(String name : MOD_CRAFTING_REGISTRY.keySet()) {
 			Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>> recipe = MOD_CRAFTING_REGISTRY.get(name);
@@ -718,7 +699,8 @@ public class Registry {
 	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
-	public static void clientSetup(FMLClientSetupEvent event) {
+	public static void clientSetup(FMLClientSetupEvent event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		
 		ItemBlockRenderTypes.setRenderLayer(getBlock("steel_fluid_tank"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("wooden_fluid_tank"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("mystium_fluid_tank"), RenderType.cutout());
@@ -740,7 +722,6 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getBlock("brain_cactus"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("bright_prism_rose"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_glass"), RenderType.cutoutMipped());
-		
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel"), RenderType.translucent());
@@ -767,12 +748,7 @@ public class Registry {
 		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
 		registerScreen("crankmill", ContainerCrankmill.class, ScreenCrankmill.class);
 		registerScreen("battery_cell", ContainerBatteryCell.class, ScreenBatteryCell.class);
-		registerScreen("electric_furnace", ContainerElectricFurnace.class, ScreenElectricFurnace.class);
-		registerScreen("electric_purifier", ContainerElectricPurifier.class, ScreenElectricPurifier.class);
-		registerScreen("electric_grinder", ContainerElectricGrinder.class, ScreenElectricGrinder.class);
-		registerScreen("electric_fluid_mixer", ContainerElectricFluidMixer.class, ScreenElectricFluidMixer.class);
 		registerScreen("autocrafting_table", ContainerAutocraftingTable.class, ScreenAutocraftingTable.class);
-		registerScreen("alloy_smelter", ContainerAlloySmelter.class, ScreenAlloySmelter.class);
 		registerScreen("refinery", ContainerRefinery.class, ScreenRefinery.class);
 		registerScreen("fluid_router", ContainerFluidRouter.class, ScreenFluidRouter.class);
 		registerScreen("interactor", ContainerInteractor.class, ScreenInteractor.class);
@@ -781,11 +757,14 @@ public class Registry {
 		registerScreen("experience_mill", ContainerExperienceMill.class, ScreenExperienceMill.class);
 		registerScreen("powered_spawner", ContainerPoweredSpawner.class, ScreenPoweredSpawner.class);
 		registerScreen("quarry", ContainerQuarry.class, ScreenQuarry.class);
-		registerScreen("lumber_mill", ContainerLumberMill.class, ScreenLumberMill.class);
 		registerScreen("quantum_link", ContainerQuantumLink.class, ScreenQuantumLink.class);
-		registerScreen("metal_shaper", ContainerMetalShaper.class, ScreenMetalShaper.class);
 		registerScreen("entropy_reactor", ContainerEntropyReactor.class, ScreenEntropyReactor.class);
 		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
+		registerScreen("omnivoid", ContainerOmnivoid.class, ScreenOmnivoid.class);
+		
+		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.SCREEN)) {
+			method.invoke(null);
+		}
 		
 		ItemProperties.registerGeneric(new ResourceLocation(AssemblyLineMachines.MODID, "active"), new ClampedItemPropertyFunction() {
 			@Override
@@ -848,7 +827,6 @@ public class Registry {
 	public static void registerEntityRenderers(RegisterRenderers event) {
 		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
-	
 	
 	//CONFIG CREATOR/DATA GENERATOR
 	
@@ -1049,6 +1027,10 @@ public class Registry {
 		return MOD_BLOCKENTITY_REGISTRY.get(name);
 	}
 	
+	public static void createBlockEntity(String name, BlockEntityType<?> type) {
+		MOD_BLOCKENTITY_REGISTRY.put(name, type.setRegistryName(name));
+	}
+	
 	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz, Block... blocks){
 		MOD_BLOCKENTITY_REGISTRY.put(name, BlockEntityType.Builder.of((pos, state) -> {
 
@@ -1092,6 +1074,10 @@ public class Registry {
 			}
 		}).setRegistryName(name);
 		MOD_CONTAINER_REGISTRY.put(name, Pair.of(mt, id));
+	}
+	
+	public static void createContainer(String name, int id, MenuType<?> menu) {
+		MOD_CONTAINER_REGISTRY.put(name, Pair.of(menu.setRegistryName(name), id));
 	}
 	
 	//SOUNDS

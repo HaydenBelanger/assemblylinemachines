@@ -78,9 +78,9 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		return LazyOptional.empty();
 	}
 	
-	public abstract boolean canExtractFromSide(int slot, Direction direction);
+	public abstract boolean canExtractFromSide(boolean isEnergy, int slot, Direction direction);
 	
-	public abstract boolean canInsertToSide(int slot, Direction direction);
+	public abstract boolean canInsertToSide(boolean isEnergy, int slot, Direction direction);
 	
 	@Override
 	public void setRemoved() {
@@ -105,7 +105,7 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-			if(canExtractFromSide(slot, side)) {
+			if(canExtractFromSide(false, slot, side)) {
 				return super.extractItem(slot, amount, simulate);
 			}else {
 				return ItemStack.EMPTY;
@@ -115,7 +115,7 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if(canInsertToSide(slot, side)) {
+			if(canInsertToSide(false, slot, side)) {
 				
 				return super.insertItem(slot, stack, simulate);
 			}else {
@@ -180,7 +180,7 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public boolean canReceive() {
-			if(canInsertToSide(-1, side)) {
+			if(canInsertToSide(true, -1, side)) {
 				return properties.getIn();
 			}
 			return false;
@@ -188,7 +188,7 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 		
 		@Override
 		public boolean canExtract() {
-			if(canExtractFromSide(0, side)) {
+			if(canExtractFromSide(true, 0, side)) {
 				return properties.getOut();
 			}
 			return false;

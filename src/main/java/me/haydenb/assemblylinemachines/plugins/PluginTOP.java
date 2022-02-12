@@ -24,7 +24,7 @@ public class PluginTOP {
 		}
 	}
 	
-	static class PluginTOPRegistry implements Function<ITheOneProbe, Void>{
+	public static class PluginTOPRegistry implements Function<ITheOneProbe, Void>{
 		
 		@Override
 		public Void apply(ITheOneProbe probe) {
@@ -51,10 +51,12 @@ public class PluginTOP {
 			
 			return null;
 		}
+		
+		public static interface TOPProvider{
+			public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data);
+		}
 	}
 	
-	public static interface TOPProvider{
-		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data);
-	}
+	
 	
 }

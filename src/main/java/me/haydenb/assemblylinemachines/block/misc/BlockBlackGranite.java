@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.block.misc;
 import java.util.stream.Stream;
 
 import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
