@@ -162,7 +162,7 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 	}
 	
 	public static enum UpgradeKit{
-		MKII(Registry.getItem("mkii_upgrade_kit"));
+		MKII(Registry.getItem("mkii_upgrade_kit")), ELECTRIC(Registry.getItem("electric_upgrade_kit"));
 		
 		private final Item item;
 		

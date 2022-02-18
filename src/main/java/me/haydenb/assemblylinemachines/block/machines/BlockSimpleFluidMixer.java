@@ -7,6 +7,7 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -153,7 +154,7 @@ public class BlockSimpleFluidMixer{
 										isa = null;
 										isb = null;
 										output = crafting.getResultItem().copy();
-										cycles = crafting.getStirs();
+										cycles = (float) crafting.getStirs() * ConfigHolder.getCommonConfig().simpleFluidMixerCycleMultiplier.get().floatValue();
 										f = crafting.getFluid();
 										pendingOutput = false;
 										sendUpdates();

@@ -4,30 +4,36 @@ import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.function.*;
 
+import com.google.common.base.Suppliers;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -44,6 +50,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.IItemHandler;
 
 public class Utils {
@@ -107,6 +114,34 @@ public class Utils {
 				return (Optional<Recipe<Container>>) entity.getLevel().getRecipeManager().getRecipeFor(recipeType, container, entity.getLevel());
 			}
 		};
+	}
+	
+	private static final Cache<String, Item> CACHED_SORTED_TAGS = CacheBuilder.newBuilder().build();
+	
+	/**
+	 * Supplier comes pre-memoized.
+	 */
+	public static Supplier<ItemStack> getPreferredOrAlphabeticSupplier(Named<Item> tag, int count){
+		return Suppliers.memoize(() -> {
+			try {
+				Item preferredResult = CACHED_SORTED_TAGS.get(tag.getName().toString(), () ->{
+					List<Item> values = new ArrayList<Item>(tag.getValues());
+					String preferredModid = ConfigHolder.getCommonConfig().preferredModid.get();
+					if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
+						Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
+						if(optionalItem.isPresent()) return optionalItem.get();
+					}
+					
+					Collections.sort(values, (a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString()));
+					return values.get(0);
+				});
+				
+				return new ItemStack(preferredResult, count);
+			}catch(ExecutionException e) {
+				e.printStackTrace();
+				return null;
+			}
+		});
 	}
 
 

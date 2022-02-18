@@ -74,7 +74,7 @@ public class BlockMachines {
 
 	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="alloy_smelter")
 	public static BlockEntityType<?> alloySmelterEntity() {
-		return MachineBuilder.blockEntity().energy(40000).baseProcessingStats(200, 16).recipeProcessor(Utils.recipeFunction(AlloyingCrafting.ALLOYING_RECIPE)).slotInfo(6, 3).build("alloy_smelter");
+		return MachineBuilder.blockEntity().energy(40000).baseProcessingStats(200, 16).recipeProcessor(Utils.recipeFunction(AlloyingCrafting.ALLOYING_RECIPE)).slotInfo(6, 3).stackManagement((i) -> i >= 1 && i <= 2, null, null).build("alloy_smelter");
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -131,14 +131,13 @@ public class BlockMachines {
 		case 1 -> 4;
 		case 2 -> 5;
 		default -> in;
-		}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).build("mkii_alloy_smelter");
+		}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).stackManagement((i) -> i >= 2 && i <= 5, null, null).build("mkii_alloy_smelter");
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_alloy_smelter")
 	public static void mkIIAlloySmelterScreen() {
-		MachineBuilder.screen().inventorySize(190, 188).energyMeterStartX(190).doNotRenderInventoryText().doNotRenderTitleText()
-		.blitUDProgressBar(57, 42, 190, 66, 8, 11).blitUDDuplicateBar(111, 42).blitWhenActive(80, 43, 190, 52, 16, 14).buildAndRegister("mkii_alloy_smelter");
+		MachineBuilder.mkIIScreen().blitUDProgressBar(57, 42, 190, 66, 8, 11).blitUDDuplicateBar(111, 42).blitWhenActive(80, 43, 190, 52, 16, 14).buildAndRegister("mkii_alloy_smelter");
 	}
 
 	//ELECTRIC FURNACE
@@ -260,7 +259,7 @@ public class BlockMachines {
 		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(60, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE))
 				.slotInfo(6, 3).processesFluids(4000, true).specialStateModifier((recipe, state) -> {
 					return state.setValue(StateProperties.FLUID, ((BathCrafting) recipe).getFluid());
-				}).build("electric_fluid_mixer");
+				}).stackManagement((i) -> i >= 1 && i <= 2, null, null).build("electric_fluid_mixer");
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -276,6 +275,88 @@ public class BlockMachines {
 				}
 			}
 		}).internalTankSwitchingButton(129, 57, 192, 41, 11, 11).buildAndRegister("electric_fluid_mixer");
+	}
+	
+	//MKII FLUID MIXER
+	
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="mkii_fluid_mixer")
+	public static Block mkIIFluidMixer() {
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
+				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 2, 16),
+				Block.box(0, 2, 1, 16, 14, 3),Block.box(0, 5, 0, 16, 14, 1),
+				Block.box(0, 2, 0, 3, 5, 1),Block.box(13, 2, 0, 16, 5, 1),
+				Block.box(9, 2, 0, 12, 5, 1),Block.box(4, 2, 0, 7, 5, 1),
+				Block.box(7, 4, 0, 9, 5, 1),Block.box(4, 2, 3, 12, 14, 13),
+				Block.box(0, 2, 13, 16, 14, 16),Block.box(1, 4, 5, 2, 12, 6),
+				Block.box(2, 4, 5, 4, 5, 6),Block.box(2, 11, 5, 4, 12, 6),
+				Block.box(0, 6, 4, 3, 7, 7),Block.box(3, 3, 4, 4, 6, 7),
+				Block.box(3, 10, 4, 4, 13, 7),Block.box(0, 9, 4, 3, 10, 7),
+				Block.box(3, 10, 9, 4, 13, 12),Block.box(2, 11, 10, 4, 12, 11),
+				Block.box(1, 4, 10, 2, 12, 11),Block.box(0, 9, 9, 3, 10, 12),
+				Block.box(0, 6, 9, 3, 7, 12),Block.box(3, 3, 9, 4, 6, 12),
+				Block.box(2, 4, 10, 4, 5, 11),Block.box(14, 4, 10, 15, 12, 11),
+				Block.box(12, 4, 10, 14, 5, 11),Block.box(12, 11, 10, 14, 12, 11),
+				Block.box(13, 6, 9, 16, 7, 12),Block.box(12, 3, 9, 13, 6, 12),
+				Block.box(12, 10, 9, 13, 13, 12),Block.box(13, 9, 9, 16, 10, 12),
+				Block.box(12, 10, 4, 13, 13, 7),Block.box(12, 11, 5, 14, 12, 6),
+				Block.box(14, 4, 5, 15, 12, 6),Block.box(13, 9, 4, 16, 10, 7),
+				Block.box(13, 6, 4, 16, 7, 7),Block.box(12, 3, 4, 13, 6, 7),Block.box(12, 4, 5, 14, 5, 6)
+				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true)
+				.additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE),
+						(builder) -> builder.add(StateProperties.FLUID))
+				.rightClickAction((state, world, pos, player) -> {
+					if(player.getMainHandItem().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent() && world.getBlockEntity(pos) instanceof IMachineDataBridge) {
+						FluidActionResult far = FluidUtil.tryEmptyContainer(player.getMainHandItem(), ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)), 1000, player, true);
+						if(far.isSuccess()) {
+							if(player.getMainHandItem().getCount() == 1) {
+								player.getInventory().removeItemNoUpdate(player.getInventory().selected);
+							}else {
+								player.getMainHandItem().shrink(1);
+							}
+							ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
+							return InteractionResult.CONSUME;
+						}
+					}
+					return null;
+				}).build("mkii_fluid_mixer");
+	}
+	
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="mkii_fluid_mixer")
+	public static MenuType<?> mkIIFluidMixerContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(2, 6).playerInventoryPos(8, 106).playerHotbarPos(8, 164).slotCoordinates(List.of(Triple.of(53, 65, true), Triple.of(107, 65, true), Triple.of(42, 22, false), Triple.of(64, 22, false), Triple.of(96, 22, false),
+				Triple.of(118, 22, false), Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false), Triple.of(167, 21, false), Triple.of(167, 39, false), Triple.of(167, 57, false))).build("mkii_fluid_mixer");
+	}
+	
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="mkii_fluid_mixer")
+	public static BlockEntityType<?> mkIIFluidMixerEntity(){
+		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(240, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE)).slotInfo(12, 6).specialStateModifier((recipe, state) -> {
+					return state.setValue(StateProperties.FLUID, ((BathCrafting) recipe).getFluid());
+				}).slotIDTransformer((in) -> switch(in) {
+				case 1 -> 2;
+				case 2 -> 3;
+				default -> in;
+				}).outputSlots(0, 0, 1).dualProcessorIDTransformer((in) -> switch(in) {
+				case 0 -> 1;
+				case 1 -> 4;
+				case 2 -> 5;
+				default -> in;
+				}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).processesFluids(8000, true).stackManagement((i) -> i >= 2 && i <= 5, null, null).build("mkii_fluid_mixer");
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_fluid_mixer")
+	public static void mkIIFluidMixerScreen() {
+		MachineBuilder.mkIIScreen().renderFluidBar(84, 33, 37, 190, 52).internalTankSwitchingButton(82, 72, 206, 40, 12, 12).addCustomBackgroundRenderer((screen, x, y) ->{
+			IScreenDataBridge data = (IScreenDataBridge) screen;
+			if(data.getDataBridge().getCycles() != 0f) {
+				BathCraftingFluids bcf = ((BlockEntity)data.getDataBridge()).getBlockState().getValue(StateProperties.FLUID);
+				if(bcf != BathCraftingFluids.NONE) {
+					int prog = Math.round((data.getDataBridge().getProgress() / data.getDataBridge().getCycles()) * 14f);
+					screen.blit(data.getPoseStack(), x+53, y+42, bcf.getMKIIBlitPiece().getFirst(), bcf.getMKIIBlitPiece().getSecond(), 16, prog);
+					screen.blit(data.getPoseStack(), x+107, y+42, bcf.getMKIIBlitPiece().getFirst(), bcf.getMKIIBlitPiece().getSecond(), 16, prog);
+				}
+			}
+		}).buildAndRegister("mkii_fluid_mixer");
 	}
 	
 	//ELECTRIC PURIFIER
@@ -303,7 +384,8 @@ public class BlockMachines {
 		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(100, 16).recipeProcessor(Utils.recipeFunction(PurifierCrafting.PURIFIER_RECIPE))
 				.slotInfo(7, 3).specialStateModifier((recipe, state) -> {
 					return ((PurifierCrafting) recipe).requiresUpgrade() ? state.setValue(Utils.PURIFIER_STATES, true) : state.setValue(Utils.PURIFIER_STATES, false);
-				}).build("electric_purifier");
+				}).stackManagement((i) -> i >= 1 && i <= 3, 3, (is, be) -> be.getLevel().getRecipeManager().getAllRecipesFor(PurifierCrafting.PURIFIER_RECIPE).stream().anyMatch((rcp) -> rcp.isPrimaryIngredient(is))
+				).build("electric_purifier");
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -349,13 +431,13 @@ public class BlockMachines {
 		case 1 -> 4;
 		case 2 -> 5;
 		default -> in;
-		}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).build("mkii_purifier");
+		}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).stackManagement((i) -> i >= 2 && i <= 5, null, null).build("mkii_purifier");
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_purifier")
 	public static void mkIIPurifierScreen() {
-		MachineBuilder.screen().inventorySize(190, 188).energyMeterStartX(190).doNotRenderInventoryText().doNotRenderTitleText().blitUDProgressBar(57, 59, 190, 52, 8, 12).blitUDFrameData(2, 20).blitUDDuplicateBar(111, 59)
+		MachineBuilder.mkIIScreen().blitUDProgressBar(57, 59, 190, 52, 8, 12).blitUDFrameData(2, 20).blitUDDuplicateBar(111, 59)
 		.blitWhenActive(59, 20, 190, 88, 58, 21).blitWhenActiveFrameData(3, 40).buildAndRegister("mkii_purifier");
 	}
 

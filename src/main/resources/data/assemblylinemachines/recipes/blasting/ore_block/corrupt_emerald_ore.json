@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_emerald_ore"
+		"tag": "forge:ores/corrupt_emerald"
 	},
 	"result": "minecraft:emerald",
 	"experience": 1,

@@ -1,9 +1,13 @@
 package me.haydenb.assemblylinemachines.registry;
 
+import java.util.List;
+
 import org.apache.commons.lang3.tuple.Pair;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ConfigHandler {
 
@@ -32,12 +36,17 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> experienceSiphonMaxDrain;
 		public final ConfigValue<Integer> coalGeneratorMultiplier;
 		public final ConfigValue<Integer> naphthaTurbineMultiplier;
+		public final ConfigValue<List<? extends String>> disallowedFluidBathItems;
+		public final BooleanValue invalidBathReturnsSludge;
+		public final ConfigValue<Integer> simpleGrinderCycleMultiplier;
+		public final ConfigValue<Double> simpleFluidMixerCycleMultiplier;
 		
 		//MISC/WORLD
 		public final BooleanValue updateChecker;
 		public final BooleanValue guideBook;
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
+		public final ConfigValue<String> preferredModid;
 		
 		//GENERAL TOOLS
 		public final ConfigValue<Double> overclockEnchantmentMultiplier;
@@ -106,7 +115,7 @@ public class ConfigHandler {
 		
 		public ALMCommonConfig(final ForgeConfigSpec.Builder builder) {
 			
-			builder.push("Machine Options");
+			builder.push("Machines");
 			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").defineInRange("crankSnapChance", 100, -1, 1000);
 			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?", "For example, attempting to \"interact with\" a block with a GUI will cause an exception.").define("interactorInteractMode", true);
 			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?",
@@ -119,9 +128,21 @@ public class ConfigHandler {
 			coalGeneratorMultiplier = builder.comment("What should the base FE multiplier for burn-time-to-FE be for fuel in the Coal Generator?", "Every 1 is equal to 4 FE more per burn tick over the 60 seconds of operation.",
 					"For example, every 1 would increase the FE output of Charcoal by 3.2KFE.").defineInRange("coalGeneratorMultiplier", 2, 1, 100);
 			naphthaTurbineMultiplier = builder.comment("What should the base operating time multiplier be for when the Naphtha Turbine is placed on the Coal Generator?", "Every 1 is equal to 60 seconds.").defineInRange("naphthaTurbineMultiplier", 4, 1, 100);
+			disallowedFluidBathItems = builder.comment("What items should be blacklisted from being accepted into the Fluid Bath?", "A handful of items cannot be accepted regardless of list content.").defineListAllowEmpty(List.of("disallowedFluidBathItems"), () -> List.of(), (s) -> {
+				try {
+					return ForgeRegistries.ITEMS.containsKey(new ResourceLocation(s.toString()));
+				}catch(Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				
+			});
+			invalidBathReturnsSludge = builder.comment("On a failed recipe, should the Fluid Bath return Sludge when emptied?", "If false, it will instead return both of the input items.").define("invalidBathReturnsSludge", true);
+			simpleGrinderCycleMultiplier = builder.comment("What should the multiplier for the amount of grinds (uses of the Manual Grinder) to convert to minimum seconds in the Simple Grinder be?", "For example, a recipe with 10 grinds with a multiplier of 2 will take a minimum of 20 seconds to craft.").defineInRange("simpleGrinderCycleModifier", 2, 1, 100);
+			simpleFluidMixerCycleMultiplier = builder.comment("What should the multiplier for the amount of stirs (uses of a Stirring Stick on Fluid Bath) to convert to minimum seconds in the Simple Fluid Mixer be?", "For example, a recipe with 10 stirs with a multiplier of 0.7 will take a minimum of 7 seconds to craft.").defineInRange("simpleFluidMixerCycleModifier", 1d, 0.01d, 100d);
 			builder.pop();
 			
-			builder.push("Tools and Armor");
+			builder.push("Tools");
 			overclockEnchantmentMultiplier = builder.comment("What multiplier should each level of the Overclock enchantment give?", "For example, the default of \"0.2\" is a 20% increase per enchantment level.").defineInRange("overclockEnchantmentMultiplier", 0.2d, 0.001d, 1d);
 			builder.push("Titanium");
 			titaniumToolAttack = builder.comment("What is the base damage Titanium Tools should do?").defineInRange("titaniumToolAttack", 5d, 0.1d, 1000d);
@@ -143,7 +164,7 @@ public class ConfigHandler {
 			steelArmorToughness = builder.comment("What should the toughness of Steel Armor be?").defineInRange("steelArmorToughness", 0.5d, 0d, 1d);
 			builder.pop();
 			
-			builder.push("Crank-Powered");
+			builder.push("Crank");
 			crankToolAttack = builder.comment("What is the base damage Crank-Powered Tools should do?").defineInRange("crankToolAttack", 8d, 0.1d, 1000d);
 			crankToolHarvestSpeed = builder.comment("What is the base harvest speed Crank-Powered Tools should do?").defineInRange("crankToolHarvestSpeed", 11d, 0.1d, 100d);
 			crankToolEnchantability = builder.comment("What should the enchantability of Crank-Powered Tools be?").defineInRange("crankToolEnchantability", 16, 0, 100);
@@ -173,8 +194,10 @@ public class ConfigHandler {
 			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
 			gasolineExplosions = builder.comment("Should Gasoline and Diesel explode when placed next to a flammable block?").define("gasolineExplosions", true);
 			guideBook = builder.comment("When Patchouli is installed, should players be automatically given the Guidebook when they first connect?").define("guideBook", true);
+			preferredModid = builder.comment("In recipe types which support inter-mod compatible output, which Mod ID should be preferred?", 
+					"If the selected Mod ID is invalid or does not provide an appropriate item for a tag, the first Mod ID alphabetically will be used.").define("preferredModid", "assemblylinemachines");
 			
-			builder.push("Titanium Generation");
+			builder.push("Titanium");
 			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumVeinSize", 5, 0, 1000);
 			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumFrequency", 7, 0, 1000);
 			titaniumMinHeight = builder.comment("What is the minimum Y value Titanium Ore should spawn at in the overworld?", 
@@ -184,21 +207,21 @@ public class ConfigHandler {
 					"UNIFORM - All generation is equal between min-max range - Akin to Redstone Ore at most altitudes.").defineEnum("titaniumOreGenStyle", OreGenOptions.TRIANGLE);
 			builder.pop();
 			
-			builder.push("Black Granite Generation");
+			builder.push("Black-Granite");
 			blackGraniteSpawnsWithNaturalTag = builder.comment("Should generated Black Granite have the \"natural\" tag?", "This tag, if present, will only allow Black Granite to be dropped if mined with a Crank-Powered Pickaxe.", 
 					"This is the intended progression, but can be disabled in order to make all Pickaxes mine it.").define("blackGraniteSpawnsWithNaturalTag", true);
 			blackGraniteVeinSize = builder.comment("What should the maximum size per vein of Black Granite be?", "Set to 0 to disable Black Granite generation.").define("blackGraniteVeinSize", 37);
 			blackGraniteFrequency = builder.comment("How many veins of Black Granite should generate per chunk?", "Set to 0 to disable Black Granite generation.").define("blackGraniteFrequency", 7);
 			builder.pop();
 			
-			builder.push("Chromium Generation");
+			builder.push("Chromium");
 			chromiumVeinSize = builder.comment("What should the maximum size per vein of Chromium Ore be?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumVeinSize", 10, 0, 1000);
 			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumFrequency", 4, 0, 1000);
 			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?", "If false, Chromium Ore will only generate on the outer End islands accessed by the End Gateway.").define("chromiumOnDragonIsland", false);
 			builder.pop();
 			builder.pop();
 			
-			builder.push("Client Options");
+			builder.push("Client");
 			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
 			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
 			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);

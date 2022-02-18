@@ -1,9 +1,9 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_coal_ore"
+		"tag": "forge:ores/corrupt_copper"
 	},
-	"result": "minecraft:coal",
+	"result": "minecraft:copper_ingot",
 	"experience": 1,
 	"cookingtime": 100
 }

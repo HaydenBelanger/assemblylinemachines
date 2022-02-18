@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_titanium_ore"
+		"tag": "forge:ores/corrupt_titanium"
 	},
 	"result": "assemblylinemachines:titanium_ingot",
 	"experience": 1,

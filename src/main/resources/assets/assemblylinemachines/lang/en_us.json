@@ -187,6 +187,7 @@
 	"item.assemblylinemachines.music_disc_assembly_required.desc": "NinjaKittens - Assembly Required",
 	"item.assemblylinemachines.mkii_upgrade_kit": "MKII Upgrade Kit",
 	"item.assemblylinemachines.wrench_o_matic": "Wrench-O-Matic",
+	"item.assemblylinemachines.electric_upgrade_kit": "Electric Upgrade Kit",
 	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",
@@ -326,6 +327,7 @@
 	"block.assemblylinemachines.mkii_alloy_smelter": "MKII Alloy Smelter",
 	"block.assemblylinemachines.mkii_purifier": "MKII Purifier",
 	"block.assemblylinemachines.omnivoid": "Omnivoid",
+	"block.assemblylinemachines.mkii_fluid_mixer": "MKII Fluid Mixer",
 	
 	"fluid.assemblylinemachines.oil":"Oil",
 	"fluid.assemblylinemachines.condensed_void":"Condensed Void",

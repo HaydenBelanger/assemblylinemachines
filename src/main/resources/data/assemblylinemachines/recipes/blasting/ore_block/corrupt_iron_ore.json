@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_iron_ore"
+		"tag": "forge:ores/corrupt_iron"
 	},
 	"result": "minecraft:iron_ingot",
 	"experience": 1,

@@ -104,15 +104,10 @@ repositories{
     	name = "Patchouli"
     	url = "https://maven.blamejared.com"
     }
-    //maven {
-    	//name = "Mekanism"
-     	//url "https://modmaven.dev/"
-    //}
 	maven {
 		name = "Cursemaven"
         url = "https://cursemaven.com"
     }
-    
     maven{
     	name = "Spongepowered"
     	url = "https://repo.spongepowered.org/maven"
@@ -132,18 +127,15 @@ jar{
 dependencies {
   minecraft 'net.minecraftforge:forge:1.18.1-39.0.45'
 	
-	//JEI - Updated.
+	//Compatibilities - 'implementation' because it needs to be during runtime and compilation.
  	implementation fg.deobf("mezz.jei:jei-1.18.1:9.2.3.82")
- 	
- 	//PATCHOULI - Updated.
     implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.1-64")
-    
-	//MEKANISM - Not yet updated to 1.18.
-	//compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
-    //runtimeOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
-    
-    //THE ONE PROBE - Updated.
     implementation fg.deobf("curse.maven:theoneprobe-245211:3606616")
+    
+    //Testing mods - 'runtimeOnly' because it doesn't need to be present during compilation.
+    runtimeOnly fg.deobf("curse.maven:immersive-engineering-231951:3587149")
+    
+    
     
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

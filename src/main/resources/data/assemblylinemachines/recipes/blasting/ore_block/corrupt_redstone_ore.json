@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_redstone_ore"
+		"tag": "forge:ores/corrupt_redstone"
 	},
 	"result": "minecraft:redstone",
 	"experience": 1,

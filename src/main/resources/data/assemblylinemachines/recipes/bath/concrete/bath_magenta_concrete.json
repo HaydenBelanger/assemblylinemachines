@@ -4,7 +4,7 @@
 		"item": "minecraft:magenta_concrete_powder"
 	},
 	"input_b":{
-		"item": "minecraft:magenta_concrete_powder"
+		"tag": "forge:gravel"
 	},
 	"output":{
 		"item": "minecraft:magenta_concrete",

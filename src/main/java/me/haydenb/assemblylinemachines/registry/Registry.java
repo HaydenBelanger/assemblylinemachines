@@ -320,6 +320,7 @@ public class Registry {
 		createItem("music_disc_assembly_required", new RecordItem(1, () -> Registry.getSound("assembly_required"), new Item.Properties().tab(CREATIVE_TAB).stacksTo(1).rarity(Rarity.RARE)));
 		
 		createItem("mkii_upgrade_kit", new ItemUpgradeKit());
+		createItem("electric_upgrade_kit", new ItemUpgradeKit());
 		
 		createItem("wrench_o_matic");
 		

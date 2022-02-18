@@ -20,32 +20,35 @@ public class StateProperties {
 	public static final EnumProperty<BathCraftingFluids> FLUID = EnumProperty.create("fluid", BathCraftingFluids.class);
 	
 	public static enum BathCraftingFluids implements StringRepresentable {
-		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52), new Pair<>(87, 197)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68), new Pair<>(87, 213)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153), new Pair<>(102, 229)), 
-		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), new Pair<>(102, 213)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), new Pair<>(102, 197)),
-		DARK_ENERGY(() -> Registry.getFluid("dark_energy"), true, null, new Pair<>(176, 169), new Pair<>(87, 229));
+		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52), Pair.of(190, 89), new Pair<>(87, 197)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68), Pair.of(190, 104), new Pair<>(87, 213)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153), Pair.of(190, 149), new Pair<>(102, 229)), 
+		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), Pair.of(190, 134), new Pair<>(102, 213)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), Pair.of(190, 119), new Pair<>(102, 197)),
+		DARK_ENERGY(() -> Registry.getFluid("dark_energy"), true, null, new Pair<>(176, 169), Pair.of(190, 164), new Pair<>(87, 229));
 
-		private Supplier<Fluid> f;
+		private final Supplier<Fluid> f;
 		private Fluid fx;
-		private boolean electricMixerOnly;
-		private Pair<Integer, Integer> simpleBlitPiece;
-		private Pair<Integer, Integer> electricBlitPiece;
-		private Pair<Integer, Integer> jeiBlitPiece;
+		private final boolean electricMixerOnly;
+		private final Pair<Integer, Integer> simpleBlitPiece;
+		private final Pair<Integer, Integer> electricBlitPiece;
+		private final Pair<Integer, Integer> mkIIBlitPiece;
+		private final Pair<Integer, Integer> jeiBlitPiece;
 		
-		BathCraftingFluids(Supplier<Fluid> f, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
+		BathCraftingFluids(Supplier<Fluid> f, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> mkIIBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
 			this.f = f;
 			this.fx = null;
 			this.electricMixerOnly = electricMixerOnly;
 			this.simpleBlitPiece = simpleBlitPiece;
 			this.electricBlitPiece = electricBlitPiece;
+			this.mkIIBlitPiece = mkIIBlitPiece;
 			this.jeiBlitPiece = jeiBlitPiece;
 		}
 		
-		BathCraftingFluids(Fluid fx, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
+		BathCraftingFluids(Fluid fx, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> mkIIBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
 			this.fx = fx;
 			this.f = null;
 			this.electricMixerOnly = electricMixerOnly;
 			this.simpleBlitPiece = simpleBlitPiece;
 			this.electricBlitPiece = electricBlitPiece;
+			this.mkIIBlitPiece = mkIIBlitPiece;
 			this.jeiBlitPiece = jeiBlitPiece;
 		}
 		
@@ -55,6 +58,8 @@ public class StateProperties {
 			this.electricMixerOnly = false;
 			this.simpleBlitPiece = null;
 			this.electricBlitPiece = null;
+			this.jeiBlitPiece = null;
+			this.mkIIBlitPiece = null;
 		}
 		
 		@Override
@@ -115,6 +120,10 @@ public class StateProperties {
 
 		public Pair<Integer, Integer> getJeiBlitPiece() {
 			return jeiBlitPiece;
+		}
+		
+		public Pair<Integer, Integer> getMKIIBlitPiece(){
+			return mkIIBlitPiece;
 		}
 	}
 }

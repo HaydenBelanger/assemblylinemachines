@@ -89,6 +89,11 @@ public class MachineBuilder {
 		return new MachineScreenBuilder();
 	}
 	
+	@OnlyIn(Dist.CLIENT)
+	public static MachineScreenBuilder mkIIScreen() {
+		return new MachineScreenBuilder().inventorySize(190, 188).energyMeterStartX(190).doNotRenderInventoryText().doNotRenderTitleText();
+	}
+	
 	public static class MachineBlockBuilder {
 		
 		private boolean activeProperty = false;
@@ -242,6 +247,9 @@ public class MachineBuilder {
 		private boolean processesFluids = false;
 		private int capacity = 0;
 		private boolean hasExternalTank = false;
+		private Function<Integer, Boolean> duplicateStackChecking = null;
+		private Integer slotFullFirst = null;
+		private BiFunction<ItemStack, BlockEntity, Boolean> firstSlotValidator = null;
 		
 		private MachineBlockEntityBuilder() {}
 		
@@ -316,22 +324,22 @@ public class MachineBuilder {
 			return this;
 		}
 		
+		public MachineBlockEntityBuilder stackManagement(Function<Integer, Boolean> duplicateStack, Integer firstSlot, BiFunction<ItemStack, BlockEntity, Boolean> firstSlotValidator) {
+			this.duplicateStackChecking = duplicateStack;
+			this.slotFullFirst = firstSlot;
+			this.firstSlotValidator = firstSlotValidator;
+			return this;
+		}
+		
 		public BlockEntityType<?> build(String blockName, Block... validBlocks) {
 			
 			class MachineBlockEntity extends ManagedSidedMachine<AbstractContainerMenu> implements ALMTicker<MachineBlockEntity>, IMachineDataBridge{
 
-				private int timer;
-				private int nTimer;
-				private float progress;
-				private float cycles;
-				private ItemStack output = ItemStack.EMPTY;
-				private ItemStack secondaryOutput = ItemStack.EMPTY;
-				private ItemStack dualProcessorOutput = ItemStack.EMPTY;
-				private Container processorContainer = null;
-				private Container dualFunctionProcessorContainer = null;
-				
-				private LazyOptional<IFluidHandler> internalLazy = null;
-				private LazyOptional<IFluidHandler> externalLazy = null;
+				private int timer, nTimer;
+				private float progress, cycles;
+				private ItemStack output, secondaryOutput, dualProcessorOutput = ItemStack.EMPTY;
+				private Container processorContainer, dualFunctionProcessorContainer = null;
+				private LazyOptional<IFluidHandler> internalLazy, externalLazy = null;
 				private FluidStack internalTank = FluidStack.EMPTY;
 				private boolean useInternalTank = true;
 				
@@ -447,6 +455,15 @@ public class MachineBuilder {
 					if(upgradeSlotNumber != 0 && (slot >= totalSlots - upgradeSlotNumber)) {
 						return (stack.getItem() instanceof ItemUpgrade);
 					}
+					
+					if(slotFullFirst != null && slotFullFirst != slot && contents.get(slotFullFirst).isEmpty()) return false;
+					if(firstSlotValidator != null && slotFullFirst != null && slot == slotFullFirst && !firstSlotValidator.apply(stack, this)) return false;
+					if(duplicateStackChecking != null) {
+						for(int i = 0; i < contents.size(); i++) {
+							if(i != slot && duplicateStackChecking.apply(i) && contents.get(i).getItem().equals(stack.getItem())) return false;
+						}
+					}
+					
 					return super.isAllowedInSlot(slot, stack);
 				}
 				

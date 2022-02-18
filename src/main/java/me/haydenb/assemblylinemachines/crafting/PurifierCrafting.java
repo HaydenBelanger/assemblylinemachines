@@ -134,6 +134,10 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		return List.of(output);
 	}
 	
+	public boolean isPrimaryIngredient(ItemStack test) {
+		return tobepurified.test(test);
+	}
+	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<PurifierCrafting>{
 
 		@Override

@@ -1,8 +1,11 @@
 package me.haydenb.assemblylinemachines.block.machines;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.google.common.base.Suppliers;
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
@@ -11,6 +14,7 @@ import me.haydenb.assemblylinemachines.item.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
@@ -18,6 +22,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.*;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
@@ -35,10 +40,12 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class BlockFluidBath extends Block implements EntityBlock {
 	
 	public static final List<Item> VALID_FILL_ITEMS = List.of(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.POTION);
+	public static final Supplier<List<Item>> DISALLOWED_ITEMS = Suppliers.memoize(() -> Lists.transform(ConfigHolder.getCommonConfig().disallowedFluidBathItems.get(), (o) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(o.toString()))));
 	
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
@@ -107,12 +114,19 @@ public class BlockFluidBath extends Block implements EntityBlock {
 							entity.fluidColor = 0;
 							entity.inputb = null;
 							entity.drainAmt = 0;
-							entity.sendUpdates();
+							
 							world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1f, 1f);
 							world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
 							player.displayClientMessage(new TextComponent("Drained basin."), true);
+							if(entity.inputIngredientReturn != null) {
+								ItemHandlerHelper.giveItemToPlayer(player, entity.inputIngredientReturn.getFirst());
+								ItemHandlerHelper.giveItemToPlayer(player, entity.inputIngredientReturn.getSecond());
+								entity.inputIngredientReturn = null;
+							}else {
+								ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), world.getRandom().nextInt(maxSludge)));
+							}
 							
-							ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), world.getRandom().nextInt(maxSludge)));
+							entity.sendUpdates();
 						}
 
 					} else {
@@ -155,7 +169,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 							}else {
 								if (entity.inputa == null) {
 									Item i = held.getItem();
-									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && !DISALLOWED_ITEMS.get().contains(i) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
 										entity.inputa = new ItemStack(held.getItem());
 										held.shrink(1);
 										entity.sendUpdates();
@@ -165,7 +179,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 								} else if (entity.inputb == null) {
 									Item i = held.getItem();
-									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && !DISALLOWED_ITEMS.get().contains(i) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
 										world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS,
 												1f, 1f);
 										entity.inputb = new ItemStack(held.getItem());
@@ -183,6 +197,9 @@ public class BlockFluidBath extends Block implements EntityBlock {
 											
 											
 										}else {
+											if(!ConfigHolder.getCommonConfig().invalidBathReturnsSludge.get()) {
+												entity.inputIngredientReturn = Pair.of(entity.inputa, entity.inputb);
+											}
 											entity.sendUpdates();
 											world.setBlockAndUpdate(pos, state.setValue(STATUS, 5));
 										}
@@ -249,6 +266,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 		private ItemStack inputa = null;
 		private ItemStack inputb = null;
 		private ItemStack output = null;
+		private Pair<ItemStack, ItemStack> inputIngredientReturn = null;
 		private int fluidColor = -1;
 		private int drainAmt = 0;
 
@@ -285,6 +303,10 @@ public class BlockFluidBath extends Block implements EntityBlock {
 				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
 			
+			if(compound.contains("assemblylinemachines:returna") && compound.contains("assemblylinemachines:returnb")) {
+				inputIngredientReturn = Pair.of(ItemStack.of(compound.getCompound("assemblylinemachines:returna")), ItemStack.of(compound.getCompound("assemblylinemachines:returnb")));
+			}
+			
 			if(compound.contains("assemblylinemachines:drainamt")) {
 				drainAmt = compound.getInt("assemblylinemachines:drainamt");
 			}
@@ -317,6 +339,11 @@ public class BlockFluidBath extends Block implements EntityBlock {
 				compound.put("assemblylinemachines:output", sub);
 			} else {
 				compound.remove("assemblylinemachines:output");
+			}
+			
+			if(inputIngredientReturn != null) {
+				compound.put("assemblylinemachines:returna", inputIngredientReturn.getFirst().save(new CompoundTag()));
+				compound.put("assemblylinemachines:returnb", inputIngredientReturn.getSecond().save(new CompoundTag()));
 			}
 			super.saveAdditional(compound);
 		}

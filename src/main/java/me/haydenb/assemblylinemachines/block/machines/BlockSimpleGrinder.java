@@ -8,6 +8,7 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBa
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -147,7 +148,7 @@ public class BlockSimpleGrinder{
 										isb = null;
 										isa = null;
 										output = crafting.assemble(null);
-										cycles = crafting.getGrinds() * 2;
+										cycles = crafting.getGrinds() * ConfigHolder.getCommonConfig().simpleGrinderCycleMultiplier.get();
 										progress = 0;
 										pendingOutput = false;
 										sendUpdates();

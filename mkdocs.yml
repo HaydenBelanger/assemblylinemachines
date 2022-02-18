@@ -28,6 +28,7 @@ nav:
       - Refining: recipes/refining.md
       - World Corruption: recipes/worldcorruption.md
       - Generator Fluid: recipes/generatorfluid.md
+      - Upgrading: recipes/upgrading.md
     - Tags: miscdev/tags.md
     - Reservoir Capability: miscdev/fluidreservoir.md
 

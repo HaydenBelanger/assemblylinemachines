@@ -7,7 +7,7 @@
 		"tag": "minecraft:sand"
 	},
 	"tobepurified":{
-		"item": "minecraft:copper_ingot"
+		"tag": "forge:ingots/copper"
 	},
 	"output":{
 		"item": "assemblylinemachines:pure_copper"
