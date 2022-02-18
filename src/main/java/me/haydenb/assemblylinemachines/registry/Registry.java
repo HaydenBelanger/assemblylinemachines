@@ -308,7 +308,7 @@ public class Registry {
 		createItem("chaotic_fertilizer", new ItemFertilizer(10));
 		
 		createItem("flerovium_gear", "flerovium_ingot", "flerovium_plate", "ground_flerovium", "raw_flerovium", "flerovium_nugget");
-		createItem("ground_diamond");
+		createItem("ground_diamond", "ground_emerald");
 		
 		createItem("nova_blend", "novasteel_ingot", "novasteel_plate", "raw_novasteel_compound", "ultimate_battery");
 		

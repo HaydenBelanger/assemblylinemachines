@@ -93,7 +93,7 @@ public class TagMaster {
 				Pair.of("copper", "ground_copper"), Pair.of("electrified_netherite", "electrified_netherite_blend"), 
 				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"), 
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
-				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"),
+				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"), Pair.of("emerald", "ground_emerald"),
 				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust"), Pair.of("chromium", "ground_chromium")));
 		forgeTags.putAll("gears", List.of(Pair.of("copper", "copper_gear"), Pair.of("gold", "gold_gear"), Pair.of("iron", "iron_gear"),
 				Pair.of("steel", "steel_gear"), Pair.of("titanium", "titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
