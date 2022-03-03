@@ -4,28 +4,24 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
-import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -104,7 +100,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 	}
 
 	public static class TECrankmill extends EnergyMachine<ContainerCrankmill>
-			implements ICrankableMachine, ALMTicker<TECrankmill>, TOPProvider {
+			implements ICrankableMachine, ALMTicker<TECrankmill>/*, TOPProvider*/ {
 
 		
 		public int rfDif = 0;
@@ -120,6 +116,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 			this(Registry.getBlockEntity("crankmill"), pos, state);
 		}
 		
+		/*
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
@@ -130,7 +127,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 			}
 			
 		}
-		
+		*/
 		
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {

@@ -8,8 +8,7 @@ import com.mojang.authlib.GameProfile;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.ISpecialEntropyPlacement;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
@@ -116,14 +115,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 		public static class ChaosbarkTreeGrower extends AbstractTreeGrower{
 
-			public static ConfiguredFeature<?, ?> chaosbarkTree;
-
-
-
-			@Override
-			protected ConfiguredFeature<?, ?> getConfiguredFeature(Random p_60014_, boolean p_60015_) {
-				return chaosbarkTree;
-			}
+			public static Holder<ConfiguredFeature<?, ?>> chaosbarkTree;
 
 			@SubscribeEvent
 			public static void registerTreeGen(FMLCommonSetupEvent event) {
@@ -134,10 +126,15 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 				FoliagePlacer foliagePlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
 				FeatureSize size = new TwoLayersFeatureSize(1, 0, 1);
 				BlockStateProvider bspDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
-
-				chaosbarkTree = new TreeFeature(TreeConfiguration.CODEC).configured(new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
+				
+				chaosbarkTree = Holder.direct(new ConfiguredFeature<>(new TreeFeature(TreeConfiguration.CODEC), new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build()));
 			}
 
+			@Override
+			protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random p_204307_,
+					boolean p_204308_) {
+				return chaosbarkTree;
+			}
 		}
 	}
 

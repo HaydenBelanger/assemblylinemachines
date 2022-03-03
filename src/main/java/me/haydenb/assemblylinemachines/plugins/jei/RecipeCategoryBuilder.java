@@ -37,6 +37,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.fluids.FluidStack;
 
+@SuppressWarnings("removal")
 public class RecipeCategoryBuilder {
 
 	private final IGuiHelper helper;
@@ -93,7 +94,6 @@ public class RecipeCategoryBuilder {
 		return this.background(getGUIPath(guiPath), u, v, width, height);
 	}
 	
-	@SuppressWarnings("deprecation")
 	RecipeCategoryBuilder icon(ItemLike b) {
 		this.icon = helper.createDrawableIngredient(new ItemStack(b));
 		return this;
@@ -323,6 +323,7 @@ public class RecipeCategoryBuilder {
 					super();
 				}
 				
+				@SuppressWarnings("deprecation")
 				public DynamicFluidStackRenderer(int capacityMb, boolean showCapacity) {
 					super(capacityMb, showCapacity, 16, 16, null);
 				}

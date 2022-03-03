@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import me.haydenb.assemblylinemachines.plugins.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.*;
@@ -28,7 +27,7 @@ public final class AssemblyLineMachines{
 		PacketHandler.INSTANCE.registerMessage(PacketHandler.ID++, PacketData.class, new EncoderConsumer(), new DecoderConsumer(), new MessageHandler());
 		
 		//The One Probe plugin registration.
-		PluginTOP.register();
+		//PluginTOP.register();
 	}
 	
 	public static ModContainer getModContainer() {

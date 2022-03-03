@@ -26,6 +26,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
+@SuppressWarnings("removal")
 public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCategoryBuilder {
 
 	public static final RecipeType<WorldCorruptionCrafting> WORLD_CORRUPTION_RECIPE = new TypeWorldCorruptionCrafting();

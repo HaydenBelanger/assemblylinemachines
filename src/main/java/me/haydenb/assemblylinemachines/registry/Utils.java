@@ -23,8 +23,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.FastColor.ARGB32;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -41,6 +44,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class Utils {
 
@@ -209,6 +213,24 @@ public class Utils {
 		return null;
 	}
 
+	public static <T> TagKey<T> getTagKey(ResourceKey<net.minecraft.core.Registry<T>> key, ResourceLocation tag){
+		return TagKey.create(key, tag);
+	}
+	
+	public static boolean isInTag(BlockState block, String minecraftTag) {
+		return isInTag(block, new ResourceLocation("minecraft", minecraftTag));
+	}
+	public static boolean isInTag(BlockState block, ResourceLocation tag) {
+		return block.is(getTagKey(Keys.BLOCKS, tag));
+	}
+	
+	public static boolean isInAnyTag(BlockState block, String... minecraftTags) {
+		return isInAnyTag(block, Utils.copy(minecraftTags, ResourceLocation.class, (i) -> new ResourceLocation("minecraft", i)));
+	}
+	public static boolean isInAnyTag(BlockState block, ResourceLocation... tags) {
+		for(ResourceLocation tag : tags) if(!isInTag(block, tag)) return false;
+		return true;
+	}
 	@OnlyIn(Dist.CLIENT)
 	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Font pFont, Component pText, int pX, int pY, int pColor) {
 		FormattedCharSequence formattedcharsequence = pText.getVisualOrderText();

@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -44,7 +45,8 @@ public class QuantumLinkTER implements BlockEntityRendererProvider<TEQuantumLink
 			@Override
 			public void render(TEQuantumLink tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 				RANDOM.setSeed(31100L);
-				double d0 = tileEntityIn.getBlockPos().distSqr(ctxt.getBlockEntityRenderDispatcher().camera.getPosition(), true);
+				Vec3 v3 = ctxt.getBlockEntityRenderDispatcher().camera.getPosition();
+				double d0 = tileEntityIn.getBlockPos().distToCenterSqr(v3.x, v3.y, v3.z);
 				int i = getPasses(d0);
 				float f = getOffset();
 				Matrix4f matrix4f = matrixStackIn.last().pose();

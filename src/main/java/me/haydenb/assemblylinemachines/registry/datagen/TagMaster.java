@@ -11,28 +11,28 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.data.tags.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.*;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class TagMaster {
 
 	//Below is all in reference to Mining Level and Tool Type, referenced by the block data generator.
-	public static final Named<Block> NEEDS_NETHERITE_TOOL = ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation("forge", "needs_netherite_tool"));
-	public static final Named<Block> NEEDS_MYSTIUM_TOOL = ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
+	public static final TagKey<Block> NEEDS_NETHERITE_TOOL = Utils.getTagKey(Keys.BLOCKS, new ResourceLocation("forge", "needs_netherite_tool"));
+	public static final TagKey<Block> NEEDS_MYSTIUM_TOOL = Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
 	
 	
-	private static final HashMap<Material, Optional<Named<Block>>> MATERIAL_TOOL = new HashMap<>();
+	private static final HashMap<Material, Optional<TagKey<Block>>> MATERIAL_TOOL = new HashMap<>();
 	static {
 		MATERIAL_TOOL.put(Material.AMETHYST, Optional.of(BlockTags.MINEABLE_WITH_PICKAXE));
 		MATERIAL_TOOL.put(Material.DIRT, Optional.of(BlockTags.MINEABLE_WITH_SHOVEL));
@@ -53,8 +53,8 @@ public class TagMaster {
 	}
 	
 	//This is for general tagging.
-	private static final ListMultimap<WrappedNamed, String> TAG_SINGLE_MASTER = ArrayListMultimap.create();
-	private static final ListMultimap<WrappedNamed, Pair<String, String>> TAG_GROUP_MASTER = ArrayListMultimap.create();
+	private static final ListMultimap<WrappedTagKey, String> TAG_SINGLE_MASTER = ArrayListMultimap.create();
+	private static final ListMultimap<WrappedTagKey, Pair<String, String>> TAG_GROUP_MASTER = ArrayListMultimap.create();
 	static {
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/gears/all"), List.of(Pair.of("assemblylinemachines", "crafting/gears/industrial"), Pair.of("assemblylinemachines", "crafting/gears/precious")));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "crafting/gears/industrial"), List.of(Pair.of("forge", "gears/copper"), Pair.of("forge", "gears/iron"), Pair.of("forge", "gears/steel")));
@@ -135,7 +135,7 @@ public class TagMaster {
 	
 	@SuppressWarnings("unchecked")
 	static <T> void tagAllInMaster(DataProviderContainer provider, TagType type) {
-		for(WrappedNamed wn : Stream.concat(TAG_SINGLE_MASTER.keySet().stream(), TAG_GROUP_MASTER.keySet().stream()).collect(Collectors.toSet())) {
+		for(WrappedTagKey wn : Stream.concat(TAG_SINGLE_MASTER.keySet().stream(), TAG_GROUP_MASTER.keySet().stream()).collect(Collectors.toSet())) {
 			for(Object x : Stream.concat(TAG_SINGLE_MASTER.get(wn).stream(), TAG_GROUP_MASTER.get(wn).stream()).collect(Collectors.toList())) {
 				x = x instanceof Pair ? new ResourceLocation(((Pair<String, String>) x).getFirst(), ((Pair<String, String>) x).getSecond()) : x;
 				if(x instanceof String) {
@@ -147,64 +147,55 @@ public class TagMaster {
 				}
 				switch(wn.type){
 				case BLOCK:
-					if(type == wn.type) provider.blockProvider.passback(x, (Named<Block>) wn.named);
-					if(wn.copy && type == TagType.ITEM) provider.itemProvider.passback((Named<Block>) wn.named, wn.namedItemCopy.orElseThrow());
+					if(type == wn.type) provider.blockProvider.passback(x, (TagKey<Block>) wn.named);
+					if(wn.copy && type == TagType.ITEM) provider.itemProvider.passback((TagKey<Block>) wn.named, wn.namedItemCopy.orElseThrow());
 					break;
 				case ITEM:
-					if(type == wn.type) provider.itemProvider.passback(x, (Named<Item>) wn.named);
+					if(type == wn.type) provider.itemProvider.passback(x, (TagKey<Item>) wn.named);
 				}
 			}
 		}
 	}
 	
-	private static WrappedNamed wrap(TagType type, String modid, String path) {
-		IForgeRegistry<?> reg = null;
-		switch(type) {
-		case BLOCK:
-			reg = ForgeRegistries.BLOCKS;
-			break;
-		case ITEM:
-			reg = ForgeRegistries.ITEMS;
-			break;
-		}
-		return new WrappedNamed(ForgeTagHandler.makeWrapperTag(reg, new ResourceLocation(modid, path)), type);
+	private static WrappedTagKey wrap(TagType type, String modid, String path) {
+		return type == TagType.BLOCK ? new WrappedTagKey(TagKey.create(Keys.BLOCKS, new ResourceLocation(modid, path)), type) : new WrappedTagKey(TagKey.create(Keys.ITEMS, new ResourceLocation(modid, path)), type);
 	}
 	
-	private static WrappedNamed wrap(TagType type, String path) {
+	private static WrappedTagKey wrap(TagType type, String path) {
 		return wrap(type, AssemblyLineMachines.MODID, path);
 	}
 	
-	//WrappedNamed, used to store the type of tag as stored above.
-	private static class WrappedNamed{
+	//WrappedTagKey, used to store the type of tag as stored above.
+	private static class WrappedTagKey{
 		private final TagType type;
-		private final Named<?> named;
+		private final TagKey<?> named;
 		private boolean copy;
-		private Optional<Named<Item>> namedItemCopy;
+		private Optional<TagKey<Item>> namedItemCopy;
 		
-		private WrappedNamed(Named<?> named, TagType type) {
+		private WrappedTagKey(TagKey<?> named, TagType type) {
 			this.named = named;
 			this.type = type;
 			this.copy = false;
 			this.namedItemCopy = Optional.empty();
 		}
 		
-		private WrappedNamed copy() {
+		private WrappedTagKey copy() {
 			if(this.type == TagType.ITEM) {
 				throw new IllegalArgumentException("Cannot perform copy on a TagType.ITEM!");
 			}
 			copy = true;
-			namedItemCopy = Optional.of(ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, named.getName()));
+			namedItemCopy = Optional.of(Utils.getTagKey(Keys.ITEMS, named.location()));
 			return this;
 		}
 		
-		private WrappedNamed copy(boolean copy) {
+		private WrappedTagKey copy(boolean copy) {
 			if(copy) return this.copy();
 			return this;
 		}
 		
 		@Override
 		public String toString() {
-			return named.getName().toString();
+			return named.location().toString();
 		}
 	}
 	
@@ -242,12 +233,12 @@ public class TagMaster {
 				
 				writer.println("[SYSTEM]: Starting Mining Level and Tool Type tagging...");
 				for(Block b : Registry.getAllBlocksUnmodifiable()) {
-					Optional<Pair<Optional<Named<Block>>, Optional<Named<Block>>>> result = getTagsForMiningLevel(b);
+					Optional<Pair<Optional<TagKey<Block>>, Optional<TagKey<Block>>>> result = getTagsForMiningLevel(b);
 					if(result == null) {
 						writer.println("[WARNING]: For " + b.getRegistryName() + ", a default tool was not exposed.");
 					}else {
 						if(result.isPresent()) {
-							Pair<Optional<Named<Block>>, Optional<Named<Block>>> r2 = result.orElseThrow();
+							Pair<Optional<TagKey<Block>>, Optional<TagKey<Block>>> r2 = result.orElseThrow();
 							if(r2.getFirst().isPresent()) {
 								this.passback(b, r2.getFirst().orElseThrow());
 							}
@@ -259,7 +250,7 @@ public class TagMaster {
 				}
 			}
 			
-			public Optional<Pair<Optional<Named<Block>>, Optional<Named<Block>>>> getTagsForMiningLevel(Block b){
+			public Optional<Pair<Optional<TagKey<Block>>, Optional<TagKey<Block>>>> getTagsForMiningLevel(Block b){
 				if(b instanceof IMiningLevelDataGenProvider) {
 					IMiningLevelDataGenProvider provider = (IMiningLevelDataGenProvider) b;
 					return Optional.of(Pair.of(provider.getToolTypeOpt(), provider.getToolLevelOpt()));
@@ -267,15 +258,16 @@ public class TagMaster {
 					return Optional.empty();
 				}else {
 					
-					Optional<Named<Block>> onb = MATERIAL_TOOL.get(b.defaultBlockState().getMaterial());
+					Optional<TagKey<Block>> onb = MATERIAL_TOOL.get(b.defaultBlockState().getMaterial());
 					return onb == null ? null : Optional.of(Pair.of(onb, Optional.empty()));
 				}
 			}
 			
-			public void passback(Object resource, Named<Block> block){
+			public void passback(Object resource, TagKey<Block> block){
 				if(resource == null) throwException(block);
 				if(resource instanceof ResourceLocation) {
-					this.tag(block).addTag(ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, (ResourceLocation) resource));
+
+					this.tag(block).addTag(Utils.getTagKey(Keys.BLOCKS, (ResourceLocation) resource));
 				}else if(resource instanceof Block) {
 					this.tag(block).add((Block) resource);
 				}else {
@@ -303,14 +295,14 @@ public class TagMaster {
 			}
 			
 			@SuppressWarnings("unchecked")
-			public void passback(Object resource, Named<Item> item){
+			public void passback(Object resource, TagKey<Item> item){
 				if(resource == null) throwException(item);
 				if(resource instanceof ResourceLocation) {
-					this.tag(item).addTag(ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, (ResourceLocation) resource));
+					this.tag(item).addTag(Utils.getTagKey(Keys.ITEMS, (ResourceLocation) resource));
 				}else if(resource instanceof Item) {
 					this.tag(item).add((Item) resource);
-				}else if(resource instanceof Named) {
-					this.copy((Named<Block>) resource, item);
+				}else if(resource instanceof TagKey) {
+					this.copy((TagKey<Block>) resource, item);
 				}else {
 					throwException(item);
 				}
@@ -335,7 +327,7 @@ public class TagMaster {
 				for(Fluid f : Registry.getAllFluids()) {
 					if(f.isSource(f.defaultFluidState()) && Registry.getBlock(f.getRegistryName().getPath() + "_block") != null) {
 						writer.println("[FLUID]: Created tag for " + f.getRegistryName() + ".");
-						Named<Fluid> named = ForgeTagHandler.makeWrapperTag(ForgeRegistries.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, f.getRegistryName().getPath()));
+						TagKey<Fluid> named = Utils.getTagKey(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, f.getRegistryName().getPath()));
 						this.tag(named).add(f);
 						Fluid flowing = Registry.getFluid(f.getRegistryName().getPath() + "_flowing");
 						if(flowing != null) this.tag(named).add(flowing);
@@ -346,19 +338,19 @@ public class TagMaster {
 			
 		}
 		
-		private void throwException(Named<?> named) {
-			throw new IllegalArgumentException("Attempt to tag " + named.getName().toString() + " failed: Resource is either null or not any appropriate Object type for the TagType.");
+		private void throwException(TagKey<?> named) {
+			throw new IllegalArgumentException("Attempt to tag " + named.location().toString() + " failed: Resource is either null or not any appropriate Object type for the TagType.");
 		}
 		
-		private void log(Object resource, Named<?> named, String descr) {
+		private void log(Object resource, TagKey<?> named, String descr) {
 			String objDesc;
-			if(resource instanceof Named) {
-				objDesc = ((Named<?>) resource).getName().toString();
+			if(resource instanceof TagKey) {
+				objDesc = ((TagKey<?>) resource).location().toString();
 			}else {
 				objDesc = resource.toString();
 			}
 			
-			writer.println("[" + descr + "]: " + objDesc + " tagged to " + named.getName().toString() + ".");
+			writer.println("[" + descr + "]: " + objDesc + " tagged to " + named.location().toString() + ".");
 			
 		}
 	}
@@ -370,15 +362,15 @@ public class TagMaster {
 	//IMiningLevelDataGenProvider, Blocks can implement this to specify the mining level and tool type.
 	public static interface IMiningLevelDataGenProvider {
 	
-		public Named<Block> getToolType();
+		public TagKey<Block> getToolType();
 		
-		public Named<Block> getToolLevel();
+		public TagKey<Block> getToolLevel();
 		
-		default public Optional<Named<Block>> getToolTypeOpt(){
+		default public Optional<TagKey<Block>> getToolTypeOpt(){
 			return this.getToolType() != null ? Optional.of(this.getToolType()) : Optional.empty();
 		}
 		
-		default public Optional<Named<Block>> getToolLevelOpt(){
+		default public Optional<TagKey<Block>> getToolLevelOpt(){
 			return this.getToolLevel() != null ? Optional.of(this.getToolLevel()) : Optional.empty();
 		}
 	}

@@ -2,8 +2,6 @@ package me.haydenb.assemblylinemachines.block.misc;
 
 import java.util.stream.Stream;
 
-import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +18,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 
-public class BlockBlackGranite extends Block implements TOPProvider{
+public class BlockBlackGranite extends Block /*implements TOPProvider*/{
 
 	public static final BooleanProperty NATURAL_GRANITE = BooleanProperty.create("natural");
 	public BlockBlackGranite() {
@@ -44,6 +42,7 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 		return super.getDestroyProgress(state, player, worldIn, pos) * 0.05F;
 	}
 
+	/*
 	@Override
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 		if(state.getValue(NATURAL_GRANITE) == true) {
@@ -56,6 +55,7 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 		
 		
 	}
+	*/
 	
 	@Override
 	public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {

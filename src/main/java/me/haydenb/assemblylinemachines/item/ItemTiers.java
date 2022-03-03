@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.TierSortingRegistry;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public enum ItemTiers {
 	
@@ -23,7 +25,7 @@ public enum ItemTiers {
 	STEEL(ConfigHolder.getCommonConfig().steelToolAttack.get(), ConfigHolder.getCommonConfig().steelToolHarvestSpeed.get(), ConfigHolder.getCommonConfig().steelEnchantability.get(), ConfigHolder.getCommonConfig().steelDurability.get(), 
 			ConfigHolder.getCommonConfig().steelArmorKnockbackResistance.get(), ConfigHolder.getCommonConfig().steelArmorDamageReduction.get(), "steel", ConfigHolder.getCommonConfig().steelArmorToughness.get(), ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
 	CRANK(ConfigHolder.getCommonConfig().crankToolAttack.get(), ConfigHolder.getCommonConfig().crankToolDurability.get(), ConfigHolder.getCommonConfig().crankToolEnchantability.get(), ConfigHolder.getCommonConfig().crankToolDurability.get(), 
-			()->{return Ingredient.of(ItemTags.getAllTags().getTag(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
+			()->{return Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
 	MYSTIUM(ConfigHolder.getCommonConfig().mystiumToolAttack.get(), ConfigHolder.getCommonConfig().mystiumToolDurability.get(), ConfigHolder.getCommonConfig().mystiumToolEnchantability.get(), ConfigHolder.getCommonConfig().mystiumToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
 	NOVASTEEL(ConfigHolder.getCommonConfig().novasteelToolAttack.get(), ConfigHolder.getCommonConfig().novasteelToolDurability.get(), ConfigHolder.getCommonConfig().novasteelToolEnchantability.get(), ConfigHolder.getCommonConfig().novasteelToolDurability.get(), ()->{return Ingredient.of(Registry.getItem("novasteel_ingot"));}),
 	CRG(750, 5, 0d, 3, "crg", 0d, () -> Ingredient.EMPTY);
@@ -151,7 +153,7 @@ public enum ItemTiers {
 		
 		
 		private final ItemTiers baseTier;
-		private final Tag.Named<Block> tierTag;
+		private final TagKey<Block> tierTag;
 		
 		ToolTiers(ItemTiers tier, List<Object> after, List<Object> before){
 			this(tier, after, before, null);
@@ -160,7 +162,7 @@ public enum ItemTiers {
 		ToolTiers(ItemTiers tier, List<Object> after, List<Object> before, ResourceLocation tierTag){
 			this.baseTier = tier;
 			
-			this.tierTag = tierTag != null ? BlockTags.createOptional(tierTag) : null;	
+			this.tierTag = tierTag != null ? Utils.getTagKey(Keys.BLOCKS, tierTag) : null;	
 			TierSortingRegistry.registerTier(this, new ResourceLocation(AssemblyLineMachines.MODID, this.name().toLowerCase()), after, before);
 			
 		}
@@ -196,7 +198,7 @@ public enum ItemTiers {
 		}
 		
 		@Override
-		public Tag<Block> getTag() {
+		public TagKey<Block> getTag() {
 			return tierTag;
 		}
 		

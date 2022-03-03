@@ -8,6 +8,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.world.level.biome.Biomes;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
@@ -31,9 +33,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.FORGE)
 public class VanillaDimensionOres {
 
-	public static PlacedFeature titaniumOre = null;
-	public static PlacedFeature blackGranite = null;
-	public static PlacedFeature chromiumOre = null;
+	public static Holder<PlacedFeature> titaniumOre = null;
+	public static Holder<PlacedFeature> blackGranite = null;
+	public static Holder<PlacedFeature> chromiumOre = null;
 	
 	//Where the initialized features are actually added to the biomes during world load.
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -75,11 +77,11 @@ public class VanillaDimensionOres {
 			
 		}	
 		
-		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, int freq) {
+		private static Holder<PlacedFeature> getFeature(List<TargetBlockState> targets, int veinsize, int freq) {
 			return getFeature(targets, veinsize, (HeightRangePlacement) PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT, freq);
 		}
-		private static PlacedFeature getFeature(List<TargetBlockState> targets, int veinsize, HeightRangePlacement range, int freq) {
-			return Feature.ORE.configured(new OreConfiguration(targets, veinsize)).placed(range, InSquarePlacement.spread(), CountPlacement.of(freq), BiomeFilter.biome());
+		private static Holder<PlacedFeature> getFeature(List<TargetBlockState> targets, int veinsize, HeightRangePlacement range, int freq) {
+			return Holder.direct(new PlacedFeature(Holder.direct(new ConfiguredFeature<>(Feature.ORE, new OreConfiguration(targets, veinsize))), List.of(InSquarePlacement.spread(), CountPlacement.of(freq), BiomeFilter.biome())));
 		}
 		
 		private static List<TargetBlockState> getBasicList(RuleTest target, BlockState result){

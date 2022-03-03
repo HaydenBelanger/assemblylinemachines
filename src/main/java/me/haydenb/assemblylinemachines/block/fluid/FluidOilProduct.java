@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -14,7 +15,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
@@ -39,8 +39,7 @@ public class FluidOilProduct extends ALMFluid {
 			while(iter.hasNext()) {
 				BlockPos cor = iter.next();
 				
-				Block block = world.getBlockState(cor).getBlock();
-				if(block.getTags().contains(new ResourceLocation("assemblylinemachines", "world/gas_flammable"))) {
+				if(Utils.isInTag(world.getBlockState(cor), new ResourceLocation("assemblylinemachines", "world/gas_flammable"))) {
 					if(world.getRandom().nextInt(3) == 0) {
 						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), breakAndBreakConnected(world, state, cor), true, BlockInteraction.BREAK);
 						

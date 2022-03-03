@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -22,9 +22,9 @@ public class CorruptFallingBlock extends FallingBlock implements TagMaster.IMini
 
 	
 	private final int dustColor;
-	private final Named<Block> toolLevelTag;
+	private final TagKey<Block> toolLevelTag;
 	
-	public CorruptFallingBlock(int dustColor, Properties properties, Named<Block> toolLevelTag) {
+	public CorruptFallingBlock(int dustColor, Properties properties, TagKey<Block> toolLevelTag) {
 		super(properties.strength(3f, 9f));
 		this.dustColor = dustColor;
 		this.toolLevelTag = toolLevelTag;
@@ -35,13 +35,13 @@ public class CorruptFallingBlock extends FallingBlock implements TagMaster.IMini
 	}
 	
 	@Override
-	public Named<Block> getToolType() {
+	public TagKey<Block> getToolType() {
 		return BlockTags.MINEABLE_WITH_SHOVEL;
 	}
 
 
 	@Override
-	public Named<Block> getToolLevel() {
+	public TagKey<Block> getToolLevel() {
 		return toolLevelTag;
 	}
 	

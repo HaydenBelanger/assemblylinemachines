@@ -116,7 +116,7 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 	public static FluidStack assemble(ChunkPos pos, Level world) {
 		List<FluidInGroundRecipe> recipes = world.getRecipeManager().getAllRecipesFor(FluidInGroundRecipe.FIG_RECIPE);
 		
-		float tc = world.getBiome(pos.getMiddleBlockPosition(63)).getBaseTemperature();
+		float tc = world.getBiome(pos.getMiddleBlockPosition(63)).value().getBaseTemperature();
 		ResourceLocation currentDim = world.dimension().location();
 		
 		for (FluidInGroundRecipe recipe : recipes) {

@@ -1,19 +1,10 @@
 package me.haydenb.assemblylinemachines.plugins;
 
-import java.util.function.Function;
-
-import mcjty.theoneprobe.api.*;
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.fml.ModList;
-
 public class PluginTOP {
+	/*
 	private static boolean registered = false;
 	private static final boolean TOP_SUPPORTED = true;
+	
 	
 	public static void register() {
 		if(!registered) {
@@ -56,5 +47,7 @@ public class PluginTOP {
 	public static interface TOPProvider{
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data);
 	}
+	
+	*/
 	
 }

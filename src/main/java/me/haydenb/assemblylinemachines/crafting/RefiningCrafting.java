@@ -24,6 +24,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
+@SuppressWarnings("removal")
 public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	

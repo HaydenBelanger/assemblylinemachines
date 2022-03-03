@@ -109,7 +109,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -133,6 +133,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -172,7 +173,6 @@ public class Registry {
 	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
 	
 	//BOTH-SIDED REGISTRATIONS - ITEMS, BLOCKS, TEs, CONTAINERS, ENTITIES, POTIONS, CRAFTING, CARVERS, SOUNDS
-	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
@@ -306,7 +306,7 @@ public class Registry {
 		createItem("quark_matter", new ItemReactorOutput("§9Medium-Quality"));
 		createItem("strange_matter", new ItemReactorOutput("§aHigh-Quality"));
 		
-		createItem("corrupt_shell_spawn_egg", new SpawnEggItem(EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("corrupt_shell_spawn_egg", new ForgeSpawnEggItem(() -> EntityCorruptShell.corruptShell, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
 		createItem("reality_crystal");
 		createItem("galactic_flesh", new ItemGalacticFlesh());
 		
@@ -527,7 +527,6 @@ public class Registry {
 			createFluid("ethylene", 0, true, false, false, 0, 0, 0);
 			createFluid("propane", 0, true, false, false, 0, 0, 0);
 			createFluid("propylene", 0, true, false, false, 0, 0, 0);
-			
 		}else {
 			event.getRegistry().registerAll(MOD_FLUID_REGISTRY.values().toArray(new Fluid[MOD_FLUID_REGISTRY.size()]));
 		}
@@ -635,17 +634,18 @@ public class Registry {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
-		
-		event.getRegistry().register(EntityCorruptShell.CORRUPT_SHELL.setRegistryName("corrupt_shell"));
-		SpawnPlacements.register(EntityCorruptShell.CORRUPT_SHELL, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMobSpawnRules);
+		EntityType<?> corruptShell = EntityType.Builder.of(EntityCorruptShell::new, MobCategory.MONSTER).build(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell").toString()).setRegistryName("corrupt_shell");
+		event.getRegistry().register(corruptShell);
+		SpawnPlacements.register((EntityType<EntityCorruptShell>)corruptShell, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMobSpawnRules);
 	}
 	
 	@SubscribeEvent
 	public static void registerEntAttributes(EntityAttributeCreationEvent event) {
 		
-		event.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().build());
+		event.put(EntityCorruptShell.corruptShell, EntityCorruptShell.registerAttributeMap().build());
 	}
 	
 	@SubscribeEvent
@@ -846,7 +846,7 @@ public class Registry {
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public static void registerEntityRenderers(RegisterRenderers event) {
-		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
+		event.registerEntityRenderer(EntityCorruptShell.corruptShell, new EntityCorruptShellRenderFactory());
 	}
 	
 	
@@ -918,7 +918,7 @@ public class Registry {
 	
 	
 	//BLOCKS
-	private static void createBlock(String name, Material material, float hardness, float resistance, SoundType sound, boolean requireToolToDrop, Named<Block> type, Named<Block> level, boolean item) {
+	private static void createBlock(String name, Material material, float hardness, float resistance, SoundType sound, boolean requireToolToDrop, TagKey<Block> type, TagKey<Block> level, boolean item) {
 		Block.Properties properties = Block.Properties.of(material).strength(hardness, resistance).sound(sound);
 		if(requireToolToDrop) {
 			properties = properties.requiresCorrectToolForDrops();
@@ -935,14 +935,14 @@ public class Registry {
 		createBlock(name, properties, item);
 	}
 	
-	private static void createBlock(String name, Block.Properties properties, Named<Block> type, Named<Block> level, boolean item) {
+	private static void createBlock(String name, Block.Properties properties, TagKey<Block> type, TagKey<Block> level, boolean item) {
 		class BlockWithTags extends Block implements TagMaster.IMiningLevelDataGenProvider{
 
 			public BlockWithTags(Properties p) {super(p);}
 			@Override
-			public Named<Block> getToolType() {return type;}
+			public TagKey<Block> getToolType() {return type;}
 			@Override
-			public Named<Block> getToolLevel() {return level;}
+			public TagKey<Block> getToolLevel() {return level;}
 			
 		}
 		

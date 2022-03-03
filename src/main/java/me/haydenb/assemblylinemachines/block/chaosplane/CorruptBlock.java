@@ -11,7 +11,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,8 +30,8 @@ import net.minecraftforge.common.*;
 
 public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGenProvider {
 
-	private final Named<Block> type;
-	private final Named<Block> level;
+	private final TagKey<Block> type;
+	private final TagKey<Block> level;
 	private final boolean isGrass;
 	private final boolean shouldBePoisonous;
 	
@@ -44,7 +44,7 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		CORRUPT_VARIANTS.put(Blocks.GRAVEL, "corrupt_gravel");
 	}
 	
-	public CorruptBlock(BlockBehaviour.Properties properties, Named<Block> type, Named<Block> level, boolean isGrass, boolean shouldBePoisonous) {
+	public CorruptBlock(BlockBehaviour.Properties properties, TagKey<Block> type, TagKey<Block> level, boolean isGrass, boolean shouldBePoisonous) {
 		super(properties.strength(3f, 9f));
 		this.type = type;
 		this.level = level;
@@ -52,7 +52,7 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		this.shouldBePoisonous = shouldBePoisonous;
 	}
 	
-	public CorruptBlock(BlockBehaviour.Properties properties, Named<Block> type, Named<Block> level) {
+	public CorruptBlock(BlockBehaviour.Properties properties, TagKey<Block> type, TagKey<Block> level) {
 		super(properties.strength(3f, 9f));
 		this.type = type;
 		this.level = level;
@@ -79,13 +79,13 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 	}
 
 	@Override
-	public Named<Block> getToolType() {
+	public TagKey<Block> getToolType() {
 		return type;
 	}
 
 
 	@Override
-	public Named<Block> getToolLevel() {
+	public TagKey<Block> getToolLevel() {
 		return level;
 	}
 	
@@ -139,7 +139,7 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 	//Used for Chaosbark/Stripped Chaosbark Logs.
 	public static class CorruptBlockWithAxis extends CorruptBlock{
 
-		public CorruptBlockWithAxis(Properties properties, Named<Block> type, Named<Block> level, boolean isGrass, boolean shouldBePoisonous) {
+		public CorruptBlockWithAxis(Properties properties, TagKey<Block> type, TagKey<Block> level, boolean isGrass, boolean shouldBePoisonous) {
 			super(properties, type, level, isGrass, shouldBePoisonous);
 			this.registerDefaultState(this.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Axis.Y));
 		}
@@ -179,12 +179,12 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		}
 
 		@Override
-		public Named<Block> getToolType() {
+		public TagKey<Block> getToolType() {
 			return BlockTags.MINEABLE_WITH_PICKAXE;
 		}
 
 		@Override
-		public Named<Block> getToolLevel() {
+		public TagKey<Block> getToolLevel() {
 			return BlockTags.NEEDS_DIAMOND_TOOL;
 		}
 		

@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -8,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.fluids.FluidStack;
 
+@SuppressWarnings("removal")
 public interface IRecipeCategoryBuilder {
 
 	default public List<Ingredient> getJEIItemIngredients(){

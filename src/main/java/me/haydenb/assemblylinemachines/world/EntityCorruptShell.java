@@ -13,7 +13,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
@@ -25,11 +24,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.registries.ObjectHolder;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class EntityCorruptShell extends Zombie{
 
-	public static final EntityType<EntityCorruptShell> CORRUPT_SHELL = EntityType.Builder.of(EntityCorruptShell::new, MobCategory.MONSTER).build(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell").toString());
+	@ObjectHolder("assemblylinemachines:corrupt_shell")
+	public static EntityType<EntityCorruptShell> corruptShell = null;
 
 	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, Level worldIn) {
 		super(type, worldIn);

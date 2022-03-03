@@ -4,10 +4,10 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -16,9 +16,8 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.*;
-import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class ALMFluid extends ForgeFlowingFluid implements ILiquidFogColor{
 	
@@ -69,22 +68,22 @@ public class ALMFluid extends ForgeFlowingFluid implements ILiquidFogColor{
 
 	public static class ALMFluidBlock extends LiquidBlock {
 
-		private final Tag.Named<Fluid> tag;
+		private final TagKey<Fluid> tag;
 		private final double acceleration;
 
-		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Block.Properties properties) {
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, TagKey<Fluid> tag, Block.Properties properties) {
 			this(fluid, tag, properties, 0.014d);
 		}
 
-		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Material material) {
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, TagKey<Fluid> tag, Material material) {
 			this(fluid, tag, material, 0.014d);
 		}
 
-		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Material material, double acceleration) {
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, TagKey<Fluid> tag, Material material, double acceleration) {
 			this(fluid, tag, Block.Properties.of(material).strength(100f).noDrops(), acceleration);
 		}
 
-		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, Tag.Named<Fluid> tag, Block.Properties properties, double acceleration) {
+		public ALMFluidBlock(Supplier<? extends FlowingFluid> fluid, TagKey<Fluid> tag, Block.Properties properties, double acceleration) {
 			super(fluid, properties);
 			this.tag = tag;
 			this.acceleration = acceleration;
@@ -101,8 +100,8 @@ public class ALMFluid extends ForgeFlowingFluid implements ILiquidFogColor{
 
 	}
 	
-	public static Named<Fluid> getTag(String name){
-		return ForgeTagHandler.makeWrapperTag(ForgeRegistries.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, name));
+	public static TagKey<Fluid> getTag(String name){
+		return Utils.getTagKey(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, name));
 	}
 
 

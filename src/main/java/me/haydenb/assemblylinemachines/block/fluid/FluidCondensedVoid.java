@@ -6,8 +6,8 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.item.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -42,9 +42,7 @@ public class FluidCondensedVoid extends ALMFluid {
 				if(randomom.nextInt(2) == 0) {
 					Block block = world.getBlockState(cor).getBlock();
 					if(world.getBlockState(cor).getDestroySpeed(world, cor) != -1f) {
-						if(block.getTags().contains(new ResourceLocation("minecraft", "leaves")) || block.getTags().contains(new ResourceLocation("minecraft", "logs"))
-								|| block.getTags().contains(new ResourceLocation("minecraft", "flowers")) || block.getTags().contains(new ResourceLocation("minecraft", "planks"))
-								|| block.getTags().contains(new ResourceLocation("minecraft", "wool"))
+						if(Utils.isInAnyTag(world.getBlockState(cor), "leaves", "logs", "flowers", "planks", "wool")
 								|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
 								|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
 							world.destroyBlock(cor, false);

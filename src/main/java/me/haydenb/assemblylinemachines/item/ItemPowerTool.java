@@ -171,7 +171,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 			
 			BlockState bs = world.getBlockState(pos);
 
-			if(bs.getBlock().getTags().contains(new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
+			if(Utils.isInTag(bs, new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
 				int cmax = ptt == PowerToolType.NOVASTEEL ? 50 : 10;
 				stack.hurtAndBreak(Utils.breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 			}

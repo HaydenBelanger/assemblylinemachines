@@ -15,15 +15,15 @@ import com.google.gson.JsonParser;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.MetalCrafting;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class AutoRecipeGenerator extends RecipeProvider {
 	
@@ -255,7 +255,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		}
 		
 		private static Supplier<Ingredient> getItemTagIngredient(String modid, String path){
-			return () -> Ingredient.of(ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation(modid, path)));
+			return () -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation(modid, path)));
 		}
 	}
 	
