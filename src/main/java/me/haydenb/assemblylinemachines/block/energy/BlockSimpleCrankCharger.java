@@ -2,9 +2,8 @@ package me.haydenb.assemblylinemachines.block.energy;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
+import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -73,7 +72,7 @@ public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankab
 				ItemStack stack = handler.getStackInSlot(i);
 				if(stack != ItemStack.EMPTY && stack.getItem() instanceof IToolWithCharge) {
 					IToolWithCharge cr = (IToolWithCharge) stack.getItem();
-					if(cr.getPowerToolType() == PowerToolType.CRANK && cr.addCharge(stack, 1, false) > 0) {
+					if(cr.getPowerToolType() == IToolWithCharge.PowerToolType.CRANK && cr.addCharge(stack, 1, false) > 0) {
 						return true;
 					}
 				}

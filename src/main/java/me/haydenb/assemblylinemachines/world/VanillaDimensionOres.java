@@ -9,6 +9,7 @@ import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.Holder;
+import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.world.level.biome.Biomes;
@@ -60,28 +61,29 @@ public class VanillaDimensionOres {
 						OreConfiguration.target(OreFeatures.DEEPSLATE_ORE_REPLACEABLES, Registry.getBlock("deepslate_titanium_ore").defaultBlockState()),
 						OreConfiguration.target(new BlockMatchTest(Registry.getBlock("corrupt_stone")), Registry.getBlock("corrupt_titanium_ore").defaultBlockState()));
 				
-				titaniumOre = getFeature(targetList, cfg.titaniumVeinSize.get(), getAbsolute(cfg.titaniumOreGenStyle.get(), cfg.titaniumMinHeight.get(), cfg.titaniumMaxHeight.get()), cfg.titaniumFrequency.get());
+				titaniumOre = getFeature("ore_titanium", targetList, cfg.titaniumVeinSize.get(), getAbsolute(cfg.titaniumOreGenStyle.get(), cfg.titaniumMinHeight.get(), cfg.titaniumMaxHeight.get()), cfg.titaniumFrequency.get());
 			}
 			
 			//Black Granite
 			if(cfg.blackGraniteVeinSize.get() != 0 && cfg.blackGraniteFrequency.get() != 0) {
 				BlockState state = Registry.getBlock("black_granite").defaultBlockState();
 				state = cfg.blackGraniteSpawnsWithNaturalTag.get() ? state.setValue(BlockBlackGranite.NATURAL_GRANITE, true) : state;
-				blackGranite = getFeature(getBasicList(OreFeatures.NETHER_ORE_REPLACEABLES, state), cfg.blackGraniteVeinSize.get(), cfg.blackGraniteFrequency.get());
+				blackGranite = getFeature("ore_black_granite", getBasicList(OreFeatures.NETHER_ORE_REPLACEABLES, state), cfg.blackGraniteVeinSize.get(), cfg.blackGraniteFrequency.get());
 			}
 			
 			//Chromium
 			if(cfg.chromiumVeinSize.get() != 0 && cfg.chromiumFrequency.get() != 0) {
-				chromiumOre = getFeature(getBasicList(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState()), cfg.chromiumVeinSize.get(), cfg.chromiumFrequency.get());
+				chromiumOre = getFeature("ore_chromium", getBasicList(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState()), cfg.chromiumVeinSize.get(), cfg.chromiumFrequency.get());
 			}
 			
 		}	
 		
-		private static Holder<PlacedFeature> getFeature(List<TargetBlockState> targets, int veinsize, int freq) {
-			return getFeature(targets, veinsize, (HeightRangePlacement) PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT, freq);
+		private static Holder<PlacedFeature> getFeature(String name, List<TargetBlockState> targets, int veinsize, int freq) {
+			return getFeature(name, targets, veinsize, (HeightRangePlacement) PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT, freq);
 		}
-		private static Holder<PlacedFeature> getFeature(List<TargetBlockState> targets, int veinsize, HeightRangePlacement range, int freq) {
-			return Holder.direct(new PlacedFeature(Holder.direct(new ConfiguredFeature<>(Feature.ORE, new OreConfiguration(targets, veinsize))), List.of(InSquarePlacement.spread(), CountPlacement.of(freq), BiomeFilter.biome())));
+		private static Holder<PlacedFeature> getFeature(String name, List<TargetBlockState> targets, int veinsize, HeightRangePlacement range, int freq) {
+			Holder<ConfiguredFeature<OreConfiguration, ?>> holderCF = FeatureUtils.register(AssemblyLineMachines.MODID + ":" + name, Feature.ORE, new OreConfiguration(targets, freq));
+			return PlacementUtils.register(AssemblyLineMachines.MODID + ":" + name + "_placed", holderCF, InSquarePlacement.spread(), CountPlacement.of(freq), BiomeFilter.biome());
 		}
 		
 		private static List<TargetBlockState> getBasicList(RuleTest target, BlockState result){

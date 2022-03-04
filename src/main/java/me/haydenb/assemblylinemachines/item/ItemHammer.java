@@ -1,6 +1,6 @@
 package me.haydenb.assemblylinemachines.item;
 
-import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
+import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import net.minecraft.world.item.*;
 
 public class ItemHammer extends SwordItem {

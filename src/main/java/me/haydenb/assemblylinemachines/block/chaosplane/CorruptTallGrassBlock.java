@@ -9,6 +9,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.ISpecialEntropyPlacement;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.*;
+import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
@@ -23,9 +24,9 @@ import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.feature.*;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration.TreeConfigurationBuilder;
 import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
@@ -115,7 +116,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 		public static class ChaosbarkTreeGrower extends AbstractTreeGrower{
 
-			public static Holder<ConfiguredFeature<?, ?>> chaosbarkTree;
+			public static Holder<ConfiguredFeature<TreeConfiguration, ?>> chaosbarkTree;
 
 			@SubscribeEvent
 			public static void registerTreeGen(FMLCommonSetupEvent event) {
@@ -127,7 +128,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 				FeatureSize size = new TwoLayersFeatureSize(1, 0, 1);
 				BlockStateProvider bspDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
 				
-				chaosbarkTree = Holder.direct(new ConfiguredFeature<>(new TreeFeature(TreeConfiguration.CODEC), new TreeConfiguration.TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build()));
+				chaosbarkTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":chaosbark_tree", Feature.TREE, new TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
 			}
 
 			@Override

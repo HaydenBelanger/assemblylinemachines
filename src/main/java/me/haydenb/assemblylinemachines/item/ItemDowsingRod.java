@@ -3,7 +3,7 @@ package me.haydenb.assemblylinemachines.item;
 import java.util.concurrent.ExecutionException;
 
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
-import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
+import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.world.FluidCapability;
@@ -55,11 +55,11 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 	@Override
 	public ResourceLocation getTexture() {
-		return PowerToolType.MYSTIUM.getBorderTexturePath();
+		return IToolWithCharge.PowerToolType.MYSTIUM.getBorderTexturePath();
 	}
 
 	@Override
 	public int getTopColor() {
-		return PowerToolType.MYSTIUM.getARGBBorderColor();
+		return IToolWithCharge.PowerToolType.MYSTIUM.getARGBBorderColor();
 	}
 }

@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import me.haydenb.assemblylinemachines.item.powertools.ItemPowerHoe;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ItemStack;
@@ -21,9 +21,8 @@ public class HoeItemTillingMixin {
 	@Inject(method = "changeIntoState", at = @At("HEAD"), cancellable = true)
 	private static void changeIntoState(BlockState state, CallbackInfoReturnable<Consumer<UseOnContext>> cir) {
 		cir.setReturnValue((context) ->{
-			if(context.getItemInHand().getItem() instanceof IToolWithCharge) {
-				IToolWithCharge tool = (IToolWithCharge) context.getItemInHand().getItem();
-				if(tool.canUseSecondaryAbilities(context.getItemInHand(), "HoeItem")) {
+			if(context.getItemInHand().getItem() instanceof ItemPowerHoe tool) {
+				if(tool.canUseSecondaryAbilities(context.getItemInHand())) {
 					context.getLevel().setBlock(context.getClickedPos(), Registry.getBlock(tool.getPowerToolType().getNameOfSecondaryFarmland()).defaultBlockState(), 11);
 					return;
 				}
@@ -35,12 +34,7 @@ public class HoeItemTillingMixin {
 	//This Mixin is responsible for changing the durability cost of a Hoe when certain conditions are met.
 	@Redirect(method = "useOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"))
 	private void hurtAndBreak(ItemStack stack, int amount, LivingEntity entity, Consumer<LivingEntity> onBroken) {
-		if(stack.getItem() instanceof IToolWithCharge) {
-			IToolWithCharge tool = (IToolWithCharge) stack.getItem();
-			if(tool.canUseSecondaryAbilities(stack, "HoeItem")) {
-				amount = 15;
-			}
-		}
+		if(stack.getItem() instanceof ItemPowerHoe tool && tool.canUseSecondaryAbilities(stack)) amount = 15;
 		stack.hurtAndBreak(amount, entity, onBroken);
 	}
 }

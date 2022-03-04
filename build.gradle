@@ -130,7 +130,7 @@ jar{
 }
 
 dependencies {
-  minecraft 'net.minecraftforge:forge:1.18.2-40.0.0'
+  minecraft 'net.minecraftforge:forge:1.18.2-40.0.2'
 	
 	//JEI - Updated.
  	implementation fg.deobf("mezz.jei:jei-1.18.2:9.4.1.116")
