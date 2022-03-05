@@ -1,7 +1,12 @@
 package me.haydenb.assemblylinemachines.registry;
 
+import java.util.function.BiFunction;
+
 import org.apache.commons.lang3.tuple.Pair;
 
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
 
@@ -213,6 +218,17 @@ public class ConfigHandler {
 	}
 	
 	public static enum OreGenOptions{
-		UNIFORM, TRIANGLE;
+		UNIFORM((min, max) -> HeightRangePlacement.uniform(VerticalAnchor.absolute(min), VerticalAnchor.absolute(max))), 
+		TRIANGLE((min, max) -> HeightRangePlacement.triangle(VerticalAnchor.absolute(min), VerticalAnchor.absolute(max)));
+		
+		public BiFunction<Integer, Integer, PlacementModifier> placementModifier;
+		
+		OreGenOptions(BiFunction<Integer, Integer, PlacementModifier> placementModifier){
+			this.placementModifier = placementModifier;
+		}
+		
+		public PlacementModifier apply(int min, int max) {
+			return this.placementModifier.apply(min, max);
+		}
 	}
 }
