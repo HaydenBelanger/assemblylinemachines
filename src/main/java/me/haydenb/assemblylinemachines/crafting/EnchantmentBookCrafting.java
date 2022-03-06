@@ -19,6 +19,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -28,15 +29,14 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	public static final RecipeType<EnchantmentBookCrafting> ENCHANTMENT_BOOK_RECIPE = new TypeEnchantmentBookCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	private static final Ingredient BOOK = Ingredient.of(Items.BOOK);
-	private static final ItemStack BOOK_STACK = new ItemStack(Items.BOOK);
 	
-	private final Ingredient input;
+	private final Lazy<Ingredient> input;
 	private final Enchantment enchantment;
 	private final int cost;
 	private final int amount;
 	private final ResourceLocation id;
 	
-	public EnchantmentBookCrafting(ResourceLocation id, Ingredient input, Enchantment enchantment, int cost, int amount) {
+	public EnchantmentBookCrafting(ResourceLocation id, Lazy<Ingredient> input, Enchantment enchantment, int cost, int amount) {
 		this.input = input;
 		this.enchantment = enchantment;
 		this.id = id;
@@ -48,13 +48,13 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		if(inv != null) {
 			if(inv instanceof TEExperienceMill) {
 				
-				if(input.test(inv.getItem(1))) {
+				if(input.get().test(inv.getItem(1))) {
 					if(BOOK.test(inv.getItem(2))) {
 						return true;
 					}
 				}
 				
-				if(input.test(inv.getItem(2))) {
+				if(input.get().test(inv.getItem(2))) {
 					if(BOOK.test(inv.getItem(1))) {
 						return true;
 					}
@@ -121,13 +121,13 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
 		nnl.add(BOOK);
-		nnl.add(input);
+		nnl.add(input.get());
 		return nnl;
 	}
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(input, BOOK);
+		return List.of(input.get(), BOOK);
 	}
 	
 	@Override
@@ -153,11 +153,12 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		@Override
 		public EnchantmentBookCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				Lazy<Ingredient> ingredient = Lazy.of(() -> {
+					Ingredient i = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+					if(i.test(Items.BOOK.getDefaultInstance())) throw new IllegalArgumentException(recipeId + " used an illegal item as input.");
+					return i;
+				});
 				
-				if(ingredient.test(BOOK_STACK)) {
-					throw new IllegalArgumentException("An Enchantment Book recipe cannot contain Book.");
-				}
 				int amt = GsonHelper.getAsInt(json, "amount");
 				int cost = GsonHelper.getAsInt(json, "cost");
 				Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "enchantment")));
@@ -183,12 +184,12 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 			final int cost = buffer.readInt();
 			final int amount = buffer.readInt();
 			
-			return new EnchantmentBookCrafting(recipeId, input, enchantment, cost, amount);
+			return new EnchantmentBookCrafting(recipeId, Lazy.of(() -> input), enchantment, cost, amount);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, EnchantmentBookCrafting recipe) {
-			recipe.input.toNetwork(buffer);
+			recipe.input.get().toNetwork(buffer);
 			buffer.writeResourceLocation(recipe.enchantment.getRegistryName());
 			buffer.writeInt(recipe.cost);
 			buffer.writeInt(recipe.amount);

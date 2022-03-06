@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -32,7 +33,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	public static final RecipeType<WorldCorruptionCrafting> WORLD_CORRUPTION_RECIPE = new TypeWorldCorruptionCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
-	private final Ingredient input;
+	private final Lazy<Ingredient> input;
 	private final Fluid inputFluid;
 	
 	private final Block output;
@@ -41,7 +42,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	
 	private final ResourceLocation id;
 	
-	public WorldCorruptionCrafting(ResourceLocation id, Ingredient input, Fluid inputFluid, ItemStack output, Fluid outputFluid, List<Pair<Float, ItemStack>> additionalOutputs) {
+	public WorldCorruptionCrafting(ResourceLocation id, Lazy<Ingredient> input, Fluid inputFluid, ItemStack output, Fluid outputFluid, List<Pair<Float, ItemStack>> additionalOutputs) {
 		this.id = id;
 		this.input = input;
 		this.output = output.isEmpty() ? Blocks.AIR : ((BlockItem) output.getItem()).getBlock();
@@ -63,7 +64,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	public boolean matches(Container container, Level level) {
 		if(container == null) return true;
 		if(container instanceof TECorruptingBasin) {
-			return input.test(container.getItem(2));
+			return input.get().test(container.getItem(2));
 		}
 		return false;
 	}
@@ -105,7 +106,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return !input.isEmpty() ? List.of(input) : null;
+		return !input.get().isEmpty() ? List.of(input.get()) : null;
 	}
 	
 	@Override
@@ -133,7 +134,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	
 	@Override
 	public void setupSlots(IRecipeLayout layout, IGuiHelper helper, RecipeCategoryBuilder category) {
-		if(!input.isEmpty()) {
+		if(!input.get().isEmpty()) {
 			layout.getItemStacks().init(0, false, 0, 4);
 			layout.getItemStacks().init(1, false, category.getBasicRenderer(ItemStack.class, this), 47, 4, 18, 18, 1, 1);
 		}else if(!inputFluid.equals(Fluids.EMPTY)){
@@ -146,7 +147,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	
 	
 	public Optional<Block> testBlock(Random rand, Block test){
-		if(input.isEmpty() || !input.test(test.asItem().getDefaultInstance())) return Optional.empty();
+		if(input.get().isEmpty() || !input.get().test(test.asItem().getDefaultInstance())) return Optional.empty();
 		return Optional.of(getRandom(rand));
 	}
 	
@@ -182,10 +183,12 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 
 		@Override
 		public WorldCorruptionCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
-			Ingredient input = GsonHelper.isValidNode(json, "input") ? Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")) : Ingredient.EMPTY;
+			
 			Fluid inputFluid = GsonHelper.isValidNode(json, "fluidInput") ? ForgeRegistries.FLUIDS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "fluidInput"))) : Fluids.EMPTY;
 			ItemStack output = GsonHelper.isValidNode(json, "output") ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output")) : ItemStack.EMPTY;
 			Fluid outputFluid = GsonHelper.isValidNode(json, "fluidOutput") ? ForgeRegistries.FLUIDS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "fluidOutput"))) : Fluids.EMPTY;
+			
+			
 			
 			List<Pair<Float, ItemStack>> additionalOutputs;
 			if(GsonHelper.isValidNode(json, "additionalOutputs")) {
@@ -199,19 +202,21 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 				additionalOutputs = List.of();
 			}
 			
-			if(input.isEmpty() && inputFluid.equals(Fluids.EMPTY)) {
-				throw new IllegalArgumentException("One of input or inputFluid must be set.");
-			}else if(output.isEmpty() && outputFluid.equals(Fluids.EMPTY)) {
-				throw new IllegalArgumentException("One of output or outputFluid must be set.");
-			}else if(!input.isEmpty() && output.isEmpty()) {
-				throw new IllegalArgumentException("If input is set, output must be set as well.");
-			}else if(!inputFluid.equals(Fluids.EMPTY) && outputFluid.equals(Fluids.EMPTY)) {
-				throw new IllegalArgumentException("If fluidInput is set, fluidOutput must be set as well.");
-			}else if((!input.isEmpty() && !inputFluid.equals(Fluids.EMPTY)) || (!output.isEmpty() && !outputFluid.equals(Fluids.EMPTY))) {
-				throw new IllegalArgumentException("Recipe may only contain a fluid or an item, not both.");
-			}else if(additionalOutputs.size() != 0 && input.isEmpty()){
-				throw new IllegalArgumentException("additionalInputs cannot be set while input is unset.");
-			}
+			Lazy<Ingredient> input = Lazy.of(() -> {
+				if(GsonHelper.isValidNode(json, "input")) {
+					if(!inputFluid.equals(Fluids.EMPTY)) throw new IllegalArgumentException(recipeId + " cannot have input and fluidInput both set.");
+					if(output.isEmpty()) throw new IllegalArgumentException(recipeId + " must have output when input is set.");
+					return Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				}else {
+					if(inputFluid.equals(Fluids.EMPTY)) throw new IllegalArgumentException(recipeId + " does not have input or fluidInput set.");
+					if(!output.isEmpty()) throw new IllegalArgumentException(recipeId + " cannot have output while input is unset.");
+					if(additionalOutputs.size() != 0) throw new IllegalArgumentException(recipeId + " cannot have additionalOutputs when input is unset.");
+					return Ingredient.EMPTY;
+				}
+			});
+			
+			if(output.isEmpty() && outputFluid.equals(Fluids.EMPTY)) throw new IllegalArgumentException("One of output or outputFluid must be set.");
+			if(!inputFluid.equals(Fluids.EMPTY) && outputFluid.equals(Fluids.EMPTY)) throw new IllegalArgumentException("If fluidInput is set, fluidOutput must be set as well.");
 			
 			return new WorldCorruptionCrafting(recipeId, input, inputFluid, output, outputFluid, additionalOutputs);
 		}
@@ -229,12 +234,12 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 				ItemStack b = buffer.readItem();
 				additionalOutputs.add(Pair.of(a, b));
 			}
-			return new WorldCorruptionCrafting(recipeId, input, fluidInput, output, fluidOutput, additionalOutputs);
+			return new WorldCorruptionCrafting(recipeId, Lazy.of(() -> input), fluidInput, output, fluidOutput, additionalOutputs);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, WorldCorruptionCrafting recipe) {
-			recipe.input.toNetwork(buffer);
+			recipe.input.get().toNetwork(buffer);
 			buffer.writeResourceLocation(recipe.inputFluid.getRegistryName());
 			buffer.writeItem(recipe.output.asItem().getDefaultInstance());
 			buffer.writeResourceLocation(recipe.outputFluid.getRegistryName());

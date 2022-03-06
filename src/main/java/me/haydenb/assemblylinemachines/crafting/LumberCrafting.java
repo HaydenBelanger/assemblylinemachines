@@ -15,6 +15,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
@@ -23,14 +24,14 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new TypeLumberCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
-	private final Ingredient input;
+	private final Lazy<Ingredient> input;
 	private final ItemStack outputa;
 	private final ItemStack outputb;
 	private final float opbchance;
 	private final int time;
 	private final ResourceLocation id;
 	
-	public LumberCrafting(ResourceLocation id, Ingredient input, ItemStack outputa, ItemStack outputb, float opbchance, int time) {
+	public LumberCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack outputa, ItemStack outputb, float opbchance, int time) {
 		this.id = id;
 		this.input = input;
 		this.outputa = outputa;
@@ -38,11 +39,12 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		this.opbchance = opbchance;
 		this.time = time;
 	}
+	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
 			if(inv instanceof TELumberMill) {
-				if(input.test(inv.getItem(2))) {
+				if(input.get().test(inv.getItem(2))) {
 					return true;
 				}
 			}
@@ -88,13 +90,13 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(input);
+		nnl.add(input.get());
 		return nnl;
 	}
 	
 	@Override
 	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(input);
+		return List.of(input.get());
 	}
 	
 	@Override
@@ -122,7 +124,7 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		@Override
 		public LumberCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
 				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				ItemStack outputb = ItemStack.EMPTY;
 				float opbchance = 0f;
@@ -150,12 +152,12 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 			final float opbc = buffer.readFloat();
 			final int time = buffer.readInt();
 			
-			return new LumberCrafting(recipeId, input, output, opb, opbc, time);
+			return new LumberCrafting(recipeId, Lazy.of(() -> input), output, opb, opbc, time);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, LumberCrafting recipe) {
-			recipe.input.toNetwork(buffer);
+			recipe.input.get().toNetwork(buffer);
 			buffer.writeItem(recipe.outputa);
 			buffer.writeItem(recipe.outputb);
 			buffer.writeFloat(recipe.opbchance);

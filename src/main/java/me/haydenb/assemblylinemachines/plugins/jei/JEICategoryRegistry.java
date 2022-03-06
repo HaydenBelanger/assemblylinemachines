@@ -78,7 +78,8 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(AlloyingCrafting.ALLOYING_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("alloying").title("Alloying Crafting")
 					.background("gui_set_pre2022", 104, 112, 62, 41).icon(Registry.getBlock("alloy_smelter")).progressBar("gui_set_pre2022", 202, 104, 16, 14, 200, StartDirection.LEFT, false, 19, 13)
-					.itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11)).catalysts(Registry.getBlock("alloy_smelter")).build(AlloyingCrafting.class));
+					.catalysts(Registry.getBlock("alloy_smelter")).itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11))
+					.build(AlloyingCrafting.class));
 			
 			CATEGORY_REGISTRY.put(GrinderCrafting.GRINDER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("grinding").title("Grinding Crafting")
 					.background("gui_set_pre2022", 166, 145, 90, 44).icon(Registry.getBlock("electric_grinder")).progressBar("gui_set_pre2022", 237, 131, 19, 14, 200, StartDirection.LEFT, false, 42, 24)

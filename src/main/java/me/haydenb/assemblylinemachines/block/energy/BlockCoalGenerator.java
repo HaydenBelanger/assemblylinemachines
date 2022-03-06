@@ -6,10 +6,12 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -23,10 +25,13 @@ import net.minecraft.network.chat.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -85,7 +90,7 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 	}
 	
 	
-	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ALMTicker<TECoalGenerator>/*, TOPProvider*/{
+	public static class TECoalGenerator extends EnergyMachine<ContainerCoalGenerator> implements ALMTicker<TECoalGenerator>, TOPProvider{
 
 		
 		private int genper = 0;
@@ -103,7 +108,6 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 			this(Registry.getBlockEntity("coal_generator"), pos, state);
 		}
 
-		/*
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			if(genper == 0) {
@@ -115,7 +119,6 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 			
 		}
 		
-		*/
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);

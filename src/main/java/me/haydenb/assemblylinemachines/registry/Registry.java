@@ -978,6 +978,7 @@ public class Registry {
 		ResourceLocation flowName = gaseous ? null : new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name + "_flowing");
 		FluidAttributes.Builder attribs = FluidAttributes.builder(new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + name), flowName).temperature(temperature);
 		if(gaseous) {
+			attribs = attribs.gaseous();
 			return new ForgeFlowingFluid.Properties(() -> Registry.getFluid(name), null, attribs);
 		}else {
 			ForgeFlowingFluid.Properties props = new ForgeFlowingFluid.Properties(() -> Registry.getFluid(name), () -> Registry.getFluid(name + "_flowing"), attribs);

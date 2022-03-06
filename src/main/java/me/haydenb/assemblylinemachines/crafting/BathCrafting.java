@@ -1,13 +1,9 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -27,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -36,11 +33,11 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	public static final RecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
-	private static final Supplier<List<Item>> ILLEGAL_RECIPE_ITEMS = Suppliers.memoize(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
+	private static final Lazy<List<Item>> ILLEGAL_RECIPE_ITEMS = Lazy.of(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
 			Registry.getItem("steel_stirring_stick")).stream(), BlockFluidBath.VALID_FILL_ITEMS.stream()).collect(Collectors.toList()));
 	
-	private final Ingredient inputa;
-	private final Ingredient inputb;
+	private final Lazy<Ingredient> inputa;
+	private final Lazy<Ingredient> inputb;
 	private final ItemStack output;
 	private final BathCraftingFluids fluid;
 	private final int stirs;
@@ -49,7 +46,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	private final BathOption type;
 	private final BathPercentage percent;
 	
-	public BathCrafting(ResourceLocation id, Ingredient inputa, Ingredient inputb, ItemStack output, int stirs, BathCraftingFluids fluid, int color, BathOption type, BathPercentage percent) {
+	public BathCrafting(ResourceLocation id, Lazy<Ingredient> inputa, Lazy<Ingredient> inputb, ItemStack output, int stirs, BathCraftingFluids fluid, int color, BathOption type, BathPercentage percent) {
 		this.inputa = inputa;
 		this.inputb = inputb;
 		this.output = output;
@@ -78,6 +75,8 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		if(inv != null) {
+			Ingredient inputa = this.inputa.get();
+			Ingredient inputb = this.inputb.get();
 			if(inv instanceof TEFluidBath) {
 				if(type == BathOption.MIXER_ONLY) {
 					return false;
@@ -160,8 +159,8 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(inputa);
-		nnl.add(inputb);
+		nnl.add(inputa.get());
+		nnl.add(inputb.get());
 		return nnl;
 	}
 	
@@ -179,7 +178,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			break;
 		}
 		
-		return List.of(inputa, inputb, Ingredient.of(items.toArray(new ItemLike[items.size()])));
+		return List.of(inputa.get(), inputb.get(), Ingredient.of(items.toArray(new ItemLike[items.size()])));
 	}
 	
 	@Override
@@ -215,17 +214,17 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		@Override
 		public BathCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient ingredienta = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_a"));
-				final Ingredient ingredientb = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_b"));
+				Lazy<Ingredient> ingredienta = Lazy.of(() -> {
+					Ingredient i = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_a"));
+					if(!Collections.disjoint(List.of(i.getItems()), ILLEGAL_RECIPE_ITEMS.get())) throw new IllegalArgumentException(recipeId + " used an illegal item as input_a.");
+					return i;
+				});
 				
-				ItemStack[] ingredients = ArrayUtils.addAll(ingredienta.getItems(), ingredientb.getItems());
-				List<Item> illegalItems = ILLEGAL_RECIPE_ITEMS.get();
-				for(ItemStack is : ingredients) {
-					if(illegalItems.contains(is.getItem())) {
-						throw new IllegalArgumentException("Recipe used " + is.getItem().getRegistryName().toString() + ", which cannot be used for a Bath recipe.");
-					}
-				}
-				Arrays.asList(ingredienta.getItems(), ingredientb.getItems());
+				Lazy<Ingredient> ingredientb = Lazy.of(() -> {
+					Ingredient i = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_b"));
+					if(!Collections.disjoint(List.of(i.getItems()), ILLEGAL_RECIPE_ITEMS.get())) throw new IllegalArgumentException(recipeId + " used an illegal item as input_b.");
+					return i;
+				});
 				
 				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				final int stirs = GsonHelper.getAsInt(json, "stirs");
@@ -271,13 +270,13 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			final BathOption machineReqd = buffer.readEnum(BathOption.class);
 			final BathPercentage percent = buffer.readEnum(BathPercentage.class);
 			
-			return new BathCrafting(recipeId, inputa, inputb, output, stirs, fluid, color, machineReqd, percent);
+			return new BathCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, stirs, fluid, color, machineReqd, percent);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, BathCrafting recipe) {
-			recipe.inputa.toNetwork(buffer);
-			recipe.inputb.toNetwork(buffer);
+			recipe.inputa.get().toNetwork(buffer);
+			recipe.inputb.get().toNetwork(buffer);
 			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.stirs);
 			buffer.writeEnum(recipe.fluid);

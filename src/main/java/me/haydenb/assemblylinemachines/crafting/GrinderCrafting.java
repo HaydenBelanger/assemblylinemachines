@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
@@ -27,7 +28,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	private static final Random RAND = new Random();
 	
-	private final Ingredient input;
+	private final Lazy<Ingredient> input;
 	private final ItemStack output;
 	private final int grinds;
 	private final Blade tier;
@@ -35,7 +36,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	private final boolean machineReqd;
 	private final float chanceToDouble;
 	
-	public GrinderCrafting(ResourceLocation id, Ingredient input, ItemStack output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
+	public GrinderCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
 		this.input = input;
 		this.output = output;
 		this.grinds = grinds;
@@ -53,11 +54,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 					return false;
 				}
 				Inventory pinv = (Inventory) inv;
-				if(input.test(pinv.getItem(pinv.selected))) {
+				if(input.get().test(pinv.getItem(pinv.selected))) {
 					return true;
 				}
 			}else {
-				if(input.test(inv.getItem(1))) {
+				if(input.get().test(inv.getItem(1))) {
 					return true;
 				}
 			}
@@ -98,7 +99,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(input);
+		nnl.add(input.get());
 		return nnl;
 	}
 	
@@ -106,7 +107,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	public List<Ingredient> getJEIItemIngredients() {
 		Ingredient ing = this.getMachineReqd() ? Ingredient.of(Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder")) 
 				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder"));
-		return List.of(input, ing, Blade.getAllBladesAtMinTier(getBlade().tier));
+		return List.of(input.get(), ing, Blade.getAllBladesAtMinTier(getBlade().tier));
 	}
 	
 	@Override
@@ -149,7 +150,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		@Override
 		public GrinderCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
 				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				final int grinds = GsonHelper.getAsInt(json, "grinds");
 				final Blade tier = Blade.valueOf(Blade.class, GsonHelper.getAsString(json, "bladetype"));
@@ -186,12 +187,12 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			final boolean machineReqd = buffer.readBoolean();
 			final float chanceToDouble = buffer.readFloat();
 			
-			return new GrinderCrafting(recipeId, input, output, grinds, tier, machineReqd, chanceToDouble);
+			return new GrinderCrafting(recipeId, Lazy.of(() -> input), output, grinds, tier, machineReqd, chanceToDouble);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, GrinderCrafting recipe) {
-			recipe.input.toNetwork(buffer);
+			recipe.input.get().toNetwork(buffer);
 			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.grinds);
 			buffer.writeEnum(recipe.tier);

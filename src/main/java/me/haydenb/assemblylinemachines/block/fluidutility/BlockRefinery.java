@@ -380,102 +380,25 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 					boolean sendUpdates = false;
 					timer = 0;
-					int upcount = getUpgradeAmount(Upgrades.UNIVERSAL_SPEED);
-					int mulcount = getUpgradeAmount(Upgrades.MACHINE_EXTRA);
 					int cost = 800;
-					switch (upcount) {
-					case 3:
-						nTimer = 2;
-						cost = 700;
-						break;
-					case 2:
-						nTimer = 4;
-						cost = 700;
-						break;
-					case 1:
-						nTimer = 8;
-						cost = 700;
-						break;
-					default:
-						nTimer = 16;
-					}
-
+					nTimer = switch(getUpgradeAmount(Upgrades.UNIVERSAL_SPEED)) {
+					case 3 -> 2;
+					case 2 -> 4;
+					case 1 -> 8;
+					default -> 16;
+					};
+					
 					boolean hasGas = false;
 					if (getUpgradeAmount(Upgrades.MACHINE_GAS) != 0) {
 						hasGas = true;
 						cost = Math.round((float) cost * 2.5f);
 					}		
 					
-					//Below determines if the recipe is valid or not. If so, sets outputRecipe to not null.
 					if (outputRecipe == null) {
 
-						List<RefiningCrafting> rList = this.getLevel().getRecipeManager().getAllRecipesFor(RefiningCrafting.REFINING_RECIPE);
-						Block b = this.getLevel().getBlockState(this.getBlockPos().above()).getBlock();
-						RefiningCrafting recipe = null;
-						for (RefiningCrafting r : rList) {
-							if (b == r.attachmentBlock) {
-								if (!r.itemInput.getFirst().isEmpty()) {
-
-									if (r.itemInput.getFirst().test(getItem(1))) {
-										if (!r.fluidInput.getFirst().isEmpty()) {
-											if (!tankin.isEmpty() && r.fluidInput.getFirst().isFluidEqual(tankin) && r.fluidInput.getFirst().getAmount() <= tankin.getAmount()) {
-												recipe = r;
-												break;
-											}
-										} else {
-											recipe = r;
-											break;
-										}
-									}
-
-								} else {
-									if (!tankin.isEmpty() && r.fluidInput.getFirst().isFluidEqual(tankin) && r.fluidInput.getFirst().getAmount() <= tankin.getAmount()) {
-										recipe = r;
-										break;
-									}
-								}
-							}
-						}
-
+						RefiningCrafting recipe = this.getLevel().getRecipeManager().getRecipeFor(RefiningCrafting.REFINING_RECIPE, this, this.getLevel()).orElse(null);
 						if (recipe != null) {
-							if (!recipe.fluidInput.getFirst().isEmpty()) {
-								float chance = recipe.fluidInput.getSecond();
-								switch (getUpgradeAmount(Upgrades.MACHINE_CONSERVATION)) {
-								case 3:
-									chance = chance * 2f;
-									break;
-								case 2:
-									chance = chance * 1.5f;
-									break;
-								case 0:
-									chance = 0f;
-								}
-								if (this.getLevel().getRandom().nextFloat() < chance) {
-									tankin.shrink(Math.round((float) recipe.fluidInput.getFirst().getAmount() / 3f));
-								} else {
-									tankin.shrink(recipe.fluidInput.getFirst().getAmount());
-								}
-
-							}
-
-							if (!recipe.itemInput.getFirst().isEmpty()) {
-
-								float chance = recipe.itemInput.getSecond();
-								switch (getUpgradeAmount(Upgrades.MACHINE_CONSERVATION)) {
-								case 3:
-									chance = chance * 2f;
-									break;
-								case 2:
-									chance = chance * 1.5f;
-									break;
-								case 0:
-									chance = 0f;
-								}
-
-								if (!(this.getLevel().getRandom().nextFloat() < chance)) {
-									getItem(1).shrink(1);
-								}
-							}
+							recipe.performOperations(this);
 							cycles = recipe.time;
 							outputRecipe = recipe;
 							if (this.getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
@@ -487,144 +410,31 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 					}
 
-					//Below determines if output can be completed whether it fits in every slot or not, etc.
 					if (outputRecipe != null) {
-
 						if (amount - cost >= 0) {
 							if (progress >= cycles) {
 
-								ItemStack stackOut = null;
-								FluidStack fluidOutA = null;
-								FluidStack fluidOutB = null;
-
-								Pair<ItemStack, Float> tempa = outputRecipe.itemOutput;
-								if (!tempa.getFirst().isEmpty()) {
-									ItemStack outstack = tempa.getFirst().copy();
-
-									float chance = tempa.getSecond();
-									switch (mulcount) {
-									case 3:
-										chance = chance * 2f;
-										break;
-									case 2:
-										chance = chance * 1.5f;
-										break;
-									case 0:
-										chance = 0f;
-									}
-
-									if (this.getLevel().getRandom().nextFloat() < chance) {
-										outstack.setCount(Math.round(((float) outstack.getCount() * 1.5f)));
-										if (outstack.getCount() > 64) {
-											outstack.setCount(64);
-										}
-									}
-									if (contents.get(0).isEmpty() || (ItemHandlerHelper.canItemStacksStack(contents.get(0), outstack)
-											&& contents.get(0).getCount() + outstack.getCount() <= contents.get(0).getMaxStackSize())) {
-										stackOut = outstack;
-									} else {
-										return;
-									}
+								if(outputRecipe.performOutputs(this)) {
+									outputRecipe = null;
+									progress = 0f;
+									cycles = 0f;
+									sendUpdates = true;
 								}
-
-								Pair<FluidStack, Float> tempb = outputRecipe.fluidOutputA;
-								if (!tempb.getFirst().isEmpty()) {
-									FluidStack outstack = tempb.getFirst().copy();
-
-									float chance = tempb.getSecond();
-									switch (mulcount) {
-									case 3:
-										chance = chance * 2f;
-										break;
-									case 2:
-										chance = chance * 1.5f;
-										break;
-									case 0:
-										chance = 0f;
-									}
-
-									if (this.getLevel().getRandom().nextFloat() < chance) {
-										outstack.setAmount(Math.round(((float) outstack.getAmount() * 1.5f)));
-									}
-									if (tankouta.isEmpty() || (tankouta.isFluidEqual(outstack) && tankouta.getAmount() + outstack.getAmount() <= 4000)) {
-										fluidOutA = outstack;
-									} else if(outputRecipe.fluidOutputB.getFirst().isEmpty() && (tankoutb.isEmpty() || (tankoutb.isFluidEqual(outstack) && tankoutb.getAmount() + outstack.getAmount() <= 4000))){
-										fluidOutB = outstack;
-									}else {
-										return;
-									}
-								}
-
-								tempb = outputRecipe.fluidOutputB;
-								if (!tempb.getFirst().isEmpty()) {
-									FluidStack outstack = tempb.getFirst().copy();
-
-									float chance = tempb.getSecond();
-									switch (mulcount) {
-									case 3:
-										chance = chance * 2f;
-										break;
-									case 2:
-										chance = chance * 1.5f;
-										break;
-									case 0:
-										chance = 0f;
-									}
-
-									if (this.getLevel().getRandom().nextFloat() < chance) {
-										outstack.setAmount(Math.round(((float) outstack.getAmount() * 1.5f)));
-									}
-									if (tankoutb.isEmpty() || (tankoutb.isFluidEqual(outstack) && tankoutb.getAmount() + outstack.getAmount() <= 4000)) {
-										fluidOutB = outstack;
-									} else {
-										return;
-									}
-								}
-
-								if (stackOut != null) {
-									if (contents.get(0).isEmpty()) {
-										contents.set(0, stackOut);
-									} else {
-										contents.get(0).grow(stackOut.getCount());
-									}
-								}
-
-								if (fluidOutA != null) {
-									if (tankouta.isEmpty()) {
-										tankouta = fluidOutA;
-									} else {
-										tankouta.grow(fluidOutA.getAmount());
-									}
-								}
-
-								if (fluidOutB != null) {
-									if (tankoutb.isEmpty()) {
-										tankoutb = fluidOutB;
-									} else {
-										tankoutb.grow(fluidOutB.getAmount());
-									}
-								}
-
-								outputRecipe = null;
-								progress = 0f;
-								cycles = 0f;
-								sendUpdates = true;
 
 							} else {
-
-								if (!outputRecipe.fluidInput.getFirst().isEmpty() && outputRecipe.fluidInput.getFirst().getFluid().getAttributes().isGaseous() && hasGas == false) {
-									showGasMsg = true;
-									sendUpdates = true;
-								} else {
-									if (showGasMsg = true) {
-										showGasMsg = false;
+								List<FluidStack> inputs = hasGas ? List.of() : outputRecipe.getJEIFluidInputs();
+								if(inputs.stream().anyMatch((fs) -> fs.getFluid().getAttributes().isGaseous())) {
+									if(!showGasMsg) {
+										showGasMsg = true;
+										sendUpdates = true;
 									}
+								}else {
+									if(showGasMsg) showGasMsg = false;
 									amount -= cost;
 									fept = (float) cost / (float) nTimer;
 									progress++;
 									sendUpdates = true;
 								}
-
 							}
 
 						}

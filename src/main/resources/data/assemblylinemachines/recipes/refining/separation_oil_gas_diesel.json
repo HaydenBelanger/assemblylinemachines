@@ -4,7 +4,7 @@
 	"input_fluid":{
 		"fluid": "assemblylinemachines:oil",
 		"amount": 1000,
-		"upgrade_preserve_chance": 0.15
+		"upgrade_multiply_chance": 0.15
 	},
 	"proc_time": 12,
 	"output_fluid_a":{

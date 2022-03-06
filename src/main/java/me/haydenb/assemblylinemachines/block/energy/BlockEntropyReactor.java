@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
@@ -15,6 +16,7 @@ import me.haydenb.assemblylinemachines.crafting.EntropyReactorCrafting;
 import me.haydenb.assemblylinemachines.crafting.WorldCorruptionCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -36,6 +38,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraft.world.level.block.*;
@@ -538,7 +541,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 	}
 
-	public static class TEEntropyReactor extends EnergyMachine<ContainerEntropyReactor> implements ALMTicker<TEEntropyReactor>/*, TOPProvider*/{
+	public static class TEEntropyReactor extends EnergyMachine<ContainerEntropyReactor> implements ALMTicker<TEEntropyReactor>, TOPProvider{
 
 		private static final Gson GSON = new Gson();
 
@@ -571,7 +574,6 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			this(Registry.getBlockEntity("entropy_reactor"), pos, state);
 		}
 		
-		/*
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
@@ -589,7 +591,6 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new TextComponent("§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
 			probeInfo.horizontal().item(new ItemStack(Items.COAL)).vertical().text(new TextComponent("§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
 		}
-		*/
 		
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {

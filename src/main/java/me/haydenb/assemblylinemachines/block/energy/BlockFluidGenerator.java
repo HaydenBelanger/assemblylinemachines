@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.TEFluidGenerator;
 import me.haydenb.assemblylinemachines.block.helpers.*;
@@ -15,6 +16,7 @@ import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.Managed
 import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
@@ -29,10 +31,13 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -92,7 +97,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		}
 	}
 
-	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ALMTicker<TEFluidGenerator>/*, TOPProvider*/{
+	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ALMTicker<TEFluidGenerator>, TOPProvider{
 		
 		private int burnTimeLeft = 0;
 		private float increasedCost = 1f;
@@ -219,7 +224,6 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			this(Registry.getBlockEntity("fluid_generator"), pos, state);
 		}
 		
-		/*
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
@@ -230,7 +234,6 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			}
 			
 		}
-		*/
 		
 		@Override
 		public BaseComponent getDefaultName() {

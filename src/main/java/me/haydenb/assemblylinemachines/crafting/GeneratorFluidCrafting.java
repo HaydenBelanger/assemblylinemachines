@@ -1,9 +1,7 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
-import java.util.function.Supplier;
 
-import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.FluidGeneratorTypes;
@@ -18,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -157,8 +156,8 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 	}
 	
 	public static enum GeneratorFluidTypes{
-		GEOTHERMAL(FluidGeneratorTypes.GEOTHERMAL, Suppliers.memoize(() -> Ingredient.of(Registry.getBlock("geothermal_generator")))), COMBUSTION(FluidGeneratorTypes.COMBUSTION, Suppliers.memoize(() -> Ingredient.of(Registry.getBlock("combustion_generator")))),
-		COOLANT(null, Suppliers.memoize(() ->{
+		GEOTHERMAL(FluidGeneratorTypes.GEOTHERMAL, Lazy.of(() -> Ingredient.of(Registry.getBlock("geothermal_generator")))), COMBUSTION(FluidGeneratorTypes.COMBUSTION, Lazy.of(() -> Ingredient.of(Registry.getBlock("combustion_generator")))),
+		COOLANT(null, Lazy.of(() ->{
 			ArrayList<ItemStack> ingredients = new ArrayList<>();
 			for(GeneratorFluidTypes type : GeneratorFluidTypes.values()) {
 				if(!type.toString().equalsIgnoreCase("COOLANT")) ingredients.addAll(Arrays.asList(type.jeiIngredient.get().getItems()));
@@ -167,9 +166,9 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 		}));
 		
 		private final FluidGeneratorTypes equivalentGenerator;
-		private final Supplier<Ingredient> jeiIngredient;
+		private final Lazy<Ingredient> jeiIngredient;
 		
-		GeneratorFluidTypes(FluidGeneratorTypes equivalentGenerator, Supplier<Ingredient> jeiIngredient){
+		GeneratorFluidTypes(FluidGeneratorTypes equivalentGenerator, Lazy<Ingredient> jeiIngredient){
 			this.equivalentGenerator = equivalentGenerator;
 			this.jeiIngredient = jeiIngredient;
 		}

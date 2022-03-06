@@ -142,8 +142,8 @@ dependencies {
 	//compileOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
     //runtimeOnly fg.deobf("mekanism:Mekanism:1.16.4-10.0.18.445:all")
     
-    //THE ONE PROBE - Not yet updated to 1.18.2.
-    //implementation fg.deobf("curse.maven:theoneprobe-245211:3665852")
+    //THE ONE PROBE - Updated.
+    implementation fg.deobf("curse.maven:theoneprobe-245211:3671753")
     
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
