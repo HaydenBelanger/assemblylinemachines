@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"p p",
+		"pcp",
+		"sss"
+	],
+	"key":{
+		"p":{
+			"item": "assemblylinemachines:mystium_armor_plating"
+		},
+		"c":{
+			"item": "assemblylinemachines:mystium_crystal"
+		},
+		"s":{
+			"tag": "forge:plates/steel"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mystium_chestplate"
+	}
+}

@@ -1,0 +1,6 @@
+{
+	"parent": "item/handheld",
+	"textures":{
+		"layer0": "assemblylinemachines:item/wrench/wrench_o_matic_interact"
+	}
+}

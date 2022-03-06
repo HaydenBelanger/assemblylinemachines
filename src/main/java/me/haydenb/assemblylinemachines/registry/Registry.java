@@ -1,14 +1,11 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import java.io.PrintWriter;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.apache.commons.lang3.tuple.Triple;
-
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -30,7 +27,6 @@ import me.haydenb.assemblylinemachines.block.fluids.FluidNaphtha.BlockNaphthaFir
 import me.haydenb.assemblylinemachines.block.fluids.FluidNaphtha.FluidNaphthaBlock;
 import me.haydenb.assemblylinemachines.block.fluids.FluidOil.FluidOilBlock;
 import me.haydenb.assemblylinemachines.block.fluids.FluidOilProduct.FluidOilProductBlock;
-import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine.Phases;
 import me.haydenb.assemblylinemachines.block.machines.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockAutocraftingTable.*;
@@ -65,18 +61,17 @@ import me.haydenb.assemblylinemachines.block.pipes.BlockPipe;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity.PipeConnectorContainer;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity.PipeConnectorScreen;
-import me.haydenb.assemblylinemachines.block.pipes.PipeProperties.PipeType;
 import me.haydenb.assemblylinemachines.block.pipes.PipeProperties.TransmissionType;
 import me.haydenb.assemblylinemachines.client.ter.*;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.item.*;
 import me.haydenb.assemblylinemachines.item.IGearboxFuel.ItemGearboxFuel;
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.EnchantmentOverclock;
+import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
-import me.haydenb.assemblylinemachines.item.ItemTiers.ArmorTiers;
-import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
-import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
+import me.haydenb.assemblylinemachines.item.ItemWrenchOMatic.EnchantmentEngineersFury;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
+import me.haydenb.assemblylinemachines.registry.Utils.PhasedMap;
 import me.haydenb.assemblylinemachines.registry.datagen.*;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
@@ -94,6 +89,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -149,18 +145,21 @@ public class Registry {
 		}
 	});
 		
-	private static final ConcurrentHashMap<String, Block> MOD_BLOCK_REGISTRY = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<String, BlockEntityType<?>> MOD_BLOCKENTITY_REGISTRY = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<String, Pair<MenuType<?>, Integer>> MOD_CONTAINER_REGISTRY = new ConcurrentHashMap<>();
+	private static final PhasedMap<String, Block> MOD_BLOCK_REGISTRY = new PhasedMap<>(Phases.BLOCK);
+	private static final PhasedMap<String, BlockEntityType<?>> MOD_BLOCKENTITY_REGISTRY = new PhasedMap<>(Phases.BLOCK_ENTITY);
+	private static final PhasedMap<String, Pair<MenuType<?>, Integer>> MOD_CONTAINER_REGISTRY = new PhasedMap<>(Phases.CONTAINER);
 	private static final ConcurrentHashMap<String, MobEffect> MOD_EFFECT_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, SoundEvent> MOD_SOUND_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Enchantment> MOD_ENCHANTMENT_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>>> MOD_CRAFTING_REGISTRY = new ConcurrentHashMap<>();
 	
-	private static final ArrayListMultimap<Phases, Method> ANNOTATED_REGISTRATIONS = ArrayListMultimap.create();
+	static {
+		MOD_BLOCK_REGISTRY.add();
+		MOD_BLOCKENTITY_REGISTRY.add();
+		MOD_CONTAINER_REGISTRY.add();
+	}
 	
-	//MOD CREATIVE TAB & DEFAULT PROPERTIES
 	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
 	
 	//BOTH-SIDED REGISTRATIONS - ITEMS, BLOCKS, TEs, CONTAINERS, ENTITIES, POTIONS, CRAFTING, CARVERS, SOUNDS
@@ -168,9 +167,7 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
-		if(PluginPatchouli.get().isPatchouliInstalled()) {
-			createItem("guidebook", new ItemGuidebook());
-		}
+		createItem("guidebook", new ItemGuidebook());
 		createItem("titanium_ingot", "titanium_nugget", "raw_titanium");
 		
 		createItem("titanium_blade_piece", "pure_gold_blade_piece", "steel_blade_piece");
@@ -220,50 +217,50 @@ public class Registry {
 		createItem("mystium_blend", "mystium_ingot");
 		createItem("corrupted_shard", new ItemCorruptedShard());
 		
-		createItem("titanium_sword", new SwordItem(ToolTiers.TITANIUM, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_axe", new AxeItem(ToolTiers.TITANIUM, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_pickaxe", new PickaxeItem(ToolTiers.TITANIUM, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_shovel", new ShovelItem(ToolTiers.TITANIUM, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_hoe", new HoeItem(ToolTiers.TITANIUM, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_hammer", new ItemHammer(ToolTiers.TITANIUM, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_sword", new SwordItem(ItemTiers.TITANIUM.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_pickaxe", new PickaxeItem(ItemTiers.TITANIUM.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_shovel", new ShovelItem(ItemTiers.TITANIUM.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_hoe", new HoeItem(ItemTiers.TITANIUM.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_hammer", new ItemHammer(ItemTiers.TITANIUM.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		createItem("crank_sword", new ItemPowerTool<TieredItem>(new SwordItem(ToolTiers.CRANK, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("crank_axe", new ItemPowerTool<TieredItem>(new AxeItem(ToolTiers.CRANK, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("crank_pickaxe", new ItemPowerTool<TieredItem>(new PickaxeItem(ToolTiers.CRANK, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("crank_shovel", new ItemPowerTool<TieredItem>(new ShovelItem(ToolTiers.CRANK, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("crank_hoe", new ItemPowerTool<TieredItem>(new HoeItem(ToolTiers.CRANK, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("crank_hammer", new ItemPowerTool<TieredItem>(new ItemHammer(ToolTiers.CRANK, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_sword", new ItemPowerTool<TieredItem>(new SwordItem(ItemTiers.CRANK.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_axe", new ItemPowerTool<TieredItem>(new AxeItem(ItemTiers.CRANK.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_pickaxe", new ItemPowerTool<TieredItem>(new PickaxeItem(ItemTiers.CRANK.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_shovel", new ItemPowerTool<TieredItem>(new ShovelItem(ItemTiers.CRANK.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_hoe", new ItemPowerTool<TieredItem>(new HoeItem(ItemTiers.CRANK.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("crank_hammer", new ItemPowerTool<TieredItem>(new ItemHammer(ItemTiers.CRANK.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
 		
-		createItem("mystium_sword", new ItemPowerTool<TieredItem>(new SwordItem(ToolTiers.MYSTIUM, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("mystium_axe", new ItemPowerTool<TieredItem>(new AxeItem(ToolTiers.MYSTIUM, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("mystium_pickaxe", new ItemPowerTool<TieredItem>(new PickaxeItem(ToolTiers.MYSTIUM, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("mystium_shovel", new ItemPowerTool<TieredItem>(new ShovelItem(ToolTiers.MYSTIUM, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("mystium_hoe", new ItemPowerTool<TieredItem>(new HoeItem(ToolTiers.MYSTIUM, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("mystium_hammer", new ItemPowerTool<TieredItem>(new ItemHammer(ToolTiers.MYSTIUM, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_sword", new ItemPowerTool<TieredItem>(new SwordItem(ItemTiers.MYSTIUM.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_axe", new ItemPowerTool<TieredItem>(new AxeItem(ItemTiers.MYSTIUM.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_pickaxe", new ItemPowerTool<TieredItem>(new PickaxeItem(ItemTiers.MYSTIUM.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_shovel", new ItemPowerTool<TieredItem>(new ShovelItem(ItemTiers.MYSTIUM.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_hoe", new ItemPowerTool<TieredItem>(new HoeItem(ItemTiers.MYSTIUM.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("mystium_hammer", new ItemPowerTool<TieredItem>(new ItemHammer(ItemTiers.MYSTIUM.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
 		
-		createItem("novasteel_sword", new ItemPowerTool<TieredItem>(new SwordItem(ToolTiers.NOVASTEEL, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("novasteel_axe", new ItemPowerTool<TieredItem>(new AxeItem(ToolTiers.NOVASTEEL, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("novasteel_pickaxe", new ItemPowerTool<TieredItem>(new PickaxeItem(ToolTiers.NOVASTEEL, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("novasteel_shovel", new ItemPowerTool<TieredItem>(new ShovelItem(ToolTiers.NOVASTEEL, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("novasteel_hoe", new ItemPowerTool<TieredItem>(new HoeItem(ToolTiers.NOVASTEEL, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
-		createItem("novasteel_hammer", new ItemPowerTool<TieredItem>(new ItemHammer(ToolTiers.NOVASTEEL, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("novasteel_sword", new ItemPowerTool<TieredItem>(new SwordItem(ItemTiers.NOVASTEEL.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("novasteel_axe", new ItemPowerTool<TieredItem>(new AxeItem(ItemTiers.NOVASTEEL.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("novasteel_pickaxe", new ItemPowerTool<TieredItem>(new PickaxeItem(ItemTiers.NOVASTEEL.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("novasteel_shovel", new ItemPowerTool<TieredItem>(new ShovelItem(ItemTiers.NOVASTEEL.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("novasteel_hoe", new ItemPowerTool<TieredItem>(new HoeItem(ItemTiers.NOVASTEEL.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB))));
+		createItem("novasteel_hammer", new ItemPowerTool<TieredItem>(new ItemHammer(ItemTiers.NOVASTEEL.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB))));
 		
-		createItem("steel_sword", new SwordItem(ToolTiers.STEEL, 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_axe", new AxeItem(ToolTiers.STEEL, 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_pickaxe", new PickaxeItem(ToolTiers.STEEL, 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_shovel", new ShovelItem(ToolTiers.STEEL, 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_hoe", new HoeItem(ToolTiers.STEEL, 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_hammer", new ItemHammer(ToolTiers.STEEL, 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_sword", new SwordItem(ItemTiers.STEEL.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_axe", new AxeItem(ItemTiers.STEEL.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_pickaxe", new PickaxeItem(ItemTiers.STEEL.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_shovel", new ShovelItem(ItemTiers.STEEL.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_hoe", new HoeItem(ItemTiers.STEEL.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		createItem("steel_helmet", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_chestplate", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_leggings", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("steel_boots", new ArmorItem(ArmorTiers.STEEL, EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_helmet", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("steel_boots", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
 		
-		createItem("titanium_helmet", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_chestplate", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_leggings", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
-		createItem("titanium_boots", new ArmorItem(ArmorTiers.TITANIUM, EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_helmet", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
 		
 		createItem("crank_shaft", "convection_component", "conduction_component", "empowered_conduction_component", "empowered_convection_component", "basic_battery",
 				"temperature_regulator", "fluid_regulator", "stainless_steel_tank_component", "steel_tank_component", "pneumatic_device");
@@ -322,28 +319,23 @@ public class Registry {
 		createItem("mkii_upgrade_kit", new ItemUpgradeKit());
 		createItem("electric_upgrade_kit", new ItemUpgradeKit());
 		
-		createItem("wrench_o_matic");
+		createItem("wrench_o_matic", new ItemWrenchOMatic());
 		
-		for(String i : MOD_ITEM_REGISTRY.keySet()) {
-			event.getRegistry().register(MOD_ITEM_REGISTRY.get(i));
-		}
+		createItem("mystium_helmet", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("mystium_chestplate", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("mystium_leggings", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("mystium_boots", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("enhanced_mystium_chestplate", new ItemPowerArmor(PowerToolType.ENHANCED_MYSTIUM, ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB).rarity(Rarity.EPIC)));
+		
+		createItem("mystium_armor_plating", "mystium_crystal", "mystium_flight_harness");
+		
+		MOD_ITEM_REGISTRY.values().forEach((i) -> event.getRegistry().register(i));
 	}
 	
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		
-		//This pulls all auto-registered methods from BlockMachines.class and sets them up for initialization, here, because Block registry is guaranteed to fire first.
-		for(Method method : MethodUtils.getMethodsWithAnnotation(BlockMachines.class, RegisterableMachine.class)) {
-			if(!Modifier.isStatic(method.getModifiers()) || method.getParameterCount() != 0) {
-				throw new IllegalArgumentException("Method " + method.getName() + " annotated with @RegisterableMachine is not compatible with auto-registration. Must be static with 0 arguments.");
-			}
-			ANNOTATED_REGISTRATIONS.put(method.getAnnotation(RegisterableMachine.class).phase(), method);
-		}
-		
-		//ALL PIPES REGISTERED HERE - Using loop.
-				for(Triple<String, PipeType, TransmissionType> pipeData : TransmissionType.getPipeRegistryValues()) {
-					createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true);
-				}
+
+		TransmissionType.getPipeRegistryValues().forEach((pipeData) -> createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true));
 		
 		createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
@@ -373,7 +365,12 @@ public class Registry {
 		createBlock("black_granite", new BlockBlackGranite(), true);
 		createBlock("smooth_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("brick_black_granite", Material.STONE, 3f, 9f,  SoundType.STONE, false, true);
-		createBlock("chiselled_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("runed_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("arcane_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("circuit_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("tile_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("etched_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
+		createBlock("large_brick_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("pillar_black_granite", new BlockBlackGranitePillar(), true);
 		createBlock("slab_black_granite", new SlabBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		createBlock("stair_black_granite", new StairBlock(() -> Registry.getBlock("smooth_black_granite").defaultBlockState(), Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
@@ -500,49 +497,35 @@ public class Registry {
 		createBlock("experience_siphon", new BlockExperienceSiphon(), true);
 		createBlock("omnivoid", new BlockOmnivoid(), true);
 		
-		registerFluids(null);
+		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(() -> Registry.getFluid("oil")), true);
+		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(() -> Registry.getFluid("condensed_void")), true);
+		createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(() -> Registry.getFluid("naphtha")), true);
+		createFluid("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), new FluidOilProductBlock(() -> Registry.getFluid("gasoline"), "gasoline"), true);
+		createFluid("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), new FluidOilProductBlock(() -> Registry.getFluid("diesel"), "diesel"), true);
+		createFluid("liquid_carbon", new FluidOilProduct("liquid_carbon", true), new FluidOilProduct("liquid_carbon", false), new FluidOilProductBlock(() -> Registry.getFluid("liquid_carbon"), "liquid_carbon"), true);
+		createFluid("liquid_experience", 35, false, true, true, 0, 184, 18);
+		createFluid("dark_energy", new FluidDarkEnergy(true), new FluidDarkEnergy(false), new FluidDarkEnergyBlock(() -> Registry.getFluid("dark_energy")), true);
+		createFluid("glacier_water", new FluidGlacierWater(true), new FluidGlacierWater(false), new FluidGlacierWaterBlock(() -> Registry.getFluid("glacier_water")), true);
 		
-		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.BLOCK)) {
-			createBlock(method.getAnnotation(RegisterableMachine.class).blockName(), (Block) method.invoke(null), true);
-		}
+		createFluid("ethane", 0, true, false, false, 0, 0, 0);
+		createFluid("ethylene", 0, true, false, false, 0, 0, 0);
+		createFluid("propane", 0, true, false, false, 0, 0, 0);
+		createFluid("propylene", 0, true, false, false, 0, 0, 0);
 		
-		event.getRegistry().registerAll(MOD_BLOCK_REGISTRY.values().toArray(new Block[MOD_BLOCK_REGISTRY.size()]));
+		MOD_BLOCK_REGISTRY.values().forEach((b) -> event.getRegistry().register(b));
 	}
 	
-	//Method can be fired with event being null - this happens from the Block registration, to ensure all LiquidBlocks, Buckets, and Fluids get created before their respective registry events.
 	@SubscribeEvent
 	public static void registerFluids(RegistryEvent.Register<Fluid> event) {
-		if(event == null) {
-			
-			createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(() -> Registry.getFluid("oil")), true);
-			createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(() -> Registry.getFluid("condensed_void")), true);
-			createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(() -> Registry.getFluid("naphtha")), true);
-			createFluid("gasoline", new FluidOilProduct("gasoline", true), new FluidOilProduct("gasoline", false), new FluidOilProductBlock(() -> Registry.getFluid("gasoline"), "gasoline"), true);
-			createFluid("diesel", new FluidOilProduct("diesel", true), new FluidOilProduct("diesel", false), new FluidOilProductBlock(() -> Registry.getFluid("diesel"), "diesel"), true);
-			createFluid("liquid_carbon", new FluidOilProduct("liquid_carbon", true), new FluidOilProduct("liquid_carbon", false), new FluidOilProductBlock(() -> Registry.getFluid("liquid_carbon"), "liquid_carbon"), true);
-			createFluid("liquid_experience", 35, false, true, true, 0, 184, 18);
-			createFluid("dark_energy", new FluidDarkEnergy(true), new FluidDarkEnergy(false), new FluidDarkEnergyBlock(() -> Registry.getFluid("dark_energy")), true);
-			createFluid("glacier_water", new FluidGlacierWater(true), new FluidGlacierWater(false), new FluidGlacierWaterBlock(() -> Registry.getFluid("glacier_water")), true);
-			
-			createFluid("ethane", 0, true, false, false, 0, 0, 0);
-			createFluid("ethylene", 0, true, false, false, 0, 0, 0);
-			createFluid("propane", 0, true, false, false, 0, 0, 0);
-			createFluid("propylene", 0, true, false, false, 0, 0, 0);
-			
-		}else {
-			event.getRegistry().registerAll(MOD_FLUID_REGISTRY.values().toArray(new Fluid[MOD_FLUID_REGISTRY.size()]));
-		}
+		
+		MOD_FLUID_REGISTRY.values().forEach((f) -> event.getRegistry().register(f));
+		
 	}
 	
 	@SubscribeEvent
 	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		//ALL PIPES CONNECTED TO TE HERE - Using loop.
-		ArrayList<Block> pipes = new ArrayList<>();
-		for(Triple<String, PipeType, TransmissionType> pipeData : TransmissionType.getPipeRegistryValues()) {
-			pipes.add(MOD_BLOCK_REGISTRY.get(pipeData.getLeft()));
-		}
 		
-		createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, pipes.toArray(new Block[pipes.size()]));
+		createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, Lists.transform(TransmissionType.getPipeRegistryValues(), (t) -> MOD_BLOCK_REGISTRY.get(t.getLeft())));
 		createBlockEntity("hand_grinder", TEHandGrinder.class);
 		createBlockEntity("fluid_bath", TEFluidBath.class);
 		createBlockEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
@@ -574,45 +557,33 @@ public class Registry {
 		createBlockEntity("experience_siphon", TEExperienceSiphon.class);
 		createBlockEntity("omnivoid", TEOmnivoid.class);
 		
-		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.BLOCK_ENTITY)) {
-			createBlockEntity(method.getAnnotation(RegisterableMachine.class).blockName(), (BlockEntityType<?>) method.invoke(null));
-		}
-		
-		event.getRegistry().registerAll(MOD_BLOCKENTITY_REGISTRY.values().toArray(new BlockEntityType<?>[MOD_BLOCKENTITY_REGISTRY.size()]));
+		MOD_BLOCKENTITY_REGISTRY.values().forEach((be) -> event.getRegistry().register(be));
 	}
 	
 	@SubscribeEvent
 	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		createContainer("simple_fluid_mixer", 1050, ContainerSimpleFluidMixer.class);
-		createContainer("simple_grinder", 1051, ContainerSimpleGrinder.class);
-		createContainer("gearbox", 1052, ContainerGearbox.class);
-		createContainer("pipe_connector", 1053, PipeConnectorContainer.class);
-		createContainer("coal_generator", 1054, ContainerCoalGenerator.class);
-		createContainer("crankmill", 1055, ContainerCrankmill.class);
-		createContainer("battery_cell", 1056, ContainerBatteryCell.class);
-		createContainer("autocrafting_table", 1061, ContainerAutocraftingTable.class);
-		createContainer("refinery", 1063, ContainerRefinery.class);
-		createContainer("fluid_router", 1064, ContainerFluidRouter.class);
-		createContainer("interactor", 1065, ContainerInteractor.class);
-		createContainer("bottomless_storage_unit", 1066, ContainerBottomlessStorageUnit.class);
-		createContainer("fluid_generator", 1067, ContainerFluidGenerator.class);
-		createContainer("powered_spawner", 1068, ContainerPoweredSpawner.class);
-		createContainer("experience_mill", 1069, ContainerExperienceMill.class);
-		createContainer("quarry", 1070, ContainerQuarry.class);
-		createContainer("quantum_link", 1072, ContainerQuantumLink.class);
-		createContainer("entropy_reactor", 1074, ContainerEntropyReactor.class);
-		createContainer("corrupting_basin", 1075, ContainerCorruptingBasin.class);
-		createContainer("omnivoid", 1076, ContainerOmnivoid.class);
+		createContainer("simple_fluid_mixer", ContainerSimpleFluidMixer.class);
+		createContainer("simple_grinder", ContainerSimpleGrinder.class);
+		createContainer("gearbox", ContainerGearbox.class);
+		createContainer("pipe_connector", PipeConnectorContainer.class);
+		createContainer("coal_generator", ContainerCoalGenerator.class);
+		createContainer("crankmill", ContainerCrankmill.class);
+		createContainer("battery_cell", ContainerBatteryCell.class);
+		createContainer("autocrafting_table", ContainerAutocraftingTable.class);
+		createContainer("refinery", ContainerRefinery.class);
+		createContainer("fluid_router", ContainerFluidRouter.class);
+		createContainer("interactor", ContainerInteractor.class);
+		createContainer("bottomless_storage_unit", ContainerBottomlessStorageUnit.class);
+		createContainer("fluid_generator", ContainerFluidGenerator.class);
+		createContainer("powered_spawner", ContainerPoweredSpawner.class);
+		createContainer("experience_mill", ContainerExperienceMill.class);
+		createContainer("quarry", ContainerQuarry.class);
+		createContainer("quantum_link", ContainerQuantumLink.class);
+		createContainer("entropy_reactor", ContainerEntropyReactor.class);
+		createContainer("corrupting_basin", ContainerCorruptingBasin.class);
+		createContainer("omnivoid", ContainerOmnivoid.class);
 		
-		int id = MOD_CONTAINER_REGISTRY.entrySet().stream().max((entry1, entry2) -> entry1.getValue().getSecond() > entry2.getValue().getSecond() ? 1 : -1).orElseThrow().getValue().getSecond() + 1;
-		
-		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.CONTAINER)) {
-			createContainer(method.getAnnotation(RegisterableMachine.class).blockName(), id, (MenuType<?>) method.invoke(null));
-			id++;
-		}
-		
-		Iterator<Pair<MenuType<?>, Integer>> iter = MOD_CONTAINER_REGISTRY.values().iterator();
-		while(iter.hasNext()) event.getRegistry().register(iter.next().getFirst());
+		MOD_CONTAINER_REGISTRY.values().forEach((p) -> event.getRegistry().register(p.getFirst()));
 		
 	}
 	
@@ -636,15 +607,16 @@ public class Registry {
 		createEffect("deep_burn", new EffectDeepBurn());
 		createEffect("dark_expulsion", new EffectDarkExpulsion());
 		
-		event.getRegistry().registerAll(MOD_EFFECT_REGISTRY.values().toArray(new MobEffect[MOD_EFFECT_REGISTRY.size()]));
+		MOD_EFFECT_REGISTRY.values().forEach((e) -> event.getRegistry().register(e));
 	}
 	
 	@SubscribeEvent
 	public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
 		
 		createEnchantment("overclock", new EnchantmentOverclock());
+		createEnchantment("engineers_fury", new EnchantmentEngineersFury());
 		
-		event.getRegistry().registerAll(MOD_ENCHANTMENT_REGISTRY.values().toArray(new Enchantment[MOD_ENCHANTMENT_REGISTRY.size()]));
+		MOD_ENCHANTMENT_REGISTRY.values().forEach((e) -> event.getRegistry().register(e));
 	}
 	
 	@SubscribeEvent
@@ -664,19 +636,11 @@ public class Registry {
 		createRecipe(GeneratorFluidCrafting.GENFLUID_RECIPE, GeneratorFluidCrafting.SERIALIZER);
 		createRecipe(UpgradeKitCrafting.UPGRADING_RECIPE, UpgradeKitCrafting.SERIALIZER);
 		
-		for(String name : MOD_CRAFTING_REGISTRY.keySet()) {
-			Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>> recipe = MOD_CRAFTING_REGISTRY.get(name);
-			net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(recipe.getFirst().toString()), recipe.getFirst());
-			event.getRegistry().register(recipe.getSecond().setRegistryName(name));
-		}
+		MOD_CRAFTING_REGISTRY.entrySet().forEach((e) -> {
+			net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(e.getValue().getFirst().toString()), e.getValue().getFirst());
+			event.getRegistry().register(e.getValue().getSecond().setRegistryName(e.getKey()));
+		});
 	}
-	
-	/*
-	@SubscribeEvent
-	public static void registerCarvers(RegistryEvent.Register<WorldCarver<?>> event) {
-		event.getRegistry().register(new ChaosPlaneCarver(CaveCarverConfiguration.CODEC).setRegistryName("chaos_plane_cave"));
-		
-	}*/
 	
 	@SubscribeEvent
 	public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
@@ -684,15 +648,13 @@ public class Registry {
 		MOD_SOUND_REGISTRY.put("corrupt_shell_hurt", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_hurt")).setRegistryName("corrupt_shell_hurt"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_death")).setRegistryName("corrupt_shell_death"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_step")).setRegistryName("corrupt_shell_step"));
-		
 		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_ambient", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_ambient")).setRegistryName("corrupt_shell_cool_ambient"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_hurt", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_hurt")).setRegistryName("corrupt_shell_cool_hurt"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_death")).setRegistryName("corrupt_shell_cool_death"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_step")).setRegistryName("corrupt_shell_cool_step"));
-		
 		MOD_SOUND_REGISTRY.put("assembly_required", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "assembly_required")).setRegistryName("assembly_required"));
 		
-		event.getRegistry().registerAll(MOD_SOUND_REGISTRY.values().toArray(new SoundEvent[MOD_SOUND_REGISTRY.size()]));
+		MOD_SOUND_REGISTRY.values().forEach((s) -> event.getRegistry().register(s));
 	}
 	
 	//CLIENT-RELATED SETUP EVENTS - RENDER LAYERS, TERs, SCREENS, ITEM PROPERTIES, TINTING HANDLERS, ENTITY RENDERERS
@@ -763,10 +725,8 @@ public class Registry {
 		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
 		registerScreen("omnivoid", ContainerOmnivoid.class, ScreenOmnivoid.class);
 		
-		for(Method method : ANNOTATED_REGISTRATIONS.get(Phases.SCREEN)) {
-			method.invoke(null);
-		}
-		
+		new PhasedMap<>(Phases.SCREEN).add();
+
 		ItemProperties.registerGeneric(new ResourceLocation(AssemblyLineMachines.MODID, "active"), new ClampedItemPropertyFunction() {
 			@Override
 			public float unclampedCall(ItemStack stack, ClientLevel level, LivingEntity entity, int p_174567_) {
@@ -774,6 +734,14 @@ public class Registry {
 					return ((IToolWithCharge) stack.getItem()).getActivePropertyState(stack, entity);
 				}
 				return 0f;
+			}
+		});
+		
+		ItemProperties.register(Registry.getItem("wrench_o_matic"), new ResourceLocation(AssemblyLineMachines.MODID, "wrenchmode"), new ClampedItemPropertyFunction() {
+			@Override
+			public float unclampedCall(ItemStack pStack, ClientLevel pLevel, LivingEntity pEntity, int pSeed) {
+				CompoundTag tag = pStack.getOrCreateTag();
+				return (float) tag.getInt("assemblylinemachines:wrenchmode") / 2f;
 			}
 		});
 	}
@@ -828,6 +796,8 @@ public class Registry {
 	public static void registerEntityRenderers(RegisterRenderers event) {
 		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
+	
+	
 	
 	//CONFIG CREATOR/DATA GENERATOR
 	
@@ -1032,6 +1002,10 @@ public class Registry {
 		MOD_BLOCKENTITY_REGISTRY.put(name, type.setRegistryName(name));
 	}
 	
+	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz, List<Block> blocks) {
+		createBlockEntity(name, clazz, blocks.toArray(new Block[blocks.size()]));
+	}
+	
 	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz, Block... blocks){
 		MOD_BLOCKENTITY_REGISTRY.put(name, BlockEntityType.Builder.of((pos, state) -> {
 
@@ -1044,7 +1018,6 @@ public class Registry {
 			}
 			return inst;
 		}, blocks).build(null).setRegistryName(name));
-	
 	}
 	
 	public static <T extends BlockEntity> void createBlockEntity(String name, Class<T> clazz) {
@@ -1060,7 +1033,7 @@ public class Registry {
 		return MOD_CONTAINER_REGISTRY.get(name).getSecond();
 	}
 	
-	public static <T extends AbstractContainerMenu> void createContainer(String name, int id, Class<T> clazz) {
+	public static <T extends AbstractContainerMenu> void createContainer(String name, Class<T> clazz) {
 		MenuType<?> mt = IForgeMenuType.create(new IContainerFactory<T>() {
 
 			@Override
@@ -1073,11 +1046,14 @@ public class Registry {
 					return null;
 				}
 			}
-		}).setRegistryName(name);
-		MOD_CONTAINER_REGISTRY.put(name, Pair.of(mt, id));
+		});
+		
+		createContainer(name, mt);
 	}
 	
-	public static void createContainer(String name, int id, MenuType<?> menu) {
+	public static void createContainer(String name, MenuType<?> menu) {
+		
+		int id = MOD_CONTAINER_REGISTRY.entrySet().stream().max((entry1, entry2) -> entry1.getValue().getSecond() > entry2.getValue().getSecond() ? 1 : -1).map((o) -> o.getValue().getSecond() + 1).orElse(1000);
 		MOD_CONTAINER_REGISTRY.put(name, Pair.of(menu.setRegistryName(name), id));
 	}
 	

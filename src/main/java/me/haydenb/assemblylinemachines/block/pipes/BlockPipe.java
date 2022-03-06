@@ -131,7 +131,7 @@ public class BlockPipe extends Block implements EntityBlock {
 		return this.updateConnections(stateIn, new Direction[]{facing}, (Level) worldIn, currentPos, null, null);
 	}
 	
-	private BlockState updateConnections(BlockState state, Direction[] toUpdate, Level world, BlockPos currentPos, Player playerForConnector, Direction clickedFace) {
+	public BlockState updateConnections(BlockState state, Direction[] toUpdate, Level world, BlockPos currentPos, Player playerForConnector, Direction clickedFace) {
 		for(Direction d : toUpdate) {
 			PipeConnOptions pco;
 			boolean set = true;

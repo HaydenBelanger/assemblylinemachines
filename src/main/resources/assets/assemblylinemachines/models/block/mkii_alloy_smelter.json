@@ -11,7 +11,7 @@
 		"11": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_front_idle",
 		"12": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_front_rad",
 		"14": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_side",
-		"16": "assemblylinemachines:block/mkii_alloy_smelter/t2_electric_furnace_inactive",
+		"16": "assemblylinemachines:block/t2_electric_furnace_inactive",
 		"17": "assemblylinemachines:block/ultimate_machine_base",
 		"18": "assemblylinemachines:block/ultimate_machine_side",
 		"particle": "assemblylinemachines:block/mkii_alloy_smelter/alloy_smelter_around"

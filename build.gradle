@@ -2,20 +2,22 @@ buildscript {
     repositories {
         // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
         maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://maven.parchmentmc.org' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
         classpath files("gradle/plugins/mixingradle-0.7-FG5BUILD.jar")
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '1.18.1-1.3.8'
+version = '1.18.1-1.4'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -26,7 +28,7 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
 
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    mappings channel: 'official', version: '1.18'
+    mappings channel: 'parchment', version: '2022.02.13-1.18.1'
     runs {
         client {
             workingDirectory project.file('run')
@@ -132,8 +134,10 @@ dependencies {
     implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.1-64")
     implementation fg.deobf("curse.maven:theoneprobe-245211:3606616")
     
-    //Testing mods - 'runtimeOnly' because it doesn't need to be present during compilation.
-    runtimeOnly fg.deobf("curse.maven:immersive-engineering-231951:3587149")
+    //Testing mods - 'runtimeOnly' because it doesn't need to be present during compilation as only for testing.
+    //runtimeOnly fg.deobf("curse.maven:immersive-engineering-231951:3587149")
+    //runtimeOnly fg.deobf("curse.maven:angel-ring-333396:3556040")
+    //runtimeOnly fg.deobf("curse.maven:curios-309927:3648837")
     
     
     

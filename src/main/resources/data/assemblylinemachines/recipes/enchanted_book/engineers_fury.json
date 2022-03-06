@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:enchantment_book",
+	"input":{
+		"tag": "assemblylinemachines:crafting/gears/precious"
+	},
+	"amount": 2,
+	"enchantment": "assemblylinemachines:engineers_fury",
+	"cost": 100
+}

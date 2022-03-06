@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "assemblylinemachines:black_granite"
+  },
+  "result": "assemblylinemachines:tile_black_granite",
+  "count": 1
+}

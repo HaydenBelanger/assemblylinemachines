@@ -50,6 +50,7 @@ public class ConfigHandler {
 		
 		//GENERAL TOOLS
 		public final ConfigValue<Double> overclockEnchantmentMultiplier;
+		public final ConfigValue<Double> engineersFuryKnockbackMultiplier;
 		
 		//TITANIUM TOOLS
 		public final ConfigValue<Double> titaniumToolAttack;
@@ -79,9 +80,13 @@ public class ConfigHandler {
 		//MYSTIUM TOOLS
 		public final ConfigValue<Double> mystiumToolAttack;
 		public final ConfigValue<Double> mystiumToolHarvestSpeed;
-		public final ConfigValue<Integer> mystiumToolEnchantability;
-		public final ConfigValue<Integer> mystiumToolDurability;
-		public final ConfigValue<Integer> mystiumToolMaxFE;
+		public final ConfigValue<Integer> mystiumEnchantability;
+		public final ConfigValue<Integer> mystiumDurability;
+		public final ConfigValue<Double> mystiumArmorKnockbackResistance;
+		public final ConfigValue<Integer> mystiumArmorDamageReduction;
+		public final ConfigValue<Double> mystiumArmorToughness;
+		public final ConfigValue<Integer> mystiumMaxFE;
+		public final ConfigValue<Integer> enhancedMystiumChestplateMaxFE;
 		
 		//NOVASTEEL TOOLS
 		public final ConfigValue<Double> novasteelToolAttack;
@@ -89,6 +94,10 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> novasteelToolEnchantability;
 		public final ConfigValue<Integer> novasteelToolDurability;
 		public final ConfigValue<Integer> novasteelToolMaxFE;
+		
+		//WRENCH-O-MATIC
+		public final ConfigValue<Double> wrenchAttack;
+		public final ConfigValue<Double> wrenchKnockback;
 		
 		//TITANIUM
 		public final ConfigValue<Integer> titaniumVeinSize;
@@ -144,6 +153,8 @@ public class ConfigHandler {
 			
 			builder.push("Tools");
 			overclockEnchantmentMultiplier = builder.comment("What multiplier should each level of the Overclock enchantment give?", "For example, the default of \"0.2\" is a 20% increase per enchantment level.").defineInRange("overclockEnchantmentMultiplier", 0.2d, 0.001d, 1d);
+			engineersFuryKnockbackMultiplier = builder.comment("What additional multiplier should each level of the Engineer's Fury enchantment give to knockback?", "For example, \"0.1\" at Level X would be +1 knockback.").defineInRange("engineersFuryKnockbackMultiplier", 0.1d, 0d, 1d);
+			
 			builder.push("Titanium");
 			titaniumToolAttack = builder.comment("What is the base damage Titanium Tools should do?").defineInRange("titaniumToolAttack", 5d, 0.1d, 1000d);
 			titaniumToolHarvestSpeed = builder.comment("What is the base harvest speed Titanium Tools should do?").defineInRange("titaniumToolHarvestSpeed", 7d, 0.1d, 100d);
@@ -151,7 +162,7 @@ public class ConfigHandler {
 			titaniumDurability = builder.comment("What should the base durability of Titanium Tools and Armor be?").defineInRange("titaniumDurability", 1150, 10, 100000);
 			titaniumArmorKnockbackResistance = builder.comment("What should the knockback resistance of Titanium Armor be?").defineInRange("titaniumArmorKnockbackResistance", 0d, 0d, 1d);
 			titaniumArmorDamageReduction = builder.comment("What should the base damage reduction of Titanium Armor be?").defineInRange("titaniumArmorDamageReduction", 4, 2, 100);
-			titaniumArmorToughness = builder.comment("What should the toughness of Titanium Armor be?").defineInRange("titaniumArmorToughness", 0d, 0d, 1d);
+			titaniumArmorToughness = builder.comment("What should the toughness of Titanium Armor be?").defineInRange("titaniumArmorToughness", 0d, 0d, 100d);
 			builder.pop();
 			
 			builder.push("Steel");
@@ -161,7 +172,7 @@ public class ConfigHandler {
 			steelDurability = builder.comment("What should the base durability of Steel Tools and Armor be?").defineInRange("steelDurability", 1800, 10, 100000);
 			steelArmorKnockbackResistance = builder.comment("What should the knockback resistance of Steel Armor be?").defineInRange("steelArmorKnockbackResistance", 0.10d, 0d, 1d);
 			steelArmorDamageReduction = builder.comment("What should the base damage reduction of Steel Armor be?").defineInRange("steelArmorDamageReduction", 4, 2, 100);
-			steelArmorToughness = builder.comment("What should the toughness of Steel Armor be?").defineInRange("steelArmorToughness", 0.5d, 0d, 1d);
+			steelArmorToughness = builder.comment("What should the toughness of Steel Armor be?").defineInRange("steelArmorToughness", 2.5d, 0d, 100d);
 			builder.pop();
 			
 			builder.push("Crank");
@@ -175,9 +186,13 @@ public class ConfigHandler {
 			builder.push("Mystium");
 			mystiumToolAttack = builder.comment("What is the base damage Mystium Tools should do?").defineInRange("mystiumToolAttack", 9d, 0.1d, 1000d);
 			mystiumToolHarvestSpeed = builder.comment("What is the base harvest speed Mystium Tools should do?").defineInRange("mystiumToolHarvestSpeed", 19d, 0.1d, 100d);
-			mystiumToolEnchantability = builder.comment("What should the enchantability of Mystium Tools be?").defineInRange("mystiumToolEnchantability", 28, 0, 100);
-			mystiumToolDurability = builder.comment("What should the base physical durability of Mystium Tools be?").defineInRange("mystiumToolDurability", 150, 10, 100000);
-			mystiumToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Mystium Tools be?").defineInRange("mystiumToolMaxFE", 1000000, 1, Integer.MAX_VALUE);
+			mystiumEnchantability = builder.comment("What should the enchantability of Mystium Tools and Armor be?").defineInRange("mystiumToolEnchantability", 28, 0, 100);
+			mystiumDurability = builder.comment("What should the base physical durability of Mystium Tools and Armor be?").defineInRange("mystiumToolDurability", 150, 10, 100000);
+			mystiumArmorKnockbackResistance = builder.comment("What should the knockback resistance of Mystium Armor be?").defineInRange("mystiumArmorKnockbackResistance", 0.15d, 0d, 1d);
+			mystiumArmorDamageReduction = builder.comment("What should the base damage reduction of Mystium Armor be?").defineInRange("mystiumArmorDamageReduction", 7, 2, 100);
+			mystiumArmorToughness = builder.comment("What should the toughness of Mystium Armor be?").defineInRange("mystiumArmorToughness", 5d, 0d, 100d);
+			mystiumMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Mystium Tools be?").defineInRange("mystiumToolMaxFE", 1000000, 1, Integer.MAX_VALUE);
+			enhancedMystiumChestplateMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of the Enhanced Mystium Chestplate be?").defineInRange("enhancedMystiumChestplateMaxFE", 10000000, 1, Integer.MAX_VALUE);
 			builder.pop();
 			
 			builder.push("Novasteel");
@@ -187,6 +202,10 @@ public class ConfigHandler {
 			novasteelToolDurability = builder.comment("What should the base physical durability of Novasteel Tools be?").defineInRange("novasteelToolDurability", 300, 10, 100000);
 			novasteelToolMaxFE = builder.comment("What should the base electrical durability (Forge Energy) of Novasteel Tools be?").defineInRange("novasteelToolMaxFE", 20000000, 1, Integer.MAX_VALUE);
 			builder.pop();
+			
+			builder.push("Wrench-O-Matic");
+			wrenchAttack = builder.comment("In half-hearts, what is the amount of damage the Wrench-O-Matic in Wrath Mode should do?").defineInRange("wrenchAttack", 6d, 0d, Double.MAX_VALUE);
+			wrenchKnockback = builder.comment("How much base knockback should the Wrench-O-Matic do?", "Note that Engineer's Fury adds additional knockback.").defineInRange("wrenchKnockback", 0.5d, 0d, 5d);
 			builder.pop();
 			
 			builder.push("World");

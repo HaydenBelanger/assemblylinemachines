@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xx",
+		"xx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:black_granite"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:smooth_black_granite",
+		"count": 4
+	}
+}

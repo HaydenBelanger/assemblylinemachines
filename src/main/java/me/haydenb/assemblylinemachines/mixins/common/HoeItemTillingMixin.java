@@ -24,7 +24,7 @@ public class HoeItemTillingMixin {
 			if(context.getItemInHand().getItem() instanceof IToolWithCharge) {
 				IToolWithCharge tool = (IToolWithCharge) context.getItemInHand().getItem();
 				if(tool.canUseSecondaryAbilities(context.getItemInHand(), "HoeItem")) {
-					context.getLevel().setBlock(context.getClickedPos(), Registry.getBlock(tool.getPowerToolType().getNameOfSecondaryFarmland()).defaultBlockState(), 11);
+					context.getLevel().setBlock(context.getClickedPos(), Registry.getBlock(tool.getPowerToolType().nameOfSecondaryFarmland).defaultBlockState(), 11);
 					return;
 				}
 			}

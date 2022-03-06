@@ -22,7 +22,7 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 	
 	public ItemDowsingRod() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
 	}
 	
 	@Override
@@ -55,11 +55,16 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 	@Override
 	public ResourceLocation getTexture() {
-		return PowerToolType.MYSTIUM.getBorderTexturePath();
+		return PowerToolType.MYSTIUM.borderTexturePath;
 	}
 
 	@Override
 	public int getTopColor() {
-		return PowerToolType.MYSTIUM.getARGBBorderColor();
+		return PowerToolType.MYSTIUM.argbBorderColor;
+	}
+	
+	@Override
+	public int getBottomColor() {
+		return 0xffb81818;
 	}
 }

@@ -1,11 +1,15 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.*;
+
+import org.apache.commons.lang3.reflect.MethodUtils;
 
 import com.google.common.base.Suppliers;
 import com.google.common.cache.Cache;
@@ -13,6 +17,9 @@ import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine.Phases;
+import me.haydenb.assemblylinemachines.block.machines.BlockMachines;
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
@@ -21,7 +28,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -33,14 +41,15 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -48,8 +57,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.IItemHandler;
 
@@ -144,14 +156,66 @@ public class Utils {
 		});
 	}
 
+	public static class PhasedMap<K, V> extends ConcurrentHashMap<K, V>{
+
+		private static final long serialVersionUID = -1346052825976440901L;
+		
+		private final Phases phase;
+		
+		public PhasedMap(Phases phase) {
+			this.phase = phase;
+		}
+		
+		public void add() {
+			List<Method> methods = MethodUtils.getMethodsListWithAnnotation(BlockMachines.class, RegisterableMachine.class);
+			methods.removeIf((m) -> m.getAnnotation(RegisterableMachine.class).phase() != phase);
+			Consumer<Method> typedConsumer = getTypedConsumer(phase);
+			methods.forEach((m) -> typedConsumer.accept(m));
+		}
+		
+		private static Consumer<Method> getTypedConsumer(Phases phase){
+			return switch(phase) {
+			case BLOCK -> (m) -> {
+				try {
+					Registry.createBlock(m.getAnnotation(RegisterableMachine.class).blockName(), (Block) m.invoke(null), true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			};
+			case BLOCK_ENTITY -> (m) -> {
+				try {
+					Registry.createBlockEntity(m.getAnnotation(RegisterableMachine.class).blockName(), (BlockEntityType<?>) m.invoke(null));
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			};
+			case CONTAINER -> (m) -> {
+				try {
+					Registry.createContainer(m.getAnnotation(RegisterableMachine.class).blockName(), (MenuType<?>) m.invoke(null));
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			};
+			case SCREEN -> (m) -> {
+				try {
+					m.invoke(null);
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+			};
+			};
+			
+		}
+	}
 
 	public static interface IToolWithCharge{
 		default public int getMaxPower(ItemStack stack) {
 			if(stack.isEnchanted()) {
 				EnchantmentOverclock enchantment = (EnchantmentOverclock) Registry.getEnchantment("overclock");
-				return Math.round(this.getPowerToolType().getMaxCharge() * (1 + (EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack) * enchantment.getMultiplier())));
+				return Math.round(this.getPowerToolType().configMaxCharge * (1 + (EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack) * enchantment.getMultiplier())));
 			}
-			return this.getPowerToolType().getMaxCharge();
+			return this.getPowerToolType().configMaxCharge;
 		}
 		
 		default public ItemStack damageItem(ItemStack stack, int amount) {
@@ -159,15 +223,15 @@ public class Utils {
 				CompoundTag compound = stack.getTag();
 
 				PowerToolType ptt = this.getPowerToolType();
-				if (compound.contains(ptt.getKeyName())) {
+				if (compound.contains(ptt.keyName)) {
 
-					int power = compound.getInt(ptt.getKeyName());
-					if ((power - (amount * ptt.getCostMultiplier())) < 1) {
-						compound.remove(ptt.getKeyName());
+					int power = compound.getInt(ptt.keyName);
+					if ((power - (amount * ptt.costMultiplier)) < 1) {
+						compound.remove(ptt.keyName);
 						compound.remove("assemblylinemachines:canbreakblackgranite");
 						compound.remove("assemblylinemachines:secondarystyle");
 					} else {
-						compound.putInt(ptt.getKeyName(), power - (amount * ptt.getCostMultiplier()));
+						compound.putInt(ptt.keyName, power - (amount * ptt.costMultiplier));
 					}
 
 					stack.setTag(compound);
@@ -181,16 +245,16 @@ public class Utils {
 			CompoundTag nbt = stack.hasTag() ? stack.getTag() : new CompoundTag();
 			
 			PowerToolType ptt = this.getPowerToolType();
-			int current = nbt.getInt(ptt.getKeyName());
+			int current = nbt.getInt(ptt.keyName);
 			
-			if(current + (amount * ptt.getChargeMultiplier()) > getMaxPower(stack)) {
+			if(current + (amount * ptt.chargeMultiplier) > getMaxPower(stack)) {
 				amount = getMaxPower(stack) - current;
-				if(!simulated) nbt.putInt(ptt.getKeyName(), getMaxPower(stack));
+				if(!simulated) nbt.putInt(ptt.keyName, getMaxPower(stack));
 			}else {
-				if(!simulated) nbt.putInt(ptt.getKeyName(), current + (amount * ptt.getChargeMultiplier()));
+				if(!simulated) nbt.putInt(ptt.keyName, current + (amount * ptt.chargeMultiplier));
 				
 			}
-			if((simulated && current > 0) || (!simulated && current + (amount * ptt.getChargeMultiplier()) > 0)) {
+			if((simulated && current > 0) || (!simulated && current + (amount * ptt.chargeMultiplier) > 0)) {
 				nbt.putBoolean("assemblylinemachines:canbreakblackgranite", true);
 			}else {
 				nbt.remove("assemblylinemachines:canbreakblackgranite");
@@ -208,11 +272,11 @@ public class Utils {
 		public float getActivePropertyState(ItemStack stack, LivingEntity entity);
 		
 		default public int getCurrentCharge(ItemStack stack) {
-			return stack.hasTag() ? stack.getTag().getInt(this.getPowerToolType().getKeyName()) : 0;
+			return stack.hasTag() ? stack.getTag().getInt(this.getPowerToolType().keyName) : 0;
 		}
 		
 		default public boolean canUseSecondaryAbilities(ItemStack stack, String secondaryName) {
-			return this.getPowerToolType().getHasSecondaryAbilities() && stack.hasTag() && stack.getTag().contains(getPowerToolType().getKeyName())
+			return this.getPowerToolType().hasSecondaryAbilities && stack.hasTag() && stack.getTag().contains(getPowerToolType().keyName)
 					&& stack.getTag().contains("assemblylinemachines:secondarystyle") && secondaryName.equals(this.getToolType());
 		}
 		
@@ -220,11 +284,60 @@ public class Utils {
 			DecimalFormat df = Formatting.GENERAL_FORMAT;
 			CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 			PowerToolType ptt = this.getPowerToolType();
-			String colorChar = compound.getInt(ptt.getKeyName()) == 0 ? "c" : "a";
-			tooltip.add(new TextComponent("§" + colorChar + df.format(compound.getInt(ptt.getKeyName())) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.getFriendlyNameOfUnit()));
+			String colorChar = compound.getInt(ptt.keyName) == 0 ? "c" : "a";
+			tooltip.add(new TextComponent("§" + colorChar + df.format(compound.getInt(ptt.keyName)) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.friendlyNameOfUnit));
 			if(compound.getBoolean("assemblylinemachines:secondarystyle")) {
 				tooltip.add(new TextComponent("§bSecondary Ability Enabled"));
 			}
+		}
+		
+		default public ICapabilityProvider getICapabilityProvider(ItemStack stack) {
+			if(this.getPowerToolType().hasEnergyCapability) {
+				return new ICapabilityProvider() {
+
+					protected IEnergyStorage energy = new IEnergyStorage() {
+
+						@Override
+						public int receiveEnergy(int maxReceive, boolean simulate) {
+							return addCharge(stack, maxReceive, simulate);
+						}
+						@Override
+						public int getMaxEnergyStored() {
+							return getMaxPower(stack);
+						}
+						@Override
+						public int getEnergyStored() {
+							return getCurrentCharge(stack);
+						}
+						@Override
+						public int extractEnergy(int maxExtract, boolean simulate) {
+							return 0;
+						}
+						@Override
+						public boolean canReceive() {
+							return true;
+						}
+						@Override
+						public boolean canExtract() {
+							return false;
+						}
+					};
+					protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
+
+					@Override
+					public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+						return this.getCapability(cap);
+					}
+					@Override
+					public <T> LazyOptional<T> getCapability(Capability<T> cap) {
+						if (cap == CapabilityEnergy.ENERGY) {
+							return energyHandler.cast();
+						}
+						return  LazyOptional.empty();
+					}
+				};
+			}
+			return null;
 		}
 	}
 	

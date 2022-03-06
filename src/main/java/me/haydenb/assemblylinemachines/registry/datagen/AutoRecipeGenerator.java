@@ -111,7 +111,8 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		CHROMIUM(false, Blade.TITANIUM, true, 2, true, true), COAL(true, Blade.PUREGOLD, false, 4, false, false, Optional.of(Ingredient.of(Items.COAL))), COPPER(true, Blade.TITANIUM,
 				false, 2, true, true), DIAMOND(true, Blade.PUREGOLD, false, 2, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/diamond")))), GOLD(true, Blade.TITANIUM,
 				false, 2, true, true), IRON(true, Blade.TITANIUM, false, 2, true, true), LAPIS(true, Blade.TITANIUM, true, 8, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/lapis")))),
-		REDSTONE(true, Blade.TITANIUM, false, 10, false, false, null), FLEROVIUM(false, Blade.TITANIUM, true, 2, true, true), TITANIUM(true, Blade.TITANIUM, false, 2, true, true),
+		REDSTONE(true, Blade.TITANIUM, false, 10, false, false, null), FLEROVIUM(false, Blade.TITANIUM, true, 2, true, true), TITANIUM(true, Blade.TITANIUM, false, 2, true, true), 
+		EMERALD(true, Blade.PUREGOLD, false, 2, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/emerald")))),
 		
 		
 		//COMPAT

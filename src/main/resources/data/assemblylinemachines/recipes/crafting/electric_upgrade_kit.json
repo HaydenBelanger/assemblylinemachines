@@ -1,0 +1,21 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ggg",
+		"rbr"
+	],
+	"key":{
+		"g":{
+			"tag": "assemblylinemachines:crafting/gears/industrial"
+		},
+		"b":{
+			"item": "assemblylinemachines:basic_battery"
+		},
+		"r":{
+			"item": "assemblylinemachines:black_granite"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:electric_upgrade_kit"
+	}
+}

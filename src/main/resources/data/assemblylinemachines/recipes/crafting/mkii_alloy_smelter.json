@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"aca",
+		"bsb",
+		"aca"
+	],
+	"key":{
+		"a":{
+			"tag": "forge:plates/attuned_titanium"
+		},
+		"b":{
+			"item": "assemblylinemachines:enhanced_battery"
+		},
+		"c":{
+			"item": "assemblylinemachines:empowered_conduction_component"
+		},
+		"s":{
+			"item": "assemblylinemachines:alloy_smelter"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mkii_alloy_smelter"
+	}
+}

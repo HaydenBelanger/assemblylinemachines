@@ -8,7 +8,6 @@ import com.google.common.collect.Multimap;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
-import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -38,11 +37,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -57,7 +52,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 
 	public ItemPowerTool(A parent) {
 		super(parent.getTier(), new Item.Properties().tab(parent.getItemCategory()));
-		this.ptt = PowerToolType.TIER_CONVERT.get(parent.getTier());
+		this.ptt = ItemTiers.getTier(parent.getTier()).getPowerToolType();
 		this.parent = parent;
 		this.type = parent.getClass().getSimpleName();
 		
@@ -81,7 +76,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	}
 	
 	@Override
-	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) { 
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
 		switch(type) {
 		case "SwordItem":
 			if(enchantment.category == EnchantmentCategory.WEAPON) return true;
@@ -173,7 +168,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 
 			if(bs.getBlock().getTags().contains(new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
 				int cmax = ptt == PowerToolType.NOVASTEEL ? 50 : 10;
-				stack.hurtAndBreak(Utils.breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
+				stack.hurtAndBreak(Utils.breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (br) -> br.broadcastBreakEvent(EquipmentSlot.MAINHAND));
 			}
 			return true;
 		}
@@ -210,53 +205,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-		if(ptt.hasEnergyCapability) {
-			return new ICapabilityProvider() {
-
-				protected IEnergyStorage energy = new IEnergyStorage() {
-
-					@Override
-					public int receiveEnergy(int maxReceive, boolean simulate) {
-
-						return addCharge(stack, maxReceive, simulate);
-					}
-					@Override
-					public int getMaxEnergyStored() {
-						return getMaxPower(stack);
-					}
-					@Override
-					public int getEnergyStored() {
-						return getCurrentCharge(stack);
-					}
-					@Override
-					public int extractEnergy(int maxExtract, boolean simulate) {
-						return 0;
-					}
-					@Override
-					public boolean canReceive() {
-						return true;
-					}
-					@Override
-					public boolean canExtract() {
-						return false;
-					}
-				};
-				protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
-
-				@Override
-				public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-					return this.getCapability(cap);
-				}
-				@Override
-				public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-					if (cap == CapabilityEnergy.ENERGY) {
-						return energyHandler.cast();
-					}
-					return  LazyOptional.empty();
-				}
-			};
-		}
-		return null;
+		return this.getICapabilityProvider(stack);
 		
 	}
 
@@ -334,7 +283,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 		private final float multiplier;
 		
 		public EnchantmentOverclock() {
-			super(Rarity.RARE, POWER_TOOLS, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
+			super(Rarity.RARE, POWER_TOOLS, EquipmentSlot.values());
 			this.multiplier = ConfigHolder.getCommonConfig().overclockEnchantmentMultiplier.get().floatValue();
 		}
 		
@@ -361,28 +310,16 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 	
 	public static enum PowerToolType{
 		CRANK("assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.getCommonConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
-		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getCommonConfig().mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getCommonConfig().mystiumMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
 		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.getCommonConfig().novasteelToolMaxFE.get(), 0xff070608, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
-		AEFG("assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000, 0x0, null);
+		AEFG("assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000, 0x0, null),
+		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, "§5FE", true, null, 0.0f, ConfigHolder.getCommonConfig().enhancedMystiumChestplateMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png"));
 		
-		private final String keyName;
-		private final int costMultiplier;
-		private final int chargeMultiplier;
-		private final boolean hasSecondaryAbilities;
-		private final String friendlyNameOfUnit;
-		private final boolean hasEnergyCapability;
-		private final String nameOfSecondaryFarmland;
-		private final int configMaxCharge;
-		private final float chanceToDropMobCrystal;
-		private final int argbBorderColor;
-		private final ResourceLocation borderTexturePath;
-		
-		private static final HashMap<Tier, PowerToolType> TIER_CONVERT = new HashMap<>();
-		static {
-			TIER_CONVERT.put(ToolTiers.CRANK, CRANK);
-			TIER_CONVERT.put(ToolTiers.MYSTIUM, MYSTIUM);
-			TIER_CONVERT.put(ToolTiers.NOVASTEEL, NOVASTEEL);
-		}
+		public final int costMultiplier, chargeMultiplier, configMaxCharge, argbBorderColor;
+		public final boolean hasSecondaryAbilities, hasEnergyCapability;
+		public final String friendlyNameOfUnit, nameOfSecondaryFarmland, keyName;
+		public final float chanceToDropMobCrystal;
+		public final ResourceLocation borderTexturePath;
 		
 		PowerToolType(String keyName, int costMultiplier, int chargeMultiplier, boolean hasSecondaryAbilities, String friendlyNameOfUnit, 
 				boolean hasEnergyCapability, String nameOfSecondaryFarmland, float chanceToDropMobCrystal, int configMaxCharge, int argbBorderColor, ResourceLocation borderTexturePath) {
@@ -399,50 +336,6 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 			this.borderTexturePath = borderTexturePath;
 			
 		}
-		
-		public String getNameOfSecondaryFarmland() {
-			return nameOfSecondaryFarmland;
-		}
-		
-		public float getChanceToDropMobCrystal() {
-			return chanceToDropMobCrystal;
-		}
-		
-		public int getMaxCharge() {
-			return configMaxCharge;
-		}
-		
-		public String getKeyName() {
-			return keyName;
-		}
-		
-		public boolean getHasSecondaryAbilities() {
-			return hasSecondaryAbilities;
-		}
-		
-		public int getCostMultiplier() {
-			return costMultiplier;
-		}
-		
-		public int getChargeMultiplier() {
-			return chargeMultiplier;
-		}
-		
-		public boolean getHasEnergyCapability() {
-			return hasEnergyCapability;
-		}
-		
-		public String getFriendlyNameOfUnit() {
-			return friendlyNameOfUnit;
-		}
-		
-		public int getARGBBorderColor() {
-			return argbBorderColor;
-		}
-		
-		public ResourceLocation getBorderTexturePath() {
-			return borderTexturePath;
-		}
 	}
 	
 	//Gives the Charged Mob Crystal when killed with a charged Secondary Ability Sword.
@@ -454,7 +347,7 @@ public class ItemPowerTool<A extends TieredItem> extends TieredItem implements I
 			
 			if(ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null && stack.getItem() instanceof IToolWithCharge) {
 				IToolWithCharge chargeTool = (IToolWithCharge) stack.getItem();
-				if(spe.getLevel().getRandom().nextFloat() <= chargeTool.getPowerToolType().getChanceToDropMobCrystal() && chargeTool.canUseSecondaryAbilities(stack, "SwordItem")) {
+				if(spe.getLevel().getRandom().nextFloat() <= chargeTool.getPowerToolType().chanceToDropMobCrystal && chargeTool.canUseSecondaryAbilities(stack, "SwordItem")) {
 					ItemStack inert = null;
 					for(int i = 0; i < spe.getInventory().getContainerSize(); i++) {
 						ItemStack sis = spe.getInventory().getItem(i);

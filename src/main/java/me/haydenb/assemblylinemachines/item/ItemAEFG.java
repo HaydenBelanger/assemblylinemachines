@@ -6,7 +6,6 @@ import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialToolt
 import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -15,11 +14,7 @@ import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 
 public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 
@@ -39,52 +34,7 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-		if(this.getPowerToolType().getHasEnergyCapability()) {
-			return new ICapabilityProvider() {
-
-				protected IEnergyStorage energy = new IEnergyStorage() {
-
-					@Override
-					public int receiveEnergy(int maxReceive, boolean simulate) {
-						return addCharge(stack, maxReceive, simulate);
-					}
-					@Override
-					public int getMaxEnergyStored() {
-						return getMaxPower(stack);
-					}
-					@Override
-					public int getEnergyStored() {
-						return getCurrentCharge(stack);
-					}
-					@Override
-					public int extractEnergy(int maxExtract, boolean simulate) {
-						return 0;
-					}
-					@Override
-					public boolean canReceive() {
-						return true;
-					}
-					@Override
-					public boolean canExtract() {
-						return false;
-					}
-				};
-				protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
-
-				@Override
-				public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-					return this.getCapability(cap);
-				}
-				@Override
-				public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-					if (cap == CapabilityEnergy.ENERGY) {
-						return energyHandler.cast();
-					}
-					return  LazyOptional.empty();
-				}
-			};
-		}
-		return null;
+		return this.getICapabilityProvider(stack);
 	}
 	
 	@Override
@@ -95,7 +45,7 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	@Override
 	public int getBarColor(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		int dmg = compound.getInt(this.getPowerToolType().getKeyName());
+		int dmg = compound.getInt(this.getPowerToolType().keyName);
 		float v = (float) dmg / (float) getMaxPower(stack);
 		return ARGB32.color(255, Math.round(v * 255f), Math.round(v * 255f), 255);
 	}
@@ -103,7 +53,7 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	@Override
 	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		int dmg = compound.getInt(this.getPowerToolType().getKeyName());
+		int dmg = compound.getInt(this.getPowerToolType().keyName);
 		return Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
 	
@@ -118,6 +68,11 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	@Override
 	public boolean isEnchantable(ItemStack pStack) {
 		return true;
+	}
+	
+	@Override
+	public int getItemEnchantability(ItemStack stack) {
+		return 30;
 	}
 
 	@Override

@@ -78,7 +78,7 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(AlloyingCrafting.ALLOYING_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("alloying").title("Alloying Crafting")
 					.background("gui_set_pre2022", 104, 112, 62, 41).icon(Registry.getBlock("alloy_smelter")).progressBar("gui_set_pre2022", 202, 104, 16, 14, 200, StartDirection.LEFT, false, 19, 13)
-					.itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11)).catalysts(Registry.getBlock("alloy_smelter")).build(AlloyingCrafting.class));
+					.itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11)).catalysts(Registry.getBlock("alloy_smelter"), Registry.getBlock("mkii_alloy_smelter")).build(AlloyingCrafting.class));
 			
 			CATEGORY_REGISTRY.put(GrinderCrafting.GRINDER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("grinding").title("Grinding Crafting")
 					.background("gui_set_pre2022", 166, 145, 90, 44).icon(Registry.getBlock("electric_grinder")).progressBar("gui_set_pre2022", 237, 131, 19, 14, 200, StartDirection.LEFT, false, 42, 24)
@@ -98,7 +98,7 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(PurifierCrafting.PURIFIER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("purifying").title("Purifier Crafting")
 					.background("gui_set_pre2022", 0, 153, 90, 44).icon(Registry.getBlock("electric_purifier")).progressBar("gui_set_pre2022", 90, 153, 43, 32, 200, StartDirection.LEFT, false, 20, 6)
-					.itemSlots(3, Pair.of(0, 0), Pair.of(0, 26), Pair.of(21, 13), Pair.of(68, 13)).catalysts(Registry.getBlock("electric_purifier")).build(PurifierCrafting.class));
+					.itemSlots(3, Pair.of(0, 0), Pair.of(0, 26), Pair.of(21, 13), Pair.of(68, 13)).catalysts(Registry.getBlock("electric_purifier"), Registry.getBlock("mkii_purifier")).build(PurifierCrafting.class));
 			
 			CATEGORY_REGISTRY.put(MetalCrafting.METAL_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("metal_shaping").title("Metal Shaper Crafting")
 					.background("gui_set_pre2022", 168, 119, 69, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_pre2022", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 21, 8)

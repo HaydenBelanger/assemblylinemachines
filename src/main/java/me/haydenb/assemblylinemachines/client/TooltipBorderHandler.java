@@ -57,11 +57,16 @@ public class TooltipBorderHandler {
 				return 0xff404040;
 			}
 		};
+		//STEEL
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_pickaxe"), steelTooltip);
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_axe"), steelTooltip);
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_shovel"), steelTooltip);
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_sword"), steelTooltip);
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_hoe"), steelTooltip);
+		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_helmet"), steelTooltip);
+		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_chestplate"), steelTooltip);
+		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_leggings"), steelTooltip);
+		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_boots"), steelTooltip);
 	}
 	
 	public static Boolean colors = null;

@@ -194,6 +194,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		case ALL:
 			items.add(Registry.getItem("simple_fluid_mixer"));
 			items.add(Registry.getItem("electric_fluid_mixer"));
+			items.add(Registry.getItem("mkii_fluid_mixer"));
 			if(this.type == BathOption.MIXER_ONLY) break;
 		case BASIN_ONLY:
 			items.add(Registry.getItem("fluid_bath"));

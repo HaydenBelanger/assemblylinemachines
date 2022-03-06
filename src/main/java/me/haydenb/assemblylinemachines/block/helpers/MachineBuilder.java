@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -87,11 +88,6 @@ public class MachineBuilder {
 	@OnlyIn(Dist.CLIENT)
 	public static MachineScreenBuilder screen() {
 		return new MachineScreenBuilder();
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public static MachineScreenBuilder mkIIScreen() {
-		return new MachineScreenBuilder().inventorySize(190, 188).energyMeterStartX(190).doNotRenderInventoryText().doNotRenderTitleText();
 	}
 	
 	public static class MachineBlockBuilder {
@@ -247,9 +243,9 @@ public class MachineBuilder {
 		private boolean processesFluids = false;
 		private int capacity = 0;
 		private boolean hasExternalTank = false;
-		private Function<Integer, Boolean> duplicateStackChecking = null;
-		private Integer slotFullFirst = null;
-		private BiFunction<ItemStack, BlockEntity, Boolean> firstSlotValidator = null;
+		private Function<Integer, List<Integer>> mustBeFullBefore = null;
+		private List<List<Integer>> slotDuplicateCheckingGroups = null;
+		private TriFunction<Integer, ItemStack, BlockEntity, Boolean> slotValidator = null;
 		
 		private MachineBlockEntityBuilder() {}
 		
@@ -324,10 +320,23 @@ public class MachineBuilder {
 			return this;
 		}
 		
-		public MachineBlockEntityBuilder stackManagement(Function<Integer, Boolean> duplicateStack, Integer firstSlot, BiFunction<ItemStack, BlockEntity, Boolean> firstSlotValidator) {
-			this.duplicateStackChecking = duplicateStack;
-			this.slotFullFirst = firstSlot;
-			this.firstSlotValidator = firstSlotValidator;
+		public MachineBlockEntityBuilder duplicateCheckingGroups(List<List<Integer>> slotGroups) {
+			this.slotDuplicateCheckingGroups = slotGroups;
+			return this;
+		}
+		
+		public MachineBlockEntityBuilder duplicateCheckingGroup(List<Integer> slotGroup) {
+			this.slotDuplicateCheckingGroups = List.of(slotGroup);
+			return this;
+		}
+		
+		public MachineBlockEntityBuilder mustBeFullBefore(Function<Integer, List<Integer>> mustBeFullBefore) {
+			this.mustBeFullBefore = mustBeFullBefore;
+			return this;
+		}
+		
+		public MachineBlockEntityBuilder slotContentsValidator(TriFunction<Integer, ItemStack, BlockEntity, Boolean> validator) {
+			this.slotValidator = validator;
 			return this;
 		}
 		
@@ -337,9 +346,13 @@ public class MachineBuilder {
 
 				private int timer, nTimer;
 				private float progress, cycles;
-				private ItemStack output, secondaryOutput, dualProcessorOutput = ItemStack.EMPTY;
-				private Container processorContainer, dualFunctionProcessorContainer = null;
-				private LazyOptional<IFluidHandler> internalLazy, externalLazy = null;
+				private ItemStack output = ItemStack.EMPTY;
+				private ItemStack secondaryOutput = ItemStack.EMPTY;
+				private ItemStack dualProcessorOutput = ItemStack.EMPTY;
+				private Container processorContainer = null;
+				private Container dualFunctionProcessorContainer = null;
+				private LazyOptional<IFluidHandler> internalLazy = null;
+				private LazyOptional<IFluidHandler> externalLazy = null;
 				private FluidStack internalTank = FluidStack.EMPTY;
 				private boolean useInternalTank = true;
 				
@@ -377,7 +390,7 @@ public class MachineBuilder {
 										ItemStack result = recipe.assemble(optRecipePair.getRight().get());
 										if(!result.isEmpty()) {
 											optRecipePair.getMiddle().accept(result);
-											if(executeOnRecipeCompletion != null) executeOnRecipeCompletion.accept(this, recipe);
+											if(executeOnRecipeCompletion != null) executeOnRecipeCompletion.accept(optRecipePair.getRight().get(), recipe);
 											if(specialStateModifier != null) this.getLevel().setBlockAndUpdate(this.getBlockPos(), specialStateModifier.apply(recipe, this.getBlockState()));
 											sendUpdates = true;
 										}
@@ -456,14 +469,30 @@ public class MachineBuilder {
 						return (stack.getItem() instanceof ItemUpgrade);
 					}
 					
-					if(slotFullFirst != null && slotFullFirst != slot && contents.get(slotFullFirst).isEmpty()) return false;
-					if(firstSlotValidator != null && slotFullFirst != null && slot == slotFullFirst && !firstSlotValidator.apply(stack, this)) return false;
-					if(duplicateStackChecking != null) {
-						for(int i = 0; i < contents.size(); i++) {
-							if(i != slot && duplicateStackChecking.apply(i) && contents.get(i).getItem().equals(stack.getItem())) return false;
+					if(mustBeFullBefore != null) {
+						List<Integer> res = mustBeFullBefore.apply(slot);
+						if(res != null) {
+							slotCheck:{
+								for(Integer slots : res) {
+									if(!contents.get(slots).isEmpty()) break slotCheck;
+								}
+								return false;
+							}
 						}
 					}
+					if(slotValidator != null) {
+						if(!slotValidator.apply(slot, stack, this)) return false;
+					}
 					
+					if(slotDuplicateCheckingGroups != null) {
+						for(List<Integer> groups : slotDuplicateCheckingGroups) {
+							if(groups.contains(slot)) {
+								for(Integer slots : groups) {
+									if(slot != slots && contents.get(slots).getItem().equals(stack.getItem())) return false;
+								}
+							}
+						}
+					}
 					return super.isAllowedInSlot(slot, stack);
 				}
 				
@@ -968,6 +997,10 @@ public class MachineBuilder {
 		public MachineScreenBuilder internalTankSwitchingButton(int x, int y, int activeBlitX, int activeBlitY, int width, int height) {
 			this.tankButtonStats = new int[] {x, y, activeBlitX, activeBlitY, width, height};
 			return this;
+		}
+		
+		public MachineScreenBuilder defaultMKIIOptions() {
+			return this.inventorySize(190, 188).energyMeterStartX(190).doNotRenderInventoryText().doNotRenderTitleText();
 		}
 		
 		@SuppressWarnings("unchecked")

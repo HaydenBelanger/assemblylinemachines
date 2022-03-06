@@ -10,7 +10,7 @@
 		"9": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_front_bar_hot",
 		"10": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_front_rad_hot",
 		"11": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_front_around_hot",
-		"12": "assemblylinemachines:block/mkii_alloy_smelter/t2_electric_furnace_active",
+		"12": "assemblylinemachines:block/t2_electric_furnace_active",
 		"14": "assemblylinemachines:block/mkii_alloy_smelter/t2_alloy_smelter_side",
 		"17": "assemblylinemachines:block/ultimate_machine_base",
 		"18": "assemblylinemachines:block/ultimate_machine_side",

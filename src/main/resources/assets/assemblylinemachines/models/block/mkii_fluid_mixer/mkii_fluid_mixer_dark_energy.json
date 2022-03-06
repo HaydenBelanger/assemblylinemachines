@@ -10,7 +10,7 @@
 		"8": "assemblylinemachines:block/ultimate_machine_base",
 		"9": "assemblylinemachines:block/ultimate_machine_side",
 		"10": "assemblylinemachines:block/mkii_fluid_mixer/t2_electric_fluid_mixer_dark_energy",
-		"11": "assemblylinemachines:block/mkii_fluid_mixer/t2_electric_furnace_active",
+		"11": "assemblylinemachines:block/t2_electric_furnace_active",
 		"particle": "assemblylinemachines:block/mkii_fluid_mixer/t2_electric_fluid_mixer_water"
 	},
 	"elements": [
