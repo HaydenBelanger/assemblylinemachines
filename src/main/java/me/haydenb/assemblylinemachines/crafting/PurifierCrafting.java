@@ -1,11 +1,13 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
+import java.util.Random;
 
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.BlockElectricPurifier.TEElectricPurifier;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,6 +26,8 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	
 	public static final RecipeType<PurifierCrafting> PURIFIER_RECIPE = new TypePurifierCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
+	
+	private static final Random RAND = new Random();
 	
 	
 	private final Lazy<Ingredient> parta;
@@ -44,23 +48,27 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			if(inv instanceof TEElectricPurifier) {
-				if((parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) || (partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2)))) {
-					if(tobepurified.get().test(inv.getItem(3))) {
-						return true;
-					}
-				}
+		if((parta.test(inv.getItem(1)) && partb.test(inv.getItem(2))) || (partb.test(inv.getItem(1)) && parta.test(inv.getItem(2)))) {
+			if(tobepurified.test(inv.getItem(3))) {
+				return true;
 			}
-			return false;
-		}else {
-			return true;
 		}
-		
+		return false;
 	}
 	
 	@Override
 	public ItemStack assemble(Container inv) {
+		if(inv instanceof IMachineDataBridge) {
+			IMachineDataBridge data = (IMachineDataBridge) inv;
+			boolean requiresUpgrade = this.requiresUpgrade();
+			if(requiresUpgrade && data.getUpgradeAmount(Upgrades.PURIFIER_EXPANDED) == 0) return ItemStack.EMPTY;
+			int conservationCount = requiresUpgrade ? 0 : data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
+			if(RAND.nextInt(10) * conservationCount < 10) inv.getItem(1).shrink(1);
+			if(RAND.nextInt(10) * conservationCount < 10) inv.getItem(2).shrink(1);
+			data.setCycles(requiresUpgrade ? time / 8f : time / 10f);
+			
+			inv.getItem(3).shrink(1);
+		}
 		return this.output.copy();
 	}
 
@@ -125,6 +133,10 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	@Override
 	public List<ItemStack> getJEIItemOutputs() {
 		return List.of(output);
+	}
+	
+	public boolean isPrimaryIngredient(ItemStack test) {
+		return tobepurified.test(test);
 	}
 	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<PurifierCrafting>{

@@ -1,0 +1,21 @@
+{
+	"parent": "item/handheld",
+	"textures":{
+		"layer0": "assemblylinemachines:item/wrench/wrench_o_matic_wrench"
+	},
+	"overrides":[
+		{
+			"predicate":{
+				"assemblylinemachines:wrenchmode": 0.5
+			},
+			"model": "assemblylinemachines:item/wrench_o_matic_interact"
+		},
+		{
+			"predicate":{
+				"assemblylinemachines:wrenchmode": 1
+			},
+			"model": "assemblylinemachines:item/wrench_o_matic_wrath"
+		}
+	]
+	
+}

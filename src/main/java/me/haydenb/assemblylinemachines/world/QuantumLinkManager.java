@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.TEQuantumLink;
+import me.haydenb.assemblylinemachines.block.machines.BlockQuantumLink.TEQuantumLink;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -15,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -40,7 +38,6 @@ public class QuantumLinkManager extends SavedData{
 		
 	}
 
-	@OnlyIn(Dist.DEDICATED_SERVER)
 	public static QuantumLinkManager getInstance(MinecraftServer server) {
 		
 		

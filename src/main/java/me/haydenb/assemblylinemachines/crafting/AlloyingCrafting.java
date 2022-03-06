@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.BlockAlloySmelter.TEAlloySmelter;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -41,21 +41,17 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			if(inv instanceof TEAlloySmelter) {
-				if((parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) || (partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2)))) {
-					return true;
-				}
-			}
-			return false;
-		}else {
-			return true;
-		}
-		
+		return ((parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) || (partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2))));
 	}
 	
 	@Override
 	public ItemStack assemble(Container inv) {
+		
+		if(inv instanceof IMachineDataBridge) {
+			inv.getItem(1).shrink(1);
+			inv.getItem(2).shrink(1);
+			((IMachineDataBridge) inv).setCycles(time / 10f);
+		}
 		return this.output.copy();
 	}
 

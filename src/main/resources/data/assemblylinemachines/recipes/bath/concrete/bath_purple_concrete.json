@@ -4,7 +4,7 @@
 		"item": "minecraft:purple_concrete_powder"
 	},
 	"input_b":{
-		"item": "minecraft:purple_concrete_powder"
+		"tag": "forge:gravel"
 	},
 	"output":{
 		"item": "minecraft:purple_concrete",

@@ -7,9 +7,10 @@ import java.util.stream.Stream;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.BlockElectricFluidMixer.TEElectricFluidMixer;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath;
-import me.haydenb.assemblylinemachines.block.rudimentary.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
+import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath;
+import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath;
+import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
@@ -25,6 +26,8 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
@@ -33,7 +36,8 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	public static final RecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
-	private static final Lazy<List<Item>> ILLEGAL_RECIPE_ITEMS = Lazy.of(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
+	private static final Random RAND = new Random();
+	private static final Supplier<List<Item>> ILLEGAL_RECIPE_ITEMS = Suppliers.memoize(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
 			Registry.getItem("steel_stirring_stick")).stream(), BlockFluidBath.VALID_FILL_ITEMS.stream()).collect(Collectors.toList()));
 	
 	private final Lazy<Ingredient> inputa;
@@ -74,61 +78,55 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			Ingredient inputa = this.inputa.get();
-			Ingredient inputb = this.inputb.get();
-			if(inv instanceof TEFluidBath) {
-				if(type == BathOption.MIXER_ONLY) {
-					return false;
-				}
-				TEFluidBath finv = (TEFluidBath) inv;
-				
-				if(inputa.test(finv.getItem(1))) {
-					if(inputb.test(finv.getItem(2))) {
-						return true;
-					}
-				}
-				
-				if(inputa.test(finv.getItem(2))) {
-					if(inputb.test(finv.getItem(1))) {
-						return true;
-					}
-				}
-			}else if(inv instanceof TEElectricFluidMixer){
-				if(type == BathOption.BASIN_ONLY) {
-					return false;
-				}
-				if(inputa.test(inv.getItem(1))) {
-					if(inputb.test(inv.getItem(2))) {
-						return true;
-					}
-				}
-				
-				if(inputa.test(inv.getItem(2))) {
-					if(inputb.test(inv.getItem(1))) {
-						return true;
-					}
-				}
-			}else {
-				if(type == BathOption.BASIN_ONLY) {
-					return false;
-				}
-				if(inputa.test(inv.getItem(0))) {
-					if(inputb.test(inv.getItem(1))) {
-						return true;
-					}
-				}
-				
-				if(inputa.test(inv.getItem(1))) {
-					if(inputb.test(inv.getItem(0))) {
-						return true;
-					}
+		if(inv instanceof TEFluidBath) {
+			if(type == BathOption.MIXER_ONLY) {
+				return false;
+			}
+			TEFluidBath finv = (TEFluidBath) inv;
+			
+			if(inputa.test(finv.getItem(1))) {
+				if(inputb.test(finv.getItem(2))) {
+					return true;
 				}
 			}
-			return false;
+			
+			if(inputa.test(finv.getItem(2))) {
+				if(inputb.test(finv.getItem(1))) {
+					return true;
+				}
+			}
+		}else if(inv instanceof IMachineDataBridge){
+			if(type == BathOption.BASIN_ONLY) {
+				return false;
+			}
+			if(inputa.test(inv.getItem(1))) {
+				if(inputb.test(inv.getItem(2))) {
+					return true;
+				}
+			}
+			
+			if(inputa.test(inv.getItem(2))) {
+				if(inputb.test(inv.getItem(1))) {
+					return true;
+				}
+			}
 		}else {
-			return true;
+			if(type == BathOption.BASIN_ONLY) {
+				return false;
+			}
+			if(inputa.test(inv.getItem(0))) {
+				if(inputb.test(inv.getItem(1))) {
+					return true;
+				}
+			}
+			
+			if(inputa.test(inv.getItem(1))) {
+				if(inputb.test(inv.getItem(0))) {
+					return true;
+				}
+			}
 		}
+		return false;
 		
 	}
 
@@ -143,12 +141,33 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	
 	@Override
 	public ItemStack assemble(Container inv) {
+		if(inv instanceof IMachineDataBridge) {
+			IMachineDataBridge data = (IMachineDataBridge) inv;
+			IFluidHandler handler = data.getCraftingFluidHandler(Optional.empty());
+			if(handler == null || handler.getFluidInTank(0).getFluid() != fluid.getAssocFluid() || handler.drain(percent.getMB(), FluidAction.SIMULATE).getAmount() != percent.getMB()) return ItemStack.EMPTY;
+			int rand = RAND.nextInt(9) * data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
+			int cons = percent.getMB();
+			if(rand > 21) {
+				cons = 0;
+			}else if(rand > 15) {
+				cons = (int) Math.round((double) cons * 0.25d);
+			}else if(rand > 10) {
+				cons = (int) Math.round((double) cons * 0.5d);
+			}else if(rand > 5) {
+				cons = (int) Math.round((double) cons * 0.75d);
+			}
+			
+			handler.drain(cons, FluidAction.EXECUTE);
+			inv.getItem(1).shrink(1);
+			inv.getItem(2).shrink(1);
+			data.setCycles((float) stirs * 3.6f);
+		}
 		return this.output.copy();
 	}
 
 	@Override
 	public ItemStack getResultItem() {
-		return output;
+		return this.output.copy();
 	}
 
 	@Override
@@ -172,6 +191,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		case ALL:
 			items.add(Registry.getItem("simple_fluid_mixer"));
 			items.add(Registry.getItem("electric_fluid_mixer"));
+			items.add(Registry.getItem("mkii_fluid_mixer"));
 			if(this.type == BathOption.MIXER_ONLY) break;
 		case BASIN_ONLY:
 			items.add(Registry.getItem("fluid_bath"));

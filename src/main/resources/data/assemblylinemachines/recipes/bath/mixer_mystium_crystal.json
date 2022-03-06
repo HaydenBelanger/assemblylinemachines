@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "forge:dusts/emerald"
+	},
+	"input_b":{
+		"tag": "forge:dusts/mystium"
+	},
+	"output":{
+		"item": "assemblylinemachines:mystium_crystal"
+	},
+	"stirs": 9,
+	"fluid": "lava",
+	"mix_color": "#000000",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "FULL"
+}

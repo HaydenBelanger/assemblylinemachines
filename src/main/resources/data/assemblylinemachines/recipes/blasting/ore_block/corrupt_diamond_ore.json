@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_diamond_ore"
+		"tag": "forge:ores/corrupt_diamond"
 	},
 	"result": "minecraft:diamond",
 	"experience": 1,

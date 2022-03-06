@@ -1,0 +1,22 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ppp",
+		"ili",
+		"iii"
+	],
+	"key":{
+		"p":{
+			"tag": "forge:plates/iron"
+		},
+		"i":{
+			"tag": "forge:ingots/steel"
+		},
+		"l":{
+			"item": "minecraft:lava_bucket"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:omnivoid"
+	}
+}

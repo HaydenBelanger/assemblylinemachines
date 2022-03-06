@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_gold_ore"
+		"tag": "forge:ores/corrupt_gold"
 	},
 	"result": "minecraft:gold_ingot",
 	"experience": 1,

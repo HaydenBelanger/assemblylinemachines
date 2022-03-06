@@ -1,0 +1,12 @@
+{
+	"type": "minecraft:smithing",
+	"base":{
+		"item": "assemblylinemachines:mystium_chestplate"
+	},
+	"addition":{
+		"item": "assemblylinemachines:mystium_flight_harness"
+	},
+	"result":{
+		"item": "assemblylinemachines:enhanced_mystium_chestplate"
+	}
+}

@@ -4,7 +4,7 @@
 		"item": "minecraft:gray_concrete_powder"
 	},
 	"input_b":{
-		"item": "minecraft:gray_concrete_powder"
+		"tag": "forge:gravel"
 	},
 	"output":{
 		"item": "minecraft:gray_concrete",

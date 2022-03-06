@@ -39,7 +39,7 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	@Override
 	public int getBarColor(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		int dmg = compound.getInt(this.getPowerToolType().getKeyName());
+		int dmg = compound.getInt(this.getPowerToolType().keyName);
 		float v = (float) dmg / (float) getMaxPower(stack);
 		return ARGB32.color(255, Math.round(v * 255f), Math.round(v * 255f), 255);
 	}
@@ -47,7 +47,7 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	@Override
 	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		int dmg = compound.getInt(this.getPowerToolType().getKeyName());
+		int dmg = compound.getInt(this.getPowerToolType().keyName);
 		return Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
 	
@@ -55,13 +55,18 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
 		this.addEnergyInfoToHoverText(pStack, pTooltipComponents);
 		
-		pTooltipComponents.add(new TextComponent("§7§oAnti-Entropy Field Generator"));
-		pTooltipComponents.add(new TextComponent("§8§oProtects against chaotic effects when charged."));
+		pTooltipComponents.add(new TextComponent("ï¿½7ï¿½oAnti-Entropy Field Generator"));
+		pTooltipComponents.add(new TextComponent("ï¿½8ï¿½oProtects against chaotic effects when charged."));
 	}
 	
 	@Override
 	public boolean isEnchantable(ItemStack pStack) {
 		return true;
+	}
+	
+	@Override
+	public int getItemEnchantability(ItemStack stack) {
+		return 30;
 	}
 
 	@Override

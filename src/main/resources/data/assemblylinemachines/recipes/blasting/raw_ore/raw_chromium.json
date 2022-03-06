@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:raw_chromium"
+		"tag": "forge:raw_materials/chromium"
 	},
 	"result": "assemblylinemachines:chromium_ingot",
 	"experience": 1,

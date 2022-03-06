@@ -5,7 +5,7 @@ site_description: Documentation for Minecraft mod Assembly Line Machines.
 repo_url: https://github.com/HaydenBelanger/assemblylinemachines
 
 #edit_uri must be updated every time default branch is changed!
-edit_uri: edit/1.18-dev/docs/
+edit_uri: edit/1.18.1-dev/docs/
 
 nav:
   - Home: index.md
@@ -28,6 +28,7 @@ nav:
       - Refining: recipes/refining.md
       - World Corruption: recipes/worldcorruption.md
       - Generator Fluid: recipes/generatorfluid.md
+      - Upgrading: recipes/upgrading.md
     - Tags: miscdev/tags.md
     - Reservoir Capability: miscdev/fluidreservoir.md
 

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.machines.BlockMetalShaper.TEMetalShaper;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -37,22 +37,16 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			if(inv instanceof TEMetalShaper) {
-				if(input.get().test(inv.getItem(1))) {
-					return true;
-				}
-			}
-			
-			return false;
-		}else {
-			return true;
-		}
+		return input.test(inv.getItem(1));
 	}
 	
 	@Override
 	public ItemStack assemble(Container inv) {
-		return this.output.copy();
+		if(inv instanceof IMachineDataBridge) {
+			inv.getItem(1).shrink(1);
+			((IMachineDataBridge) inv).setCycles(time);
+		}
+		return output.copy();
 	}
 
 	@Override

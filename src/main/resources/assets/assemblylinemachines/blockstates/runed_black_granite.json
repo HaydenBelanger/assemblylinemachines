@@ -1,0 +1,16 @@
+{
+	"variants":{
+		"": [{
+			"model": "assemblylinemachines:block/black_granite/runed_black_granite"
+		},
+		{
+			"model": "assemblylinemachines:block/black_granite/runed_black_granite_1"
+		},
+		{
+			"model": "assemblylinemachines:block/black_granite/runed_black_granite_2"
+		},
+		{
+			"model": "assemblylinemachines:block/black_granite/runed_black_granite_3"
+		}]
+	}
+}

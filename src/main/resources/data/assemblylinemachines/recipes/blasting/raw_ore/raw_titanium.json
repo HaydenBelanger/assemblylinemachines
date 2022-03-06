@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:raw_titanium"
+		"tag": "forge:raw_materials/titanium"
 	},
 	"result": "assemblylinemachines:titanium_ingot",
 	"experience": 1,

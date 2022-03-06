@@ -1,12 +1,19 @@
 package me.haydenb.assemblylinemachines.registry;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.function.*;
 
+import org.apache.commons.lang3.reflect.MethodUtils;
+
+import com.google.common.base.Suppliers;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
@@ -28,23 +35,33 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class Utils {
 
 	public static final Direction[] CARDINAL_DIRS = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+	
+	public static final BooleanProperty PURIFIER_STATES = BooleanProperty.create("enhanced");
 	
 	public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
 		VoxelShape[] buffer = new VoxelShape[] { shape, Shapes.empty() };
@@ -69,6 +86,10 @@ public class Utils {
 
 		return clazz.cast(posEntity);
 	}
+	
+	public static RandomizableContainerBlockEntity getBlockEntity(Inventory pInv, FriendlyByteBuf data) {
+		return getBlockEntity(pInv, data, RandomizableContainerBlockEntity.class);
+	}
 
 	public static void spawnItem(ItemStack stack, BlockPos pos, Level world) {
 		ItemEntity ent = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
@@ -88,8 +109,97 @@ public class Utils {
 		return stack;
 	}
 
+	public static <T extends Recipe<Container>> BiFunction<BlockEntity, Container, Optional<Recipe<Container>>> recipeFunction(RecipeType<T> recipeType){
+		
+		return new BiFunction<>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public Optional<Recipe<Container>> apply(BlockEntity entity, Container container) {
+				return (Optional<Recipe<Container>>) entity.getLevel().getRecipeManager().getRecipeFor(recipeType, container, entity.getLevel());
+			}
+		};
+	}
 	
+	private static final Cache<String, Item> CACHED_SORTED_TAGS = CacheBuilder.newBuilder().build();
+	
+	/**
+	 * Supplier comes pre-memoized.
+	 */
+	public static Supplier<ItemStack> getPreferredOrAlphabeticSupplier(Named<Item> tag, int count){
+		return Suppliers.memoize(() -> {
+			try {
+				Item preferredResult = CACHED_SORTED_TAGS.get(tag.getName().toString(), () ->{
+					List<Item> values = new ArrayList<Item>(tag.getValues());
+					String preferredModid = ConfigHolder.getCommonConfig().preferredModid.get();
+					if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
+						Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
+						if(optionalItem.isPresent()) return optionalItem.get();
+					}
+					
+					Collections.sort(values, (a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString()));
+					return values.get(0);
+				});
+				
+				return new ItemStack(preferredResult, count);
+			}catch(ExecutionException e) {
+				e.printStackTrace();
+				return null;
+			}
+		});
+	}
 
+	public static class PhasedMap<K, V> extends ConcurrentHashMap<K, V>{
+
+		private static final long serialVersionUID = -1346052825976440901L;
+		
+		private final Phases phase;
+		
+		public PhasedMap(Phases phase) {
+			this.phase = phase;
+		}
+		
+		public void add() {
+			List<Method> methods = MethodUtils.getMethodsListWithAnnotation(BlockMachines.class, RegisterableMachine.class);
+			methods.removeIf((m) -> m.getAnnotation(RegisterableMachine.class).phase() != phase);
+			Consumer<Method> typedConsumer = getTypedConsumer(phase);
+			methods.forEach((m) -> typedConsumer.accept(m));
+		}
+		
+		private static Consumer<Method> getTypedConsumer(Phases phase){
+			return switch(phase) {
+			case BLOCK -> (m) -> {
+				try {
+					Registry.createBlock(m.getAnnotation(RegisterableMachine.class).blockName(), (Block) m.invoke(null), true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			};
+			case BLOCK_ENTITY -> (m) -> {
+				try {
+					Registry.createBlockEntity(m.getAnnotation(RegisterableMachine.class).blockName(), (BlockEntityType<?>) m.invoke(null));
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			};
+			case CONTAINER -> (m) -> {
+				try {
+					Registry.createContainer(m.getAnnotation(RegisterableMachine.class).blockName(), (MenuType<?>) m.invoke(null));
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			};
+			case SCREEN -> (m) -> {
+				try {
+					m.invoke(null);
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+			};
+			};
+			
+		}
+	}
 
 	public static int breakAndBreakConnected(Level world, BlockState origState, int ctx, int cmax, BlockPos posx, LivingEntity player) {
 		world.destroyBlock(posx, true, player);
@@ -242,6 +352,10 @@ public class Utils {
 			renderScaledText(fr, xpos, ypos, scale, text, false, 0xffffff);
 		}
 		
+		public static boolean isMouseBetween(int globalX, int globalY, int mouseX, int mouseY, int minX, int minY, int maxX, int maxY) {
+			return mouseX >= globalX + minX && mouseX <= globalX + maxX && mouseY >= globalY + minY && mouseY <= globalY + maxY;
+		}
+		
 		public static int multiplyARGBColor(int argb, float multiplier) {
 			int[] argbSplit = new int[] {ARGB32.alpha(argb), ARGB32.red(argb), ARGB32.green(argb), ARGB32.blue(argb)};
 			
@@ -322,24 +436,16 @@ public class Utils {
 			private final String trueText;
 			private final String falseText;
 			
-			public final Supplier<Boolean> supplier;
+			private final Supplier<Boolean> supplier;
 
 			public TrueFalseButtonSupplier(String trueText, String falseText, Supplier<Boolean> supplier) {
 				this.trueText = trueText;
 				this.falseText = falseText;
 				this.supplier = supplier;
-
-			}
-			
-			public TrueFalseButtonSupplier(String text, Supplier<Boolean> supplier) {
-				this.trueText = text;
-				this.falseText = text;
-				this.supplier = supplier;
-
 			}
 			
 			public boolean get() {
-				return supplier.get();
+				return supplier != null ? supplier.get() : false;
 			}
 			
 			public String getTrueText() {
@@ -358,10 +464,6 @@ public class Utils {
 					return falseText;
 				}
 			}
-			
-			
 		}
-
-		
 	}
 }

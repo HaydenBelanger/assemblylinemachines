@@ -24,7 +24,7 @@ public class ManagedSidedMachine<A extends AbstractContainerMenu> extends Abstra
 	}
 
 	@Override
-	public boolean canExtractFromSide(int slot, Direction direction) {
+	public boolean canExtractFromSide(boolean isEnergy, int slot, Direction direction) {
 		if(enabledSides.getOrDefault(direction, true) && slot == 0) {
 			return true;
 		}
@@ -34,7 +34,7 @@ public class ManagedSidedMachine<A extends AbstractContainerMenu> extends Abstra
 
 
 	@Override
-	public boolean canInsertToSide(int slot, Direction direction) {
+	public boolean canInsertToSide(boolean isEnergy, int slot, Direction direction) {
 		if(enabledSides.getOrDefault(direction, true) && slot != 0) {
 			return true;
 		}

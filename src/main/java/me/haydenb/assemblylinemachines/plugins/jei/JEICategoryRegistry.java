@@ -69,7 +69,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof LumberCrafting) {
 								LumberCrafting recipe = (LumberCrafting) pP1;
 								if(!recipe.getSecondaryOutput().isEmpty() && pP2.is(recipe.getSecondaryOutput().getItem())){
-									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.getOutputChance() * 100f)) + " Chance"));
+									return List.of(new TextComponent("ï¿½b" + String.format("%.0f%%", (recipe.getOutputChance() * 100f)) + " Chance"));
 								}
 							}
 							return null;
@@ -78,8 +78,7 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(AlloyingCrafting.ALLOYING_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("alloying").title("Alloying Crafting")
 					.background("gui_set_pre2022", 104, 112, 62, 41).icon(Registry.getBlock("alloy_smelter")).progressBar("gui_set_pre2022", 202, 104, 16, 14, 200, StartDirection.LEFT, false, 19, 13)
-					.catalysts(Registry.getBlock("alloy_smelter")).itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11))
-					.build(AlloyingCrafting.class));
+					.itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11)).catalysts(Registry.getBlock("alloy_smelter"), Registry.getBlock("mkii_alloy_smelter")).build(AlloyingCrafting.class));
 			
 			CATEGORY_REGISTRY.put(GrinderCrafting.GRINDER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("grinding").title("Grinding Crafting")
 					.background("gui_set_pre2022", 166, 145, 90, 44).icon(Registry.getBlock("electric_grinder")).progressBar("gui_set_pre2022", 237, 131, 19, 14, 200, StartDirection.LEFT, false, 42, 24)
@@ -90,7 +89,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof GrinderCrafting) {
 								GrinderCrafting recipe = (GrinderCrafting) pP1;
 								if(recipe.getChanceToDouble() != 0 && pP2.getCount() == recipe.getResultItem().getCount() * 2) {
-									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.getChanceToDouble() * 100f)) + " Chance"));
+									return List.of(new TextComponent("ï¿½b" + String.format("%.0f%%", (recipe.getChanceToDouble() * 100f)) + " Chance"));
 								}
 							}
 							return null;
@@ -99,7 +98,7 @@ public class JEICategoryRegistry implements IModPlugin{
 			
 			CATEGORY_REGISTRY.put(PurifierCrafting.PURIFIER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("purifying").title("Purifier Crafting")
 					.background("gui_set_pre2022", 0, 153, 90, 44).icon(Registry.getBlock("electric_purifier")).progressBar("gui_set_pre2022", 90, 153, 43, 32, 200, StartDirection.LEFT, false, 20, 6)
-					.itemSlots(3, Pair.of(0, 0), Pair.of(0, 26), Pair.of(21, 13), Pair.of(68, 13)).catalysts(Registry.getBlock("electric_purifier")).build(PurifierCrafting.class));
+					.itemSlots(3, Pair.of(0, 0), Pair.of(0, 26), Pair.of(21, 13), Pair.of(68, 13)).catalysts(Registry.getBlock("electric_purifier"), Registry.getBlock("mkii_purifier")).build(PurifierCrafting.class));
 			
 			CATEGORY_REGISTRY.put(MetalCrafting.METAL_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("metal_shaping").title("Metal Shaper Crafting")
 					.background("gui_set_pre2022", 168, 119, 69, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_pre2022", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
@@ -115,7 +114,7 @@ public class JEICategoryRegistry implements IModPlugin{
 								if(recipe.hasOptionalResults()) {
 									Optional<Float> amount = recipe.getChanceOfSubdrop(pP2.getItem());
 									if(amount.isPresent()) {
-										return List.of(new TextComponent("§b" + String.format("%.0f%%", (amount.get() * 100f)) + " Chance"));
+										return List.of(new TextComponent("ï¿½b" + String.format("%.0f%%", (amount.get() * 100f)) + " Chance"));
 									}
 								}
 							}
@@ -147,7 +146,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof EntropyReactorCrafting) {
 								EntropyReactorCrafting recipe = (EntropyReactorCrafting) pP1;
 								if(recipe.getResultItem().is(pP2.getItem())) {
-									String text = recipe.getVarietyReqd() < 0.01f ? "§5Any Variety" :  "§5 > " + String.format("%.0f%%", (recipe.getVarietyReqd() * 100f)) + " Variety";
+									String text = recipe.getVarietyReqd() < 0.01f ? "ï¿½5Any Variety" :  "ï¿½5 > " + String.format("%.0f%%", (recipe.getVarietyReqd() * 100f)) + " Variety";
 									return List.of(new TextComponent(text));
 								}
 							}

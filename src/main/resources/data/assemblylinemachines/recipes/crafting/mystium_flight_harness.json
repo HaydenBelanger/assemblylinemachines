@@ -1,0 +1,24 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"mem",
+		"pcp"
+	],
+	"key":{
+		"e":{
+			"item": "minecraft:elytra"
+		},
+		"c":{
+			"item": "assemblylinemachines:mystium_crystal"
+		},
+		"m":{
+			"item": "assemblylinemachines:mystium_armor_plating"
+		},
+		"p":{
+			"item": "minecraft:phantom_membrane"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mystium_flight_harness"
+	}
+}

@@ -1,0 +1,81 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/omnivoid/omnivoid_side",
+		"1": "assemblylinemachines:block/machine_advanced_top",
+		"2": "assemblylinemachines:block/omnivoid/omnivoid_lid",
+		"3": "assemblylinemachines:block/omnivoid/omnivoid_top",
+		"4": "assemblylinemachines:block/omnivoid/omnivoid_handle",
+		"particle": "assemblylinemachines:block/omnivoid/omnivoid_side"
+	},
+	"elements": [
+		{
+			"name": "body",
+			"from": [0, 0, 0],
+			"to": [16, 11, 16],
+			"faces": {
+				"north": {"uv": [0, 5, 16, 16], "texture": "#0"},
+				"east": {"uv": [0, 5, 16, 16], "texture": "#0"},
+				"south": {"uv": [0, 5, 16, 16], "texture": "#0"},
+				"west": {"uv": [0, 5, 16, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "lid",
+			"from": [1, 11, 1],
+			"to": [15, 14, 15],
+			"faces": {
+				"north": {"uv": [1, 2, 15, 5], "texture": "#2"},
+				"east": {"uv": [1, 2, 15, 5], "texture": "#2"},
+				"south": {"uv": [1, 2, 15, 5], "texture": "#2"},
+				"west": {"uv": [1, 2, 15, 5], "texture": "#2"},
+				"up": {"uv": [1, 1, 15, 15], "texture": "#3"}
+			}
+		},
+		{
+			"name": "handle1",
+			"from": [6, 14, 7],
+			"to": [7, 16, 9],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 2], "texture": "#4"},
+				"east": {"uv": [0, 0, 2, 2], "texture": "#4"},
+				"south": {"uv": [0, 0, 1, 2], "texture": "#4"},
+				"west": {"uv": [0, 0, 2, 2], "texture": "#4"},
+				"up": {"uv": [0, 0, 1, 2], "texture": "#4"}
+			}
+		},
+		{
+			"name": "handle2",
+			"from": [9, 14, 7],
+			"to": [10, 16, 9],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 2], "texture": "#4"},
+				"east": {"uv": [0, 0, 2, 2], "texture": "#4"},
+				"south": {"uv": [0, 0, 1, 2], "texture": "#4"},
+				"west": {"uv": [0, 0, 2, 2], "texture": "#4"},
+				"up": {"uv": [0, 0, 1, 2], "texture": "#4"}
+			}
+		},
+		{
+			"name": "handle3",
+			"from": [7, 15, 7],
+			"to": [9, 16, 9],
+			"faces": {
+				"north": {"uv": [0, 0, 2, 1], "texture": "#4"},
+				"south": {"uv": [0, 0, 2, 1], "texture": "#4"},
+				"up": {"uv": [0, 0, 2, 2], "texture": "#4"},
+				"down": {"uv": [0, 0, 2, 2], "texture": "#4"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4]
+		}
+	]
+}

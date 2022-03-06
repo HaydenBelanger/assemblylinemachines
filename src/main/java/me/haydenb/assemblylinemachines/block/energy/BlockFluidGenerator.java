@@ -16,7 +16,7 @@ import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.Managed
 import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;

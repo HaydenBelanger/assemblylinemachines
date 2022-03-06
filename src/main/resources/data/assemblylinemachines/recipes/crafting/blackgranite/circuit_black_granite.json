@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xxx",
+		"xmx",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:etched_black_granite"
+		},
+		"m":{
+			"tag": "forge:dusts/mystium"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:circuit_black_granite",
+		"count": 8
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:upgrade_kit",
+	"input_block":{
+		"item": "assemblylinemachines:electric_purifier"
+	},
+	"upgrade_kit": "MKII",
+	"output_block": "assemblylinemachines:mkii_purifier",
+	"slot_copy":{
+		"0": 0,
+		"1": 4,
+		"2": 5,
+		"3": 2,
+		"4": 6,
+		"5": 7,
+		"6": 8
+	}
+}

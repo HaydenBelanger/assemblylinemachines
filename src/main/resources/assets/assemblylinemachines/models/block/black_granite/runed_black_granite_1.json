@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_column",
+    "textures": {
+        "side": "assemblylinemachines:block/black_granite/runed_black_granite_1",
+        "end": "assemblylinemachines:block/black_granite/smooth_black_granite"
+    }
+}

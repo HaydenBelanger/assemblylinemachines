@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:raw_flerovium"
+		"tag": "forge:raw_materials/flerovium"
 	},
 	"result": "assemblylinemachines:flerovium_ingot",
 	"experience": 1,

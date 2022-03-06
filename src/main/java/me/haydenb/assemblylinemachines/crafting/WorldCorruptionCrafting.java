@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockCorruptingBasin.TECorruptingBasin;
+import me.haydenb.assemblylinemachines.block.machines.BlockCorruptingBasin.TECorruptingBasin;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder;
 import mezz.jei.api.gui.IRecipeLayout;

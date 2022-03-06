@@ -5,10 +5,9 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
-import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,13 +18,12 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
@@ -35,35 +33,11 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFluidMixer.TESimpleFluidMixer> implements ICrankableBlock{
+public class BlockSimpleFluidMixer{
 	
-
-	public BlockSimpleFluidMixer() {
-		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_fluid_mixer", BlockSimpleFluidMixer.TESimpleFluidMixer.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
-	}
-	
-	
-
-	@Override
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-
-		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
-	}
-	
-	@Override
-	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
-	}
-	
-	@Override
-	public boolean validSide(BlockState state, Direction dir) {
-		return true;
-	}
-	
-	@Override
-	public boolean needsGearbox() {
-		return false;
+	public static Block simpleFluidMixer() {
+		return MachineBuilder.block().voxelShape(Shapes.block(), true).additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE), (builder) -> builder.add(StateProperties.FLUID))
+				.crankable(false, null).build("simple_fluid_mixer", TESimpleFluidMixer.class);
 	}
 	
 	public static class TESimpleFluidMixer extends SimpleMachine<ContainerSimpleFluidMixer> implements ALMTicker<TESimpleFluidMixer>, ICrankableMachine{
@@ -180,7 +154,7 @@ public class BlockSimpleFluidMixer extends BlockScreenBlockEntity<BlockSimpleFlu
 										isa = null;
 										isb = null;
 										output = crafting.getResultItem().copy();
-										cycles = crafting.getStirs();
+										cycles = (float) crafting.getStirs() * ConfigHolder.getCommonConfig().simpleFluidMixerCycleMultiplier.get().floatValue();
 										f = crafting.getFluid();
 										pendingOutput = false;
 										sendUpdates();

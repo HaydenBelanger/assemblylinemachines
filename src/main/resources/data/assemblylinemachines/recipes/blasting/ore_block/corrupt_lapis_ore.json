@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:blasting",
 	"ingredient":{
-		"item": "assemblylinemachines:corrupt_lapis_ore"
+		"tag": "forge:ores/corrupt_lapis"
 	},
 	"result": "minecraft:lapis_lazuli",
 	"experience": 1,

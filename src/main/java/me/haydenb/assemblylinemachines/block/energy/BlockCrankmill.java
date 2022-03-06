@@ -10,7 +10,7 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
-import me.haydenb.assemblylinemachines.plugins.PluginTOP.TOPProvider;
+import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;

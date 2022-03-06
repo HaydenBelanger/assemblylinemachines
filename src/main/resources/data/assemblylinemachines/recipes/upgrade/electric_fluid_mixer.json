@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:upgrade_kit",
+	"input_block":{
+		"item": "assemblylinemachines:simple_fluid_mixer"
+	},
+	"upgrade_kit": "ELECTRIC",
+	"output_block": "assemblylinemachines:electric_fluid_mixer",
+	"slot_copy":{
+		"0": 1,
+		"1": 2
+	}
+}

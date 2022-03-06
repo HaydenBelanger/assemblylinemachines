@@ -162,7 +162,7 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 		protected final Pair<Integer, Integer> energyMeterLoc;
 		protected final EnergyMachine<?> machine;
 		protected final boolean usesfept;
-		protected final int startx;
+		protected int startx;
 		
 		public ScreenALMEnergyBased(T screenContainer, Inventory inv, Component titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,

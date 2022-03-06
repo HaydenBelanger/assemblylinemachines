@@ -7,13 +7,11 @@ import java.util.function.*;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.automation.*;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.TEBatteryCell;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockFluidRouter;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockRefinery;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.*;
-import me.haydenb.assemblylinemachines.block.pipe.PipeConnectorTileEntity;
-import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink;
+import me.haydenb.assemblylinemachines.block.machines.BlockOmnivoid.TEOmnivoid;
+import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +38,8 @@ public class PacketHandler {
 		PACKET_TARGETS.put("exp_mill_gui", (pd, world) -> BlockExperienceMill.updateDataFromPacket(pd, world));
 		PACKET_TARGETS.put("quarry_gui", (pd, world) -> BlockQuarry.updateDataFromPacket(pd, world));
 		PACKET_TARGETS.put("quantum_link_gui", (pd, world) -> BlockQuantumLink.receiveFromServer(pd, world));
-		PACKET_TARGETS.put("efm_gui", (pd, world) -> BlockElectricFluidMixer.updateDataFromPacket(pd, world));
+		PACKET_TARGETS.put("machine_builder_gui", (pd, world) -> ((IMachineDataBridge) world.getBlockEntity(pd.get("pos", BlockPos.class))).receiveButtonPacket(pd));
+		PACKET_TARGETS.put("omnivoid_gui", (pd, world) -> ((TEOmnivoid) world.getBlockEntity(pd.get("location", BlockPos.class))).toggleSettings(pd.get("settingtoggle", Integer.class)));
 		
 		//SERVER -> CLIENT
 		PACKET_TARGETS.put("vacuum_hopper_particles", (pd, world) -> BlockVacuumHopper.spawnTeleparticles(pd));

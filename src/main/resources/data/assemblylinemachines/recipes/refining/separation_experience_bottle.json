@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_separation",
+	"input_item":{
+		"item": "minecraft:experience_bottle"
+	},
+	"proc_time": 4,
+	"output_fluid_a":{
+		"fluid": "assemblylinemachines:liquid_experience",
+		"amount": 50
+	},
+	"output_item":{
+		"item": "minecraft:glass_bottle"
+	}
+}

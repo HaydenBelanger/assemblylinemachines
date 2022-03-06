@@ -10,7 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 
-import me.haydenb.assemblylinemachines.block.utility.BlockQuantumLink.TEQuantumLink;
+import me.haydenb.assemblylinemachines.block.machines.BlockQuantumLink.TEQuantumLink;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;

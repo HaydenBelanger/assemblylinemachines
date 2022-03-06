@@ -22,7 +22,7 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 	
 	public ItemDowsingRod() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
 	}
 	
 	@Override

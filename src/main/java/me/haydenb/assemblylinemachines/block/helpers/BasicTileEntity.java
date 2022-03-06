@@ -41,6 +41,7 @@ public class BasicTileEntity extends BlockEntity{
 	
 	@Override
 	public void handleUpdateTag(CompoundTag tag) {
+		if(tag == null) tag = new CompoundTag();
 		this.load(tag);
 	}
 	

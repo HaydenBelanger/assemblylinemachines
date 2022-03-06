@@ -9,17 +9,18 @@ import java.util.function.Supplier;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
+import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.crafting.MetalCrafting;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.tags.Tag.Named;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
@@ -60,7 +61,11 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			writer.println(mrg.generateRecipes(consumer));
 		}
 		
-		
+		writer.println("[SYSTEM]: Starting auto-generation of mod-compat-Grinder recipes...");
+		for(GrinderRecipeGeneration grg : GrinderRecipeGeneration.values()) {
+			grg.consumer.accept(consumer);
+		}
+		writer.println("[GRINDER RECIPES]: Generated Ore Block, Raw Ore, and Ingot pulverizing recipes for " + GrinderRecipeGeneration.values().length + " metal(s).");
 		
 	}
 	
@@ -95,6 +100,50 @@ public class AutoRecipeGenerator extends RecipeProvider {
 					concursivelyCopyRecipe(consumer, file.getAbsolutePath());
 				}
 			}
+		}
+	}
+	
+	private static enum GrinderRecipeGeneration{
+		
+		CHROMIUM(false, Blade.TITANIUM, true, 2, true, true), COAL(true, Blade.PUREGOLD, false, 4, false, false, Optional.of(Ingredient.of(Items.COAL))), COPPER(true, Blade.TITANIUM,
+				false, 2, true, true), DIAMOND(true, Blade.PUREGOLD, false, 2, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/diamond")))), GOLD(true, Blade.TITANIUM,
+				false, 2, true, true), IRON(true, Blade.TITANIUM, false, 2, true, true), LAPIS(true, Blade.TITANIUM, true, 8, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/lapis")))),
+		REDSTONE(true, Blade.TITANIUM, false, 10, false, false, null), FLEROVIUM(false, Blade.TITANIUM, true, 2, true, true), TITANIUM(true, Blade.TITANIUM, false, 2, true, true), 
+		EMERALD(true, Blade.PUREGOLD, false, 2, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/emerald")))),
+		
+		
+		//COMPAT
+		ALUMINUM, LEAD, SILVER, NICKEL, URANIUM, CONSTANTAN, ELECTRUM, TIN, ZINC, PLATINUM, TUNGSTEN, OSMIUM, COBALT, ARDITE, BRONZE, BRASS, INVAR, ROSE_GOLD, MANYULLYN;
+		
+		private final Consumer<Consumer<FinishedRecipe>> consumer;
+		
+		GrinderRecipeGeneration(boolean corruptOre, Blade bladeType, boolean machineRequired, int countFromOre, boolean hasRaw, boolean hasRawBlock){
+			this(corruptOre, bladeType, machineRequired, countFromOre, hasRaw, hasRawBlock, Optional.empty());
+		}
+		GrinderRecipeGeneration(boolean corruptOre, Blade bladeType, boolean machineRequired, int countFromOre, boolean hasRaw, boolean hasRawBlock, Optional<Ingredient> input){
+			this.consumer = (consumer) ->{
+				String name = this.toString().toLowerCase();
+				
+				consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "block_ores/" + name), Ingredient.of(getNamed("forge", "ores/" + name)), getNamed("forge", "dusts/" + name), countFromOre, 10, 0f, machineRequired, bladeType));
+				if(hasRaw) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), Ingredient.of(getNamed("forge", "raw_materials/" + name)), getNamed("forge", "dusts/" + name), 1, 5, 0.25f, machineRequired, bladeType));
+				if(hasRawBlock) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), Ingredient.of(getNamed("forge", "storage_blocks/raw_" + name)), getNamed("forge", "dusts/" + name), 9, 10, 0.25f, machineRequired, bladeType));
+				if(input != null ) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "ingots/" + name), input.orElse(Ingredient.of(getNamed("forge", "ingots/" + this.toString().toLowerCase()))), 
+						getNamed("forge", "dusts/" + name), 1, 4, 0f, machineRequired, bladeType));
+				if(corruptOre) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "corrupt_block_ores/" + name), Ingredient.of(getNamed("forge", "ores/corrupt_" + name)), getNamed("forge", "dusts/" + name),
+						Math.round((float) countFromOre * 1.5f), 15, 0f, true, bladeType));
+				
+			};
+		}
+		
+		GrinderRecipeGeneration(){
+			this.consumer = (consumer) ->{
+				String name = this.toString().toLowerCase();
+				
+				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "block_ores/" + name), getNamed("forge", "ores/" + name), getNamed("forge", "dusts/" + name), 2, 10, 0f));
+				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), getNamed("forge", "raw_materials/" + name), getNamed("forge", "dusts/" + name), 1, 5, 0.25f));
+				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "ingots/" + name), getNamed("forge", "ingots/" + name), getNamed("forge", "dusts/" + name), 1, 4, 0f));
+				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), getNamed("forge", "storage_blocks/raw_" + name), getNamed("forge", "dusts/" + name), 9, 10, 0.25f));
+			};
 		}
 	}
 	
@@ -233,13 +282,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			return "[WARNING]: No recipes generated for " + typeName + ".";
 		}
 		
-		private ResourceLocation getRecipeLoc(String fileName){
-			return this.getRecipeLoc("crafting", fileName);
-		}
 		
-		private ResourceLocation getRecipeLoc(String mainPath, String fileName) {
-			return new ResourceLocation(AssemblyLineMachines.MODID, mainPath + "/" + fileName);
-		}
 		
 		@SafeVarargs
 		private HashMap<Character, Ingredient> getShapedKey(Supplier<Ingredient>... ingredients){
@@ -257,6 +300,18 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		private static Supplier<Ingredient> getItemTagIngredient(String modid, String path){
 			return () -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation(modid, path)));
 		}
+	}
+	
+	private static ResourceLocation getRecipeLoc(String fileName){
+		return getRecipeLoc("crafting", fileName);
+	}
+	
+	private static ResourceLocation getRecipeLoc(String mainPath, String fileName) {
+		return new ResourceLocation(AssemblyLineMachines.MODID, mainPath + "/" + fileName);
+	}
+	
+	private static Named<Item> getNamed(String modid, String path){
+		return ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation(modid, path));
 	}
 	
 	public static class AdvancementlessResult implements FinishedRecipe{
@@ -348,6 +403,92 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		@Override
 		public ResourceLocation getAdvancementId() {
 			return null;
+		}
+		
+	}
+	
+	public static class GrinderResult implements FinishedRecipe{
+		private final ResourceLocation rl;
+		private final Named<Item> inputTag;
+		private final Named<Item> outputTag;
+		private final int outputCount;
+		private final int grinds;
+		private final float chanceToDouble;
+		
+		public GrinderResult(ResourceLocation rl, Named<Item> inputTag, Named<Item> outputTag, int outputCount, int grinds, float chanceToDouble) {
+			this.rl = rl;
+			this.inputTag = inputTag;
+			this.outputTag = outputTag;
+			this.outputCount = outputCount;
+			this.grinds = grinds;
+			this.chanceToDouble = chanceToDouble;
+		}
+		
+		@Override
+		public void serializeRecipeData(JsonObject json) {
+			json.add("input", Ingredient.of(inputTag).toJson());
+			if(chanceToDouble != 0f) json.addProperty("chanceToDouble", chanceToDouble);
+			json.addProperty("bladetype", "TITANIUM");
+			json.addProperty("grinds", grinds);
+			
+			JsonObject outputJson = new JsonObject();
+			outputJson.addProperty("name", outputTag.getName().toString());
+			if(outputCount != 1) outputJson.addProperty("count", outputCount);
+			json.add("output_tag", outputJson);
+			
+			JsonArray conditionArray = new JsonArray();
+			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(inputTag.getName()))));
+			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(outputTag.getName()))));
+			json.add("conditions", conditionArray);
+		}
+		
+		@Override
+		public ResourceLocation getId() {
+			return rl;
+		}
+		
+		@Override
+		public RecipeSerializer<?> getType() {
+			return GrinderCrafting.SERIALIZER;
+		}
+		
+		@Override
+		public JsonObject serializeAdvancement() {
+			return null;
+		}
+		
+		@Override
+		public ResourceLocation getAdvancementId() {
+			return null;
+		}
+		
+	}
+	
+	public static class NativeGrinderResult extends GrinderResult{
+
+		private final Ingredient input;
+		private final boolean machineRequired;
+		private final Blade bladeType;
+		
+		public NativeGrinderResult(ResourceLocation rl, Ingredient input, Named<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
+			super(rl, null, outputTag, outputCount, grinds, chanceToDouble);
+			this.input = input;
+			this.machineRequired = machineRequired;
+			this.bladeType = bladeType;
+		}
+		
+		@Override
+		public void serializeRecipeData(JsonObject json) {
+			json.add("input", input.toJson());
+			if(super.chanceToDouble != 0f) json.addProperty("chanceToDouble", super.chanceToDouble);
+			json.addProperty("bladetype", bladeType.toString());
+			json.addProperty("grinds", super.grinds);
+			if(machineRequired) json.addProperty("machine_required", true);
+			
+			JsonObject outputJson = new JsonObject();
+			outputJson.addProperty("name", super.outputTag.getName().toString());
+			if(super.outputCount != 1) outputJson.addProperty("count", super.outputCount);
+			json.add("output_tag", outputJson);
 		}
 		
 	}

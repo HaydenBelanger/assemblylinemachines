@@ -1,0 +1,27 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"mem",
+		"slt"
+	],
+	"key":{
+		"m":{
+			"tag": "forge:plates/mystium"
+		},
+		"e":{
+			"tag": "forge:plates/energized_gold"
+		},
+		"s":{
+			"tag": "forge:plates/stainless_steel"
+		},
+		"l":{
+			"tag": "forge:leather"
+		},
+		"t":{
+			"tag": "forge:plates/titanium"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:mystium_armor_plating"
+	}
+}

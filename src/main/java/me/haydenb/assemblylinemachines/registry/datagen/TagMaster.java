@@ -93,7 +93,7 @@ public class TagMaster {
 				Pair.of("copper", "ground_copper"), Pair.of("electrified_netherite", "electrified_netherite_blend"), 
 				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"), 
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
-				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"),
+				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"), Pair.of("emerald", "ground_emerald"),
 				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust"), Pair.of("chromium", "ground_chromium")));
 		forgeTags.putAll("gears", List.of(Pair.of("copper", "copper_gear"), Pair.of("gold", "gold_gear"), Pair.of("iron", "iron_gear"),
 				Pair.of("steel", "steel_gear"), Pair.of("titanium", "titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
@@ -108,10 +108,13 @@ public class TagMaster {
 				Pair.of("novasteel", "novasteel_plate")));
 		forgeTags.putAll("rods", List.of(Pair.of("steel", "steel_rod"), Pair.of("graphene", "graphene_rod")));
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));
-		forgeTags.putAll("ores", List.of(Pair.of("chromium", "chromium_ore"), Pair.of("titanium", "titanium_ore;deepslate_titanium_ore"), Pair.of("flerovium", "flerovium_ore")));
+		forgeTags.putAll("ores", List.of(Pair.of("chromium", "chromium_ore"), Pair.of("titanium", "titanium_ore;deepslate_titanium_ore"), Pair.of("flerovium", "flerovium_ore"),
+				Pair.of("corrupt_coal", "corrupt_coal_ore"), Pair.of("corrupt_copper", "corrupt_copper_ore"), Pair.of("corrupt_diamond", "corrupt_diamond_ore"), Pair.of("corrupt_gold", "corrupt_gold_ore"), Pair.of("corrupt_iron", "corrupt_iron_ore"),
+				Pair.of("corrupt_lapis", "corrupt_lapis_ore"), Pair.of("corrupt_redstone", "corrupt_redstone_ore"), Pair.of("corrupt_emerald", "corrupt_emerald_ore"), Pair.of("corrupt_titanium", "corrupt_titanium_ore")));
 		forgeTags.putAll("storage_blocks", List.of(Pair.of("chromium", "chromium_block"), Pair.of("titanium", "titanium_block"), Pair.of("mystium", "mystium_block"), Pair.of("steel", "steel_block"),
 				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block"), Pair.of("novasteel", "novasteel_block"), 
 				Pair.of("raw_chromium", "raw_chromium_block"), Pair.of("raw_titanium", "raw_titanium_block"), Pair.of("raw_flerovium", "raw_flerovium_block")));
+		forgeTags.putAll("raw_materials", List.of(Pair.of("chromium", "raw_chromium"), Pair.of("titanium", "raw_titanium"), Pair.of("flerovium", "raw_flerovium")));
 		
 		//Blocks get special treatment since they need to have both a block and item tag
 		List<String> forgeBlockTypes = List.of("ores", "storage_blocks");
