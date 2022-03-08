@@ -27,15 +27,8 @@ Recipe namespace: `assemblylinemachines:grinder`
 *If this is set to true, the recipe will not work in the Manual Grinder, and will only work in the Simple or Electric Grinder.*  
 - `chanceToDouble`: Decimal between 0 and 1, **1.18-1.3.3+ only,** *optional*  
 *If set, this will be the percentage likelihood that the output is doubled when the operation is completed. If unset, the chance is 0%.*
-
 - `output`: ItemStack, *optional*  
-*The resulting output from the recipe. In 1.18.1-1.3.8 and below, this field is required.*  
-- `output_tag`: Tag Result, **1.18.1-1.4.0+ only,** *optional*  
-*The resulting output in tag form from the recipe.*  
-
-??? warning "1.18.1+ Warning"
-	**1.18.1-1.4.0+ only:** Please note that either `output` or `output_tag` must be set, or the recipe will fail to load. For an example of `output_tag`, view Example #3 below.
-
+*The resulting output from the recipe. As of 1.18.2-1.4, this may be a [Tag ItemStack.](../miscdev/datatypes.md#tag-itemstack)*
 
 ## Example
 
@@ -72,23 +65,5 @@ Below is an example of a Grinding recipe. This will take Chromium Ore and produc
 	"grinds": 7,
 	"chanceToDouble": 0.15,
 	"bladetype": "PUREGOLD"
-}
-```
-
-**1.18.1-1.4.0+ only:** This recipe is a demonstration of the `output_tag` parameter. This recipe will grind any Corrupt Lapis Ore into Lapis Lazuli Dust, and will pull from the `forge:dusts/lapis` tag to determine the most appropriate output.
-
-``` json
-{
-	"type":"assemblylinemachines:grinder",
-	"input":{
-		"tag":"forge:ores/corrupt_lapis"
-	},
-	"bladetype":"TITANIUM",
-	"grinds":15,
-	"machine_required":true,
-	"output_tag":{
-		"name":"forge:dusts/lapis",
-		"count":12
-	}
 }
 ```

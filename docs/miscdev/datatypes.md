@@ -40,6 +40,20 @@ The ItemStack type is used primarily for outputs from recipes. This cannot use a
 }
 ```
 
+### Tag ItemStack
+
+??? error "1.18.2+ Feature"
+	This Data Type was made available in 1.18.2-1.4. Prior versions did not have this option and only supported regular ItemStacks.
+
+The Tag ItemStack is a hybrid of an *Ingredient* and an *ItemStack* used and referenced in certain recipe types which support it. It allows you to specify a tag to pull from for a recipe result as opposed to a static single-item result that one would normally expect with an ItemStack. If the tag has multiple like-type results, set `preferredModid` in `assemblylinemachines-common.toml`. For more information, see comments in the configuration file.
+
+``` json
+"output":{
+	"tag":"forge:plates/titanium",
+	"count": 5
+}
+```
+
 ## FluidStack
 
 The FluidStack type is used primarily for inputs or outputs of liquids for some recipes.
@@ -48,19 +62,5 @@ The FluidStack type is used primarily for inputs or outputs of liquids for some 
 "input_fluid":{
     "fluid": "minecraft:water",
     "amount": 1000
-}
-```
-
-## Tag Result
-
-??? error "1.18.1+ Feature"
-	This Data Type was made available in 1.18.1-1.4.0. Prior versions did not have any results which could be specified from a tag, so this type was not used anywhere.
-
-The Tag Result type is a hybrid of an *Ingredient* and an *ItemStack* used and referenced in recipe results which do not use a static item. Instead, when the world is loaded, based on a number of factors, the resulting item in the recipe will be automatically established from the specified tag. This is most useful where multiple mods add items that are very similar, like Ore Dust. This would allow a pack author to unify the result of some recipes.
-
-``` json
-"output_tag":{
-	"name":"forge:dusts/lapis",
-	"count":12
 }
 ```

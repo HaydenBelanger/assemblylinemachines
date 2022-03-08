@@ -79,7 +79,6 @@ minecraft {
         	arg '-mixin.config=mixins.assemblylinemachines.json'
         	//Datagen-required args (4)
             args '--mod', 'assemblylinemachines', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--input', file('src/main/resources/')
-
             mods {
                 examplemod {
                     source sourceSets.main

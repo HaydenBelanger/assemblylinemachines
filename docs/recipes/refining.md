@@ -6,41 +6,45 @@ The Refining recipes are available for the Refinery processing. This can take in
 
 Recipe namespace: `assemblylinemachines:refining`
 
-??? info "Ingredients, ItemStacks, and FluidStacks With Chances"
-    Below, all input and output fields have additional optional keys:
+??? info "Preservation/Multiplication Chance"
+    All `input` and `output` fields below can have an additional property set that is exclusive to the Refinery: `upgrade_multiply_chance`. This is a decimal between 0-1 and acts as a percentage chance, and works in conjunction with upgrades to allow the following:
 
-    `upgrade_preserve_chance`, Decimal between 0-1, valid for `input_fluid` and `input_item` - If set, will allow for the input item or fluid to be preserved if there is the Machine Conservation Upgrade installed. The chance will scale up to 2x `upgrade_preserve_chance` if there are 3 Machine Conservation Upgrades installed.
+	- For inputs, the input may be preserved if there is a Machine Conservation Upgrade installed. This chance to preserve will scale up to 2x specified if there are multiple upgrades installed.  
+	- For outputs, the output may be multiplied if there is an Extra Output Upgrade installed. This chance to multiply will scale up to 2x if there are multiple upgrades installed.
 
-    `upgrade_multiply_chance`, Decimal between 0-1, valid for `output_fluid_a`, `output_fluid_b`, and `output_item` - If set, will allow for the outputs to be multiplied by 1.5x the normal output amount if there is an Extra Output Machine Upgrade installed. The chance will scale up to 2x `upgrade_multiply_chance` if there are 3 Extra Output Machine Upgrades installed.
+	Not specifying `upgrade_multiply_chance` will always make the chance 0%, regardless of the amount of upgrades installed. In both cases, the amount after conservation or multiplication is always 1.5x the regular amount.
 
 !!! warning inline end
     Any block may be used as an `attachment`, but only Blocks that extend `BlockRefineryAddon` will have the effects of the reactor, including particles and other client-side effects.
 
 - `attachment`: Namespace, required  
 *The block attachment that must be placed above the Refinery during the craft to allow function.*
-- `input_fluid`: FluidStack with Chance, *optional*  
-*The fluid required to start the recipe.*
-- `input_item`: Ingredient with Chance, *optional*  
-*The item required to start the recipe.*
-
-!!! warning
-    You may use both or one of `input_fluid` or `input_item`, but one must be present or the recipe will not load.
-
-    If `input_fluid` is present and has property `FluidAttributes#isGaseous()` set, the Refinery will require the Gas Upgrade, and FE/t cost will be increased by 2.5x.
-
 - `proc_time`: Positive Integer, required  
 *The time required to process the recipe. 1 is equal to 0.8 seconds of processing time. Every Speed Upgrade in the machine will cut this processing time in half.*
-- `output_item`: ItemStack with Chance, *optional*  
-*The resulting item from the recipe.*
-- `output_fluid_a`: FluidStack with Chance, *optional*  
-*The resulting fluid from the recipe. Can also be entered as `output_fluid`.*
-- `output_fluid_b`: FluidStack with Chance, *optional*  
-*The second resulting fluid from the recipe.*
+
+!!! info inline end
+	If `input_fluid` is present and has property `FluidAttributes#isGaseous()` set, the Refinery will require the Gas Upgrade, and FE/t cost will be increased by 2.5x.
+
+- `input_fluid`: FluidStack, *optional*  
+*A fluid required to process the recipe.*
+- `input_item`: Ingredient, *optional*  
+*An item required to process the recipe.*
+- `output_item`: ItemStack, *optional*  
+*A resulting item from the recipe.*
+- `output_fluid_a`: FluidStack, *optional*  
+*A resulting fluid from the recipe.*
+- `output_fluid_b`: FluidStack, *optional*  
+*Another resulting fluid from the recipe.*
 
 !!! warning
-    You may use any or all of `output_item`, `output_fluid_a`, or `output_fluid_b`, but at least one must be present or the recipe will not load.
+    At least one `input` and one `output` must be set, or the recipe will fail to load.
 
-    If `output_fluid_b` is set, `output_fluid_a` must be set as well, or else the recipe will not load.
+??? warning "1.18.2+ Update Warning"
+	If you created recipes prior to 1.18.2-1.4 and are upgrading, there are a number of changes with the format that will result in the recipe not working as intended:
+
+	- The `output_fluid_a` field may **no longer** be entered as `output_fluid`. You must use the long-form version of the name.
+	- The `upgrade_preserve_chance` field for inputs is **no longer utilized.** Both inputs and outputs now use `upgrade_multiply_chance`, and just serves to simplify the recipe creation process. This tag works identically to `upgrade_preserve_chance` in prior versions.
+	- You no longer need `output_fluid_a` to be present in order to load a recipe with `output_fluid_b` set, if you wish to only set `output_fluid_b`.
 
 ## Examples
 
@@ -55,7 +59,7 @@ Below are a number of examples of a Refining recipe.
 	"input_fluid":{
 		"fluid": "assemblylinemachines:oil",
 		"amount": 1000,
-		"upgrade_preserve_chance": 0.15
+		"upgrade_multiply_chance": 0.15
 	},
 	"proc_time": 12,
 	"output_fluid_a":{
