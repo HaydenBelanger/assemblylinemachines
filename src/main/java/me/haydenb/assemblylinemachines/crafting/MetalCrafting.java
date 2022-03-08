@@ -37,7 +37,7 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		return input.test(inv.getItem(1));
+		return input.get().test(inv.getItem(1));
 	}
 	
 	@Override

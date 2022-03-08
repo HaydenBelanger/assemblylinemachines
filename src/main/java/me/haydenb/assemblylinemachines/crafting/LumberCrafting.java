@@ -26,6 +26,8 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new TypeLumberCrafting();
 	public static final Serializer SERIALIZER = new Serializer();
 	
+	private static final Random RAND = new Random();
+	
 	private final Lazy<Ingredient> input;
 	private final ItemStack outputa;
 	private final ItemStack outputb;
@@ -44,7 +46,7 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		return input.test(inv.getItem(2));
+		return input.get().test(inv.getItem(2));
 	}
 	
 	@Override

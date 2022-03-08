@@ -2,7 +2,8 @@ package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.util.TriConsumer;
@@ -13,7 +14,7 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.fluidutility.BlockRefinery.TERefinery;
+import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.TERefinery;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting.RefineryIO.RefineryIOType;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;

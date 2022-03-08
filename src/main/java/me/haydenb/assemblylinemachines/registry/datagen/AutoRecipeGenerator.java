@@ -19,10 +19,13 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.NotCondition;
+import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
@@ -310,8 +313,8 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		return new ResourceLocation(AssemblyLineMachines.MODID, mainPath + "/" + fileName);
 	}
 	
-	private static Named<Item> getNamed(String modid, String path){
-		return ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation(modid, path));
+	private static TagKey<Item> getNamed(String modid, String path){
+		return Utils.getTagKey(Keys.ITEMS, new ResourceLocation(modid, path));
 	}
 	
 	public static class AdvancementlessResult implements FinishedRecipe{
@@ -409,13 +412,13 @@ public class AutoRecipeGenerator extends RecipeProvider {
 	
 	public static class GrinderResult implements FinishedRecipe{
 		private final ResourceLocation rl;
-		private final Named<Item> inputTag;
-		private final Named<Item> outputTag;
+		private final TagKey<Item> inputTag;
+		private final TagKey<Item> outputTag;
 		private final int outputCount;
 		private final int grinds;
 		private final float chanceToDouble;
 		
-		public GrinderResult(ResourceLocation rl, Named<Item> inputTag, Named<Item> outputTag, int outputCount, int grinds, float chanceToDouble) {
+		public GrinderResult(ResourceLocation rl, TagKey<Item> inputTag, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble) {
 			this.rl = rl;
 			this.inputTag = inputTag;
 			this.outputTag = outputTag;
@@ -432,13 +435,13 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			json.addProperty("grinds", grinds);
 			
 			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("name", outputTag.getName().toString());
+			outputJson.addProperty("name", outputTag.location().toString());
 			if(outputCount != 1) outputJson.addProperty("count", outputCount);
 			json.add("output_tag", outputJson);
 			
 			JsonArray conditionArray = new JsonArray();
-			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(inputTag.getName()))));
-			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(outputTag.getName()))));
+			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(inputTag.location()))));
+			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(outputTag.location()))));
 			json.add("conditions", conditionArray);
 		}
 		
@@ -470,7 +473,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		private final boolean machineRequired;
 		private final Blade bladeType;
 		
-		public NativeGrinderResult(ResourceLocation rl, Ingredient input, Named<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
+		public NativeGrinderResult(ResourceLocation rl, Ingredient input, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
 			super(rl, null, outputTag, outputCount, grinds, chanceToDouble);
 			this.input = input;
 			this.machineRequired = machineRequired;
@@ -486,7 +489,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			if(machineRequired) json.addProperty("machine_required", true);
 			
 			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("name", super.outputTag.getName().toString());
+			outputJson.addProperty("name", super.outputTag.location().toString());
 			if(super.outputCount != 1) outputJson.addProperty("count", super.outputCount);
 			json.add("output_tag", outputJson);
 		}

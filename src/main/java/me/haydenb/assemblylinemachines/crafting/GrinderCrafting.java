@@ -1,9 +1,7 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
-import java.util.function.Supplier;
 
-import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -15,7 +13,7 @@ import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,8 +21,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeTagHandler;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
@@ -36,7 +34,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	private static final Random RAND = new Random();
 	
 	private final Lazy<Ingredient> input;
-	private Supplier<ItemStack> output;
+	private Lazy<ItemStack> output;
 
 	private final int grinds;
 	private final Blade tier;
@@ -44,7 +42,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	private final boolean machineReqd;
 	private final float chanceToDouble;
 	
-	public GrinderCrafting(ResourceLocation id, Lazy<Ingredient> input, Supplier<ItemStack> output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
+	public GrinderCrafting(ResourceLocation id, Lazy<Ingredient> input, Lazy<ItemStack> output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
 		this.input = input;
 		this.output = output;
 		this.grinds = grinds;
@@ -61,11 +59,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				return false;
 			}
 			Inventory pinv = (Inventory) inv;
-			if(input.test(pinv.getItem(pinv.selected))) {
+			if(input.get().test(pinv.getItem(pinv.selected))) {
 				return true;
 			}
 		}else {
-			if(input.test(inv.getItem(1))) {
+			if(input.get().test(inv.getItem(1))) {
 				return true;
 			}
 		}
@@ -157,14 +155,14 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		@Override
 		public GrinderCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-				Supplier<ItemStack> supplier = null;
+				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
+				Lazy<ItemStack> supplier = null;
 				if(GsonHelper.isValidNode(json, "output")) {
 					ItemStack stack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
-					supplier = Suppliers.memoize(() -> stack);
+					supplier = Lazy.of(() -> stack);
 				}else if(GsonHelper.isValidNode(json, "output_tag")) {
 					JsonObject sub = GsonHelper.getAsJsonObject(json, "output_tag");
-					Named<Item> tag = ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation(GsonHelper.getAsString(sub, "name")));
+					TagKey<Item> tag = Utils.getTagKey(Keys.ITEMS, new ResourceLocation(GsonHelper.getAsString(sub, "name")));
 					int outputCount = GsonHelper.isValidNode(sub, "count") ? GsonHelper.getAsInt(sub, "count") : 1;
 					supplier = Utils.getPreferredOrAlphabeticSupplier(tag, outputCount);
 				}else {
@@ -205,12 +203,12 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			boolean machineReqd = buffer.readBoolean();
 			float chanceToDouble = buffer.readFloat();
 			
-			return new GrinderCrafting(recipeId, input, Suppliers.memoize(() -> stack), grinds, tier, machineReqd, chanceToDouble);
+			return new GrinderCrafting(recipeId, Lazy.of(() -> input), Lazy.of(() -> stack), grinds, tier, machineReqd, chanceToDouble);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, GrinderCrafting recipe) {
-			recipe.input.toNetwork(buffer);
+			recipe.input.get().toNetwork(buffer);
 			buffer.writeItem(recipe.getResultItem());
 			buffer.writeInt(recipe.grinds);
 			buffer.writeEnum(recipe.tier);

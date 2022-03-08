@@ -48,8 +48,8 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if((parta.test(inv.getItem(1)) && partb.test(inv.getItem(2))) || (partb.test(inv.getItem(1)) && parta.test(inv.getItem(2)))) {
-			if(tobepurified.test(inv.getItem(3))) {
+		if((parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) || (partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2)))) {
+			if(tobepurified.get().test(inv.getItem(3))) {
 				return true;
 			}
 		}
@@ -136,7 +136,7 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	
 	public boolean isPrimaryIngredient(ItemStack test) {
-		return tobepurified.test(test);
+		return tobepurified.get().test(test);
 	}
 	
 	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<PurifierCrafting>{

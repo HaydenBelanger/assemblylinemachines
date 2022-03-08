@@ -124,9 +124,9 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
 			if(fept == 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§cIdle")).text(new TextComponent("0 FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Â§cIdle")).text(new TextComponent("0 FE/t"));
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§aGenerating...")).text(new TextComponent("§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Â§aGenerating...")).text(new TextComponent("Â§a+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t"));
 			}
 			
 		}

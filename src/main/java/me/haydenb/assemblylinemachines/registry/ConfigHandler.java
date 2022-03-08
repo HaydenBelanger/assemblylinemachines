@@ -1,9 +1,11 @@
 package me.haydenb.assemblylinemachines.registry;
 
+import java.util.List;
 import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;

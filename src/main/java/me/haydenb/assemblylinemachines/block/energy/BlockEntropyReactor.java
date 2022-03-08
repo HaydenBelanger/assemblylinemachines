@@ -594,18 +594,18 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
 			if(cyclesRemaining != 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§aDischarging...")).text(new TextComponent("§a+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Â§aDischarging...")).text(new TextComponent("Â§a+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t"));
 			}else {
 				if(shardMap.isEmpty()) {
-					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§cIdle")).text(new TextComponent("0 FE/t"));
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Â§cIdle")).text(new TextComponent("0 FE/t"));
 				}else {
-					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§dWarming Up...")).text(new TextComponent("0 FE/t"));
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Â§dWarming Up...")).text(new TextComponent("0 FE/t"));
 				}
 			}
 			
-			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text(new TextComponent("§dShards")).progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
-			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new TextComponent("§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
-			probeInfo.horizontal().item(new ItemStack(Items.COAL)).vertical().text(new TextComponent("§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text(new TextComponent("Â§dShards")).progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
+			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new TextComponent("Â§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Items.COAL)).vertical().text(new TextComponent("Â§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
 		}
 		
 		@Override
@@ -1210,13 +1210,13 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			if(mouseX >= x + 50 && mouseY >= y + 17 && mouseX <= x + 55 && mouseY <= y + 68) {
 				ArrayList<String> str = new ArrayList<>();
 				if(tsfm.total != 0) {
-					str.add("§5Total Shards Stored");
-					str.add("§d" + num.format(tsfm.total) + "/" + num.format(tsfm.capacity));
+					str.add("Â§5Total Shards Stored");
+					str.add("Â§d" + num.format(tsfm.total) + "/" + num.format(tsfm.capacity));
 				}else {
-					str.add("§4Shard Tank Empty");
+					str.add("Â§4Shard Tank Empty");
 				}
 				
-				str.add("§7Runs at " + Formatting.GENERAL_FORMAT.format((tsfm.total * 6000f) / 20f) + " FE/t.");
+				str.add("Â§7Runs at " + Formatting.GENERAL_FORMAT.format((tsfm.total * 6000f) / 20f) + " FE/t.");
 
 				this.renderComponentTooltip(str, mouseX - x, mouseY - y);
 			}
@@ -1241,14 +1241,14 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				}
 				
 				
-				str.add("§eVariety Rating: §" + cc + num.format(tsfm.varietyRating * 100f) + "%");
+				str.add("Â§eVariety Rating: Â§" + cc + num.format(tsfm.varietyRating * 100f) + "%");
 				
 				int cycles = Math.round(tsfm.varietyRating * 9f);
 				
 				if(cycles == 1) {
-					str.add("§7Powered for 1 second.");
+					str.add("Â§7Powered for 1 second.");
 				}else {
-					str.add("§7Powered for " + cycles + " seconds.");
+					str.add("Â§7Powered for " + cycles + " seconds.");
 				}
 				
 				this.renderComponentTooltip(str, mouseX - x, mouseY - y);
@@ -1267,11 +1267,11 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 					cc = "4";
 				}
 				
-				str.add("§cCore Entropy Levels: §" + cc + num.format(tsfm.entropy * 100f) + "%");
+				str.add("Â§cCore Entropy Levels: Â§" + cc + num.format(tsfm.entropy * 100f) + "%");
 				
 				if(tsfm.entropy > 0.1f) {
-					str.add("§7Bad things will happen if this is not lowered.");
-					str.add("§7Lower by keeping Variety high!");
+					str.add("Â§7Bad things will happen if this is not lowered.");
+					str.add("Â§7Lower by keeping Variety high!");
 				}
 				
 				this.renderComponentTooltip(str, mouseX - x, mouseY - y);

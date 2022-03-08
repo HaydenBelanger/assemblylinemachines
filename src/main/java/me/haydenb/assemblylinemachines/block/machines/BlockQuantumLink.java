@@ -482,15 +482,15 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 					switch(tsfm.pfi[channel]) {
 					case 0:
 						vals.add(tooltip + " Receive Mode");
-						vals.add("§8§oWill receive " + tooltip + " from other QLs.");
+						vals.add("Â§8Â§oWill receive " + tooltip + " from other QLs.");
 						break;
 					case 1:
 						vals.add(tooltip + " Send Mode");
-						vals.add("§8§oWill transfer " + tooltip + " to other QLs.");
+						vals.add("Â§8Â§oWill transfer " + tooltip + " to other QLs.");
 						break;
 					case 2:
 						vals.add(tooltip + " Disabled");
-						vals.add("§8§oWill not interact with " + tooltip + ".");
+						vals.add("Â§8Â§oWill not interact with " + tooltip + ".");
 						break;
 					}
 					

@@ -1,9 +1,11 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -84,14 +86,14 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			}
 			TEFluidBath finv = (TEFluidBath) inv;
 			
-			if(inputa.test(finv.getItem(1))) {
-				if(inputb.test(finv.getItem(2))) {
+			if(inputa.get().test(finv.getItem(1))) {
+				if(inputb.get().test(finv.getItem(2))) {
 					return true;
 				}
 			}
 			
-			if(inputa.test(finv.getItem(2))) {
-				if(inputb.test(finv.getItem(1))) {
+			if(inputa.get().test(finv.getItem(2))) {
+				if(inputb.get().test(finv.getItem(1))) {
 					return true;
 				}
 			}
@@ -99,14 +101,14 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			if(type == BathOption.BASIN_ONLY) {
 				return false;
 			}
-			if(inputa.test(inv.getItem(1))) {
-				if(inputb.test(inv.getItem(2))) {
+			if(inputa.get().test(inv.getItem(1))) {
+				if(inputb.get().test(inv.getItem(2))) {
 					return true;
 				}
 			}
 			
-			if(inputa.test(inv.getItem(2))) {
-				if(inputb.test(inv.getItem(1))) {
+			if(inputa.get().test(inv.getItem(2))) {
+				if(inputb.get().test(inv.getItem(1))) {
 					return true;
 				}
 			}
@@ -114,14 +116,14 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			if(type == BathOption.BASIN_ONLY) {
 				return false;
 			}
-			if(inputa.test(inv.getItem(0))) {
-				if(inputb.test(inv.getItem(1))) {
+			if(inputa.get().test(inv.getItem(0))) {
+				if(inputb.get().test(inv.getItem(1))) {
 					return true;
 				}
 			}
 			
-			if(inputa.test(inv.getItem(1))) {
-				if(inputb.test(inv.getItem(0))) {
+			if(inputa.get().test(inv.getItem(1))) {
+				if(inputb.get().test(inv.getItem(0))) {
 					return true;
 				}
 			}

@@ -236,10 +236,10 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 	}
 	
 	public static enum FluidInGroundCriteria{
-		OVERWORLD_PREFCOLD(68, 111, true, new TextComponent("§9Favors very cold biomes.")), OVERWORLD_PREFHOT(102, 77, true, new TextComponent("§cFavors very hot biomes.")), 
-		OVERWORLD_ONLYCOLD(68, 111, true, new TextComponent("§9Only in very cold biomes.")), OVERWORLD_ONLYHOT(102, 77, true, new TextComponent("§cOnly in very hot biomes.")),
-		OVERWORLD_ANY(0, 111, false, new TextComponent("§2Found in The Overworld.")), NETHER(34, 111, false, new TextComponent("§4Found in The Nether.")), 
-		END(68, 77, false, new TextComponent("§5Found in The End."));
+		OVERWORLD_PREFCOLD(68, 111, true, new TextComponent("Â§9Favors very cold biomes.")), OVERWORLD_PREFHOT(102, 77, true, new TextComponent("Â§cFavors very hot biomes.")), 
+		OVERWORLD_ONLYCOLD(68, 111, true, new TextComponent("Â§9Only in very cold biomes.")), OVERWORLD_ONLYHOT(102, 77, true, new TextComponent("Â§cOnly in very hot biomes.")),
+		OVERWORLD_ANY(0, 111, false, new TextComponent("Â§2Found in The Overworld.")), NETHER(34, 111, false, new TextComponent("Â§4Found in The Nether.")), 
+		END(68, 77, false, new TextComponent("Â§5Found in The End."));
 		
 		private final int jeiBlitX, jeiBlitY;
 		private final TextComponent descriptor;
@@ -262,9 +262,9 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		public List<Component> getTooltip(int chanceToGenerate){
 			
 			if(isOverworld) {
-				return List.of(OVERWORLD_ANY.descriptor, this.descriptor, new TextComponent("§e" + chanceToGenerate + "% chance to generate."));
+				return List.of(OVERWORLD_ANY.descriptor, this.descriptor, new TextComponent("Â§e" + chanceToGenerate + "% chance to generate."));
 			}else {
-				return List.of(this.descriptor, new TextComponent("§e" + chanceToGenerate + "% chance to generate."));
+				return List.of(this.descriptor, new TextComponent("Â§e" + chanceToGenerate + "% chance to generate."));
 			}
 		}
 	}

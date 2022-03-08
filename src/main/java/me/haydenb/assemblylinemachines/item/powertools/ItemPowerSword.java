@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemMobCrystal;
+import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -29,9 +30,9 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 
 	private final IToolWithCharge.PowerToolType ptt;
 	
-	public ItemPowerSword(IToolWithCharge.PowerToolType ptt, Properties properties) {
-		super(ptt.getTier(), 2, -1.5f, properties);
-		this.ptt = ptt;
+	public ItemPowerSword(ItemTiers ptt, Properties properties) {
+		super(ptt.getItemTier(), 2, -1.5f, properties);
+		this.ptt = ptt.getPowerToolType();
 	}
 
 	@Override

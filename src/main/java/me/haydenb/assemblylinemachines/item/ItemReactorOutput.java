@@ -19,7 +19,7 @@ public class ItemReactorOutput extends Item {
 	
 	@Override
 	public void appendHoverText(ItemStack stack, Level pLevel, List<Component> tooltipComponents, TooltipFlag pIsAdvanced) {
-		tooltipComponents.add(new TextComponent("ง8This is a " + quality + "ง8 by-product."));
+		tooltipComponents.add(new TextComponent("ยง8This is a " + quality + "ยง8 by-product."));
 		super.appendHoverText(stack, pLevel, tooltipComponents, pIsAdvanced);
 	}
 }

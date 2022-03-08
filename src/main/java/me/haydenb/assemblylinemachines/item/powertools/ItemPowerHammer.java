@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemHammer;
+import me.haydenb.assemblylinemachines.item.ItemTiers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -23,9 +24,9 @@ public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpe
 
 	private final IToolWithCharge.PowerToolType ptt;
 	
-	public ItemPowerHammer(IToolWithCharge.PowerToolType ptt, Properties properties) {
-		super(ptt.getTier(), 8, -3.2f, properties);
-		this.ptt = ptt;
+	public ItemPowerHammer(ItemTiers ptt, Properties properties) {
+		super(ptt.getItemTier(), 8, -3.2f, properties);
+		this.ptt = ptt.getPowerToolType();
 	}
 
 	@Override

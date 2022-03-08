@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
+import me.haydenb.assemblylinemachines.item.ItemTiers;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -29,9 +30,9 @@ public class ItemPowerPickaxe extends PickaxeItem implements IToolWithCharge, IS
 
 	private final IToolWithCharge.PowerToolType ptt;
 	
-	public ItemPowerPickaxe(IToolWithCharge.PowerToolType ptt, Properties properties) {
-		super(ptt.getTier(), 0, -1.5f, properties);
-		this.ptt = ptt;
+	public ItemPowerPickaxe(ItemTiers ptt, Properties properties) {
+		super(ptt.getItemTier(), 0, -1.5f, properties);
+		this.ptt = ptt.getPowerToolType();
 	}
 
 	@Override

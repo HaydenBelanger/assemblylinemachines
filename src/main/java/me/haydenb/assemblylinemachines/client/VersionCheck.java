@@ -29,7 +29,7 @@ public class VersionCheck {
 				CheckResult result = VersionChecker.getResult(imi);
 				
 				if(result.status() == Status.BETA_OUTDATED || result.status() == Status.OUTDATED) {
-					TextComponent tc = new TextComponent("[§aAssemblyLineMachines§f] Update available, version §e" + result.target().getCanonical() + ",§f you're using §e" + imi.getVersion().toString() + ". §2Click to Update!");
+					TextComponent tc = new TextComponent("[Â§aAssemblyLineMachinesÂ§f] Update available, version Â§e" + result.target().getCanonical() + ",Â§f you're using Â§e" + imi.getVersion().toString() + ". Â§2Click to Update!");
 					tc.withStyle(tc.getStyle().withClickEvent(new ClickEvent(Action.OPEN_URL, result.url())));
 					player.sendMessage(tc, null);
 				}

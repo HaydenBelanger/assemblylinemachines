@@ -55,8 +55,8 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
 		this.addEnergyInfoToHoverText(pStack, pTooltipComponents);
 		
-		pTooltipComponents.add(new TextComponent("�7�oAnti-Entropy Field Generator"));
-		pTooltipComponents.add(new TextComponent("�8�oProtects against chaotic effects when charged."));
+		pTooltipComponents.add(new TextComponent("§7§oAnti-Entropy Field Generator"));
+		pTooltipComponents.add(new TextComponent("§8§oProtects against chaotic effects when charged."));
 	}
 	
 	@Override

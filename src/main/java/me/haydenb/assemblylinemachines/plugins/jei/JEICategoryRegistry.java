@@ -69,7 +69,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof LumberCrafting) {
 								LumberCrafting recipe = (LumberCrafting) pP1;
 								if(!recipe.getSecondaryOutput().isEmpty() && pP2.is(recipe.getSecondaryOutput().getItem())){
-									return List.of(new TextComponent("�b" + String.format("%.0f%%", (recipe.getOutputChance() * 100f)) + " Chance"));
+									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.getOutputChance() * 100f)) + " Chance"));
 								}
 							}
 							return null;
@@ -89,7 +89,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof GrinderCrafting) {
 								GrinderCrafting recipe = (GrinderCrafting) pP1;
 								if(recipe.getChanceToDouble() != 0 && pP2.getCount() == recipe.getResultItem().getCount() * 2) {
-									return List.of(new TextComponent("�b" + String.format("%.0f%%", (recipe.getChanceToDouble() * 100f)) + " Chance"));
+									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.getChanceToDouble() * 100f)) + " Chance"));
 								}
 							}
 							return null;
@@ -114,7 +114,7 @@ public class JEICategoryRegistry implements IModPlugin{
 								if(recipe.hasOptionalResults()) {
 									Optional<Float> amount = recipe.getChanceOfSubdrop(pP2.getItem());
 									if(amount.isPresent()) {
-										return List.of(new TextComponent("�b" + String.format("%.0f%%", (amount.get() * 100f)) + " Chance"));
+										return List.of(new TextComponent("§b" + String.format("%.0f%%", (amount.get() * 100f)) + " Chance"));
 									}
 								}
 							}
@@ -146,7 +146,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof EntropyReactorCrafting) {
 								EntropyReactorCrafting recipe = (EntropyReactorCrafting) pP1;
 								if(recipe.getResultItem().is(pP2.getItem())) {
-									String text = recipe.getVarietyReqd() < 0.01f ? "�5Any Variety" :  "�5 > " + String.format("%.0f%%", (recipe.getVarietyReqd() * 100f)) + " Variety";
+									String text = recipe.getVarietyReqd() < 0.01f ? "§5Any Variety" :  "§5 > " + String.format("%.0f%%", (recipe.getVarietyReqd() * 100f)) + " Variety";
 									return List.of(new TextComponent(text));
 								}
 							}

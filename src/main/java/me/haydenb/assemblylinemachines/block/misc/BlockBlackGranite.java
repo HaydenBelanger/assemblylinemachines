@@ -48,9 +48,9 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 		if(state.getValue(NATURAL_GRANITE) == true) {
 			if(canToolMine(player, state)) {
-				probeInfo.horizontal().text(new TextComponent("§aBlock will drop when mined."));
+				probeInfo.horizontal().text(new TextComponent("Â§aBlock will drop when mined."));
 			}else {
-				probeInfo.horizontal().text(new TextComponent("§cBlock will not drop when mined."));
+				probeInfo.horizontal().text(new TextComponent("Â§cBlock will not drop when mined."));
 			}
 		}
 		
@@ -60,7 +60,7 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 	@Override
 	public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 		if(!player.isCreative() && !canToolMine(player, state)) {
-			player.displayClientMessage(new TextComponent("§cA Pickaxe with mechanical power is needed to extract the Black Granite."), true);
+			player.displayClientMessage(new TextComponent("Â§cA Pickaxe with mechanical power is needed to extract the Black Granite."), true);
 		}
 		return super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
 	}

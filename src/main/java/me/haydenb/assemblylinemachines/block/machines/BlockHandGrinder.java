@@ -66,9 +66,9 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
 		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
-			tooltip.add(new TextComponent("ง8XL+ Definitive Edition"));
-			tooltip.add(new TextComponent("ง8With Sonic & Knuckles"));
-			tooltip.add(new TextComponent("ง8Season Pass"));
+			tooltip.add(new TextComponent("ยง8XL+ Definitive Edition"));
+			tooltip.add(new TextComponent("ยง8With Sonic & Knuckles"));
+			tooltip.add(new TextComponent("ยง8Season Pass"));
 		}
 		super.appendHoverText(stack, level, tooltip, flag);
 	}

@@ -7,9 +7,8 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.client.armor.ArmorData;
 import me.haydenb.assemblylinemachines.client.armor.ArmorModel;
-import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
+import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils.IToolWithCharge;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -53,14 +52,14 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-		return this.getICapabilityProvider(stack);
+		return this.defaultInitCapabilities(stack, nbt);
 	}
 	
 	@Override
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents,
 			TooltipFlag pIsAdvanced) {
 		this.addEnergyInfoToHoverText(pStack, pTooltipComponents);
-		if(ptt == PowerToolType.ENHANCED_MYSTIUM) pTooltipComponents.add(new TextComponent("§7§oEnables creative flight at the cost of power."));
+		if(ptt == PowerToolType.ENHANCED_MYSTIUM) pTooltipComponents.add(new TextComponent("Â§7Â§oEnables creative flight at the cost of power."));
 	}
 	
 	@Override
@@ -113,17 +112,12 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	public int getBottomColor() {
 		return ptt == PowerToolType.MYSTIUM || ptt == PowerToolType.ENHANCED_MYSTIUM ? 0xffb81818 : ISpecialTooltip.super.getBottomColor();
 	}
-	
+
 	@Override
-	public String getToolType() {
-		return null;
-	}
-	
-	@Override
-	public boolean canUseSecondaryAbilities(ItemStack stack, String secondaryName) {
+	public boolean canUseSecondaryAbilities(ItemStack stack) {
 		return false;
 	}
-
+	
 	@Override
 	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
 		return 0f;
@@ -133,12 +127,12 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	public void initializeClient(Consumer<IItemRenderProperties> consumer) {
 		consumer.accept(new IItemRenderProperties() {
 			private Optional<ArmorModel> model = null;
-			@SuppressWarnings("unchecked")
+			
 			@Override
-			public <A extends HumanoidModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack,
-					EquipmentSlot armorSlot, A _default) {
+			public HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack,
+					EquipmentSlot armorSlot, HumanoidModel<?> _default) {
 				if(model == null) model = ArmorData.get(ptt.toString().toLowerCase(), armorSlot);
-				return model.isPresent() ? (A) model.get() : _default;
+				return model.isPresent() ? model.get() : _default;
 			}
 		});
 	}

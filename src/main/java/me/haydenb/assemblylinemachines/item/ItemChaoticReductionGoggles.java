@@ -19,7 +19,7 @@ public class ItemChaoticReductionGoggles extends ArmorItem implements ISpecialTo
 	
 	@Override
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-		pTooltipComponents.add(new TextComponent("§8§oKeeps Dark Energy out of your eyes."));
+		pTooltipComponents.add(new TextComponent("Â§8Â§oKeeps Dark Energy out of your eyes."));
 	}
 	
 	@Override

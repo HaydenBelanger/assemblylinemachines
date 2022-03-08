@@ -1,10 +1,8 @@
 package me.haydenb.assemblylinemachines.block.machines;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 
@@ -12,9 +10,9 @@ import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
@@ -39,13 +37,14 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class BlockFluidBath extends Block implements EntityBlock {
 	
 	public static final List<Item> VALID_FILL_ITEMS = List.of(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.POTION);
-	public static final Supplier<List<Item>> DISALLOWED_ITEMS = Suppliers.memoize(() -> Lists.transform(ConfigHolder.getCommonConfig().disallowedFluidBathItems.get(), (o) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(o.toString()))));
+	public static final Lazy<List<Item>> DISALLOWED_ITEMS = Lazy.of(() -> Lists.transform(ConfigHolder.getCommonConfig().disallowedFluidBathItems.get(), (o) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(o.toString()))));
 	
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),

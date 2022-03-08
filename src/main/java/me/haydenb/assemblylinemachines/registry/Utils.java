@@ -11,12 +11,15 @@ import java.util.function.*;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
 
-import com.google.common.base.Suppliers;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine.Phases;
+import me.haydenb.assemblylinemachines.block.machines.BlockMachines;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
@@ -32,12 +35,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.*;
@@ -48,11 +54,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.common.util.*;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
@@ -125,11 +127,13 @@ public class Utils {
 	/**
 	 * Supplier comes pre-memoized.
 	 */
-	public static Supplier<ItemStack> getPreferredOrAlphabeticSupplier(Named<Item> tag, int count){
-		return Suppliers.memoize(() -> {
+	@SuppressWarnings("deprecation")
+	public static Lazy<ItemStack> getPreferredOrAlphabeticSupplier(TagKey<Item> tag, int count){
+		return Lazy.of(() -> {
 			try {
-				Item preferredResult = CACHED_SORTED_TAGS.get(tag.getName().toString(), () ->{
-					List<Item> values = new ArrayList<Item>(tag.getValues());
+				Item preferredResult = CACHED_SORTED_TAGS.get(tag.location().toString(), () ->{
+					List<Item> values = new ArrayList<>();
+					net.minecraft.core.Registry.ITEM.getTagOrEmpty(tag).forEach((holder) -> values.add(holder.value()));
 					String preferredModid = ConfigHolder.getCommonConfig().preferredModid.get();
 					if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
 						Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();

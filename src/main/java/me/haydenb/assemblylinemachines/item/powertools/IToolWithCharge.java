@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.item.ItemTiers.ToolTiers;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
@@ -20,7 +19,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.enchantment.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
@@ -106,9 +104,9 @@ public interface IToolWithCharge{
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		IToolWithCharge.PowerToolType ptt = this.getPowerToolType();
 		String colorChar = compound.getInt(ptt.getKeyName()) == 0 ? "c" : "a";
-		tooltip.add(new TextComponent("§" + colorChar + df.format(compound.getInt(ptt.getKeyName())) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.getFriendlyNameOfUnit()));
+		tooltip.add(new TextComponent("Â§" + colorChar + df.format(compound.getInt(ptt.getKeyName())) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.getFriendlyNameOfUnit()));
 		if(compound.getBoolean("assemblylinemachines:secondarystyle")) {
-			tooltip.add(new TextComponent("§bSecondary Ability Enabled"));
+			tooltip.add(new TextComponent("Â§bSecondary Ability Enabled"));
 		}
 	}
 	
@@ -182,27 +180,26 @@ public interface IToolWithCharge{
 	}
 	
 	public static enum PowerToolType{
-		CRANK(ToolTiers.CRANK, "assemblylinemachines:cranks", 1, 30, false, "§6Cranks", false, null, 0.0f, ConfigHolder.getCommonConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
-		MYSTIUM(ToolTiers.MYSTIUM, "assemblylinemachines:fe", 150, 1, true, "§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getCommonConfig().mystiumToolMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
-		NOVASTEEL(ToolTiers.NOVASTEEL, "assemblylinemachines:fe", 75, 1, true, "§3FE", true, "nova_farmland", 0.25f, ConfigHolder.getCommonConfig().novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
-		AEFG(null, "assemblylinemachines:fe", 1, 1, false, "§9FE", true, null, 0.0f, 10000000, 0x0, null);
+		CRANK("assemblylinemachines:cranks", 1, 30, false, "Â§6Cranks", false, null, 0.0f, ConfigHolder.getCommonConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, "Â§5FE", true, "mystium_farmland", 0.1f, ConfigHolder.getCommonConfig().mystiumMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, "Â§3FE", true, "nova_farmland", 0.25f, ConfigHolder.getCommonConfig().novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
+		AEFG("assemblylinemachines:fe", 1, 1, false, "Â§9FE", true, null, 0.0f, 10000000, 0x0, null),
+		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, "Â§5FE", true, null, 0.0f, ConfigHolder.getCommonConfig().enhancedMystiumChestplateMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png"));
 		
-		private final String keyName;
-		private final int costMultiplier;
-		private final int chargeMultiplier;
-		private final boolean hasSecondaryAbilities;
-		private final String friendlyNameOfUnit;
-		private final boolean hasEnergyCapability;
-		private final String nameOfSecondaryFarmland;
-		private final int configMaxCharge;
-		private final float chanceToDropMobCrystal;
-		private final int argbBorderColor;
-		private final Tier equivalentTier;
-		private final ResourceLocation borderTexturePath;
+		public final String keyName;
+		public final int costMultiplier;
+		public final int chargeMultiplier;
+		public final boolean hasSecondaryAbilities;
+		public final String friendlyNameOfUnit;
+		public final boolean hasEnergyCapability;
+		public final String nameOfSecondaryFarmland;
+		public final int configMaxCharge;
+		public final float chanceToDropMobCrystal;
+		public final int argbBorderColor;
+		public final ResourceLocation borderTexturePath;
 		
-		PowerToolType(Tier equivalentTier, String keyName, int costMultiplier, int chargeMultiplier, boolean hasSecondaryAbilities, String friendlyNameOfUnit, 
+		PowerToolType(String keyName, int costMultiplier, int chargeMultiplier, boolean hasSecondaryAbilities, String friendlyNameOfUnit, 
 				boolean hasEnergyCapability, String nameOfSecondaryFarmland, float chanceToDropMobCrystal, int configMaxCharge, int argbBorderColor, ResourceLocation borderTexturePath) {
-			this.equivalentTier = equivalentTier;
 			this.keyName = keyName;
 			this.costMultiplier = costMultiplier;
 			this.chargeMultiplier = chargeMultiplier;
@@ -263,10 +260,6 @@ public interface IToolWithCharge{
 		
 		public ResourceLocation getBorderTexturePath() {
 			return borderTexturePath;
-		}
-		
-		public Tier getTier() {
-			return equivalentTier;
 		}
 	}
 

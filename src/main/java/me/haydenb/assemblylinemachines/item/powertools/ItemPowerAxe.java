@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
+import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -25,9 +26,9 @@ public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTo
 
 	private final IToolWithCharge.PowerToolType ptt;
 	
-	public ItemPowerAxe(IToolWithCharge.PowerToolType ptt, Properties properties) {
-		super(ptt.getTier(), 3f, -3.5f, properties);
-		this.ptt = ptt;
+	public ItemPowerAxe(ItemTiers tier, Properties properties) {
+		super(tier.getItemTier(), 3f, -3.5f, properties);
+		this.ptt = tier.getPowerToolType();
 	}
 
 	@Override

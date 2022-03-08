@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.item.ItemPowerTool.PowerToolType;
+import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.PowerToolType;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ALMCommonConfig;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -12,8 +12,7 @@ import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.*;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -30,7 +29,7 @@ public enum ItemTiers {
 			cfg().steelArmorKnockbackResistance.get(), cfg().steelArmorDamageReduction.get(), "steel", cfg().steelArmorToughness.get(), List.of(Tiers.IRON), List.of(Tiers.DIAMOND), false, ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
 	
 	CRANK(cfg().crankToolAttack.get(), cfg().crankToolDurability.get(), cfg().crankToolEnchantability.get(), cfg().crankToolDurability.get(), 0d, 0, null, 0d, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE), false,
-			()->{return Ingredient.of(ItemTags.getAllTags().getTag(new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
+			()->{return Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
 	
 	MYSTIUM(cfg().mystiumToolAttack.get(), cfg().mystiumToolHarvestSpeed.get(), cfg().mystiumEnchantability.get(), cfg().mystiumDurability.get(), cfg().mystiumArmorKnockbackResistance.get(), cfg().mystiumArmorDamageReduction.get(), "mystium", cfg().mystiumArmorToughness.get(),
 			List.of(Tiers.NETHERITE), List.of(), true, ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
@@ -47,10 +46,10 @@ public enum ItemTiers {
 
 		class ItemTier implements Tier{
 
-			private final Named<Block> blockTag;
+			private final TagKey<Block> blockTag;
 			
 			public ItemTier() {
-				this.blockTag = hasTag ? BlockTags.createOptional(new ResourceLocation(AssemblyLineMachines.MODID, "needs_" + ItemTiers.this.toString().toLowerCase() + "_tool")) : null;
+				this.blockTag = hasTag ? Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_" + ItemTiers.this.toString().toLowerCase() + "_tool")) : null;
 				if(tiersAfter != null && tiersBefore != null) TierSortingRegistry.registerTier(this, new ResourceLocation(AssemblyLineMachines.MODID, ItemTiers.this.toString().toLowerCase()), tiersAfter, tiersBefore);
 			}
 			
@@ -85,7 +84,7 @@ public enum ItemTiers {
 			}
 			
 			@Override
-			public Tag<Block> getTag() {
+			public TagKey<Block> getTag() {
 				return blockTag;
 			}
 		}

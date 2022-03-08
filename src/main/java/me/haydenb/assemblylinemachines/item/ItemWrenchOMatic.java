@@ -50,9 +50,9 @@ public class ItemWrenchOMatic extends Item {
 			};
 			
 			pPlayer.displayClientMessage(new TextComponent(switch(newMode) {
-			case 1 -> "Switched to §1Interact Mode.";
-			case 2 -> "Switched to §4Wrath Mode.";
-			default -> "Switched to §2Wrench Mode.";
+			case 1 -> "Switched to Â§1Interact Mode.";
+			case 2 -> "Switched to Â§4Wrath Mode.";
+			default -> "Switched to Â§2Wrench Mode.";
 			}), true);
 			
 			compound.putInt("assemblylinemachines:wrenchmode", newMode);
@@ -90,11 +90,11 @@ public class ItemWrenchOMatic extends Item {
 			TooltipFlag pIsAdvanced) {
 		pTooltipComponents.addAll(switch(pStack.getOrCreateTag().getInt("assemblylinemachines:wrenchmode")) {
 		//Interact
-		case 1 -> List.of(new TextComponent("§1§oInteract Mode:"), new TextComponent("§7§o- Can rotate machines and other blocks."));
+		case 1 -> List.of(new TextComponent("Â§1Â§oInteract Mode:"), new TextComponent("Â§7Â§o- Can rotate machines and other blocks."));
 		//Wrath
-		case 2 -> List.of(new TextComponent("§4§oWrath Mode:"), new TextComponent("§7§o- Deals additional damage and knockback."), new TextComponent("§7§o- Can be enchanted with Engineer's Fury."));
+		case 2 -> List.of(new TextComponent("Â§4Â§oWrath Mode:"), new TextComponent("Â§7Â§o- Deals additional damage and knockback."), new TextComponent("Â§7Â§o- Can be enchanted with Engineer's Fury."));
 		//Wrench
-		default -> List.of(new TextComponent("§2§oWrench Mode:"), new TextComponent("§7§o- Can reconfigure connections on Pipes."));
+		default -> List.of(new TextComponent("Â§2Â§oWrench Mode:"), new TextComponent("Â§7Â§o- Can reconfigure connections on Pipes."));
 		});
 		super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
 	}
