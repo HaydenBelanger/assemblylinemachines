@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -14,6 +15,7 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting;
+import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.GeneratorFluidTypes;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
@@ -48,6 +50,7 @@ import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
@@ -103,34 +106,17 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		private float increasedCost = 1f;
 		private FluidStack burnTank = FluidStack.EMPTY;
 		private FluidStack coolTank = FluidStack.EMPTY;
-		public FluidGeneratorTypes type = null;
+		public Lazy<FluidGeneratorTypes> type = Lazy.of(() -> ((BlockFluidGenerator)this.getLevel().getBlockState(this.getBlockPos()).getBlock()).getType());
 		private TranslatableComponent name = null;
 		
 		private IFluidHandler fluids = new IFluidHandler() {
 			
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				if(tank == 0) {
-					
-					for(GeneratorFluidCrafting recipe : level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE)) {
-						if(recipe.matches(TEFluidGenerator.this, level) && recipe.checkBurnableFluid(stack.getFluid()) != 0) {
-							return true;
-						}
-					}
-					
-				}else if(tank == 1) {
-					
-					if(getUpgradeAmount(Upgrades.GENERATOR_COOLANT) != 0) {
-						for(GeneratorFluidCrafting recipe : level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE)) {
-							if(recipe.checkCoolantFluid(stack.getFluid()) != 0f) {
-								return true;
-							}
-						}
-					}
-					
-				}
 				
-				return false;
+				if(tank >= 2) return false;
+				Predicate<GeneratorFluidTypes> typePred = tank == 0 ? (type) -> TEFluidGenerator.this.type.get() == type.equivalentGenerator : (type) -> type == GeneratorFluidTypes.COOLANT;
+				return level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE).stream().anyMatch((recipe) -> typePred.test(recipe.fluidType) && recipe.fluid.equals(stack.getFluid()) && (recipe.powerPerUnit != 0 || recipe.coolantStrength != 0));
 			}
 			
 			@Override
@@ -253,7 +239,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 		@Override
 		public void tick() {
 			
-			if(checkGeneratorType() && !level.isClientSide) {
+			if(!level.isClientSide) {
 				
 				if(timer++ == 20) {
 					timer = 0;
@@ -279,34 +265,21 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 					
 					if(burnTimeLeft == 0) {
 						if(burnTank.getAmount() >= 1000) {
-							int burnAmt = 0;
-							List<GeneratorFluidCrafting> recipes = this.getLevel().getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE);
-							for(GeneratorFluidCrafting recipe : recipes) {
-								if(recipe.matches(this, level)) {
-									burnAmt = recipe.checkBurnableFluid(burnTank.getFluid());
-									if(burnAmt != 0) break;
-								}
-							}
-							if(burnAmt != 0) {
+							Stream<GeneratorFluidCrafting> recipes = this.getLevel().getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE).stream();
+							Optional<Integer> burnAmt = recipes.filter((recipe) -> recipe.matches(this, this.getLevel()) && recipe.fluid.equals(burnTank.getFluid())).map((recipe) -> recipe.powerPerUnit).findAny();
+							if(burnAmt.isPresent()) {
 								float cMult;
 								
 								boolean shrinkCoolant = false;
 								
-								if(getUpgradeAmount(Upgrades.GENERATOR_COOLANT) != 0) {
-									cMult = 0;
+								if(getUpgradeAmount(Upgrades.GENERATOR_COOLANT) != 0 && coolTank.getAmount() >= 1000) {
 									shrinkCoolant = true;
-									if(coolTank.getAmount() >= 1000) {
-										for(GeneratorFluidCrafting recipe : recipes) {
-											cMult = recipe.checkCoolantFluid(coolTank.getFluid());
-											if(cMult != 0f) break;
-											
-										}
-									}
+									cMult = recipes.filter((recipe) -> recipe.fluidType == GeneratorFluidTypes.COOLANT && recipe.fluid.equals(coolTank.getFluid())).map((recipe) -> recipe.coolantStrength).findAny().orElse(0f);
 								}else {
 									cMult = 1;
 								}
 								if(cMult != 0) {
-									burnTimeLeft = Math.round((float)burnAmt * cMult);
+									burnTimeLeft = Math.round((float)burnAmt.get() * cMult);
 									burnTank.shrink(1000);
 									if(shrinkCoolant) {
 										coolTank.shrink(1000);
@@ -321,7 +294,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 					
 					if(burnTimeLeft != 0) {
 						
-						int burn = Math.round(type.basefept * 20 * powerOutMult);
+						int burn = Math.round(type.get().basefept * 20 * powerOutMult);
 						
 						int cX = Math.round(burn * increasedCost);
 						
@@ -367,10 +340,10 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			if(cap == CapabilityEnergy.ENERGY) {
 				
 				if(type != null) {
-					if(type.outputSide == null) {
+					if(type.get().outputSide == null) {
 						return super.getCapability(cap);
 					}else {
-						if(side == type.outputSide.getDirection(getBlockState().getValue(HorizontalDirectionalBlock.FACING))) {
+						if(side == type.get().outputSide.getDirection(getBlockState().getValue(HorizontalDirectionalBlock.FACING))) {
 							return super.getCapability(cap);
 						}else {
 							return LazyOptional.empty();
@@ -381,10 +354,10 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 				}
 			}else if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
 				if(type != null) {
-					if(type.inputSide == null) {
+					if(type.get().inputSide == null) {
 						return fhandler.cast();
 					}else {
-						if(side == type.inputSide.getDirection(getBlockState().getValue(HorizontalDirectionalBlock.FACING))) {
+						if(side == type.get().inputSide.getDirection(getBlockState().getValue(HorizontalDirectionalBlock.FACING))) {
 							return fhandler.cast();
 						}else {
 							return LazyOptional.empty();
@@ -429,21 +402,6 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 				return true;
 			}
 			return false;
-		}
-		
-		public boolean checkGeneratorType() {
-			
-			if(type != null) {
-				return true;
-			}else {
-				
-				Block bl = this.getLevel().getBlockState(this.getBlockPos()).getBlock();
-				if(bl instanceof BlockFluidGenerator) {
-					type = ((BlockFluidGenerator) bl).getType();
-					return true;
-				}
-				return false;
-			}
 		}
 		
 		public int getUpgradeAmount(Upgrades upgrade) {
@@ -503,7 +461,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			renderFluid(tsfm.burnTank, x + 49, y + 23);
 			renderFluid(tsfm.coolTank, x + 62, y + 23);
 			
-			ResourceLocation rl = FG_BACKGROUNDS.get(tsfm.type);
+			ResourceLocation rl = FG_BACKGROUNDS.get(tsfm.type.get());
 			
 			if(rl != null) {
 				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
@@ -525,10 +483,10 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			
 			if(tsfm.burnTimeLeft != 0) {
 				
-				if(tsfm.type == FluidGeneratorTypes.GEOTHERMAL) {
+				if(tsfm.type.get() == FluidGeneratorTypes.GEOTHERMAL) {
 					blit(x+82, y+26, 176, 89, 18, 6);
 					blit(x+82, y+52, 176, 89, 18, 6);
-				}else if(tsfm.type == FluidGeneratorTypes.COMBUSTION) {
+				}else if(tsfm.type.get() == FluidGeneratorTypes.COMBUSTION) {
 					blit(x+84, y+51, 176, 89, 13, 12);
 				}
 			}

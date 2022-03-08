@@ -289,7 +289,7 @@ public class Registry {
 		createItem("quark_matter", new ItemReactorOutput("§9Medium-Quality"));
 		createItem("strange_matter", new ItemReactorOutput("§aHigh-Quality"));
 		
-		createItem("corrupt_shell_spawn_egg", new ForgeSpawnEggItem(() -> EntityCorruptShell.corruptShell, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
+		createItem("corrupt_shell_spawn_egg", new ForgeSpawnEggItem(() -> EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
 		createItem("reality_crystal");
 		createItem("galactic_flesh", new ItemGalacticFlesh());
 		
@@ -596,7 +596,7 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerEntAttributes(EntityAttributeCreationEvent event) {
 		
-		event.put(EntityCorruptShell.corruptShell, EntityCorruptShell.registerAttributeMap().build());
+		event.put(EntityCorruptShell.CORRUPT_SHELL, EntityCorruptShell.registerAttributeMap().build());
 	}
 	
 	@SubscribeEvent
@@ -793,7 +793,7 @@ public class Registry {
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public static void registerEntityRenderers(RegisterRenderers event) {
-		event.registerEntityRenderer(EntityCorruptShell.corruptShell, new EntityCorruptShellRenderFactory());
+		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
 	
 	

@@ -30,8 +30,14 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 @SuppressWarnings("removal")
 public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCategoryBuilder {
 
-	public static final RecipeType<WorldCorruptionCrafting> WORLD_CORRUPTION_RECIPE = new TypeWorldCorruptionCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<WorldCorruptionCrafting> WORLD_CORRUPTION_RECIPE = new RecipeType<WorldCorruptionCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:world_corruption";
+		}
+	};
+	
+	public static final WorldCorruptionSerializer SERIALIZER = new WorldCorruptionSerializer();
 	
 	private final Lazy<Ingredient> input;
 	private final Fluid inputFluid;
@@ -179,7 +185,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 		return this.additionalOutputs.size() != 0;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<WorldCorruptionCrafting>{
+	public static class WorldCorruptionSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<WorldCorruptionCrafting>{
 
 		@Override
 		public WorldCorruptionCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -251,12 +257,4 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 		}
 		
 	}
-	public static class TypeWorldCorruptionCrafting implements RecipeType<WorldCorruptionCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:world_corruption";
-		}
-	}
-
 }

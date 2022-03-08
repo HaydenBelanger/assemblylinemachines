@@ -143,12 +143,12 @@ public class BlockSimpleGrinder{
 							if(blade != null) {
 								GrinderCrafting crafting = this.getLevel().getRecipeManager().getRecipeFor(GrinderCrafting.GRINDER_RECIPE, this, this.getLevel()).orElse(null);
 								if(crafting != null) {
-									if(blade.tier >= crafting.getBlade().tier) {
+									if(blade.tier >= crafting.tier.tier) {
 										isb.shrink(1);
 										isb = null;
 										isa = null;
 										output = crafting.assemble(null);
-										cycles = crafting.getGrinds() * ConfigHolder.getCommonConfig().simpleGrinderCycleMultiplier.get();
+										cycles = crafting.grinds * ConfigHolder.getCommonConfig().simpleGrinderCycleMultiplier.get();
 										progress = 0;
 										pendingOutput = false;
 										sendUpdates();

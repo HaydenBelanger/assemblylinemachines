@@ -30,7 +30,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class EntityCorruptShell extends Zombie{
 
 	@ObjectHolder("assemblylinemachines:corrupt_shell")
-	public static EntityType<EntityCorruptShell> corruptShell = null;
+	public static final EntityType<EntityCorruptShell> CORRUPT_SHELL = null;
 
 	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, Level worldIn) {
 		super(type, worldIn);

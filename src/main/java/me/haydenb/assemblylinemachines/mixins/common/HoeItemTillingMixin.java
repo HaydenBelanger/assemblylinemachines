@@ -23,7 +23,7 @@ public class HoeItemTillingMixin {
 		cir.setReturnValue((context) ->{
 			if(context.getItemInHand().getItem() instanceof ItemPowerHoe tool) {
 				if(tool.canUseSecondaryAbilities(context.getItemInHand())) {
-					context.getLevel().setBlock(context.getClickedPos(), Registry.getBlock(tool.getPowerToolType().getNameOfSecondaryFarmland()).defaultBlockState(), 11);
+					context.getLevel().setBlock(context.getClickedPos(), Registry.getBlock(tool.getPowerToolType().nameOfSecondaryFarmland).defaultBlockState(), 11);
 					return;
 				}
 			}

@@ -55,11 +55,16 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 	@Override
 	public ResourceLocation getTexture() {
-		return IToolWithCharge.PowerToolType.MYSTIUM.getBorderTexturePath();
+		return IToolWithCharge.PowerToolType.MYSTIUM.borderTexturePath;
 	}
 
 	@Override
 	public int getTopColor() {
-		return IToolWithCharge.PowerToolType.MYSTIUM.getARGBBorderColor();
+		return IToolWithCharge.PowerToolType.MYSTIUM.argbBorderColor;
+	}
+	
+	@Override
+	public int getBottomColor() {
+		return IToolWithCharge.PowerToolType.MYSTIUM.getBottomARGBBorderColor().get();
 	}
 }

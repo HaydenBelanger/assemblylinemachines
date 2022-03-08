@@ -747,13 +747,13 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 						}
 						
 						List<EntropyReactorCrafting> recipes = level.getRecipeManager().getAllRecipesFor(EntropyReactorCrafting.ERO_RECIPE);
-						Collections.sort(recipes, Comparator.comparing(EntropyReactorCrafting::getVarietyReqd));
+						Collections.sort(recipes, Comparator.comparing((r) -> r.varietyReqd));
 						Collections.reverse(recipes);
 						for(EntropyReactorCrafting erc : recipes) {
 							
-							if(varietyRating >= erc.getVarietyReqd()) {
+							if(varietyRating >= erc.varietyReqd) {
 								int wastecount = 0;
-								while(this.getLevel().getRandom().nextFloat() < erc.getOdds() && wastecount < erc.getMax()) {
+								while(this.getLevel().getRandom().nextFloat() < erc.odds && wastecount < erc.max) {
 									wastecount++;
 								}
 								if(wastecount != 0) {
@@ -947,7 +947,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 						double d1 = (double)(this.getBlockPos().getY() + level.random.nextInt(3) - 1);
 						double d2 = (double)this.getBlockPos().getZ() + (level.random.nextDouble() - level.random.nextDouble()) * (double) 6 + 0.5D;
 						
-						EntityType<?> type = EntityCorruptShell.corruptShell;
+						EntityType<?> type = EntityCorruptShell.CORRUPT_SHELL;
 						for(int j = 0; j < 10; j++) {
 							
 							if(this.getLevel().noCollision(type.getAABB(d0, d1, d2)) && SpawnPlacements.checkSpawnRules(type, sw, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), this.getLevel().getRandom())) {

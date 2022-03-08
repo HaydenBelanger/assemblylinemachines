@@ -23,13 +23,21 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-	public static final RecipeType<GeneratorFluidCrafting> GENFLUID_RECIPE = new TypeGeneratorFluidCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<GeneratorFluidCrafting> GENFLUID_RECIPE = new RecipeType<GeneratorFluidCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:generator_fluid";
+		}
+	};
 	
-	private final GeneratorFluidTypes fluidType;
-	private final Fluid fluid;
-	private final int powerPerUnit;
-	private final float coolantStrength;
+	public static final GeneratorFluidSerializer SERIALIZER = new GeneratorFluidSerializer();
+	
+	public final GeneratorFluidTypes fluidType;
+	public final Fluid fluid;
+	public final int powerPerUnit;
+	public final float coolantStrength;
+	
+	
 	
 	private final ResourceLocation id;
 	
@@ -43,15 +51,8 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 	
 	@Override
 	public boolean matches(Container inv, Level level) {
-		if(inv != null && fluidType != GeneratorFluidTypes.COOLANT && inv instanceof TEFluidGenerator) {
-			TEFluidGenerator generator = (TEFluidGenerator) inv;
-			if(generator.checkGeneratorType()) {
-				return this.fluidType.equivalentGenerator.equals(generator.type);
-			}
-			return false;
-		}
-		
-		return true;
+		if(inv != null && fluidType != GeneratorFluidTypes.COOLANT && inv instanceof TEFluidGenerator generator) return this.fluidType.equivalentGenerator.equals(generator.type.get());
+		return false;
 	}
 
 	@Override
@@ -99,23 +100,7 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 		return List.of(fluidType.jeiIngredient.get());
 	}
 	
-	public int checkBurnableFluid(Fluid fluid) {
-		return fluid.equals(this.fluid) ? powerPerUnit : 0;
-	}
-	
-	public float checkCoolantFluid(Fluid fluid) {
-		return fluid.equals(this.fluid) ? coolantStrength : 0f;
-	}
-	
-	public GeneratorFluidTypes getFluidType() {
-		return fluidType;
-	}
-	
-	public Fluid getFluid() {
-		return fluid;
-	}
-	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GeneratorFluidCrafting>{
+	public static class GeneratorFluidSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GeneratorFluidCrafting>{
 
 		@Override
 		public GeneratorFluidCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -147,14 +132,6 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 		
 	}
 	
-	public static class TypeGeneratorFluidCrafting implements RecipeType<GeneratorFluidCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:generator_fluid";
-		}
-	}
-	
 	public static enum GeneratorFluidTypes{
 		GEOTHERMAL(FluidGeneratorTypes.GEOTHERMAL, Lazy.of(() -> Ingredient.of(Registry.getBlock("geothermal_generator")))), COMBUSTION(FluidGeneratorTypes.COMBUSTION, Lazy.of(() -> Ingredient.of(Registry.getBlock("combustion_generator")))),
 		COOLANT(null, Lazy.of(() ->{
@@ -165,7 +142,7 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 			return Ingredient.of(ingredients.stream());
 		}));
 		
-		private final FluidGeneratorTypes equivalentGenerator;
+		public final FluidGeneratorTypes equivalentGenerator;
 		private final Lazy<Ingredient> jeiIngredient;
 		
 		GeneratorFluidTypes(FluidGeneratorTypes equivalentGenerator, Lazy<Ingredient> jeiIngredient){

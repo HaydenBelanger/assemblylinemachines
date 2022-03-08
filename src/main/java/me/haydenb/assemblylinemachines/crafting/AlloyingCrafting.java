@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -21,8 +20,14 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<AlloyingCrafting> ALLOYING_RECIPE = new TypeAlloyingCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<AlloyingCrafting> ALLOYING_RECIPE = new RecipeType<AlloyingCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:alloying";
+		}
+	};
+	
+	public static final AlloyingSerializer SERIALIZER = new AlloyingSerializer();
 	
 	
 	private final Lazy<Ingredient> parta;
@@ -85,15 +90,6 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	
 	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(parta.get());
-		nnl.add(partb.get());
-		
-		return nnl;
-	}
-	
-	@Override
 	public List<Ingredient> getJEIItemIngredients() {
 		return List.of(parta.get(), partb.get());
 	}
@@ -108,7 +104,7 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		return true;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AlloyingCrafting>{
+	public static class AlloyingSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AlloyingCrafting>{
 
 		@Override
 		public AlloyingCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -116,8 +112,8 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 				Lazy<Ingredient> ingredienta = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a")));
 				Lazy<Ingredient> ingredientb = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b")));
 				
-				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
-				final int time = GsonHelper.getAsInt(json, "time");
+				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				int time = GsonHelper.getAsInt(json, "time");
 				
 				return new AlloyingCrafting(recipeId, ingredienta, ingredientb, output, time);
 			}catch(Exception e) {
@@ -131,10 +127,10 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 
 		@Override
 		public AlloyingCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			final Ingredient inputa = Ingredient.fromNetwork(buffer);
-			final Ingredient inputb = Ingredient.fromNetwork(buffer);
-			final ItemStack output = buffer.readItem();
-			final int time = buffer.readInt();
+			Ingredient inputa = Ingredient.fromNetwork(buffer);
+			Ingredient inputb = Ingredient.fromNetwork(buffer);
+			ItemStack output = buffer.readItem();
+			int time = buffer.readInt();
 			
 			return new AlloyingCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, time);
 		}
@@ -149,14 +145,4 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 		
 	}
-	
-	public static class TypeAlloyingCrafting implements RecipeType<AlloyingCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:alloying";
-		}
-	}
-
-	
 }

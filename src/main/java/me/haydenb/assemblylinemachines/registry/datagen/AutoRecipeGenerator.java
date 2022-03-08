@@ -489,9 +489,9 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			if(machineRequired) json.addProperty("machine_required", true);
 			
 			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("name", super.outputTag.location().toString());
+			outputJson.addProperty("tag", super.outputTag.location().toString());
 			if(super.outputCount != 1) outputJson.addProperty("count", super.outputCount);
-			json.add("output_tag", outputJson);
+			json.add("output", outputJson);
 		}
 		
 	}

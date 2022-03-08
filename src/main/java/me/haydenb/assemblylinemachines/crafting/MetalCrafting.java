@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -21,12 +20,18 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<MetalCrafting> METAL_RECIPE = new TypeMetalCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<MetalCrafting> METAL_RECIPE = new RecipeType<MetalCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:metal";
+		}
+	};
+	
+	public static final MetalSerializer SERIALIZER = new MetalSerializer();
 	
 	private final Lazy<Ingredient> input;
 	private final ItemStack output;
-	private final int time;
+	public final int time;
 	private final ResourceLocation id;
 	
 	public MetalCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack outputa, int time) {
@@ -59,20 +64,9 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		return output;
 	}
 	
-	public int getTime() {
-		return time;
-	}
-	
 	@Override
 	public boolean isSpecial() {
 		return true;
-	}
-	
-	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(input.get());
-		return nnl;
 	}
 	
 	@Override
@@ -100,15 +94,15 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		return METAL_RECIPE;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<MetalCrafting>{
+	public static class MetalSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<MetalCrafting>{
 
 		@Override
 		public MetalCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
 				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
-				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				
-				final int time = GsonHelper.getAsInt(json, "time");
+				int time = GsonHelper.getAsInt(json, "time");
 				
 				return new MetalCrafting(recipeId, input, output, time);
 			}catch(Exception e) {
@@ -122,9 +116,9 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 		@Override
 		public MetalCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			final Ingredient input = Ingredient.fromNetwork(buffer);
-			final ItemStack output = buffer.readItem();
-			final int time = buffer.readInt();
+			Ingredient input = Ingredient.fromNetwork(buffer);
+			ItemStack output = buffer.readItem();
+			int time = buffer.readInt();
 			
 			return new MetalCrafting(recipeId, Lazy.of(() -> input), output, time);
 		}
@@ -138,14 +132,4 @@ public class MetalCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		}
 		
 	}
-	
-	public static class TypeMetalCrafting implements RecipeType<MetalCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:metal";
-		}
-	}
-
-	
 }

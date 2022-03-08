@@ -13,6 +13,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
@@ -35,6 +36,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -42,8 +44,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.*;
@@ -128,7 +129,7 @@ public class Utils {
 	 * Supplier comes pre-memoized.
 	 */
 	@SuppressWarnings("deprecation")
-	public static Lazy<ItemStack> getPreferredOrAlphabeticSupplier(TagKey<Item> tag, int count){
+	public static Lazy<ItemStack> getPreferredOrAlphabeticTagItemStack(TagKey<Item> tag, int count){
 		return Lazy.of(() -> {
 			try {
 				Item preferredResult = CACHED_SORTED_TAGS.get(tag.location().toString(), () ->{
@@ -150,6 +151,18 @@ public class Utils {
 				return null;
 			}
 		});
+	}
+	
+	public static Optional<Lazy<ItemStack>> getTaggedOutputFromJson(JsonObject json){
+		if(GsonHelper.isValidNode(json, "item")) {
+			return Optional.of(Lazy.of(() -> ShapedRecipe.itemStackFromJson(json)));
+		}else if(GsonHelper.isValidNode(json, "tag")) {
+			TagKey<Item> tag = Utils.getTagKey(Keys.ITEMS, new ResourceLocation(GsonHelper.getAsString(json, "tag")));
+			int outputCount = GsonHelper.isValidNode(json, "count") ? GsonHelper.getAsInt(json, "count") : 1;
+			return Optional.of(getPreferredOrAlphabeticTagItemStack(tag, outputCount));
+		}else {
+			return Optional.empty();
+		}
 	}
 
 	public static class PhasedMap<K, V> extends ConcurrentHashMap<K, V>{

@@ -162,11 +162,11 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 								if(recipe != null) {
 									Blade blade = Blade.getBladeFromItem(entity.blade.getItem());
 									if(blade != null) {
-										if(recipe.getBlade().tier <= blade.tier) {
+										if(recipe.tier.tier <= blade.tier) {
 											
 											bladeBroke = Blade.damageBlade(entity.blade);
 											entity.input = held.copy();
-											entity.value = recipe.getGrinds() - 1;
+											entity.value = recipe.grinds - 1;
 											entity.output = recipe.assemble(null);
 										}else {
 											player.displayClientMessage(new TextComponent("You need a better blade to use this recipe."), true);

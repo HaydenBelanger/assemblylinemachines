@@ -31,7 +31,11 @@ The Ingredient type is used primarily for inputs on recipes. It allows the setti
 
 ## ItemStack
 
-The ItemStack type is used primarily for outputs from recipes. This cannot use a tag as it needs to output an exact item, but it allows for specification of a count, so that multiple can be given.
+The ItemStack type is used primarily for outputs from recipes, and can always contain a count.
+
+### Traditional ItemStack
+
+The Traditional ItemStack uses an exact item for the specified output.
 
 ``` json
 "output":{

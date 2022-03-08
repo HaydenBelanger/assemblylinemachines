@@ -27,8 +27,14 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBuilder {
 
-	public static final RecipeType<UpgradeKitCrafting> UPGRADING_RECIPE = new TypeUpgradeKitCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<UpgradeKitCrafting> UPGRADING_RECIPE = new RecipeType<UpgradeKitCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:upgrade_kit";
+		}
+	};
+	
+	public static final UpgradeKitSerializer SERIALIZER = new UpgradeKitSerializer();
 	
 	private final Ingredient inputBlock;
 	private final UpgradeKit inputUpgradeKit;
@@ -124,7 +130,7 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 		return false;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<UpgradeKitCrafting>{
+	public static class UpgradeKitSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<UpgradeKitCrafting>{
 		
 		@Override
 		public UpgradeKitCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -168,14 +174,6 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 		
 		UpgradeKit(Item item){
 			this.item = item;
-		}
-	}
-	
-	public static class TypeUpgradeKitCrafting implements RecipeType<UpgradeKitCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:upgrade_kit";
 		}
 	}
 }

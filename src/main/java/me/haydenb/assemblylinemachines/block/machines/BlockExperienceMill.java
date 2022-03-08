@@ -1,8 +1,7 @@
 package me.haydenb.assemblylinemachines.block.machines;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -33,8 +32,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -72,11 +70,11 @@ public class BlockExperienceMill {
 		//2 - Book
 		//3 - Anvil
 		private int timer = 0;
-		private FluidStack tank = FluidStack.EMPTY;
+		public FluidStack tank = FluidStack.EMPTY;
 		private IFluidHandler handler = new ExperienceMillFluidHandler();
 		private LazyOptional<IFluidHandler> lazy = LazyOptional.of(() -> handler);
 		private float progress = 0;
-		private float cycles = 0;
+		public float cycles = 0;
 		private AnvilMenu anvilMenu = null;
 		private ItemStack output = null;
 		private WeakReference<FakePlayer> anvilFp = null;
@@ -168,52 +166,10 @@ public class BlockExperienceMill {
 
 						}else if(mode == 2) {
 
-							EnchantmentBookCrafting recipe = this.getLevel().getRecipeManager().getRecipeFor(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, this, this.getLevel()).orElse(null);
-							if(recipe != null) {
-								int cx = recipe.getCost();
-								int cycles = Math.round((float) cx / 10f);
-								switch(getUpgradeAmount(Upgrades.UNIVERSAL_SPEED)) {
-								case 3:
-									cx = Math.round((float) cx * 1.3f);
-									cycles = Math.round(cycles * 0.25f);
-									break;
-								case 2:
-									cx = Math.round((float) cx * 1.2f);
-									cycles = Math.round(cycles * 0.5f);
-									break;
-								case 1:
-									cx = Math.round((float) cx * 1.1f);
-									cycles = Math.round(cycles * 0.75f);
-									break;
-								}
-
-								Pair<ItemStack, Integer> output = recipe.getLeveledBookCraftingResult(this);
-
-								cx *= output.getSecond();
-								cycles *= output.getSecond();
-
-								if(tank.getAmount() >= cx) {
-
-									int shrink = -1;
-									int bookShrink = -1;
-									int shrAmt = recipe.getAmount() * output.getSecond();
-									if(contents.get(1).getItem() == Items.BOOK && contents.get(2).getCount() >= shrAmt) {
-										shrink = 2;
-										bookShrink = 1;
-									}else if(contents.get(2).getItem() == Items.BOOK && contents.get(1).getCount() >= shrAmt) {
-										shrink = 1;
-										bookShrink = 2;
-									}
-
-									if(shrink != -1) {
-										tank.shrink(cx);
-										this.cycles = cycles;
-										contents.get(shrink).shrink(shrAmt);
-										contents.get(bookShrink).shrink(1);
-										this.output = output.getFirst();
-										sendUpdates = true;
-									}
-								}
+							Optional<ItemStack> optional = this.getLevel().getRecipeManager().getRecipeFor(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, this, this.getLevel()).map((recipe) -> recipe.assemble(this));
+							if(optional.isPresent()) {
+								this.output = optional.get();
+								sendUpdates = true;
 							}
 						}else {
 							if(anvilMenu == null) {

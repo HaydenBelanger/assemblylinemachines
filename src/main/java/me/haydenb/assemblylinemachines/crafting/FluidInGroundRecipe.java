@@ -26,15 +26,21 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<FluidInGroundRecipe> FIG_RECIPE = new TypeFluidInGroundRecipe();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<FluidInGroundRecipe> FIG_RECIPE = new RecipeType<FluidInGroundRecipe>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:fluid_in_ground";
+		}
+	};
+	
+	public static final FluidInGroundSerializer SERIALIZER = new FluidInGroundSerializer();
 	
 	private final Fluid fluid;
 	private final ResourceLocation id;
-	private int odds;
+	public int odds;
 	private int minAmount;
 	private int maxAmount;
-	private FluidInGroundCriteria figc;
+	public FluidInGroundCriteria criteria;
 	
 	public FluidInGroundRecipe(ResourceLocation id, Fluid fluid, int odds, int minAmount, int maxAmount, FluidInGroundCriteria figc) {
 		
@@ -43,7 +49,7 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		this.odds = odds;
 		this.minAmount = minAmount;
 		this.maxAmount = maxAmount;
-		this.figc = figc;
+		this.criteria = figc;
 	}
 	
 	
@@ -93,26 +99,6 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		return List.of(new FluidStack(fluid, 1000));
 	}
 	
-	public int getChance() {
-		return odds;
-	}
-	
-	public FluidInGroundCriteria getCriteria() {
-		return figc;
-	}
-	
-	public int getMinimum() {
-		return minAmount;
-	}
-	
-	public int getMaximum() {
-		return maxAmount;
-	}
-	
-	public Fluid getFluid() {
-		return fluid;
-	}
-	
 	public static FluidStack assemble(ChunkPos pos, Level world) {
 		List<FluidInGroundRecipe> recipes = world.getRecipeManager().getAllRecipesFor(FluidInGroundRecipe.FIG_RECIPE);
 		
@@ -124,27 +110,23 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 			boolean canProcess = false;
 			boolean notPreferredBiome = false;
 			
-			switch(recipe.getCriteria()) {
+			switch(recipe.criteria) {
 			case END:
 				if(currentDim.equals(DimensionType.END_LOCATION.location())) canProcess = true;
 				break;
 			case NETHER:
 				if(currentDim.equals(DimensionType.NETHER_LOCATION.location())) canProcess = true;
 				break;
-			case OVERWORLD_ANY:
-			case OVERWORLD_ONLYCOLD:
-			case OVERWORLD_ONLYHOT:
-			case OVERWORLD_PREFCOLD:
-			case OVERWORLD_PREFHOT:
-				Pair<Boolean, Boolean> pair = getAllowanceForOverworld(recipe.getCriteria(), currentDim, tc);
+			case OVERWORLD_ANY, OVERWORLD_ONLYCOLD, OVERWORLD_ONLYHOT, OVERWORLD_PREFCOLD, OVERWORLD_PREFHOT:
+				Pair<Boolean, Boolean> pair = getAllowanceForOverworld(recipe.criteria, currentDim, tc);
 				if(pair.getFirst()) canProcess = true;
 				if(pair.getSecond()) notPreferredBiome = true;
 			}
 			if(canProcess) {
-				if (world.getRandom().nextInt(100) <= recipe.getChance()) {
-					int amt = (recipe.getMinimum() + world.getRandom().nextInt(recipe.getMaximum() - recipe.getMinimum())) * 10000;
+				if (world.getRandom().nextInt(100) <= recipe.odds) {
+					int amt = (recipe.minAmount + world.getRandom().nextInt(recipe.maxAmount - recipe.minAmount)) * 10000;
 					if (notPreferredBiome) amt = Math.round((float) amt / 2f);
-					return new FluidStack(recipe.getFluid(), amt);
+					return new FluidStack(recipe.fluid, amt);
 				}
 			}
 		}
@@ -177,7 +159,7 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		return Pair.of(true, false);
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<FluidInGroundRecipe>{
+	public static class FluidInGroundSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<FluidInGroundRecipe>{
 
 		@Override
 		public FluidInGroundRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -217,20 +199,11 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, FluidInGroundRecipe recipe) {
-			buffer.writeResourceLocation(recipe.getFluid().getRegistryName());
-			buffer.writeInt(recipe.getChance());
-			buffer.writeInt(recipe.getMinimum());
-			buffer.writeInt(recipe.getMaximum());
-			buffer.writeEnum(recipe.getCriteria());
-		}
-		
-	}
-	
-	public static class TypeFluidInGroundRecipe implements RecipeType<FluidInGroundRecipe>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:fluid_in_ground";
+			buffer.writeResourceLocation(recipe.fluid.getRegistryName());
+			buffer.writeInt(recipe.odds);
+			buffer.writeInt(recipe.minAmount);
+			buffer.writeInt(recipe.maxAmount);
+			buffer.writeEnum(recipe.criteria);
 		}
 		
 	}

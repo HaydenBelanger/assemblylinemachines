@@ -68,8 +68,8 @@ public class JEICategoryRegistry implements IModPlugin{
 						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
 							if(pP1 instanceof LumberCrafting) {
 								LumberCrafting recipe = (LumberCrafting) pP1;
-								if(!recipe.getSecondaryOutput().isEmpty() && pP2.is(recipe.getSecondaryOutput().getItem())){
-									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.getOutputChance() * 100f)) + " Chance"));
+								if(!recipe.outputb.isEmpty() && pP2.is(recipe.outputb.getItem())){
+									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.opbchance * 100f)) + " Chance"));
 								}
 							}
 							return null;
@@ -88,8 +88,8 @@ public class JEICategoryRegistry implements IModPlugin{
 						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
 							if(pP1 instanceof GrinderCrafting) {
 								GrinderCrafting recipe = (GrinderCrafting) pP1;
-								if(recipe.getChanceToDouble() != 0 && pP2.getCount() == recipe.getResultItem().getCount() * 2) {
-									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.getChanceToDouble() * 100f)) + " Chance"));
+								if(recipe.chanceToDouble != 0 && pP2.getCount() == recipe.getResultItem().getCount() * 2) {
+									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.chanceToDouble * 100f)) + " Chance"));
 								}
 							}
 							return null;
@@ -130,8 +130,8 @@ public class JEICategoryRegistry implements IModPlugin{
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
 							if(k instanceof GeneratorFluidCrafting) {
 								GeneratorFluidCrafting recipe = (GeneratorFluidCrafting) k;
-								TextComponent l1 = recipe.getFluidType() == GeneratorFluidTypes.COOLANT ? new TextComponent("Coolant") : new TextComponent("Fuel");
-								TextComponent l2 = recipe.getFluidType() == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.checkCoolantFluid(recipe.getFluid())) + "x") : new TextComponent(Formatting.formatToSuffix(recipe.checkBurnableFluid(recipe.getFluid())) + " FE");
+								TextComponent l1 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent("Coolant") : new TextComponent("Fuel");
+								TextComponent l2 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.coolantStrength) + "x") : new TextComponent(Formatting.formatToSuffix(recipe.powerPerUnit) + " FE");
 								Utils.drawCenteredStringWithoutShadow(v, l1, 64, 6);
 								Utils.drawCenteredStringWithoutShadow(v, l2, 64, 15);
 							}
@@ -146,7 +146,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(pP1 instanceof EntropyReactorCrafting) {
 								EntropyReactorCrafting recipe = (EntropyReactorCrafting) pP1;
 								if(recipe.getResultItem().is(pP2.getItem())) {
-									String text = recipe.getVarietyReqd() < 0.01f ? "§5Any Variety" :  "§5 > " + String.format("%.0f%%", (recipe.getVarietyReqd() * 100f)) + " Variety";
+									String text = recipe.varietyReqd < 0.01f ? "§5Any Variety" :  "§5 > " + String.format("%.0f%%", (recipe.varietyReqd * 100f)) + " Variety";
 									return List.of(new TextComponent(text));
 								}
 							}
@@ -180,10 +180,10 @@ public class JEICategoryRegistry implements IModPlugin{
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
 							if(k instanceof FluidInGroundRecipe) {
 								FluidInGroundRecipe recipe = (FluidInGroundRecipe) k;
-								IDrawable drawable = drawables.get(recipe.getCriteria());
+								IDrawable drawable = drawables.get(recipe.criteria);
 								if(drawable == null) {
-									drawable = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_pre2022"), recipe.getCriteria().getJeiBlitX(), recipe.getCriteria().getJeiBlitY(), 34, 34).build();
-									drawables.put(recipe.getCriteria(), drawable);
+									drawable = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_pre2022"), recipe.criteria.getJeiBlitX(), recipe.criteria.getJeiBlitY(), 34, 34).build();
+									drawables.put(recipe.criteria, drawable);
 								}
 								drawable.draw(v, 1, 42);
 							}
@@ -193,7 +193,7 @@ public class JEICategoryRegistry implements IModPlugin{
 						public List<Component> apply(Recipe<?> pP1, FluidStack pP2, TooltipFlag pP3) {
 							if(pP1 instanceof FluidInGroundRecipe) {
 								FluidInGroundRecipe recipe = (FluidInGroundRecipe) pP1;
-								return recipe.getCriteria().getTooltip(recipe.getChance());
+								return recipe.criteria.getTooltip(recipe.odds);
 							}
 							return null;
 						}
@@ -212,7 +212,7 @@ public class JEICategoryRegistry implements IModPlugin{
 							if(t instanceof EnchantmentBookCrafting && result.size() > 0) {
 								EnchantmentBookCrafting recipe = (EnchantmentBookCrafting) t;
 								for(ItemStack item : result.get(0)) {
-									item.setCount(recipe.getAmount());
+									item.setCount(recipe.amount);
 								}
 							}
 							return result;

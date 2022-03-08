@@ -475,7 +475,7 @@ public class BlockMachines {
 				}).duplicateCheckingGroup(List.of(1, 2, 3)).mustBeFullBefore((i) -> i == 1 || i == 2 ? List.of(3) : null)
 				.slotContentsValidator((slot, is, be) -> {
 					if(slot != 3) return true;
-					return be.getLevel().getRecipeManager().getAllRecipesFor(PurifierCrafting.PURIFIER_RECIPE).stream().anyMatch((rcp) -> rcp.isPrimaryIngredient(is));
+					return be.getLevel().getRecipeManager().getAllRecipesFor(PurifierCrafting.PURIFIER_RECIPE).stream().anyMatch((rcp) -> rcp.tobepurified.get().test(is));
 				}).build("electric_purifier");
 	}
 	
@@ -525,7 +525,7 @@ public class BlockMachines {
 		}).slotExtractableFunction((slot) -> slot < 2).duplicateCheckingGroups(List.of(List.of(2, 4, 5), List.of(3, 4, 5)))
 		.mustBeFullBefore((i) -> i == 4 || i == 5 ? List.of(2, 3) : null).slotContentsValidator((slot, is, be) -> {
 			if(slot != 2 && slot != 3) return true;
-			return be.getLevel().getRecipeManager().getAllRecipesFor(PurifierCrafting.PURIFIER_RECIPE).stream().anyMatch((rcp) -> rcp.isPrimaryIngredient(is));
+			return be.getLevel().getRecipeManager().getAllRecipesFor(PurifierCrafting.PURIFIER_RECIPE).stream().anyMatch((rcp) -> rcp.tobepurified.get().test(is));
 		}).build("mkii_purifier");
 	}
 	

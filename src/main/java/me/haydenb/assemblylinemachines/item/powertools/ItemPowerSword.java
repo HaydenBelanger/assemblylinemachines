@@ -69,14 +69,14 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 	
 	@Override
 	public boolean isBarVisible(ItemStack stack) {
-		if(!stack.hasTag() || stack.getTag().getInt(ptt.getKeyName()) == 0) return super.isBarVisible(stack);
-		return stack.getTag().getInt(ptt.getKeyName()) != this.getMaxPower(stack);
+		if(!stack.hasTag() || stack.getTag().getInt(ptt.keyName) == 0) return super.isBarVisible(stack);
+		return stack.getTag().getInt(ptt.keyName) != this.getMaxPower(stack);
 	}
 	
 	@Override
 	public int getBarColor(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		int dmg = compound.getInt(ptt.getKeyName());
+		int dmg = compound.getInt(ptt.keyName);
 		if(dmg == 0) {
 			return super.getBarColor(stack);
 		}else {
@@ -89,18 +89,18 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 	@Override
 	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
-		int dmg = compound.getInt(ptt.getKeyName());
+		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
 	
 	@Override
 	public ResourceLocation getTexture() {
-		return ptt.getBorderTexturePath();
+		return ptt.borderTexturePath;
 	}
 
 	@Override
 	public int getTopColor() {
-		return ptt.getARGBBorderColor();
+		return ptt.argbBorderColor;
 	}
 	
 	@Override
@@ -120,7 +120,7 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 			ItemStack stack = spe.getMainHandItem();
 			
 			if(ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null && stack.getItem() instanceof ItemPowerSword chargeTool) {
-				if(spe.getLevel().getRandom().nextFloat() <= chargeTool.getPowerToolType().getChanceToDropMobCrystal() && chargeTool.canUseSecondaryAbilities(stack)) {
+				if(spe.getLevel().getRandom().nextFloat() <= chargeTool.getPowerToolType().chanceToDropMobCrystal && chargeTool.canUseSecondaryAbilities(stack)) {
 					ItemStack inert = null;
 					for(int i = 0; i < spe.getInventory().getContainerSize(); i++) {
 						ItemStack sis = spe.getInventory().getItem(i);

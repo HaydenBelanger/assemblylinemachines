@@ -40,8 +40,14 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<RefiningCrafting> REFINING_RECIPE = new TypeRefiningCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<RefiningCrafting> REFINING_RECIPE = new RecipeType<RefiningCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:refining";
+		}
+	};
+	
+	public static final RefiningSerializer SERIALIZER = new RefiningSerializer();
 	private static final List<Pair<Integer, Integer>> SLOTS = List.of(Pair.of(0, 0), Pair.of(0, 23), Pair.of(34, 0), Pair.of(54, 0), Pair.of(24, 23), Pair.of(44, 23), Pair.of(64, 23));
 	
 	private final Cache<Integer, List<?>> streamCache = CacheBuilder.newBuilder().build();
@@ -75,8 +81,7 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			
 			return true;
 		}
-		return true;
-		
+		return false;
 	}
 	
 	public void performOperations(TERefinery refinery) {
@@ -288,7 +293,7 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<RefiningCrafting>{
+	public static class RefiningSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<RefiningCrafting>{
 
 		@Override
 		public RefiningCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -350,15 +355,7 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 		
 	}
-	
-	public static class TypeRefiningCrafting implements RecipeType<RefiningCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:refining";
-		}
-	}
-	
+
 	public static class RefineryIO{
 		
 		private final Lazy<Ingredient> input;

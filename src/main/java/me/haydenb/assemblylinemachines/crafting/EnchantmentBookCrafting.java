@@ -1,15 +1,15 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import com.google.common.cache.*;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockExperienceMill.TEExperienceMill;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -26,15 +26,28 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<EnchantmentBookCrafting> ENCHANTMENT_BOOK_RECIPE = new TypeEnchantmentBookCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<EnchantmentBookCrafting> ENCHANTMENT_BOOK_RECIPE = new RecipeType<EnchantmentBookCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:enchantment_book";
+		}
+	};
+	
+	public static final EnchantmentBookSerializer SERIALIZER = new EnchantmentBookSerializer();
 	private static final Ingredient BOOK = Ingredient.of(Items.BOOK);
 	
 	private final Lazy<Ingredient> input;
 	private final Enchantment enchantment;
 	private final int cost;
-	private final int amount;
+	public final int amount;
 	private final ResourceLocation id;
+	
+	private final LoadingCache<Integer, ItemStack> bookCache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, ItemStack>(){
+		@Override
+		public ItemStack load(Integer key) throws Exception {
+			return EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, key));
+		}
+	});
 	
 	public EnchantmentBookCrafting(ResourceLocation id, Lazy<Ingredient> input, Enchantment enchantment, int cost, int amount) {
 		this.input = input;
@@ -45,26 +58,21 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(inv != null) {
-			if(inv instanceof TEExperienceMill) {
-				
-				if(input.get().test(inv.getItem(1))) {
-					if(BOOK.test(inv.getItem(2))) {
-						return true;
-					}
-				}
-				
-				if(input.get().test(inv.getItem(2))) {
-					if(BOOK.test(inv.getItem(1))) {
-						return true;
-					}
+		if(inv instanceof TEExperienceMill) {
+			
+			if(input.get().test(inv.getItem(1))) {
+				if(BOOK.test(inv.getItem(2))) {
+					return true;
 				}
 			}
-			return false;
-		}else {
-			return true;
+			
+			if(input.get().test(inv.getItem(2))) {
+				if(BOOK.test(inv.getItem(1))) {
+					return true;
+				}
+			}
 		}
-		
+		return false;
 	}
 	
 	@Override
@@ -74,25 +82,36 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	
 	@Override
 	public ItemStack assemble(Container inv) {
-		
-		return getResultItem();
-	}
-	
-	public Pair<ItemStack, Integer> getLeveledBookCraftingResult(TEExperienceMill te){
-		int mx = 1;
-		switch(te.getUpgradeAmount(Upgrades.EXP_MILL_LEVEL)) {
-		case 3:
-			mx = enchantment.getMaxLevel();
-			break;
-		case 2:
-			mx = (int) Math.ceil((double) enchantment.getMaxLevel() / 2d);
-			break;
-		case 1:
-			mx = (int) Math.ceil((double) enchantment.getMaxLevel() / 3d);
-			break;
+		int level = 1;
+		if(inv instanceof TEExperienceMill te) {
+			level = switch(te.getUpgradeAmount(Upgrades.EXP_MILL_LEVEL)) {
+			case 3 -> enchantment.getMaxLevel();
+			case 2 -> (int) Math.ceil((double) enchantment.getMaxLevel() / 2d);
+			case 1 -> (int) Math.ceil((double) enchantment.getMaxLevel() / 3d);
+			default -> 1;
+			};
+			
+			float spUp = te.getUpgradeAmount(Upgrades.UNIVERSAL_SPEED);
+			int cost = Math.round(this.cost * (1f + (0.1f * spUp))) * level;
+			int cycles = spUp != 0f ? Math.round(((float) this.cost * (0.75f / spUp)) / 10f) * level : Math.round((float) this.cost / 10f) * level;
+			
+			if(te.tank.getAmount() < cost) return ItemStack.EMPTY;
+			
+			int bookSlot = inv.getItem(1).getItem() == Items.BOOK ? 1 : 2;
+			int catalystSlot = bookSlot == 2 ? 1 : 2;
+			if(inv.getItem(catalystSlot).getCount() < this.amount * level) return ItemStack.EMPTY;
+			
+			te.tank.shrink(cost);
+			inv.getItem(bookSlot).shrink(1);
+			inv.getItem(catalystSlot).shrink(this.amount * level);
+			te.cycles = cycles;
 		}
-		
-		return Pair.of(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, mx)), mx);
+		try {
+			return bookCache.get(level).copy();
+		}catch(ExecutionException e) {
+			e.printStackTrace();
+			return ItemStack.EMPTY;
+		}
 	}
 
 	@Override
@@ -102,8 +121,12 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 
 	@Override
 	public ItemStack getResultItem() {
-		
-		return EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, 1));
+		try {
+			return bookCache.get(1);
+		}catch(ExecutionException e) {
+			e.printStackTrace();
+			return ItemStack.EMPTY;
+		}
 	}
 
 	@Override
@@ -114,15 +137,6 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
-	}
-	
-	
-	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(BOOK);
-		nnl.add(input.get());
-		return nnl;
 	}
 	
 	@Override
@@ -140,15 +154,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		return ENCHANTMENT_BOOK_RECIPE;
 	}
 	
-	public int getCost() {
-		return cost;
-	}
-	
-	public int getAmount() {
-		return amount;
-	}
-	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<EnchantmentBookCrafting>{
+	public static class EnchantmentBookSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<EnchantmentBookCrafting>{
 
 		@Override
 		public EnchantmentBookCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -179,10 +185,10 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 
 		@Override
 		public EnchantmentBookCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			final Ingredient input = Ingredient.fromNetwork(buffer);
-			final Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(buffer.readResourceLocation());
-			final int cost = buffer.readInt();
-			final int amount = buffer.readInt();
+			Ingredient input = Ingredient.fromNetwork(buffer);
+			Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(buffer.readResourceLocation());
+			int cost = buffer.readInt();
+			int amount = buffer.readInt();
 			
 			return new EnchantmentBookCrafting(recipeId, Lazy.of(() -> input), enchantment, cost, amount);
 		}
@@ -196,14 +202,4 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		}
 		
 	}
-	
-	public static class TypeEnchantmentBookCrafting implements RecipeType<EnchantmentBookCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:enchantment_book";
-		}
-	}
-
-	
 }

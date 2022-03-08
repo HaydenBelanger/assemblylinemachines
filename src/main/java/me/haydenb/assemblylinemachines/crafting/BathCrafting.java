@@ -1,11 +1,9 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -16,7 +14,6 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -35,11 +32,17 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<BathCrafting> BATH_RECIPE = new TypeBathCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<BathCrafting> BATH_RECIPE = new RecipeType<BathCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:bath";
+		}
+	};
+	
+	public static final BathSerializer SERIALIZER = new BathSerializer();
 	
 	private static final Random RAND = new Random();
-	private static final Supplier<List<Item>> ILLEGAL_RECIPE_ITEMS = Suppliers.memoize(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
+	private static final Lazy<List<Item>> ILLEGAL_RECIPE_ITEMS = Lazy.of(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
 			Registry.getItem("steel_stirring_stick")).stream(), BlockFluidBath.VALID_FILL_ITEMS.stream()).collect(Collectors.toList()));
 	
 	private final Lazy<Ingredient> inputa;
@@ -178,14 +181,6 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	}
 	
 	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(inputa.get());
-		nnl.add(inputb.get());
-		return nnl;
-	}
-	
-	@Override
 	public List<Ingredient> getJEIItemIngredients() {
 		ArrayList<ItemLike> items = new ArrayList<>();
 		switch(this.type) {
@@ -213,8 +208,6 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		return List.of(output);
 	}
 	
-	
-	
 	public BathCraftingFluids getFluid() {
 		return fluid;
 	}
@@ -231,7 +224,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		return percent;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<BathCrafting>{
+	public static class BathSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<BathCrafting>{
 
 		@Override
 		public BathCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -248,22 +241,22 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 					return i;
 				});
 				
-				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
-				final int stirs = GsonHelper.getAsInt(json, "stirs");
-				final BathCraftingFluids fluid = BathCraftingFluids.valueOf(GsonHelper.getAsString(json, "fluid").toUpperCase());
+				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				int stirs = GsonHelper.getAsInt(json, "stirs");
+				BathCraftingFluids fluid = BathCraftingFluids.valueOf(GsonHelper.getAsString(json, "fluid").toUpperCase());
 				if(fluid == BathCraftingFluids.NONE) {
 					throw new IllegalArgumentException("Fluid cannot be 'NONE'.");
 				}
 				
-				final int color = Integer.parseInt(GsonHelper.getAsString(json, "mix_color").replace("#", ""), 16);
-				final BathOption machineReqd;
+				int color = Integer.parseInt(GsonHelper.getAsString(json, "mix_color").replace("#", ""), 16);
+				BathOption machineReqd;
 				if(GsonHelper.isValidNode(json, "mixer_type")) {
 					machineReqd = BathOption.valueOf(GsonHelper.getAsString(json, "mixer_type").toUpperCase());
 				}else {
 					machineReqd = BathOption.ALL;
 				}
 				
-				final BathPercentage percent;
+				BathPercentage percent;
 				
 				if(GsonHelper.isValidNode(json, "drain_percent")) {
 					percent = BathPercentage.valueOf(GsonHelper.getAsString(json, "drain_percent").toUpperCase());
@@ -283,14 +276,14 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 		@Override
 		public BathCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			final Ingredient inputa = Ingredient.fromNetwork(buffer);
-			final Ingredient inputb = Ingredient.fromNetwork(buffer);
-			final ItemStack output = buffer.readItem();
-			final int stirs = buffer.readInt();
-			final BathCraftingFluids fluid = buffer.readEnum(BathCraftingFluids.class);
-			final int color = buffer.readInt();
-			final BathOption machineReqd = buffer.readEnum(BathOption.class);
-			final BathPercentage percent = buffer.readEnum(BathPercentage.class);
+			Ingredient inputa = Ingredient.fromNetwork(buffer);
+			Ingredient inputb = Ingredient.fromNetwork(buffer);
+			ItemStack output = buffer.readItem();
+			int stirs = buffer.readInt();
+			BathCraftingFluids fluid = buffer.readEnum(BathCraftingFluids.class);
+			int color = buffer.readInt();
+			BathOption machineReqd = buffer.readEnum(BathOption.class);
+			BathPercentage percent = buffer.readEnum(BathPercentage.class);
 			
 			return new BathCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, stirs, fluid, color, machineReqd, percent);
 		}
@@ -306,15 +299,6 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			buffer.writeEnum(recipe.type);
 			buffer.writeEnum(recipe.percent);
 			
-		}
-		
-	}
-	
-	public static class TypeBathCrafting implements RecipeType<BathCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:bath";
 		}
 		
 	}

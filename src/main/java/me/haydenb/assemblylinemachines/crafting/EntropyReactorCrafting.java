@@ -19,13 +19,19 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<EntropyReactorCrafting> ERO_RECIPE = new TypeEntropyReactorCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<EntropyReactorCrafting> ERO_RECIPE = new RecipeType<EntropyReactorCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:entropy_reactor";
+		}
+	};
+	
+	public static final EntropyReactorSerializer SERIALIZER = new EntropyReactorSerializer();
 	
 	private final ItemStack output;
-	private final float odds;
-	private final float varietyReqd;
-	private final int max;
+	public final float odds;
+	public final float varietyReqd;
+	public final int max;
 	private final ResourceLocation id;
 	
 	public EntropyReactorCrafting(ResourceLocation id, ItemStack output, float odds, int max, float varietyReqd) {
@@ -85,24 +91,12 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 		return ERO_RECIPE;
 	}
 	
-	public float getOdds() {
-		return odds;
-	}
-	
-	public float getVarietyReqd() {
-		return varietyReqd;
-	}
-	
-	public int getMax() {
-		return max;
-	}
-	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<EntropyReactorCrafting>{
+	public static class EntropyReactorSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<EntropyReactorCrafting>{
 
 		@Override
 		public EntropyReactorCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				float odds = GsonHelper.getAsFloat(json, "odds");
 				float varietyReqd = GsonHelper.getAsFloat(json, "varietyReqd");
 				if(odds < 0f || odds > 1f) {
@@ -128,7 +122,7 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 
 		@Override
 		public EntropyReactorCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			final ItemStack output = buffer.readItem();
+			ItemStack output = buffer.readItem();
 			float odds = buffer.readFloat();
 			float varietyReqd = buffer.readFloat();
 			int max = buffer.readInt();
@@ -146,14 +140,4 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 		}
 		
 	}
-	
-	public static class TypeEntropyReactorCrafting implements RecipeType<EntropyReactorCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:entropy_reactor";
-		}
-	}
-
-	
 }

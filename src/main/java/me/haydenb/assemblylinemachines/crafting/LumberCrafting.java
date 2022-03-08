@@ -9,7 +9,6 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -23,16 +22,22 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
-	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new TypeLumberCrafting();
-	public static final Serializer SERIALIZER = new Serializer();
+	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new RecipeType<LumberCrafting>() {
+		@Override
+		public String toString() {
+			return "assemblylinemachines:lumber";
+		}
+	};
+	
+	public static final LumberSerializer SERIALIZER = new LumberSerializer();
 	
 	private static final Random RAND = new Random();
 	
 	private final Lazy<Ingredient> input;
 	private final ItemStack outputa;
-	private final ItemStack outputb;
-	private final float opbchance;
-	private final int time;
+	public final ItemStack outputb;
+	public final float opbchance;
+	public final int time;
 	private final ResourceLocation id;
 	
 	public LumberCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack outputa, ItemStack outputb, float opbchance, int time) {
@@ -72,28 +77,9 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		return outputa;
 	}
 	
-	public ItemStack getSecondaryOutput() {
-		return outputb;
-	}
-	
-	public float getOutputChance() {
-		return opbchance;
-	}
-	
-	public int getTime() {
-		return time;
-	}
-	
 	@Override
 	public boolean isSpecial() {
 		return true;
-	}
-	
-	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		NonNullList<Ingredient> nnl = NonNullList.create();
-		nnl.add(input.get());
-		return nnl;
 	}
 	
 	@Override
@@ -121,20 +107,20 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		return LUMBER_RECIPE;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<LumberCrafting>{
+	public static class LumberSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<LumberCrafting>{
 
 		@Override
 		public LumberCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
 				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
-				final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				ItemStack outputb = ItemStack.EMPTY;
 				float opbchance = 0f;
 				if(GsonHelper.isValidNode(json, "secondaryoutput")) {
 					outputb = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "secondaryoutput"));
 					opbchance = GsonHelper.getAsFloat(json, "opbchance");
 				}
-				final int time = GsonHelper.getAsInt(json, "time");
+				int time = GsonHelper.getAsInt(json, "time");
 				
 				return new LumberCrafting(recipeId, input, output, outputb, opbchance, time);
 			}catch(Exception e) {
@@ -148,11 +134,11 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 
 		@Override
 		public LumberCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			final Ingredient input = Ingredient.fromNetwork(buffer);
-			final ItemStack output = buffer.readItem();
-			final ItemStack opb = buffer.readItem();
-			final float opbc = buffer.readFloat();
-			final int time = buffer.readInt();
+			Ingredient input = Ingredient.fromNetwork(buffer);
+			ItemStack output = buffer.readItem();
+			ItemStack opb = buffer.readItem();
+			float opbc = buffer.readFloat();
+			int time = buffer.readInt();
 			
 			return new LumberCrafting(recipeId, Lazy.of(() -> input), output, opb, opbc, time);
 		}
@@ -168,14 +154,4 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		}
 		
 	}
-	
-	public static class TypeLumberCrafting implements RecipeType<LumberCrafting>{
-		
-		@Override
-		public String toString() {
-			return "assemblylinemachines:lumber";
-		}
-	}
-
-	
 }

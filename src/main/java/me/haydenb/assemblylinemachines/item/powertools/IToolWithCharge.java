@@ -32,9 +32,9 @@ public interface IToolWithCharge{
 	default public int getMaxPower(ItemStack stack) {
 		if(stack.isEnchanted()) {
 			IToolWithCharge.EnchantmentOverclock enchantment = (IToolWithCharge.EnchantmentOverclock) Registry.getEnchantment("overclock");
-			return Math.round(this.getPowerToolType().getMaxCharge() * (1 + (EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack) * enchantment.getMultiplier())));
+			return Math.round(this.getPowerToolType().configMaxCharge * (1 + (EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack) * enchantment.getMultiplier())));
 		}
-		return this.getPowerToolType().getMaxCharge();
+		return this.getPowerToolType().configMaxCharge;
 	}
 	
 	default public ItemStack damageItem(ItemStack stack, int amount) {
@@ -42,15 +42,15 @@ public interface IToolWithCharge{
 			CompoundTag compound = stack.getTag();
 
 			IToolWithCharge.PowerToolType ptt = this.getPowerToolType();
-			if (compound.contains(ptt.getKeyName())) {
+			if (compound.contains(ptt.keyName)) {
 
-				int power = compound.getInt(ptt.getKeyName());
-				if ((power - (amount * ptt.getCostMultiplier())) < 1) {
-					compound.remove(ptt.getKeyName());
+				int power = compound.getInt(ptt.keyName);
+				if ((power - (amount * ptt.costMultiplier)) < 1) {
+					compound.remove(ptt.keyName);
 					compound.remove("assemblylinemachines:canbreakblackgranite");
 					compound.remove("assemblylinemachines:secondarystyle");
 				} else {
-					compound.putInt(ptt.getKeyName(), power - (amount * ptt.getCostMultiplier()));
+					compound.putInt(ptt.keyName, power - (amount * ptt.costMultiplier));
 				}
 
 				stack.setTag(compound);
@@ -64,16 +64,16 @@ public interface IToolWithCharge{
 		CompoundTag nbt = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		
 		IToolWithCharge.PowerToolType ptt = this.getPowerToolType();
-		int current = nbt.getInt(ptt.getKeyName());
+		int current = nbt.getInt(ptt.keyName);
 		
-		if(current + (amount * ptt.getChargeMultiplier()) > getMaxPower(stack)) {
+		if(current + (amount * ptt.chargeMultiplier) > getMaxPower(stack)) {
 			amount = getMaxPower(stack) - current;
-			if(!simulated) nbt.putInt(ptt.getKeyName(), getMaxPower(stack));
+			if(!simulated) nbt.putInt(ptt.keyName, getMaxPower(stack));
 		}else {
-			if(!simulated) nbt.putInt(ptt.getKeyName(), current + (amount * ptt.getChargeMultiplier()));
+			if(!simulated) nbt.putInt(ptt.keyName, current + (amount * ptt.chargeMultiplier));
 			
 		}
-		if((simulated && current > 0) || (!simulated && current + (amount * ptt.getChargeMultiplier()) > 0)) {
+		if((simulated && current > 0) || (!simulated && current + (amount * ptt.chargeMultiplier) > 0)) {
 			nbt.putBoolean("assemblylinemachines:canbreakblackgranite", true);
 		}else {
 			nbt.remove("assemblylinemachines:canbreakblackgranite");
@@ -87,15 +87,15 @@ public interface IToolWithCharge{
 	public IToolWithCharge.PowerToolType getPowerToolType();
 	
 	default public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
-		return getPowerToolType().getHasSecondaryAbilities() && stack.hasTag() && stack.getTag().contains("assemblylinemachines:secondarystyle") ? 1f : 0f;
+		return getPowerToolType().hasSecondaryAbilities && stack.hasTag() && stack.getTag().contains("assemblylinemachines:secondarystyle") ? 1f : 0f;
 	}
 	
 	default public int getCurrentCharge(ItemStack stack) {
-		return stack.hasTag() ? stack.getTag().getInt(this.getPowerToolType().getKeyName()) : 0;
+		return stack.hasTag() ? stack.getTag().getInt(this.getPowerToolType().keyName) : 0;
 	}
 	
 	default public boolean canUseSecondaryAbilities(ItemStack stack) {
-		return this.getPowerToolType().getHasSecondaryAbilities() && stack.hasTag() && stack.getTag().contains(getPowerToolType().getKeyName())
+		return this.getPowerToolType().hasSecondaryAbilities && stack.hasTag() && stack.getTag().contains(getPowerToolType().keyName)
 				&& stack.getTag().contains("assemblylinemachines:secondarystyle");
 	}
 	
@@ -103,15 +103,15 @@ public interface IToolWithCharge{
 		DecimalFormat df = Formatting.GENERAL_FORMAT;
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		IToolWithCharge.PowerToolType ptt = this.getPowerToolType();
-		String colorChar = compound.getInt(ptt.getKeyName()) == 0 ? "c" : "a";
-		tooltip.add(new TextComponent("§" + colorChar + df.format(compound.getInt(ptt.getKeyName())) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.getFriendlyNameOfUnit()));
+		String colorChar = compound.getInt(ptt.keyName) == 0 ? "c" : "a";
+		tooltip.add(new TextComponent("§" + colorChar + df.format(compound.getInt(ptt.keyName)) + "/" + df.format(this.getMaxPower(stack)) + " " + ptt.friendlyNameOfUnit));
 		if(compound.getBoolean("assemblylinemachines:secondarystyle")) {
 			tooltip.add(new TextComponent("§bSecondary Ability Enabled"));
 		}
 	}
 	
 	default public ICapabilityProvider defaultInitCapabilities(ItemStack stack, CompoundTag nbt) {
-		if(this.getPowerToolType().getHasEnergyCapability()) {
+		if(this.getPowerToolType().hasSecondaryAbilities) {
 			return new ICapabilityProvider() {
 
 				protected IEnergyStorage energy = new IEnergyStorage() {
@@ -161,12 +161,12 @@ public interface IToolWithCharge{
 	}
 	
 	default public void defaultUse(Level world, Player player, InteractionHand hand){
-		if (!world.isClientSide && player.isShiftKeyDown() && this.getPowerToolType().getHasSecondaryAbilities()) {
+		if (!world.isClientSide && player.isShiftKeyDown() && this.getPowerToolType().hasSecondaryAbilities) {
 
 			ItemStack stack = player.getMainHandItem();
 
 			CompoundTag nbt = stack.hasTag() ? stack.getTag() : new CompoundTag();
-			if(nbt.getInt(this.getPowerToolType().getKeyName()) > 0) {
+			if(nbt.getInt(this.getPowerToolType().keyName) > 0) {
 				if (nbt.contains("assemblylinemachines:secondarystyle")) {
 					nbt.remove("assemblylinemachines:secondarystyle");
 					player.displayClientMessage(new TextComponent("Disabled Secondary Ability.").withStyle(ChatFormatting.RED), true);
@@ -214,52 +214,8 @@ public interface IToolWithCharge{
 			
 		}
 		
-		public String getNameOfSecondaryFarmland() {
-			return nameOfSecondaryFarmland;
-		}
-		
-		public float getChanceToDropMobCrystal() {
-			return chanceToDropMobCrystal;
-		}
-		
-		public int getMaxCharge() {
-			return configMaxCharge;
-		}
-		
-		public String getKeyName() {
-			return keyName;
-		}
-		
-		public boolean getHasSecondaryAbilities() {
-			return hasSecondaryAbilities;
-		}
-		
-		public int getCostMultiplier() {
-			return costMultiplier;
-		}
-		
-		public int getChargeMultiplier() {
-			return chargeMultiplier;
-		}
-		
-		public boolean getHasEnergyCapability() {
-			return hasEnergyCapability;
-		}
-		
-		public String getFriendlyNameOfUnit() {
-			return friendlyNameOfUnit;
-		}
-		
-		public int getARGBBorderColor() {
-			return argbBorderColor;
-		}
-		
 		public Optional<Integer> getBottomARGBBorderColor() {
 			return this == PowerToolType.MYSTIUM ? Optional.of(0xffb81818) : Optional.empty();
-		}
-		
-		public ResourceLocation getBorderTexturePath() {
-			return borderTexturePath;
 		}
 	}
 
