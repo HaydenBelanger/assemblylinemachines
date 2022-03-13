@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:acacia_sapling"
+	},
+	"output":{
+		"item": "minecraft:acacia_log",
+		"count": 6
+	},
+	"waterPerUnit": 75,
+	"baseAdditionalChance": 0.10,
+	"upgradeAdditionalChance": 0.20,
+	"maxAdditional": 5,
+	"additionalScaling": "pure_random",
+	"time": 3,
+	"soil": "dirt",
+	"sprout": "sapling"
+}

@@ -197,6 +197,11 @@
 	"item.assemblylinemachines.mystium_crystal": "Mystium Crystal",
 	"item.assemblylinemachines.mystium_flight_harness": "Mystium Flight Harness",
 	"item.assemblylinemachines.mystium_armor_plating": "Mystium Armor Plating",
+	"item.assemblylinemachines.greenhouse_upgrade_arborists_specialization": "Greenhouse Upgrade: Arborist's Specialization",
+	"item.assemblylinemachines.greenhouse_upgrade_florists_specialization": "Greenhouse Upgrade: Florist's Specialization",
+	"item.assemblylinemachines.greenhouse_upgrade_interdimensional_specialization": "Greenhouse Upgrade: Interdimensional Specialization",
+	"item.assemblylinemachines.greenhouse_upgrade_internal_lamp": "Greenhouse Upgrade: Internal Lamp",
+	"item.assemblylinemachines.greenhouse_upgrade_blackout_glass": "Greenhouse Upgrade: Blackout Glass",
 	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",
@@ -344,6 +349,9 @@
 	"block.assemblylinemachines.mkii_fluid_mixer": "MKII Fluid Mixer",
 	"block.assemblylinemachines.mkii_grinder": "MKII Grinder",
 	"block.assemblylinemachines.mkii_furnace": "MKII Furnace",
+	"block.assemblylinemachines.greenhouse": "Greenhouse",
+	"block.assemblylinemachines.cocoa_leaves": "Cocoa Leaves",
+	"block.assemblylinemachines.cocoa_sapling": "Cocoa Sapling",
 	
 	"fluid.assemblylinemachines.oil":"Oil",
 	"fluid.assemblylinemachines.condensed_void":"Condensed Void",

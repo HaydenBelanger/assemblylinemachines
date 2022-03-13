@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.item;
 
+import java.util.Arrays;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -59,55 +60,46 @@ public class ItemUpgrade extends Item {
 	}
 	
 	public static enum Upgrades{
-		GB_EFFICIENCY(Registry.getItem("gearbox_upgrade_efficiency")),
-		GB_COMPATABILITY(Registry.getItem("gearbox_upgrade_compatability")), GB_LIMITER(Registry.getItem("gearbox_upgrade_limiter")),
+		GB_EFFICIENCY("gearbox_upgrade_efficiency"),
+		GB_COMPATABILITY("gearbox_upgrade_compatability"), GB_LIMITER("gearbox_upgrade_limiter"),
 		
-		PIPE_STACK(Registry.getItem("item_pipe_upgrade_stack")), 
-		PIPE_FILTER(Registry.getItem("item_pipe_upgrade_filter")), PIPE_REDSTONE(Registry.getItem("item_pipe_upgrade_redstone")),
+		PIPE_STACK("item_pipe_upgrade_stack"), 
+		PIPE_FILTER("item_pipe_upgrade_filter"), PIPE_REDSTONE("item_pipe_upgrade_redstone"),
 		
-		UNIVERSAL_SPEED(Registry.getItem("upgrade_speed")),
+		UNIVERSAL_SPEED("upgrade_speed"),
 		
-		MACHINE_CONSERVATION(Registry.getItem("machine_upgrade_conservation")), MACHINE_EXTRA(Registry.getItem("machine_upgrade_extra")),
-		MACHINE_GAS(Registry.getItem("machine_upgrade_gas")),
+		MACHINE_CONSERVATION("machine_upgrade_conservation"), MACHINE_EXTRA("machine_upgrade_extra"),
+		MACHINE_GAS("machine_upgrade_gas"),
 		
-		AC_SUSTAINED(Registry.getItem("autocrafting_upgrade_sustained")), AC_RECIPES(Registry.getItem("autocrafting_upgrade_recipes")),
+		AC_SUSTAINED("autocrafting_upgrade_sustained"), AC_RECIPES("autocrafting_upgrade_recipes"),
 		
-		GENERATOR_COOLANT(Registry.getItem("generator_upgrade_coolant")),
+		GENERATOR_COOLANT("generator_upgrade_coolant"),
 		
-		EXP_MILL_LEVEL(Registry.getItem("experience_mill_upgrade_level")),
+		EXP_MILL_LEVEL("experience_mill_upgrade_level"),
 		
-		PURIFIER_EXPANDED(Registry.getItem("purifier_upgrade_enhanced")),
+		PURIFIER_EXPANDED("purifier_upgrade_enhanced"),
 		
-		E_R_CAPACITY(Registry.getItem("entropy_reactor_upgrade_capacity")), E_R_CYCLE_DELAY(Registry.getItem("entropy_reactor_upgrade_cycle_delayer")),
+		E_R_CAPACITY("entropy_reactor_upgrade_capacity"), E_R_CYCLE_DELAY("entropy_reactor_upgrade_cycle_delayer"),
+		E_R_VARIETY("entropy_reactor_upgrade_variety"), E_R_ENTROPIC_HARNESSER("entropy_reactor_upgrade_entropic_harnesser"),
 		
-		E_R_VARIETY(Registry.getItem("entropy_reactor_upgrade_variety")), E_R_ENTROPIC_HARNESSER(Registry.getItem("entropy_reactor_upgrade_entropic_harnesser")),
+		GREENHOUSE_ARBORIST("greenhouse_upgrade_arborists_specialization"), GREENHOUSE_FLORIST("greenhouse_upgrade_florists_specialization"),
+		GREENHOUSE_INTERDIM("greenhouse_upgrade_interdimensional_specialization"), GREENHOUSE_LAMP("greenhouse_upgrade_internal_lamp"),
+		GREENHOUSE_BLACKOUT("greenhouse_upgrade_blackout_glass"),
 		
 		NONE(null);
 		
-		public final Item i;
+		public final String name;
 		
-		Upgrades(Item i){
-			this.i = i;
-		}
-		
-		public static Upgrades match(Item i) {
-			for(Upgrades u : values()) {
-				if(u.i == i) {
-					return u;
-				}
-			}
-			
-			return Upgrades.NONE;
+		Upgrades(String name){
+			this.name = name;
 		}
 		
 		public static Upgrades match(ItemStack i) {
-			for(Upgrades u : values()) {
-				if(u.i == i.getItem()) {
-					return u;
-				}
-			}
-			
-			return Upgrades.NONE;
+			return match(i.getItem());
+		}
+		
+		public static Upgrades match(Item i) {
+			return Arrays.stream(values()).filter((u) -> u.name != null && u.name.equalsIgnoreCase(i.getRegistryName().getPath())).findFirst().orElse(Upgrades.NONE);
 		}
 	}
 }

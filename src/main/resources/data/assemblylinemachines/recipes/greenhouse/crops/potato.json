@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:potato"
+	},
+	"output":{
+		"item": "minecraft:potato",
+		"count": 2
+	},
+	"waterPerUnit": 125,
+	"baseAdditionalChance": 0.2,
+	"upgradeAdditionalChance": 0.2,
+	"maxAdditional": 3,
+	"additionalScaling": "pure_random",
+	"time": 6,
+	"soil": "dirt",
+	"sprout": "sprout"
+}

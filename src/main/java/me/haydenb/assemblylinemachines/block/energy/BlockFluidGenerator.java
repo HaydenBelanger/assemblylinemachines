@@ -265,8 +265,8 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 					
 					if(burnTimeLeft == 0) {
 						if(burnTank.getAmount() >= 1000) {
-							Stream<GeneratorFluidCrafting> recipes = this.getLevel().getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE).stream();
-							Optional<Integer> burnAmt = recipes.filter((recipe) -> recipe.matches(this, this.getLevel()) && recipe.fluid.equals(burnTank.getFluid())).map((recipe) -> recipe.powerPerUnit).findAny();
+							List<GeneratorFluidCrafting> recipes = this.getLevel().getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE);
+							Optional<Integer> burnAmt = recipes.stream().filter((recipe) -> recipe.matches(this, this.getLevel()) && recipe.fluid.equals(burnTank.getFluid())).map((recipe) -> recipe.powerPerUnit).findAny();
 							if(burnAmt.isPresent()) {
 								float cMult;
 								
@@ -274,7 +274,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 								
 								if(getUpgradeAmount(Upgrades.GENERATOR_COOLANT) != 0 && coolTank.getAmount() >= 1000) {
 									shrinkCoolant = true;
-									cMult = recipes.filter((recipe) -> recipe.fluidType == GeneratorFluidTypes.COOLANT && recipe.fluid.equals(coolTank.getFluid())).map((recipe) -> recipe.coolantStrength).findAny().orElse(0f);
+									cMult = recipes.stream().filter((recipe) -> recipe.fluidType == GeneratorFluidTypes.COOLANT && recipe.fluid.equals(coolTank.getFluid())).map((recipe) -> recipe.coolantStrength).findAny().orElse(0f);
 								}else {
 									cMult = 1;
 								}

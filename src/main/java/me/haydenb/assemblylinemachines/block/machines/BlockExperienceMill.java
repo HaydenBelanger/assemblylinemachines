@@ -71,7 +71,10 @@ public class BlockExperienceMill {
 		//3 - Anvil
 		private int timer = 0;
 		public FluidStack tank = FluidStack.EMPTY;
-		private IFluidHandler handler = new ExperienceMillFluidHandler();
+		private IFluidHandler handler = Utils.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Registry.getFluid("liquid_experience")), 6000, (oFs) -> {
+			if(oFs.isPresent()) tank = oFs.get();
+			return tank;
+		}, (v) -> this.sendUpdates(), false);
 		private LazyOptional<IFluidHandler> lazy = LazyOptional.of(() -> handler);
 		private float progress = 0;
 		public float cycles = 0;
@@ -310,72 +313,6 @@ public class BlockExperienceMill {
 
 			return ii;
 		}
-
-		private class ExperienceMillFluidHandler implements IFluidHandler{
-
-			@Override
-			public boolean isFluidValid(int tank, FluidStack stack) {
-				return Registry.getFluid("liquid_experience") == stack.getFluid();
-			}
-
-			@Override
-			public int getTanks() {
-				return 1;
-			}
-
-			@Override
-			public int getTankCapacity(int tank) {
-				return 6000;
-			}
-
-			@Override
-			public FluidStack getFluidInTank(int tank) {
-				return TEExperienceMill.this.tank;
-			}
-
-			@Override
-			public int fill(FluidStack resource, FluidAction action) {
-
-				if(!isFluidValid(0, resource)) {
-					return 0;
-				}
-
-				if (!tank.isEmpty()) {
-					if (resource.getFluid() != tank.getFluid()) {
-						return 0;
-					}
-				}
-
-				int attemptedInsert = resource.getAmount();
-				int rmCapacity = getTankCapacity(0) - tank.getAmount();
-				if (rmCapacity < attemptedInsert) {
-					attemptedInsert = rmCapacity;
-				}
-
-				if (action != FluidAction.SIMULATE) {
-					if (tank.isEmpty()) {
-						tank = resource;
-					} else {
-						tank.setAmount(tank.getAmount() + attemptedInsert);
-					}
-				}
-
-				sendUpdates();
-				return attemptedInsert;
-			}
-
-			@Override
-			public FluidStack drain(int maxDrain, FluidAction action) {
-
-				return FluidStack.EMPTY;
-			}
-
-			@Override
-			public FluidStack drain(FluidStack resource, FluidAction action) {
-				return drain(resource.getAmount(), action);
-			}
-		}
-
 	}
 
 	public static class ContainerExperienceMill extends ContainerALMBase<TEExperienceMill>{

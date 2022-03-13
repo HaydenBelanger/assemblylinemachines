@@ -41,13 +41,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	private final int cost;
 	public final int amount;
 	private final ResourceLocation id;
-	
-	private final LoadingCache<Integer, ItemStack> bookCache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, ItemStack>(){
-		@Override
-		public ItemStack load(Integer key) throws Exception {
-			return EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, key));
-		}
-	});
+	private final LoadingCache<Integer, ItemStack> bookCache;
 	
 	public EnchantmentBookCrafting(ResourceLocation id, Lazy<Ingredient> input, Enchantment enchantment, int cost, int amount) {
 		this.input = input;
@@ -55,6 +49,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		this.id = id;
 		this.cost = cost;
 		this.amount = amount;
+		this.bookCache = CacheBuilder.newBuilder().build(CacheLoader.from((key) -> EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, key))));
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {

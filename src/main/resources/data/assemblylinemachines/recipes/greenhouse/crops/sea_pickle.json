@@ -1,0 +1,14 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:sea_pickle"
+	},
+	"output":{
+		"item": "minecraft:sea_pickle",
+		"count": 1
+	},
+	"waterPerUnit": 1000,
+	"time": 10,
+	"soil": "sand",
+	"sprout": "sprout"
+}

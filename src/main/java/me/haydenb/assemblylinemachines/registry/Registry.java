@@ -38,6 +38,7 @@ import me.haydenb.assemblylinemachines.block.machines.BlockExperienceSiphon.TEEx
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidRouter.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank;
+import me.haydenb.assemblylinemachines.block.machines.BlockGreenhouse.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.TEHandGrinder;
 import me.haydenb.assemblylinemachines.block.machines.BlockInteractor.*;
@@ -57,6 +58,7 @@ import me.haydenb.assemblylinemachines.block.misc.*;
 import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite.BlockBlackGranitePillar;
 import me.haydenb.assemblylinemachines.block.misc.CorruptBlock.*;
 import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.*;
+import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.ChaosbarkSaplingBlock.ChaosbarkTreeGrower;
 import me.haydenb.assemblylinemachines.block.pipes.BlockPipe;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity.PipeConnectorContainer;
@@ -83,12 +85,12 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -111,8 +113,10 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
@@ -323,14 +327,21 @@ public class Registry {
 		
 		createItem("mystium_armor_plating", "mystium_crystal", "mystium_flight_harness");
 		
+		createItem("greenhouse_upgrade_arborists_specialization", new ItemUpgrade(false, "Greenhouse can support Saplings."));
+		createItem("greenhouse_upgrade_florists_specialization", new ItemUpgrade(false, "Greenhouse can support Flowers."));
+		createItem("greenhouse_upgrade_interdimensional_specialization", new ItemUpgrade(false, "Greenhouse can support otherworldly crops."));
+		createItem("greenhouse_upgrade_internal_lamp", new ItemUpgrade(false, new String[]{"Allows sunlight crops to grow in dark environments.", "Increases speed of operation."}, new String[] {"Increases power consumption.", "Becomes too bright to sustain darkness crops."}));
+		createItem("greenhouse_upgrade_blackout_glass", new ItemUpgrade(false, "Allows darkness crops to grow in light environments.", "Won't allow sunlight crops to get enough sun."));
+		
 		MOD_ITEM_REGISTRY.values().forEach((i) -> event.getRegistry().register(i));
 	}
 	
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-		TransmissionType.getPipeRegistryValues().forEach((pipeData) -> createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true));
 		MOD_BLOCK_REGISTRY.add();
+		
+		TransmissionType.getPipeRegistryValues().forEach((pipeData) -> createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true));
 		
 		createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
@@ -491,6 +502,15 @@ public class Registry {
 		
 		createBlock("experience_siphon", new BlockExperienceSiphon(), true);
 		createBlock("omnivoid", new BlockOmnivoid(), true);
+		createBlock("greenhouse", new BlockGreenhouse(), true);
+		
+		createBlock("cocoa_sapling", new SaplingBlock(new AbstractTreeGrower() {
+			@Override
+			protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random p_204307_, boolean p_204308_) {
+				return ChaosbarkTreeGrower.cocoaTree;
+			}
+		}, Block.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.GRASS)), true);
+		createBlock("cocoa_leaves", new LeavesBlock(Block.Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never)), true);
 		
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(() -> Registry.getFluid("oil")), true);
 		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(() -> Registry.getFluid("condensed_void")), true);
@@ -514,13 +534,13 @@ public class Registry {
 	public static void registerFluids(RegistryEvent.Register<Fluid> event) {
 		
 		MOD_FLUID_REGISTRY.values().forEach((f) -> event.getRegistry().register(f));
-		
 	}
 	
 	@SubscribeEvent
 	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
 		MOD_BLOCKENTITY_REGISTRY.add();
+		
 		createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, Lists.transform(TransmissionType.getPipeRegistryValues(), (t) -> MOD_BLOCK_REGISTRY.get(t.getLeft())));
 		createBlockEntity("hand_grinder", TEHandGrinder.class);
 		createBlockEntity("fluid_bath", TEFluidBath.class);
@@ -552,6 +572,7 @@ public class Registry {
 		createBlockEntity("corrupting_basin", TECorruptingBasin.class);
 		createBlockEntity("experience_siphon", TEExperienceSiphon.class);
 		createBlockEntity("omnivoid", TEOmnivoid.class);
+		createBlockEntity("greenhouse", TEGreenhouse.class);
 		
 		MOD_BLOCKENTITY_REGISTRY.values().forEach((be) -> event.getRegistry().register(be));
 	}
@@ -560,6 +581,7 @@ public class Registry {
 	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
 		MOD_CONTAINER_REGISTRY.add();
+		
 		createContainer("simple_fluid_mixer", ContainerSimpleFluidMixer.class);
 		createContainer("simple_grinder", ContainerSimpleGrinder.class);
 		createContainer("gearbox", ContainerGearbox.class);
@@ -580,6 +602,7 @@ public class Registry {
 		createContainer("entropy_reactor", ContainerEntropyReactor.class);
 		createContainer("corrupting_basin", ContainerCorruptingBasin.class);
 		createContainer("omnivoid", ContainerOmnivoid.class);
+		createContainer("greenhouse", ContainerGreenhouse.class);
 		
 		MOD_CONTAINER_REGISTRY.values().forEach((p) -> event.getRegistry().register(p.getFirst()));
 		
@@ -634,6 +657,8 @@ public class Registry {
 		createRecipe(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, WorldCorruptionCrafting.SERIALIZER);
 		createRecipe(GeneratorFluidCrafting.GENFLUID_RECIPE, GeneratorFluidCrafting.SERIALIZER);
 		createRecipe(UpgradeKitCrafting.UPGRADING_RECIPE, UpgradeKitCrafting.SERIALIZER);
+		createRecipe(GreenhouseCrafting.GREENHOUSE_RECIPE, GreenhouseCrafting.SERIALIZER);
+		createRecipe(GreenhouseFertilizerCrafting.FERTILIZER_RECIPE, GreenhouseFertilizerCrafting.SERIALIZER);
 		
 		MOD_CRAFTING_REGISTRY.entrySet().forEach((e) -> {
 			net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(e.getValue().getFirst().toString()), e.getValue().getFirst());
@@ -675,6 +700,8 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getBlock("entropy_reactor_block"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_leaves"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosbark_sapling"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("cocoa_leaves"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("cocoa_sapling"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("chaosweed"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("blooming_chaosweed"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("tall_chaosweed"), RenderType.cutout());
@@ -683,7 +710,9 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_rose"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("brain_cactus"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("bright_prism_rose"), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(getBlock("greenhouse"), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_glass"), RenderType.cutoutMipped());
+		
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("naphtha_flowing"), RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(getFluid("diesel"), RenderType.translucent());
@@ -723,6 +752,7 @@ public class Registry {
 		registerScreen("entropy_reactor", ContainerEntropyReactor.class, ScreenEntropyReactor.class);
 		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
 		registerScreen("omnivoid", ContainerOmnivoid.class, ScreenOmnivoid.class);
+		registerScreen("greenhouse", ContainerGreenhouse.class, ScreenGreenhouse.class);
 		
 		new PhasedMap<>(Phases.SCREEN).add();
 
@@ -765,6 +795,25 @@ public class Registry {
 				return 0;
 			}
 		}, getBlock("fluid_bath"));
+		
+		event.getBlockColors().register(new BlockColor() {
+			
+			@Override
+			public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
+				if(level.getBlockEntity(pos) instanceof TEGreenhouse greenhouse) {
+					return greenhouse.getTint(tint);
+				}
+				return 0;
+			}
+		}, getBlock("greenhouse"));
+		
+		event.getBlockColors().register(new BlockColor() {
+			
+			@Override
+			public int getColor(BlockState pState, BlockAndTintGetter pLevel, BlockPos pPos, int pTintIndex) {
+				return pLevel.getBlockTint(pPos, BiomeColors.FOLIAGE_COLOR_RESOLVER);
+			}
+		}, getBlock("cocoa_leaves"));
 		
 	}
 	

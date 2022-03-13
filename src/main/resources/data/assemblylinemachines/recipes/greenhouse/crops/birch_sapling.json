@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:birch_sapling"
+	},
+	"output":{
+		"item": "minecraft:birch_log",
+		"count": 3
+	},
+	"waterPerUnit": 150,
+	"baseAdditionalChance": 0.10,
+	"upgradeAdditionalChance": 0.20,
+	"maxAdditional": 2,
+	"additionalScaling": "pure_random",
+	"time": 3,
+	"soil": "dirt",
+	"sprout": "sapling"
+}

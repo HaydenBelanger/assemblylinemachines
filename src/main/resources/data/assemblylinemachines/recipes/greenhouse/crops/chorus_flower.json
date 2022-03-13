@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:chorus_flower"
+	},
+	"output":{
+		"item": "minecraft:chorus_fruit",
+		"count": 1
+	},
+	"waterPerUnit": 0,
+	"baseAdditionalChance": 0,
+	"upgradeAdditionalChance": 0.25,
+	"maxAdditional": 3,
+	"additionalScaling": "upgrade",
+	"time": 6,
+	"soil": "end_stone",
+	"sprout": "chorus"
+}

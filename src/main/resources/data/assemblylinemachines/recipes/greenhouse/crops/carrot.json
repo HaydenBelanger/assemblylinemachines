@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:carrot"
+	},
+	"output":{
+		"item": "minecraft:carrot",
+		"count": 2
+	},
+	"waterPerUnit": 200,
+	"baseAdditionalChance": 0.2,
+	"upgradeAdditionalChance": 0.2,
+	"maxAdditional": 3,
+	"additionalScaling": "pure_random",
+	"time": 6,
+	"soil": "dirt",
+	"sprout": "sprout"
+}

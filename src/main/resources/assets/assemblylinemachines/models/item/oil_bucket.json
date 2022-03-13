@@ -1,7 +1,10 @@
 {
-	"parent": "item/generated",
+	"parent": "forge:item/default",
+	"loader": "forge:bucket",
+	"fluid": "assemblylinemachines:oil",
 	"textures":{
-		"layer0": "assemblylinemachines:item/oil_bucket"
+		"base": "assemblylinemachines:item/bucket/base",
+		"fluid": "assemblylinemachines:item/bucket/fluid"
 	}
 	
 }

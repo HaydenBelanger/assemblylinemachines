@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:glow_berries"
+	},
+	"output":{
+		"item": "minecraft:glow_berries",
+		"count": 1
+	},
+	"waterPerUnit": 20,
+	"baseAdditionalChance": 0.1,
+	"upgradeAdditionalChance": 0.1,
+	"maxAdditional": 3,
+	"additionalScaling": "upgrade",
+	"time": 6,
+	"soil": "dirt",
+	"sprout": "sprout"
+}

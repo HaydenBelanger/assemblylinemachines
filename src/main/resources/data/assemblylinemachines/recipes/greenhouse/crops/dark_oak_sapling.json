@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:dark_oak_sapling"
+	},
+	"output":{
+		"item": "minecraft:dark_oak_log",
+		"count": 15
+	},
+	"waterPerUnit": 100,
+	"baseAdditionalChance": 0.10,
+	"upgradeAdditionalChance": 0.20,
+	"maxAdditional": 7,
+	"additionalScaling": "pure_random",
+	"time": 3,
+	"soil": "dirt",
+	"sprout": "sapling"
+}

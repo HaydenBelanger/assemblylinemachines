@@ -62,6 +62,7 @@ public class LootTableGenerator extends LootTableProvider {
 	private class GeneratedBlockLoot extends BlockLoot{
 		
 		private static final List<String> BLOCK_ONLY_EXCEPTIONS = List.of("mystium_farmland", "nova_farmland");
+		
 		private final List<String> existingLootTables = getExistingLootTables();
 		
 		private static final HashMap<String, Triple<Supplier<Item>, Float, Float>> ORE_DROPS = new HashMap<>();
@@ -82,6 +83,12 @@ public class LootTableGenerator extends LootTableProvider {
 			ORE_DROPS.put("titanium_ore", titaniumTriple);
 			ORE_DROPS.put("chromium_ore", Triple.of(() -> Registry.getItem("raw_chromium"), -1f, -1f));
 			ORE_DROPS.put("flerovium_ore", Triple.of(() -> Registry.getItem("raw_flerovium"), -1f, -1f));
+		}
+		
+		private static final HashMap<String, Block> LEAVES_SAPLINGS = new HashMap<>();
+		static {
+			LEAVES_SAPLINGS.put("chaosbark_leaves", Registry.getBlock("chaosbark_sapling"));
+			LEAVES_SAPLINGS.put("cocoa_leaves", Registry.getBlock("cocoa_sapling"));
 		}
 		
 		private static final HashMap<String, List<String>> NBT_COPYING_KEYS = new HashMap<>();
@@ -200,8 +207,9 @@ public class LootTableGenerator extends LootTableProvider {
 					break;
 				
 				case("chaosbark_leaves"):
+				case("cocoa_leaves"):
 					//Leaves loot tables - occasionally drops Saplings, and leaves if shears are used.
-					this.add(b, (bl) -> createLeavesDrops(bl, Registry.getBlock("chaosbark_sapling"), new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F}));
+					this.add(b, (bl) -> createLeavesDrops(bl, LEAVES_SAPLINGS.get(b.getRegistryName().getPath()), new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F}));
 					break;
 					
 				default:

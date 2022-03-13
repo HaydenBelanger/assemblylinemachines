@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:cactus"
+	},
+	"output":{
+		"item": "minecraft:cactus",
+		"count": 1
+	},
+	"waterPerUnit": 25,
+	"baseAdditionalChance": 0.2,
+	"upgradeAdditionalChance": 0.1,
+	"maxAdditional": 2,
+	"additionalScaling": "upgrade",
+	"time": 4,
+	"soil": "sand",
+	"sprout": "cactus"
+}

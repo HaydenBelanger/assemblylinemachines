@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:bamboo"
+	},
+	"output":{
+		"item": "minecraft:bamboo",
+		"count": 4
+	},
+	"waterPerUnit": 300,
+	"baseAdditionalChance": 0,
+	"upgradeAdditionalChance": 0.3,
+	"maxAdditional": 11,
+	"additionalScaling": "pure_random",
+	"time": 8,
+	"soil": "dirt",
+	"sprout": "sprout"
+}

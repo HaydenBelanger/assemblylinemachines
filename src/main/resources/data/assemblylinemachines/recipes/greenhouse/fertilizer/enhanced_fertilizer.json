@@ -1,0 +1,8 @@
+{
+	"type": "assemblylinemachines:greenhouse_fertilizer",
+	"fertilizer":{
+		"item": "assemblylinemachines:enhanced_fertilizer"
+	},
+	"usesPerItem": 20,
+	"outputMultiplication": 2
+}

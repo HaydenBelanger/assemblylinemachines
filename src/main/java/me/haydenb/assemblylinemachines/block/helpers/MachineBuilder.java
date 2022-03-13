@@ -573,8 +573,10 @@ public class MachineBuilder {
 					
 					if(useInternal) {
 						if(internalLazy == null) {
-							internalLazy = LazyOptional.of(() -> new MachineFluidHandler());
-							internalLazy.addListener((lazy) -> internalLazy = null);
+							internalLazy = LazyOptional.of(() -> Utils.getSimpleOneTankHandler(null, capacity, (oFs) -> {
+								if(oFs.isPresent()) internalTank = oFs.get();
+								return internalTank;
+							}, (v) -> this.sendUpdates(), false));
 						}
 						return internalLazy.orElse(null);
 					}else if(!useInternal && hasExternalTank) {
@@ -705,61 +707,6 @@ public class MachineBuilder {
 					public void receiveButtonPacket(PacketData pd) {
 						MachineBlockEntity.this.receiveButtonPacket(pd);
 					}
-				}
-				
-				class MachineFluidHandler implements IFluidHandler{
-
-					@Override
-					public int getTanks() {
-						return 1;
-					}
-
-					@Override
-					public FluidStack getFluidInTank(int tank) {
-						return internalTank;
-					}
-
-					@Override
-					public int getTankCapacity(int tank) {
-						return capacity;
-					}
-
-					@Override
-					public boolean isFluidValid(int tank, FluidStack stack) {
-						return internalTank.isEmpty() || stack.getFluid().equals(internalTank.getFluid());
-					}
-
-					@Override
-					public int fill(FluidStack resource, FluidAction action) {
-						int toFill = !isFluidValid(0, resource) ? 0 : resource.getAmount() + internalTank.getAmount() >= capacity ? capacity - internalTank.getAmount() : resource.getAmount();
-						if(toFill != 0 && action == FluidAction.EXECUTE) {
-							if(internalTank.isEmpty()) {
-								internalTank = new FluidStack(resource, toFill);
-							}else {
-								internalTank.grow(toFill);
-							}
-							MachineBlockEntity.this.sendUpdates();
-						}
-						return toFill;
-					}
-
-					@Override
-					public FluidStack drain(FluidStack resource, FluidAction action) {
-						if(internalTank.isEmpty() || !resource.getFluid().equals(internalTank.getFluid())) return FluidStack.EMPTY;
-						if(resource.getAmount() >= internalTank.getAmount()) resource.setAmount(internalTank.getAmount());
-						FluidStack returnStack = new FluidStack(internalTank.getFluid(), resource.getAmount());
-						if(action == FluidAction.EXECUTE) {
-							internalTank.shrink(returnStack.getAmount());
-							MachineBlockEntity.this.sendUpdates();
-						}
-						return returnStack;
-					}
-
-					@Override
-					public FluidStack drain(int maxDrain, FluidAction action) {
-						return internalTank.isEmpty() ? FluidStack.EMPTY : drain(new FluidStack(internalTank.getFluid(), maxDrain), action);
-					}
-					
 				}
 			}
 			

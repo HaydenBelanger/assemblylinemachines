@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:peony"
+	},
+	"output":{
+		"item": "minecraft:peony",
+		"count": 1
+	},
+	"waterPerUnit": 85,
+	"baseAdditionalChance": 0,
+	"upgradeAdditionalChance": 0.32,
+	"maxAdditional": 2,
+	"additionalScaling": "pure_random",
+	"time": 9,
+	"soil": "dirt",
+	"sprout": "flower"
+}

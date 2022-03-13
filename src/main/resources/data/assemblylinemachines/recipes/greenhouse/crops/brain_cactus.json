@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "assemblylinemachines:brain_cactus"
+	},
+	"output":{
+		"item": "assemblylinemachines:brain_cactus",
+		"count": 1
+	},
+	"waterPerUnit": 100,
+	"baseAdditionalChance": 0.25,
+	"upgradeAdditionalChance": 0.25,
+	"maxAdditional": 3,
+	"additionalScaling": "upgrade",
+	"time": 5,
+	"soil": "corrupt",
+	"sprout": "brain_cactus"
+}

@@ -1,0 +1,6 @@
+{
+	"parent": "assemblylinemachines:block/greenhouse/base/inactive",
+	"textures":{
+		"10": "assemblylinemachines:block/greenhouse/greenhouse_light_active"
+	}
+}

@@ -456,17 +456,10 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 
 		//WRAPPED renderTooltip = renderComponentTooltip
 		protected void renderComponentTooltip(String a, int b, int c) {
-			List<Component> list = new ArrayList<>();
-			list.add(new TextComponent(a));
-			super.renderComponentTooltip(mx, list, b, c);
+			super.renderComponentTooltip(mx, List.of((Component) new TextComponent(a)), b, c);
 		}
 		public void renderComponentTooltip(List<String> a, int b, int c) {
-			List<Component> list = new ArrayList<>();
-			for (String s : a) {
-				list.add(new TextComponent(s));
-			}
-			super.renderComponentTooltip(mx, list, b, c);
-
+			super.renderComponentTooltip(mx, a.stream().map((s) -> (Component) new TextComponent(s)).toList(), b, c);
 		}
 
 		//Filled without MX to use internally stored PoseStack

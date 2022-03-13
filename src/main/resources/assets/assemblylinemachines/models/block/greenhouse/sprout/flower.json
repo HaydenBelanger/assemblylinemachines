@@ -1,0 +1,171 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/greenhouse/sprouts/flower_petal",
+		"1": "assemblylinemachines:block/greenhouse/sprouts/flower_side",
+		"2": "assemblylinemachines:block/greenhouse/sprouts/flower_stem",
+		"3": "assemblylinemachines:block/greenhouse/sprouts/flower_top",
+		"4": "assemblylinemachines:block/greenhouse/sprouts/flower_bottom",
+		"particle": "assemblylinemachines:block/greenhouse/sprouts/flower_petal"
+	},
+	"elements": [
+		{
+			"name": "stem1",
+			"from": [10, 9, 5],
+			"to": [11, 12, 6],
+			"faces": {
+				"north": {"uv": [8, 13, 9, 16], "texture": "#2"},
+				"east": {"uv": [8, 13, 9, 16], "texture": "#2"},
+				"south": {"uv": [8, 13, 9, 16], "texture": "#2"},
+				"west": {"uv": [8, 13, 9, 16], "texture": "#2"}
+			}
+		},
+		{
+			"name": "stem2",
+			"from": [5, 9, 10],
+			"to": [6, 12, 11],
+			"faces": {
+				"north": {"uv": [8, 13, 9, 16], "texture": "#2"},
+				"east": {"uv": [8, 13, 9, 16], "texture": "#2"},
+				"south": {"uv": [8, 13, 9, 16], "texture": "#2"},
+				"west": {"uv": [8, 13, 9, 16], "texture": "#2"}
+			}
+		},
+		{
+			"name": "bulb1",
+			"from": [9, 13, 4],
+			"to": [12, 14, 7],
+			"faces": {
+				"north": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"east": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"south": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"west": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [7, 8, 10, 11], "texture": "#3", "tintindex": 0}
+			}
+		},
+		{
+			"name": "bulb2",
+			"from": [4, 13, 9],
+			"to": [7, 14, 12],
+			"faces": {
+				"north": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"east": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"south": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"west": {"uv": [7, 11, 10, 12], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [7, 8, 10, 11], "texture": "#3", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal1",
+			"from": [9, 13, 3],
+			"to": [12, 13, 4],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [11, 13, 4]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal2",
+			"from": [9, 13, 7],
+			"to": [12, 13, 8],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [11, 13, 7]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal3",
+			"from": [4, 13, 12],
+			"to": [7, 13, 13],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [4, 13, 12]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal4",
+			"from": [4, 13, 8],
+			"to": [7, 13, 9],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [5, 13, 9]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "rotation": 90, "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal5",
+			"from": [3, 13, 9],
+			"to": [4, 13, 12],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [4, 13, 10]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal6",
+			"from": [7, 13, 9],
+			"to": [8, 13, 12],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [7, 13, 10]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal7",
+			"from": [8, 13, 4],
+			"to": [9, 13, 7],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [9, 13, 5]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "petal8",
+			"from": [12, 13, 4],
+			"to": [13, 13, 7],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [12, 13, 5]},
+			"faces": {
+				"up": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 8, 7, 11], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "bulb3",
+			"from": [9, 12, 4],
+			"to": [12, 13, 7],
+			"faces": {
+				"north": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"east": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"south": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"west": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"down": {"uv": [6, 8, 9, 11], "texture": "#4"}
+			}
+		},
+		{
+			"name": "bulb4",
+			"from": [4, 12, 9],
+			"to": [7, 13, 12],
+			"faces": {
+				"north": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"east": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"south": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"west": {"uv": [7, 12, 10, 13], "texture": "#1"},
+				"down": {"uv": [6, 8, 9, 11], "texture": "#4"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+		}
+	]
+}

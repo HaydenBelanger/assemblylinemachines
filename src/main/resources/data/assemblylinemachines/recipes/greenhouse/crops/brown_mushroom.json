@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:brown_mushroom"
+	},
+	"output":{
+		"item": "minecraft:brown_mushroom",
+		"count": 1
+	},
+	"waterPerUnit": 25,
+	"baseAdditionalChance": 0.25,
+	"upgradeAdditionalChance": 0.25,
+	"maxAdditional": 5,
+	"additionalScaling": "upgrade",
+	"time": 4,
+	"soil": "mycelium",
+	"sprout": "mushroom"
+}

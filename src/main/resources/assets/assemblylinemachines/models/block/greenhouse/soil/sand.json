@@ -1,0 +1,6 @@
+{
+	"parent": "assemblylinemachines:block/greenhouse/soil/empty",
+	"textures": {
+		"0": "assemblylinemachines:block/greenhouse/soil/sand"
+	}
+}

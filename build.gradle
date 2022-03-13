@@ -28,7 +28,7 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
 
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'parchment', version: '1.18.1-2022.03.06-1.18.2'
     
     runs {
         client {

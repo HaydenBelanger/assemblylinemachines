@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -36,13 +37,13 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 	
 	public static final UpgradeKitSerializer SERIALIZER = new UpgradeKitSerializer();
 	
-	private final Ingredient inputBlock;
+	private final Lazy<Ingredient> inputBlock;
 	private final UpgradeKit inputUpgradeKit;
 	private final Block outputBlock;
 	private final Map<Integer, Integer> slotCopying;
 	private final ResourceLocation id;
 	
-	public UpgradeKitCrafting(ResourceLocation id, Ingredient inputBlock, UpgradeKit inputUpgradeKit, Block outputBlock, Map<Integer, Integer> slotCopying) {
+	public UpgradeKitCrafting(ResourceLocation id, Lazy<Ingredient> inputBlock, UpgradeKit inputUpgradeKit, Block outputBlock, Map<Integer, Integer> slotCopying) {
 		this.inputBlock = inputBlock;
 		this.inputUpgradeKit = inputUpgradeKit;
 		this.outputBlock = outputBlock;
@@ -94,7 +95,7 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 		if(level.isClientSide) throw new IllegalArgumentException("Upgrade attempted from the client side.");
 		List<UpgradeKitCrafting> list = level.getRecipeManager().getAllRecipesFor(UPGRADING_RECIPE);
 		for(UpgradeKitCrafting recipe : list) {
-			if(recipe.inputBlock.test(level.getBlockState(upgradeBlock).getBlock().asItem().getDefaultInstance()) && upgradeKit.is(recipe.inputUpgradeKit.item)) {
+			if(recipe.inputBlock.get().test(level.getBlockState(upgradeBlock).getBlock().asItem().getDefaultInstance()) && upgradeKit.is(recipe.inputUpgradeKit.item)) {
 				HashMap<Integer, ItemStack> copyItems = new HashMap<>();
 				if(!recipe.slotCopying.isEmpty() && level.getBlockEntity(upgradeBlock) instanceof Container) {
 					Container container = (Container) level.getBlockEntity(upgradeBlock);
@@ -134,7 +135,7 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 		
 		@Override
 		public UpgradeKitCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
-			Ingredient inputBlock = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_block"));
+			Lazy<Ingredient> inputBlock = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_block")));
 			UpgradeKit upgradeKit = UpgradeKit.valueOf(GsonHelper.getAsString(json, "upgrade_kit"));
 			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "output_block")));
 			Map<Integer, Integer> slotCopy = new HashMap<>();
@@ -154,12 +155,12 @@ public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBui
 			UpgradeKit upgradeKit = buffer.readEnum(UpgradeKit.class);
 			Block block = ForgeRegistries.BLOCKS.getValue(buffer.readResourceLocation());
 			Map<Integer, Integer> slotCopy = buffer.readMap((buf) -> buf.readInt(), (buf) -> buf.readInt());
-			return new UpgradeKitCrafting(recipeId, inputBlock, upgradeKit, block, slotCopy);
+			return new UpgradeKitCrafting(recipeId, Lazy.of(() -> inputBlock), upgradeKit, block, slotCopy);
 		}
 		
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, UpgradeKitCrafting recipe) {
-			recipe.inputBlock.toNetwork(buffer);
+			recipe.inputBlock.get().toNetwork(buffer);
 			buffer.writeEnum(recipe.inputUpgradeKit);
 			buffer.writeResourceLocation(recipe.outputBlock.getRegistryName());
 			buffer.writeMap(recipe.slotCopying, (bufferkey, key) -> bufferkey.writeInt(key), (buffervalue, value) -> buffervalue.writeInt(value));

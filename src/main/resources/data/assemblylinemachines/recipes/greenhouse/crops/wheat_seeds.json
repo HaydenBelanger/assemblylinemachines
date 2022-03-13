@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:wheat_seeds"
+	},
+	"output":{
+		"item": "minecraft:wheat",
+		"count": 1
+	},
+	"waterPerUnit": 200,
+	"baseAdditionalChance": 0.25,
+	"upgradeAdditionalChance": 0.25,
+	"maxAdditional": 4,
+	"additionalScaling": "upgrade",
+	"time": 6,
+	"soil": "dirt",
+	"sprout": "sprout"
+}

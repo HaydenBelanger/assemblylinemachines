@@ -1,0 +1,72 @@
+{
+	"multipart":[
+		{"when": {"active": false, "blackout": false},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/base/inactive"}
+		},
+		{"when": {"active": true, "blackout": false},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/base/active"}
+		},
+		{"when": {"active": false, "blackout": true},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/base/inactive_blackout"}
+		},
+		{"when": {"active": true, "blackout": true},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/base/active_blackout"}
+		},
+		
+		{"when": {"sprout": "cactus"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/cactus"}
+		},
+		{"when": {"sprout": "corrupt_sprout"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/corrupt_sprout"}
+		},
+		{"when": {"sprout": "nether_sprout"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/nether_sprout"}
+		},
+		{"when": {"sprout": "sapling"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/sapling"}
+		},
+		{"when": {"sprout": "mushroom"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/mushroom"}
+		},
+		{"when": {"sprout": "sprout"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/sprout"}
+		},
+		{"when": {"sprout": "sugar_cane"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/sugar_cane"}
+		},
+		{"when": {"sprout": "chorus"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/chorus"}
+		},
+		{"when": {"sprout": "brain_cactus"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/brain_cactus"}
+		},
+		{"when": {"sprout": "chaosbark_sapling"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/chaosbark_sapling"}
+		},
+		{"when": {"sprout": "flower"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/flower"}
+		},
+		
+		{"when": {"soil": "empty"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/empty"}
+		},
+		{"when": {"soil": "dirt"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/dirt"}
+		},
+		{"when": {"soil": "mycelium"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/mycelium"}
+		},
+		{"when": {"soil": "sand"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/sand"}
+		},
+		{"when": {"soil": "soul_sand"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/soul_sand"}
+		},
+		{"when": {"soil": "corrupt"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/corrupt"}
+		},
+		{"when": {"soil": "end_stone"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/end_stone"}
+		}
+	]
+}

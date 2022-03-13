@@ -1,0 +1,111 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_sapling_leaf_grayscale",
+		"1": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_wood_grayscale",
+		"2": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_branch_grayscale",
+		"particle": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_sapling_leaf_grayscale"
+	},
+	"elements": [
+		{
+			"name": "stem",
+			"from": [7, 9, 7],
+			"to": [9, 12, 9],
+			"faces": {
+				"north": {"uv": [7, 13, 9, 16], "texture": "#1", "tintindex": 0},
+				"east": {"uv": [7, 13, 9, 16], "texture": "#1", "tintindex": 0},
+				"south": {"uv": [9, 16, 7, 13], "rotation": 180, "texture": "#1", "tintindex": 0},
+				"west": {"uv": [7, 13, 9, 16], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [7, 14, 9, 16], "texture": "#1", "tintindex": 0}
+			}
+		},
+		{
+			"name": "branch1",
+			"from": [5, 11, 7],
+			"to": [7, 12, 8],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [7, 11, 8]},
+			"faces": {
+				"north": {"uv": [9, 8, 7, 9], "texture": "#2", "tintindex": 0},
+				"south": {"uv": [7, 8, 9, 9], "texture": "#2", "tintindex": 0},
+				"west": {"uv": [8, 14, 9, 15], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [7, 8, 9, 9], "texture": "#2", "tintindex": 0},
+				"down": {"uv": [7, 8, 9, 9], "texture": "#2", "tintindex": 0}
+			}
+		},
+		{
+			"name": "branch2",
+			"from": [9, 11, 8],
+			"to": [11, 12, 9],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [9, 11, 8]},
+			"faces": {
+				"north": {"uv": [7, 8, 9, 9], "texture": "#2", "tintindex": 0},
+				"east": {"uv": [7, 8, 8, 9], "texture": "#2", "tintindex": 0},
+				"south": {"uv": [7, 8, 9, 9], "rotation": 180, "texture": "#2", "tintindex": 0},
+				"up": {"uv": [7, 8, 9, 9], "rotation": 180, "texture": "#2", "tintindex": 0},
+				"down": {"uv": [7, 8, 9, 9], "rotation": 180, "texture": "#2", "tintindex": 0}
+			}
+		},
+		{
+			"name": "leaf1",
+			"from": [5, 11, 6],
+			"to": [6, 12, 7],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [7, 11, 7]},
+			"faces": {
+				"north": {"uv": [6, 7, 7, 8], "texture": "#0", "tintindex": 1},
+				"east": {"uv": [6, 7, 7, 8], "texture": "#0", "tintindex": 1},
+				"west": {"uv": [6, 7, 7, 8], "texture": "#0", "tintindex": 1},
+				"up": {"uv": [6, 7, 7, 8], "texture": "#0", "tintindex": 1},
+				"down": {"uv": [6, 7, 7, 8], "texture": "#0", "tintindex": 1}
+			}
+		},
+		{
+			"name": "leaf2",
+			"from": [4, 11, 8],
+			"to": [5, 12, 9],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [7, 11, 7]},
+			"faces": {
+				"north": {"uv": [8, 5, 9, 6], "texture": "#0", "tintindex": 1},
+				"east": {"uv": [8, 5, 9, 6], "texture": "#0", "tintindex": 1},
+				"south": {"uv": [8, 5, 9, 6], "texture": "#0", "tintindex": 1},
+				"west": {"uv": [8, 5, 9, 6], "texture": "#0", "tintindex": 1},
+				"up": {"uv": [8, 5, 9, 6], "texture": "#0", "tintindex": 1},
+				"down": {"uv": [8, 5, 9, 6], "texture": "#0", "tintindex": 1}
+			}
+		},
+		{
+			"name": "leaf3",
+			"from": [9, 11, 9],
+			"to": [10, 12, 10],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [9, 11, 7]},
+			"faces": {
+				"east": {"uv": [7, 6, 8, 7], "texture": "#0", "tintindex": 1},
+				"south": {"uv": [7, 6, 8, 7], "texture": "#0", "tintindex": 1},
+				"west": {"uv": [7, 6, 8, 7], "texture": "#0", "tintindex": 1},
+				"up": {"uv": [7, 6, 8, 7], "texture": "#0", "tintindex": 1},
+				"down": {"uv": [7, 6, 8, 7], "texture": "#0", "tintindex": 1}
+			}
+		},
+		{
+			"name": "leaf4",
+			"from": [11, 11, 7],
+			"to": [12, 12, 8],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [9, 11, 7]},
+			"faces": {
+				"north": {"uv": [6, 6, 7, 7], "texture": "#0", "tintindex": 1},
+				"east": {"uv": [6, 6, 7, 7], "texture": "#0", "tintindex": 1},
+				"south": {"uv": [6, 6, 7, 7], "texture": "#0", "tintindex": 1},
+				"west": {"uv": [6, 6, 7, 7], "texture": "#0", "tintindex": 1},
+				"up": {"uv": [6, 6, 7, 7], "texture": "#0", "tintindex": 1},
+				"down": {"uv": [6, 7, 7, 6], "texture": "#0", "tintindex": 1}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5, 6]
+		}
+	]
+}

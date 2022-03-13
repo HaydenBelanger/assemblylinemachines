@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:kelp"
+	},
+	"output":{
+		"item": "minecraft:kelp",
+		"count": 1
+	},
+	"waterPerUnit": 200,
+	"baseAdditionalChance": 1,
+	"maxAdditional": 29,
+	"additionalScaling": "pure_random",
+	"time": 4,
+	"soil": "sand",
+	"sprout": "sprout"
+}

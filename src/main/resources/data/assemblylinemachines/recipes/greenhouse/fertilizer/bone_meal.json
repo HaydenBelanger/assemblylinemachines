@@ -1,0 +1,7 @@
+{
+	"type": "assemblylinemachines:greenhouse_fertilizer",
+	"fertilizer":{
+		"item": "minecraft:bone_meal"
+	},
+	"usesPerItem": 5
+}

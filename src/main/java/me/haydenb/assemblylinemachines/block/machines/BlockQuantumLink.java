@@ -68,7 +68,11 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 		String status = "";
 		int statusTimer = 0;
 
-		IFluidHandler handler = new QuantumLinkFluidHandler();
+		IFluidHandler handler = Utils.getSimpleOneTankHandler(null, 4000, (oFs) -> {
+				if(oFs.isPresent()) tank = oFs.get();
+				return tank;
+		}, (v) -> this.sendUpdates(), true);
+		
 		LazyOptional<IFluidHandler> lazy = LazyOptional.of(() -> handler);
 
 		public TEQuantumLink(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
@@ -250,84 +254,6 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			connected = compound.getBoolean("assemblylinemachines:connected");
 			
 			passwordEnabled = compound.getBoolean("assemblylinemachines:passwordconnection");
-		}
-
-
-		private class QuantumLinkFluidHandler implements IFluidHandler{
-
-			QuantumLinkFluidHandler(){
-			}
-			@Override
-			public boolean isFluidValid(int tank, FluidStack stack) {
-				return true;
-			}
-
-			@Override
-			public int getTanks() {
-				return 1;
-			}
-
-			@Override
-			public int getTankCapacity(int tank) {
-				return 4000;
-			}
-
-			@Override
-			public FluidStack getFluidInTank(int tank) {
-				return TEQuantumLink.this.tank;
-			}
-
-			@Override
-			public int fill(FluidStack resource, FluidAction action) {
-				if (!tank.isEmpty()) {
-					if (resource.getFluid() != tank.getFluid()) {
-						return 0;
-					}
-				}
-
-				int attemptedInsert = resource.getAmount();
-				int rmCapacity = getTankCapacity(0) - tank.getAmount();
-				if (rmCapacity < attemptedInsert) {
-					attemptedInsert = rmCapacity;
-				}
-
-				if (action != FluidAction.SIMULATE) {
-					if (tank.isEmpty()) {
-						tank = new FluidStack(resource.getFluid(), attemptedInsert);
-					} else {
-						tank.setAmount(tank.getAmount() + attemptedInsert);
-					}
-				}
-
-				sendUpdates();
-				return attemptedInsert;
-			}
-
-			@Override
-			public FluidStack drain(int maxDrain, FluidAction action) {
-
-				if (tank.getAmount() < maxDrain) {
-					maxDrain = tank.getAmount();
-				}
-
-				Fluid f = tank.getFluid();
-				if (action != FluidAction.SIMULATE) {
-					tank.setAmount(tank.getAmount() - maxDrain);
-				}
-
-				if (tank.getAmount() <= 0) {
-					tank = FluidStack.EMPTY;
-
-				}
-
-				sendUpdates();
-				return new FluidStack(f, maxDrain);
-			}
-
-			@Override
-			public FluidStack drain(FluidStack resource, FluidAction action) {
-				return drain(resource.getAmount(), action);
-			}
 		}
 
 	}

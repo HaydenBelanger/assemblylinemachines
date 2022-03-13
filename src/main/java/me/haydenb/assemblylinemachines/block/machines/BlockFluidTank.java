@@ -6,11 +6,10 @@ import java.util.stream.Stream;
 
 import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
-import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank.FluidTankHandler;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -29,7 +28,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
@@ -119,7 +117,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 			if (handIn.equals(InteractionHand.MAIN_HAND)) {
 				if (world.getBlockEntity(pos) instanceof TEFluidTank) {
 					TEFluidTank entity = (TEFluidTank) world.getBlockEntity(pos);
-					FluidTankHandler handler = entity.fluids;
+					IFluidHandler handler = entity.fluids;
 					if (handler != null) {
 						if (player.isShiftKeyDown()) {
 							FluidStack f = handler.getFluidInTank(0);
@@ -169,15 +167,23 @@ public class BlockFluidTank extends Block implements EntityBlock {
 
 		public FluidStack fluid = FluidStack.EMPTY;
 
-		FluidTankHandler fluids = new FluidTankHandler(this);
-
-		protected LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> fluids);
+		private final IFluidHandler fluids;
+		private final LazyOptional<IFluidHandler> handler;
 		
 		public final BlockFluidTank block;
 
 		public TEFluidTank(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
 			block = (BlockFluidTank) state.getBlock();
+			fluids = Utils.getSimpleOneTankHandler((fs) -> {
+				if(fs.getFluid().getAttributes().getTemperature() >= 800 && block.temperatureResistance == TemperatureResistance.COLD) return false;
+				return true;
+			}, block.capacity, (oFs) -> {
+				if(oFs.isPresent()) fluid = oFs.get();
+				return fluid;
+			}, (v) -> this.sendUpdates(), true);
+			
+			handler = LazyOptional.of(() -> fluids);
 		}
 
 		public TEFluidTank(BlockPos pos, BlockState state) {
@@ -227,107 +233,6 @@ public class BlockFluidTank extends Block implements EntityBlock {
 
 		public boolean isEmpty() {
 			return fluid.isEmpty();
-		}
-
-		public static class FluidTankHandler implements IFluidHandler {
-
-			private final TEFluidTank te;
-
-			FluidTankHandler(TEFluidTank te) {
-				this.te = te;
-			}
-
-			@Override
-			public boolean isFluidValid(int tank, FluidStack stack) {
-				BathCraftingFluids ff = BathCraftingFluids.getAssocFluids(stack.getFluid());
-				if (ff != BathCraftingFluids.NONE) {
-					return true;
-				}
-				return false;
-			}
-
-			@Override
-			public int getTanks() {
-				return 1;
-			}
-
-			@Override
-			public int getTankCapacity(int tank) {
-				return te.block.capacity;
-			}
-
-			@Override
-			public FluidStack getFluidInTank(int tank) {
-				return te.fluid;
-			}
-
-			public int fill(FluidStack resource, FluidAction action, Player player) {
-				if (!te.fluid.isEmpty()) {
-					if (resource.getFluid() != te.fluid.getFluid()) {
-						sendIfNotNull(player, "This is not the same fluid.");
-						return 0;
-					}
-				}
-
-				if (resource.getFluid().getAttributes().getTemperature() >= 800 && te.block.temperatureResistance == TemperatureResistance.COLD) {
-					sendIfNotNull(player, "This fluid is too hot for this tank");
-					return 0;
-				}
-				int attemptedInsert = resource.getAmount();
-				int rmCapacity = te.block.capacity - te.fluid.getAmount();
-				if (rmCapacity < attemptedInsert) {
-					attemptedInsert = rmCapacity;
-				}
-
-				if (action != FluidAction.SIMULATE) {
-					if (te.fluid.isEmpty()) {
-						te.fluid = resource;
-					} else {
-						te.fluid.setAmount(te.fluid.getAmount() + attemptedInsert);
-					}
-				}
-
-				te.sendUpdates();
-				return attemptedInsert;
-			}
-
-			@Override
-			public int fill(FluidStack resource, FluidAction action) {
-				return fill(resource, action, null);
-			}
-
-			@Override
-			public FluidStack drain(int maxDrain, FluidAction action) {
-
-				if (te.fluid.getAmount() < maxDrain) {
-					maxDrain = te.fluid.getAmount();
-				}
-
-				Fluid f = te.fluid.getFluid();
-				if (action != FluidAction.SIMULATE) {
-					te.fluid.setAmount(te.fluid.getAmount() - maxDrain);
-				}
-
-				if (te.fluid.getAmount() <= 0) {
-					te.fluid = FluidStack.EMPTY;
-
-				}
-
-				te.sendUpdates();
-				return new FluidStack(f, maxDrain);
-			}
-
-			@Override
-			public FluidStack drain(FluidStack resource, FluidAction action) {
-				return drain(resource.getAmount(), action);
-			}
-
-			private void sendIfNotNull(Player player, String message) {
-				if (player != null) {
-					player.displayClientMessage(new TextComponent(message), true);
-				}
-			}
-
 		}
 
 		@Override

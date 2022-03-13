@@ -45,10 +45,7 @@ public class ManagedSidedMachine<A extends AbstractContainerMenu> extends Abstra
 
 	@Override
 	public boolean isAllowedInSlot(int slot, ItemStack stack) {
-		if(slot != 0) {
-			return true;
-		}
-		return false;
+		return slot != 0;
 	}
 
 	public Direction getDirection(ManagedDirection mdir) {

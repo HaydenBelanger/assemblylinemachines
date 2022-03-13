@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:warped_fungus"
+	},
+	"output":{
+		"item": "minecraft:warped_stem",
+		"count": 3
+	},
+	"waterPerUnit": 0,
+	"baseAdditionalChance": 0.10,
+	"upgradeAdditionalChance": 0.20,
+	"maxAdditional": 2,
+	"additionalScaling": "pure_random",
+	"time": 3,
+	"soil": "soul_sand",
+	"sprout": "sapling"
+}

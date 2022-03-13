@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:nether_wart"
+	},
+	"output":{
+		"item": "minecraft:nether_wart",
+		"count": 1
+	},
+	"waterPerUnit": 0,
+	"baseAdditionalChance": 0.10,
+	"upgradeAdditionalChance": 0.20,
+	"maxAdditional": 3,
+	"additionalScaling": "upgrade",
+	"time": 4,
+	"soil": "soul_sand",
+	"sprout": "nether_sprout"
+}

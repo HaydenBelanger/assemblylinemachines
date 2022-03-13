@@ -1,0 +1,132 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_bit_brown",
+		"1": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_bit_red",
+		"2": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_bottom",
+		"3": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_cap_brown",
+		"4": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_cap_red",
+		"5": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_stem",
+		"6": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_top_brown",
+		"7": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_top_red",
+		"particle": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_shroom_bit_brown"
+	},
+	"elements": [
+		{
+			"name": "stem1",
+			"from": [10, 9, 5],
+			"to": [11, 11, 6],
+			"faces": {
+				"north": {"uv": [8, 12, 7, 14], "texture": "#5"},
+				"east": {"uv": [7, 12, 8, 14], "texture": "#5"},
+				"south": {"uv": [8, 12, 7, 14], "texture": "#5"},
+				"west": {"uv": [7, 12, 8, 14], "texture": "#5"}
+			}
+		},
+		{
+			"name": "cap1",
+			"from": [9, 11, 4],
+			"to": [12, 13, 7],
+			"faces": {
+				"north": {"uv": [6, 12, 9, 14], "texture": "#4"},
+				"east": {"uv": [9, 12, 6, 14], "texture": "#4"},
+				"south": {"uv": [6, 12, 9, 14], "texture": "#4"},
+				"west": {"uv": [9, 12, 6, 14], "texture": "#4"},
+				"up": {"uv": [6, 9, 9, 12], "texture": "#7"},
+				"down": {"uv": [6, 7, 9, 10], "texture": "#2"}
+			}
+		},
+		{
+			"name": "bit1",
+			"from": [10, 13, 5],
+			"to": [11, 14, 6],
+			"faces": {
+				"north": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"east": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"south": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"west": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"up": {"uv": [7, 11, 8, 12], "texture": "#1"}
+			}
+		},
+		{
+			"name": "stem2",
+			"from": [6, 9, 7],
+			"to": [7, 13, 8],
+			"faces": {
+				"north": {"uv": [8, 12, 7, 16], "texture": "#5"},
+				"east": {"uv": [7, 12, 8, 16], "texture": "#5"},
+				"south": {"uv": [8, 12, 7, 16], "texture": "#5"},
+				"west": {"uv": [7, 12, 8, 16], "texture": "#5"}
+			}
+		},
+		{
+			"name": "cap2",
+			"from": [5, 13, 6],
+			"to": [8, 15, 9],
+			"faces": {
+				"north": {"uv": [9, 12, 6, 14], "texture": "#4"},
+				"east": {"uv": [6, 12, 9, 14], "texture": "#4"},
+				"south": {"uv": [9, 12, 6, 14], "texture": "#4"},
+				"west": {"uv": [6, 12, 9, 14], "texture": "#4"},
+				"up": {"uv": [6, 9, 9, 12], "rotation": 90, "texture": "#7"},
+				"down": {"uv": [6, 7, 9, 10], "texture": "#2"}
+			}
+		},
+		{
+			"name": "bit2",
+			"from": [6, 15, 7],
+			"to": [7, 16, 8],
+			"faces": {
+				"north": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"east": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"south": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"west": {"uv": [7, 11, 8, 12], "texture": "#1"},
+				"up": {"uv": [7, 11, 8, 12], "texture": "#1"}
+			}
+		},
+		{
+			"name": "cap3",
+			"from": [9, 12, 9],
+			"to": [12, 14, 12],
+			"faces": {
+				"north": {"uv": [9, 12, 6, 14], "texture": "#3"},
+				"east": {"uv": [6, 12, 9, 14], "texture": "#3"},
+				"south": {"uv": [9, 12, 6, 14], "texture": "#3"},
+				"west": {"uv": [6, 12, 9, 14], "texture": "#3"},
+				"up": {"uv": [6, 9, 9, 12], "texture": "#6"},
+				"down": {"uv": [6, 7, 9, 10], "texture": "#2"}
+			}
+		},
+		{
+			"name": "stem3",
+			"from": [10, 9, 10],
+			"to": [11, 12, 11],
+			"faces": {
+				"north": {"uv": [8, 12, 7, 15], "texture": "#5"},
+				"east": {"uv": [7, 12, 8, 15], "texture": "#5"},
+				"south": {"uv": [8, 12, 7, 15], "texture": "#5"},
+				"west": {"uv": [7, 12, 8, 15], "texture": "#5"}
+			}
+		},
+		{
+			"name": "bit3",
+			"from": [10, 14, 10],
+			"to": [11, 15, 11],
+			"faces": {
+				"north": {"uv": [7, 11, 8, 12], "texture": "#0"},
+				"east": {"uv": [7, 11, 8, 12], "texture": "#0"},
+				"south": {"uv": [7, 11, 8, 12], "texture": "#0"},
+				"west": {"uv": [7, 11, 8, 12], "texture": "#0"},
+				"up": {"uv": [7, 11, 8, 12], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+		}
+	]
+}

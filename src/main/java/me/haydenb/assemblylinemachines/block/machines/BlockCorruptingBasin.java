@@ -81,65 +81,10 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 		public FluidStack tank = FluidStack.EMPTY;
 		
 		
-		public IFluidHandler handler = new IFluidHandler() {
-
-			@Override
-			public int getTanks() {
-				return 1;
-			}
-
-			@Override
-			public FluidStack getFluidInTank(int tank) {
-				return TECorruptingBasin.this.tank;
-			}
-
-			@Override
-			public int getTankCapacity(int tank) {
-				return 4000;
-			}
-
-			@Override
-			public boolean isFluidValid(int tank, FluidStack stack) {
-				return stack.getFluid().equals(Registry.getFluid("condensed_void"));
-			}
-
-			@Override
-			public int fill(FluidStack resource, FluidAction action) {
-				if(!tank.isEmpty()) {
-					if(!resource.getFluid().equals(tank.getFluid())) return 0;
-				}
-				
-				if(!this.isFluidValid(0, resource)) return 0;
-				
-				int attemptedInsert = resource.getAmount();
-				int rmCapacity = getTankCapacity(0) - tank.getAmount();
-				if (rmCapacity < attemptedInsert) {
-					attemptedInsert = rmCapacity;
-				}
-
-				if (action != FluidAction.SIMULATE) {
-					if (tank.isEmpty()) {
-						tank = new FluidStack(resource.getFluid(), attemptedInsert);
-					} else {
-						tank.setAmount(tank.getAmount() + attemptedInsert);
-					}
-				}
-				sendUpdates();
-				return attemptedInsert;
-			}
-
-			@Override
-			public FluidStack drain(FluidStack resource, FluidAction action) {
-				return FluidStack.EMPTY;
-			}
-
-			@Override
-			public FluidStack drain(int maxDrain, FluidAction action) {
-				return FluidStack.EMPTY;
-			}
-			
-			
-		};
+		public IFluidHandler handler = Utils.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Registry.getFluid("condensed_void")), 4000, (oFs) -> {
+			if(oFs.isPresent()) tank = oFs.get();
+			return tank;
+		}, (v) -> this.sendUpdates(), false);
 		
 		protected LazyOptional<IFluidHandler> lazy = LazyOptional.of(() -> handler);
 		

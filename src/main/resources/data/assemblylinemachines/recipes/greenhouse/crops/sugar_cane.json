@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:sugar_cane"
+	},
+	"output":{
+		"item": "minecraft:sugar_cane",
+		"count": 1
+	},
+	"waterPerUnit": 300,
+	"baseAdditionalChance": 1,
+	"maxAdditional": 2,
+	"additionalScaling": "pure_random",
+	"time": 8,
+	"soil": "sand",
+	"sprout": "sugar_cane"
+}

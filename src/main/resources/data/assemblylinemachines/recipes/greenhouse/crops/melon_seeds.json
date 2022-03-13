@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:melon_seeds"
+	},
+	"output":{
+		"item": "minecraft:melon",
+		"count": 1
+	},
+	"waterPerUnit": 350,
+	"baseAdditionalChance": 0.2,
+	"upgradeAdditionalChance": 0.2,
+	"maxAdditional": 1,
+	"additionalScaling": "pure_random",
+	"time": 20,
+	"soil": "dirt",
+	"sprout": "sprout"
+}

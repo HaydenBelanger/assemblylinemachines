@@ -1,0 +1,85 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"1": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_chaos_wood",
+		"2": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_chaos_branch",
+		"3": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_chaos_leaves",
+		"particle": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_chaos_leaves"
+	},
+	"elements": [
+		{
+			"name": "stem",
+			"from": [7, 9, 7],
+			"to": [9, 12, 9],
+			"faces": {
+				"north": {"uv": [7, 13, 9, 16], "texture": "#1"},
+				"east": {"uv": [7, 13, 9, 16], "texture": "#1"},
+				"south": {"uv": [9, 16, 7, 13], "rotation": 180, "texture": "#1"},
+				"west": {"uv": [7, 13, 9, 16], "texture": "#1"},
+				"up": {"uv": [7, 14, 9, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "branch1",
+			"from": [5, 11, 7],
+			"to": [7, 12, 8],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [7, 11, 8]},
+			"faces": {
+				"north": {"uv": [9, 8, 7, 9], "texture": "#2"},
+				"south": {"uv": [7, 8, 9, 9], "texture": "#2"},
+				"west": {"uv": [8, 14, 9, 15], "texture": "#1"},
+				"up": {"uv": [7, 8, 9, 9], "texture": "#2"},
+				"down": {"uv": [7, 8, 9, 9], "texture": "#2"}
+			}
+		},
+		{
+			"name": "branch2",
+			"from": [9, 11, 8],
+			"to": [11, 12, 9],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [9, 11, 8]},
+			"faces": {
+				"north": {"uv": [7, 8, 9, 9], "texture": "#2"},
+				"east": {"uv": [7, 8, 8, 9], "texture": "#2"},
+				"south": {"uv": [7, 8, 9, 9], "rotation": 180, "texture": "#2"},
+				"up": {"uv": [7, 8, 9, 9], "rotation": 180, "texture": "#2"},
+				"down": {"uv": [7, 8, 9, 9], "rotation": 180, "texture": "#2"}
+			}
+		},
+		{
+			"name": "leaves1",
+			"from": [4, 10.5, 6.5],
+			"to": [6, 12.5, 8.5],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [7, 11, 8]},
+			"faces": {
+				"north": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"east": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"south": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"west": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"up": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"down": {"uv": [5, 6, 10, 11], "texture": "#3"}
+			}
+		},
+		{
+			"name": "leaves2",
+			"from": [10, 10.5, 7.5],
+			"to": [12, 12.5, 9.5],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [9, 11, 8]},
+			"faces": {
+				"north": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"east": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"south": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"west": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"up": {"uv": [5, 6, 10, 11], "texture": "#3"},
+				"down": {"uv": [5, 6, 10, 11], "texture": "#3"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4]
+		}
+	]
+}

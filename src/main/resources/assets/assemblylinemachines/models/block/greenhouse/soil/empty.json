@@ -1,0 +1,25 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/greenhouse/greenhouse_soil_default",
+		"particle": "assemblylinemachines:block/greenhouse/greenhouse_soil_default"
+	},
+	"elements": [
+		{
+			"name": "soil",
+			"from": [0, 9, 0],
+			"to": [16, 9, 16],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

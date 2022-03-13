@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,6 +15,7 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.Utils.IFluidHandlerBypass;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -149,7 +151,9 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		if(inv instanceof IMachineDataBridge) {
 			IMachineDataBridge data = (IMachineDataBridge) inv;
 			IFluidHandler handler = data.getCraftingFluidHandler(Optional.empty());
-			if(handler == null || handler.getFluidInTank(0).getFluid() != fluid.getAssocFluid() || handler.drain(percent.getMB(), FluidAction.SIMULATE).getAmount() != percent.getMB()) return ItemStack.EMPTY;
+			BiFunction<Integer, FluidAction, FluidStack> drain = handler instanceof IFluidHandlerBypass ? (i, a) -> ((IFluidHandlerBypass) handler).drainBypassRestrictions(i, a) : (i, a) -> handler.drain(i, a);
+			if(handler == null || handler.getFluidInTank(0).getFluid() != fluid.getAssocFluid() || drain.apply(percent.getMB(), FluidAction.SIMULATE).getAmount() != percent.getMB()) return ItemStack.EMPTY;
+
 			int rand = RAND.nextInt(9) * data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
 			int cons = percent.getMB();
 			if(rand > 21) {
@@ -162,7 +166,8 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 				cons = (int) Math.round((double) cons * 0.75d);
 			}
 			
-			handler.drain(cons, FluidAction.EXECUTE);
+			drain.apply(cons, FluidAction.EXECUTE);
+			
 			inv.getItem(1).shrink(1);
 			inv.getItem(2).shrink(1);
 			data.setCycles((float) stirs * 3.6f);
