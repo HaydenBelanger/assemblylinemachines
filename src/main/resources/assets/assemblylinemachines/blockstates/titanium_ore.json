@@ -1,13 +1,13 @@
 {
 	"variants":{
 		"": [{
-			"model": "assemblylinemachines:block/ores/titanium_ore"
+			"model": "assemblylinemachines:block/titanium_ore"
 		},
 		{
-			"model": "assemblylinemachines:block/ores/titanium_ore_1"
+			"model": "assemblylinemachines:block/titanium_ore_1"
 		},
 		{
-			"model": "assemblylinemachines:block/ores/titanium_ore_2"
+			"model": "assemblylinemachines:block/titanium_ore_2"
 		}]
 	}
 	

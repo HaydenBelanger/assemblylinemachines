@@ -1,8 +1,0 @@
-{
-    "parent": "block/orientable",
-    "textures": {
-        "top": "assemblylinemachines:block/machine_basic_top",
-        "front": "assemblylinemachines:block/mixerfronts/simple_fluid_mixer_water",
-        "side": "assemblylinemachines:block/machine_basic_side"
-    }
-}

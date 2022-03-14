@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/dirt"
+			"model": "assemblylinemachines:block/corrupt_dirt"
 		}
 	}
 	

@@ -1,13 +1,13 @@
 {
 	"variants":{
 		"": [{
-			"model": "assemblylinemachines:block/ores/flerovium_ore"
+			"model": "assemblylinemachines:block/flerovium_ore"
 		},
 		{
-			"model": "assemblylinemachines:block/ores/flerovium_ore_1"
+			"model": "assemblylinemachines:block/flerovium_ore_1"
 		},
 		{
-			"model": "assemblylinemachines:block/ores/flerovium_ore_2"
+			"model": "assemblylinemachines:block/flerovium_ore_2"
 		}]
 	}
 	

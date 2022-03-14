@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/tank/mystium_frame"
+			"model": "assemblylinemachines:block/mystium_fluid_tank"
 		}
 	}
 	

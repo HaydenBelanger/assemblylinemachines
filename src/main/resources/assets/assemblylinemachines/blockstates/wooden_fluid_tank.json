@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/tank/wooden_frame"
+			"model": "assemblylinemachines:block/wooden_fluid_tank"
 		}
 	}
 	

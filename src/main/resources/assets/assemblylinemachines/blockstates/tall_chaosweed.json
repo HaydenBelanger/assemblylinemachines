@@ -1,10 +1,10 @@
 {
   "variants": {
     "half=lower": {
-      "model": "assemblylinemachines:block/corrupt/plants/tall_chaosweed_lower"
+      "model": "assemblylinemachines:block/tall_chaosweed_lower"
     },
     "half=upper": {
-      "model": "assemblylinemachines:block/corrupt/plants/tall_chaosweed_upper"
+      "model": "assemblylinemachines:block/tall_chaosweed"
     }
   }
 }

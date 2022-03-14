@@ -1,8 +1,8 @@
 {
     "variants": {
-        "facing=north": { "model": "assemblylinemachines:block/pump/pump" },
-        "facing=south": { "model": "assemblylinemachines:block/pump/pump", "y": 180 },
-        "facing=west":  { "model": "assemblylinemachines:block/pump/pump", "y": 270 },
-        "facing=east":  { "model": "assemblylinemachines:block/pump/pump", "y": 90 }
+        "facing=north": { "model": "assemblylinemachines:block/pump" },
+        "facing=south": { "model": "assemblylinemachines:block/pump", "y": 180 },
+        "facing=west":  { "model": "assemblylinemachines:block/pump", "y": 270 },
+        "facing=east":  { "model": "assemblylinemachines:block/pump", "y": 90 }
     }
 }

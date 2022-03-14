@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/plants/chaosweed"
+			"model": "assemblylinemachines:block/chaosweed"
 		}
 	}
 	

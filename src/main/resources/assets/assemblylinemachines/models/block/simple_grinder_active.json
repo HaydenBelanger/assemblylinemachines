@@ -1,0 +1,6 @@
+{
+    "parent": "assemblylinemachines:block/simple_grinder",
+    "textures": {
+        "front": "assemblylinemachines:block/simple_grinder_active"
+    }
+}

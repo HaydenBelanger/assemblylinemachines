@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/plants/mandelbloom"
+			"model": "assemblylinemachines:block/mandelbloom"
 		}
 	}
 	

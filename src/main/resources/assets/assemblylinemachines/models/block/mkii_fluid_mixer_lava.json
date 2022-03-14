@@ -1,0 +1,7 @@
+{
+	"parent": "assemblylinemachines:block/mkii_fluid_mixer",
+	"textures": {
+		"10": "assemblylinemachines:block/mkii_fluid_mixer/t2_electric_fluid_mixer_lava",
+		"11": "assemblylinemachines:block/t2_electric_furnace_active"
+	}
+}

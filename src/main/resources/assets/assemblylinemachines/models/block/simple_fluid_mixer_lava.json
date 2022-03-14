@@ -1,0 +1,6 @@
+{
+    "parent": "assemblylinemachines:block/simple_fluid_mixer",
+    "textures": {
+        "front": "assemblylinemachines:block/mixerfronts/simple_fluid_mixer_lava"
+    }
+}

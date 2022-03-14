@@ -1,0 +1,7 @@
+{
+	"parent": "assemblylinemachines:block/mkii_grinder",
+	"textures": {
+		"0": "assemblylinemachines:block/mkii_grinder/t2_grinder_active",
+		"3": "assemblylinemachines:block/t2_electric_furnace_active"
+	}
+}

@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/chaosbark_planks"
+			"model": "assemblylinemachines:block/chaosbark_planks"
 		}
 	}
 	

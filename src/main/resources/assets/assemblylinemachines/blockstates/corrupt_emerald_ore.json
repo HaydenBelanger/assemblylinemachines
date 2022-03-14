@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/ores/corrupt_emerald_ore"
+			"model": "assemblylinemachines:block/corrupt_emerald_ore"
 		}
 	}
 	

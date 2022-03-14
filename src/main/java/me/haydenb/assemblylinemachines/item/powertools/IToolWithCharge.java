@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.item.ItemAEFG;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
@@ -219,7 +220,8 @@ public interface IToolWithCharge{
 		}
 		
 		public boolean needsActiveModel(Item item) {
-			return this.hasSecondaryAbilities && (item instanceof SwordItem || item instanceof PickaxeItem || item instanceof HoeItem || item instanceof AxeItem || item instanceof ShovelItem);
+			return (this.hasSecondaryAbilities && (item instanceof SwordItem || item instanceof PickaxeItem || item instanceof HoeItem || item instanceof AxeItem 
+					|| item instanceof ShovelItem)) || item instanceof ItemAEFG;
 		}
 	}
 

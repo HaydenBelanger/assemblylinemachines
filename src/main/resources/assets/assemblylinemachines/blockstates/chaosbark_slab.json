@@ -1,7 +1,7 @@
 {
     "variants": {
-        "type=bottom": { "model": "assemblylinemachines:block/corrupt/slab/slab_chaosbark" },
-        "type=top": { "model": "assemblylinemachines:block/corrupt/slab/slab_chaosbark_top" },
+        "type=bottom": { "model": "assemblylinemachines:block/chaosbark_slab" },
+        "type=top": { "model": "assemblylinemachines:block/chaosbark_slab_top" },
         "type=double": { "model": "assemblylinemachines:block/corrupt/chaosbark_planks" }
     }
 }

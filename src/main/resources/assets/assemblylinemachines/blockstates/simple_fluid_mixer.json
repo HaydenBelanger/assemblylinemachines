@@ -1,42 +1,42 @@
 {
     "multipart": [
     	{   "when": { "fluid": "none", "facing": "north" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer"}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer"}
         },
         {   "when": { "fluid": "none", "facing": "east" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer", "y": 90}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer", "y": 90}
         },
 		{   "when": { "fluid": "none", "facing": "south" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer", "y": 180}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer", "y": 180}
         },
 		{   "when": { "fluid": "none", "facing": "west" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer", "y": 270}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer", "y": 270}
         },
     	
     	{   "when": { "fluid": "water", "facing": "north" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_water"}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_water"}
         },
         {   "when": { "fluid": "water", "facing": "east" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_water", "y": 90}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_water", "y": 90}
         },
 		{   "when": { "fluid": "water", "facing": "south" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_water", "y": 180}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_water", "y": 180}
         },
 		{   "when": { "fluid": "water", "facing": "west" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_water", "y": 270}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_water", "y": 270}
         },
         
         {   "when": { "fluid": "lava", "facing": "north" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_lava"}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_lava"}
         },
         {   "when": { "fluid": "lava", "facing": "east" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_lava", "y": 90}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_lava", "y": 90}
         },
 		{   "when": { "fluid": "lava", "facing": "south" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_lava", "y": 180}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_lava", "y": 180}
         },
 		{   "when": { "fluid": "lava", "facing": "west" },
-            "apply": { "model": "assemblylinemachines:block/mixer/simple_fluid_mixer_lava", "y": 270}
+            "apply": { "model": "assemblylinemachines:block/simple_fluid_mixer_lava", "y": 270}
         }
     ]
 }

@@ -50,6 +50,7 @@ public class TagMaster {
 		MATERIAL_TOOL.put(Material.REPLACEABLE_PLANT, Optional.empty());
 		MATERIAL_TOOL.put(Material.CACTUS, Optional.empty());
 		MATERIAL_TOOL.put(Material.FIRE, Optional.empty());
+		MATERIAL_TOOL.put(Material.LEAVES, Optional.of(BlockTags.MINEABLE_WITH_HOE));
 	}
 	
 	//This is for general tagging.

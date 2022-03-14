@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/tank/novasteel_frame"
+			"model": "assemblylinemachines:block/novasteel_fluid_tank"
 		}
 	}
 	

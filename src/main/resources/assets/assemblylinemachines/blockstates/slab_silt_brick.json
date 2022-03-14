@@ -1,7 +1,7 @@
 {
     "variants": {
-        "type=bottom": { "model": "assemblylinemachines:block/silt_brick/slab_silt_brick" },
-        "type=top": { "model": "assemblylinemachines:block/silt_brick/slab_silt_brick_top" },
-        "type=double": { "model": "assemblylinemachines:block/silt_brick/silt_brick" }
+        "type=bottom": { "model": "assemblylinemachines:block/slab_silt_brick" },
+        "type=top": { "model": "assemblylinemachines:block/slab_silt_brick_top" },
+        "type=double": { "model": "assemblylinemachines:block/silt_brick" }
     }
 }

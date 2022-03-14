@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "assemblylinemachines:block/tall_chaosweed_lower"
+  }
+}

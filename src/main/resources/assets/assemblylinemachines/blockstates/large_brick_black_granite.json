@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/black_granite/large_brick_black_granite"
+			"model": "assemblylinemachines:block/large_brick_black_granite"
 		}
 	}
 	

@@ -225,22 +225,26 @@ public class LootTableGenerator extends LootTableProvider {
 			List<Block> skippedBlks = excludedBlocks();
 			if(!skippedBlks.isEmpty()) {
 				int fluidSkips = 0;
+				int knownSkips = 0;
 				List<Block> otherSkips = new ArrayList<>();
 				for(Block b : skippedBlks) {
 					if(b instanceof LiquidBlock) {
 						fluidSkips++;
-					}else if(!KNOWN_ERRORS.contains(b.getRegistryName().getPath())) {
+					}else if(KNOWN_ERRORS.contains(b.getRegistryName().getPath())) {
+						knownSkips++;
+					}else {
 						otherSkips.add(b);
 					}
 				}
 				if(fluidSkips != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + fluidSkips + " block(s) which are LiquidBlocks and expected to be skipped as a result.");
+				if(knownSkips != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + knownSkips + " block(s) which are flagged as a \"known error\", meaning they intentionally don't have an associated sequence.");
 				if(!otherSkips.isEmpty()) {
 					String blocks = "";
 					for(Block b : otherSkips) {
 						blocks = blocks + b.getRegistryName().toString() + ", ";
 					}
 					blocks = blocks.substring(0, blocks.length() - 2);
-					pw.println("[LOOT TABLES - WARNING]: There were blocks skipped which were skipped for not having an associated BlockItem, not given an alternative drop, or marked as allowed: " + blocks);
+					pw.println("[LOOT TABLES - WARNING]: There were blocks skipped which were skipped for not having an associated BlockItem, not given an alternative drop, or marked as a \"known error\": " + blocks);
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.BushBlock;
 import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
@@ -45,17 +46,23 @@ public class ItemModelGenerator extends ItemModelProvider {
 		List<String> exclude = Lists.transform(files, (f) -> FileNameUtils.getBaseName(f.getPath()));
 		
 		//BLOCK, HANDHELD, OTHER
-		int[] stats = new int[7];
+		int[] stats = new int[8];
 		
 		for(Item item : Registry.getAllItemsUnmodifiable()) {
 			String name = item.getRegistryName().getPath();
 			if(exclude.contains(name)) {
 				stats[6]++;
 			}else {
-				if(item instanceof BlockItem) {
-					this.blockParent(name);
-					stats[1]++;
-					
+				if(item instanceof BlockItem blockItem) {
+					if(blockItem.getBlock() instanceof BushBlock) {
+						this.blockTextureGenerated(name);
+						stats[7]++;
+						
+					}else {
+						this.blockParent(name);
+						stats[1]++;
+						
+					}
 				}else if(item instanceof IToolWithCharge chargeTool && chargeTool.getPowerToolType().needsActiveModel(item)) {
 					this.toolWithAbility(name);
 					stats[5]++;
@@ -87,11 +94,16 @@ public class ItemModelGenerator extends ItemModelProvider {
 		writer.println("[ITEM MODELS - INFO]: Generated " + stats[3] + " Bucket Model(s) for mod fluid buckets.");
 		writer.println("[ITEM MODELS - INFO]: Generated " + stats[4] + " Spawn Egg Model(s) for mod mob Spawn Eggs.");
 		writer.println("[ITEM MODELS - INFO]: Generated " + stats[5] + " Power Tool Model(s) with active models for tools with secondary abilities.");
+		writer.println("[ITEM MODELS - INFO]: Generated " + stats[7] + " Bush Model(s) for mod saplings, flowers, bushes, and other plants.");
 		writer.println("[ITEM MODELS - INFO]: Skipped " + stats[6] + " model(s) which had an existing model file in an input directory.");
 	}
 	
 	private void blockParent(String name) {
 		super.withExistingParent(name, new ResourceLocation(AssemblyLineMachines.MODID, "block/" + name));
+	}
+	
+	private void blockTextureGenerated(String name) {
+		super.withExistingParent(name, "item/generated").texture("layer0", new ResourceLocation(AssemblyLineMachines.MODID, "block/" + name));
 	}
 	
 	private void simple(String name, String parent) {

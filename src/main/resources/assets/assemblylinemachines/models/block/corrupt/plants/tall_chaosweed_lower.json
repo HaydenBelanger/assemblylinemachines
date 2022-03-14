@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cross",
-  "textures": {
-    "cross": "assemblylinemachines:block/corrupt/plants/tall_chaosweed_lower"
-  }
-}

@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/black_granite/smooth_black_granite"
+			"model": "assemblylinemachines:block/smooth_black_granite"
 		}
 	}
 	

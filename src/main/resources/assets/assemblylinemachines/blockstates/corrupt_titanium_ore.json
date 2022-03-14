@@ -1,13 +1,13 @@
 {
 	"variants":{
 		"": [{
-			"model": "assemblylinemachines:block/corrupt/ores/corrupt_titanium_ore"
+			"model": "assemblylinemachines:block/corrupt_titanium_ore"
 		},
 		{
-			"model": "assemblylinemachines:block/corrupt/ores/corrupt_titanium_ore_1"
+			"model": "assemblylinemachines:block/corrupt_titanium_ore_1"
 		},
 		{
-			"model": "assemblylinemachines:block/corrupt/ores/corrupt_titanium_ore_2"
+			"model": "assemblylinemachines:block/corrupt_titanium_ore_2"
 		}]
 	}
 	

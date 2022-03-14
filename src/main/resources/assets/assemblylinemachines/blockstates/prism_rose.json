@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/plants/prism_rose"
+			"model": "assemblylinemachines:block/prism_rose"
 		}
 	}
 	

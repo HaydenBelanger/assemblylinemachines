@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/corrupt/stone"
+			"model": "assemblylinemachines:block/corrupt_stone"
 		}
 	}
 	

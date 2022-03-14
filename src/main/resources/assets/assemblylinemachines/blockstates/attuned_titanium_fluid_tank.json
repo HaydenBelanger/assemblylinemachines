@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/tank/attuned_titanium_frame"
+			"model": "assemblylinemachines:block/attuned_titanium_fluid_tank"
 		}
 	}
 	

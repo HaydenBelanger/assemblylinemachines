@@ -1,15 +1,15 @@
 {
 	"multipart":[
 		{
-			"apply": {"model": "assemblylinemachines:block/black_granite/pillar_black_granite"}
+			"apply": {"model": "assemblylinemachines:block/pillar_black_granite"}
 		},
 		{
 			"when": {"top": true},
-			"apply": {"model": "assemblylinemachines:block/black_granite/pillar_black_granite_cappiece"}
+			"apply": {"model": "assemblylinemachines:block/pillar_black_granite_cappiece"}
 		},
 		{
 			"when": {"bottom": true},
-			"apply": {"model": "assemblylinemachines:block/black_granite/pillar_black_granite_cappiece", "x": 180}
+			"apply": {"model": "assemblylinemachines:block/pillar_black_granite_cappiece", "x": 180}
 		}
 	]
 }

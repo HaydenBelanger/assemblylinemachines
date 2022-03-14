@@ -1,7 +1,7 @@
 {
 	"variants":{
 		"": {
-			"model": "assemblylinemachines:block/black_granite/etched_black_granite"
+			"model": "assemblylinemachines:block/etched_black_granite"
 		}
 	}
 	
