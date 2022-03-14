@@ -48,27 +48,27 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		
 		
 		if(inputFolders.size() == 0) {
-			writer.println("[WARNING]: Datagen was not provided with any input folders, so no Blasting to Furnace auto-recipes will be generated.");
+			writer.println("[FURNACE RECIPES - WARNING]: Datagen was not provided with any input folders, so no Blasting to Furnace auto-recipes will be generated.");
 		}else {
-			writer.println("[SYSTEM]: Starting Blasting to Furnace recipe auto-conversion with " + inputFolders.size() + " input folder(s)...");
+			writer.println("[FURNACE RECIPES - INFO]: Starting Blasting to Furnace recipe auto-conversion with " + inputFolders.size() + " input folder(s)...");
 			for(Path p : inputFolders) {
 				File f = new File(p.toString() + "/data/" + AssemblyLineMachines.MODID.toLowerCase() + "/recipes/blasting/");
-				writer.println("[SYSTEM]: Using input directory \"" + f.getPath() + "\"...");
+				writer.println("[FURNACE RECIPES - INFO]: Using input directory \"" + f.getPath() + "\"...");
 				this.concursivelyCopyRecipe(consumer, f.getPath());
 			}
 		}
 		
-		writer.println("[SYSTEM]: Starting auto-generation of metal-related recipes...");
+		writer.println("[METAL RECIPES - INFO]: Starting auto-generation of metal-related recipes...");
 		
 		for(MetalRecipeGeneration mrg : MetalRecipeGeneration.values()) {
 			writer.println(mrg.generateRecipes(consumer));
 		}
 		
-		writer.println("[SYSTEM]: Starting auto-generation of mod-compat-Grinder recipes...");
+		writer.println("[GRINDER RECIPES - INFO]: Starting auto-generation of mod-compat-Grinder recipes...");
 		for(GrinderRecipeGeneration grg : GrinderRecipeGeneration.values()) {
 			grg.consumer.accept(consumer);
 		}
-		writer.println("[GRINDER RECIPES]: Generated Ore Block, Raw Ore, and Ingot pulverizing recipes for " + GrinderRecipeGeneration.values().length + " metal(s).");
+		writer.println("[GRINDER RECIPES - INFO]: Generated Ore Block, Raw Ore, and Ingot pulverizing recipes for " + GrinderRecipeGeneration.values().length + " metal(s).");
 		
 	}
 	
@@ -92,10 +92,10 @@ public class AutoRecipeGenerator extends RecipeProvider {
 						BlastingRecipe recipe = RecipeSerializer.BLASTING_RECIPE.fromJson(new ResourceLocation(AssemblyLineMachines.MODID, "blasting/" + rlPath), json);
 						
 						consumer.accept(new AdvancementlessResult(new ResourceLocation(AssemblyLineMachines.MODID, "smelting/" + rlPath), recipe.getIngredients().get(0), recipe.assemble(null).getItem(), recipe.getExperience(), recipe.getCookingTime() * 2));
-						writer.println("[FURNACE RECIPES]: Copied blasting recipe " + rlPath + ".");
+						writer.println("[FURNACE RECIPES - INFO]: Copied blasting recipe " + rlPath + ".");
 					}catch(Exception e) {
 						
-						writer.println("[WARNING]: Generating recipe for " + file.getName() + " failed. View console for more info.");
+						writer.println("[FURNACE RECIPES - WARNING]: Generating recipe for " + file.getName() + " failed. View console for more info.");
 						e.printStackTrace();
 					}
 					
@@ -280,9 +280,9 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			}
 			
 			if(!logText.isEmpty()) {
-				return "[METAL RECIPES]: Generated " + typeName + " recipes: " + logText.substring(0, logText.length() - 2) + ".";
+				return "[METAL RECIPES - INFO]: Generated " + typeName + " recipes: " + logText.substring(0, logText.length() - 2) + ".";
 			}
-			return "[WARNING]: No recipes generated for " + typeName + ".";
+			return "[METAL RECIPES - WARNING]: No recipes generated for " + typeName + ".";
 		}
 		
 		

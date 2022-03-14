@@ -1,7 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures":{
-		"layer0": "assemblylinemachines:item/greenhouse_upgrade_interdimensional_specialization"
-	}
-	
-}

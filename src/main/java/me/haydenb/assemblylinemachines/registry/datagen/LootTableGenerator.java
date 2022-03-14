@@ -22,8 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.LootTable.Builder;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -62,6 +61,7 @@ public class LootTableGenerator extends LootTableProvider {
 	private class GeneratedBlockLoot extends BlockLoot{
 		
 		private static final List<String> BLOCK_ONLY_EXCEPTIONS = List.of("mystium_farmland", "nova_farmland");
+		private static final List<String> KNOWN_ERRORS = List.of("naphtha_fire");
 		
 		private final List<String> existingLootTables = getExistingLootTables();
 		
@@ -118,13 +118,13 @@ public class LootTableGenerator extends LootTableProvider {
 		
 		@Override
 		protected void addTables() {
-			pw.println("[SYSTEM]: Starting block loot table generation...");
+			pw.println("[LOOT TABLES - INFO]: Starting block loot table generation...");
 			
 			Iterator<Block> knownBlocks = getKnownBlocks().iterator();
 			
-			
-			for(String str : existingLootTables) {
-				pw.println("[WARNING]: Skipping " + str + " as an existing file is in an input directory.");
+			int skipped = 0;
+			for(@SuppressWarnings("unused") String str : existingLootTables) {
+				skipped++;
 			}
 			
 			int i = 0;
@@ -220,12 +220,29 @@ public class LootTableGenerator extends LootTableProvider {
 				i++;
 			}
 			
-			pw.println("[LOOT TABLES]: Processed and generated loot tables for " + i + " block(s).");
-			int diff = Registry.getAllBlocksUnmodifiable().size() - i;
-			if(diff > 0) {
-				pw.println("[WARNING]: " + diff + " block(s) were skipped as they do not have a BlockItem, most likely Fluids and other fringe blocks.");
+			pw.println("[LOOT TABLES - INFO]: Processed and generated loot tables for " + i + " block(s).");
+			if(skipped != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + skipped + " block(s) which had an existing loot table file in an input directory.");
+			List<Block> skippedBlks = excludedBlocks();
+			if(!skippedBlks.isEmpty()) {
+				int fluidSkips = 0;
+				List<Block> otherSkips = new ArrayList<>();
+				for(Block b : skippedBlks) {
+					if(b instanceof LiquidBlock) {
+						fluidSkips++;
+					}else if(!KNOWN_ERRORS.contains(b.getRegistryName().getPath())) {
+						otherSkips.add(b);
+					}
+				}
+				if(fluidSkips != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + fluidSkips + " block(s) which are LiquidBlocks and expected to be skipped as a result.");
+				if(!otherSkips.isEmpty()) {
+					String blocks = "";
+					for(Block b : otherSkips) {
+						blocks = blocks + b.getRegistryName().toString() + ", ";
+					}
+					blocks = blocks.substring(0, blocks.length() - 2);
+					pw.println("[LOOT TABLES - WARNING]: There were blocks skipped which were skipped for not having an associated BlockItem, not given an alternative drop, or marked as allowed: " + blocks);
+				}
 			}
-			
 		}
 		
 		@Override
@@ -235,6 +252,10 @@ public class LootTableGenerator extends LootTableProvider {
 			recipesToApply.removeIf((b) -> existingLootTables.contains(b.getRegistryName().getPath()));
 			
 			return recipesToApply;
+		}
+		
+		private List<Block> excludedBlocks(){
+			return Registry.getAllBlocksUnmodifiable().stream().filter((b) -> b.asItem().equals(Items.AIR) && !BLOCK_ONLY_EXCEPTIONS.contains(b.getRegistryName().getPath())).toList();
 		}
 		
 		private List<String> getExistingLootTables(){

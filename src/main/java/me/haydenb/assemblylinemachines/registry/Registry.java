@@ -853,11 +853,12 @@ public class Registry {
 	public static void gatherData(GatherDataEvent event) throws Exception {
 		
 		PrintWriter pw = new PrintWriter("logs/almdatagen.log", "UTF-8");
-		pw.println("[SYSTEM]: Commencing ALM data generation...");
+		pw.println("[DATAGEN SYSTEM - INFO]: Commencing ALM data generation...");
 		
 		new DataProviderContainer(pw, event);
 		new AutoRecipeGenerator(event, pw);
 		new LootTableGenerator(event, pw);
+		new ItemModelGenerator(event, pw);
 		
 		event.getGenerator().run();
 		pw.close();
@@ -913,6 +914,9 @@ public class Registry {
 		return MOD_ITEM_REGISTRY.get(name);
 	}
 	
+	public static Collection<Item> getAllItemsUnmodifiable(){
+		return Collections.unmodifiableCollection(MOD_ITEM_REGISTRY.values());
+	}
 	
 	//BLOCKS
 	private static void createBlock(String name, Material material, float hardness, float resistance, SoundType sound, boolean requireToolToDrop, TagKey<Block> type, TagKey<Block> level, boolean item) {

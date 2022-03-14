@@ -1,7 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures":{
-		"layer0": "assemblylinemachines:item/entropy_reactor_upgrade_cycle_delayer"
-	}
-	
-}

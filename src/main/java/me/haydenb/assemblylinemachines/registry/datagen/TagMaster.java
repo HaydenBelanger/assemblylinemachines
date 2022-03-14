@@ -231,14 +231,14 @@ public class TagMaster {
 			
 			@Override
 			protected void addTags() {
-				writer.println("[SYSTEM]: Starting general block tagging...");
+				writer.println("[BLOCK TAGGING - INFO]: Starting general block tagging...");
 				TagMaster.tagAllInMaster(container, TagType.BLOCK);
 				
-				writer.println("[SYSTEM]: Starting Mining Level and Tool Type tagging...");
+				writer.println("[BLOCK TAGGING - INFO]: Starting Mining Level and Tool Type tagging...");
 				for(Block b : Registry.getAllBlocksUnmodifiable()) {
 					Optional<Pair<Optional<TagKey<Block>>, Optional<TagKey<Block>>>> result = getTagsForMiningLevel(b);
 					if(result == null) {
-						writer.println("[WARNING]: For " + b.getRegistryName() + ", a default tool was not exposed.");
+						writer.println("[BLOCK TAGGING - WARNING]: For " + b.getRegistryName() + ", a default tool was not exposed.");
 					}else {
 						if(result.isPresent()) {
 							Pair<Optional<TagKey<Block>>, Optional<TagKey<Block>>> r2 = result.orElseThrow();
@@ -293,7 +293,7 @@ public class TagMaster {
 			
 			@Override
 			protected void addTags() {
-				writer.println("[SYSTEM]: Starting general item tagging...");
+				writer.println("[ITEM TAGGING - INFO]: Starting general item tagging...");
 				TagMaster.tagAllInMaster(container, TagType.ITEM);
 			}
 			
@@ -326,10 +326,10 @@ public class TagMaster {
 			
 			@Override
 			protected void addTags() {
-				writer.println("[SYSTEM]: Starting fluid tagging...");
+				writer.println("[FLUID TAGGING - INFO]: Starting fluid tagging...");
 				for(Fluid f : Registry.getAllFluids()) {
 					if(f.isSource(f.defaultFluidState()) && Registry.getBlock(f.getRegistryName().getPath() + "_block") != null) {
-						writer.println("[FLUID]: Created tag for " + f.getRegistryName() + ".");
+						writer.println("[FLUID TAGGING - INFO]: Created tag for " + f.getRegistryName() + ".");
 						TagKey<Fluid> named = Utils.getTagKey(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, f.getRegistryName().getPath()));
 						this.tag(named).add(f);
 						Fluid flowing = Registry.getFluid(f.getRegistryName().getPath() + "_flowing");
@@ -353,7 +353,7 @@ public class TagMaster {
 				objDesc = resource.toString();
 			}
 			
-			writer.println("[" + descr + "]: " + objDesc + " tagged to " + named.location().toString() + ".");
+			writer.println("[" + descr + " TAGGING - INFO]: " + objDesc + " tagged to " + named.location().toString() + ".");
 			
 		}
 	}

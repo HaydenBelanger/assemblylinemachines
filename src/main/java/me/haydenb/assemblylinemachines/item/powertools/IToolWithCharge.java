@@ -18,7 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
@@ -216,6 +216,10 @@ public interface IToolWithCharge{
 		
 		public Optional<Integer> getBottomARGBBorderColor() {
 			return this == PowerToolType.MYSTIUM ? Optional.of(0xffb81818) : Optional.empty();
+		}
+		
+		public boolean needsActiveModel(Item item) {
+			return this.hasSecondaryAbilities && (item instanceof SwordItem || item instanceof PickaxeItem || item instanceof HoeItem || item instanceof AxeItem || item instanceof ShovelItem);
 		}
 	}
 
