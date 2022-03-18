@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -83,13 +83,8 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	}
 	
 	@Override
-	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(input.get());
-	}
-	
-	@Override
-	public List<ItemStack> getJEIItemOutputs() {
-		return List.of(outputa, outputb);
+	public List<?> getJEIComponents() {
+		return List.of(input.get(), outputa, outputb);
 	}
 
 	@Override

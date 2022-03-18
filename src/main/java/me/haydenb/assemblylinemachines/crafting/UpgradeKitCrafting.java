@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -26,7 +25,7 @@ import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class UpgradeKitCrafting implements Recipe<Container>, IRecipeCategoryBuilder {
+public class UpgradeKitCrafting implements Recipe<Container> {
 
 	public static final RecipeType<UpgradeKitCrafting> UPGRADING_RECIPE = new RecipeType<UpgradeKitCrafting>() {
 		@Override

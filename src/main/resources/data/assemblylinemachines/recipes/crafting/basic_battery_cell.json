@@ -19,7 +19,7 @@
 			"item": "assemblylinemachines:basic_battery"
 		},
 		"p":{
-			"tag": "assemblylinemachines:crafting/gears/precious"
+			"tag": "assemblylinemachines:precious_gears"
 		},
 		"s":{
 			"tag": "forge:plates/steel"

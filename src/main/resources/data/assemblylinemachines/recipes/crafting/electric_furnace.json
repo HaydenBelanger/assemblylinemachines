@@ -16,7 +16,7 @@
 			"tag": "forge:ingots/brick"
 		},
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+			"tag": "assemblylinemachines:industrial_gears"
 		},
 		"q":{
 			"item": "assemblylinemachines:conduction_component"

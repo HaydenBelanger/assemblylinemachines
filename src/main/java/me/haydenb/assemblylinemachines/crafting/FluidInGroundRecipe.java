@@ -6,10 +6,10 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
@@ -95,7 +95,7 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 	}
 	
 	@Override
-	public List<FluidStack> getJEIFluidOutputs() {
+	public List<?> getJEIComponents() {
 		return List.of(new FluidStack(fluid, 1000));
 	}
 	
@@ -209,16 +209,16 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 	}
 	
 	public static enum FluidInGroundCriteria{
-		OVERWORLD_PREFCOLD(68, 111, true, new TextComponent("§9Favors very cold biomes.")), OVERWORLD_PREFHOT(102, 77, true, new TextComponent("§cFavors very hot biomes.")), 
-		OVERWORLD_ONLYCOLD(68, 111, true, new TextComponent("§9Only in very cold biomes.")), OVERWORLD_ONLYHOT(102, 77, true, new TextComponent("§cOnly in very hot biomes.")),
-		OVERWORLD_ANY(0, 111, false, new TextComponent("§2Found in The Overworld.")), NETHER(34, 111, false, new TextComponent("§4Found in The Nether.")), 
-		END(68, 77, false, new TextComponent("§5Found in The End."));
+		OVERWORLD_PREFCOLD(68, 111, true, new TextComponent("Favors very cold biomes.").withStyle(ChatFormatting.BLUE)), OVERWORLD_PREFHOT(102, 77, true, new TextComponent("Favors very hot biomes.").withStyle(ChatFormatting.RED)), 
+		OVERWORLD_ONLYCOLD(68, 111, true, new TextComponent("Only in very cold biomes.").withStyle(ChatFormatting.BLUE)), OVERWORLD_ONLYHOT(102, 77, true, new TextComponent("Only in very hot biomes.").withStyle(ChatFormatting.RED)),
+		OVERWORLD_ANY(0, 111, false, new TextComponent("Found in The Overworld.").withStyle(ChatFormatting.DARK_GREEN)), NETHER(34, 111, false, new TextComponent("Found in The Nether.").withStyle(ChatFormatting.DARK_RED)), 
+		END(68, 77, false, new TextComponent("Found in The End.").withStyle(ChatFormatting.DARK_PURPLE));
 		
 		private final int jeiBlitX, jeiBlitY;
-		private final TextComponent descriptor;
+		private final MutableComponent descriptor;
 		private final boolean isOverworld;
 		
-		FluidInGroundCriteria(int jeiBlitX, int jeiBlitY, boolean isOverworld, TextComponent descriptor){
+		FluidInGroundCriteria(int jeiBlitX, int jeiBlitY, boolean isOverworld, MutableComponent descriptor){
 			this.jeiBlitX = jeiBlitX;
 			this.jeiBlitY = jeiBlitY;
 			this.descriptor = descriptor;
@@ -235,9 +235,9 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		public List<Component> getTooltip(int chanceToGenerate){
 			
 			if(isOverworld) {
-				return List.of(OVERWORLD_ANY.descriptor, this.descriptor, new TextComponent("§e" + chanceToGenerate + "% chance to generate."));
+				return List.of(OVERWORLD_ANY.descriptor, this.descriptor, new TextComponent(chanceToGenerate + "% chance to generate.").withStyle(ChatFormatting.YELLOW));
 			}else {
-				return List.of(this.descriptor, new TextComponent("§e" + chanceToGenerate + "% chance to generate."));
+				return List.of(this.descriptor, new TextComponent(chanceToGenerate + "% chance to generate.").withStyle(ChatFormatting.YELLOW));
 			}
 		}
 	}

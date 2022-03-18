@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
 import java.util.Random;
 
 import com.google.gson.JsonObject;
@@ -8,7 +9,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockGreenhouse;
 import me.haydenb.assemblylinemachines.block.machines.BlockGreenhouse.*;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.StateProperties;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -39,8 +40,8 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 	private final int max;
 	private final OutputScaling scaling;
 	private final int processingPerUnit;
-	private final Sprout sprout;
-	private final Soil soil;
+	public final Sprout sprout;
+	public final Soil soil;
 	
 	public GreenhouseCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack baseOutput, int waterPerUnit, float base, float additional, int max, OutputScaling scaling, int processingPerUnit, Sprout sprout, Soil soil) {
 		this.id = id;
@@ -132,6 +133,18 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 	@Override
 	public boolean isSpecial() {
 		return true;
+	}
+	
+	@Override
+	public List<?> getJEIComponents() {
+		Ingredient upgradeSoil = soil.requiredSpecialization != null ? Ingredient.of(soil.requiredSpecialization.getItem()) : Ingredient.EMPTY;
+		Ingredient upgradeSprout = sprout.requiredSpecialization != null ? Ingredient.of(sprout.requiredSpecialization.getItem()) : Ingredient.EMPTY;
+		if(!upgradeSprout.isEmpty() && upgradeSoil.isEmpty()) {
+			upgradeSoil = upgradeSprout;
+			upgradeSprout = Ingredient.EMPTY;
+		}
+		
+		return List.of(input.get(), soil.soil.get(), upgradeSoil, upgradeSprout, baseOutput);
 	}
 	
 	private int getAdditionalChance(int upgrades, Random rand) {

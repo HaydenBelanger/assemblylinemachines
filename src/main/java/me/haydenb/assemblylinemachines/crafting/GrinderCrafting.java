@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.network.FriendlyByteBuf;
@@ -100,18 +100,14 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	}
 	
 	@Override
-	public List<Ingredient> getJEIItemIngredients() {
+	public List<?> getJEIComponents() {
 		Ingredient ing = this.machineReqd ? Ingredient.of(Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder")) 
 				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder"));
-		return List.of(input.get(), ing, Blade.getAllBladesAtMinTier(this.tier.tier));
-	}
-	
-	@Override
-	public List<List<ItemStack>> getJEIItemOutputLists() {
 		List<ItemStack> stacks = new ArrayList<>();
 		stacks.add(output.get());
 		if(chanceToDouble != 0f) stacks.add(new ItemStack(output.get().getItem(), output.get().getCount() * 2));
-		return List.of(stacks);
+		
+		return List.of(input.get(), ing, Blade.getAllBladesAtMinTier(this.tier.tier), stacks);
 	}
 
 	@Override

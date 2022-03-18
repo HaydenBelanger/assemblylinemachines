@@ -29,7 +29,7 @@ public enum ItemTiers {
 			cfg().steelArmorKnockbackResistance.get(), cfg().steelArmorDamageReduction.get(), "steel", cfg().steelArmorToughness.get(), List.of(Tiers.IRON), List.of(Tiers.DIAMOND), false, ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
 	
 	CRANK(cfg().crankToolAttack.get(), cfg().crankToolDurability.get(), cfg().crankToolEnchantability.get(), cfg().crankToolDurability.get(), 0d, 0, null, 0d, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE), false,
-			()->{return Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("assemblylinemachines", "crafting/gears/precious")));}),
+			()->{return Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("assemblylinemachines", "precious_gears")));}),
 	
 	MYSTIUM(cfg().mystiumToolAttack.get(), cfg().mystiumToolHarvestSpeed.get(), cfg().mystiumEnchantability.get(), cfg().mystiumDurability.get(), cfg().mystiumArmorKnockbackResistance.get(), cfg().mystiumArmorDamageReduction.get(), "mystium", cfg().mystiumArmorToughness.get(),
 			List.of(Tiers.NETHERITE), List.of(), true, ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),

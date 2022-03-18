@@ -5,6 +5,7 @@ import java.util.List;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -55,8 +56,8 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
 		this.addEnergyInfoToHoverText(pStack, pTooltipComponents);
 		
-		pTooltipComponents.add(new TextComponent("§7§oAnti-Entropy Field Generator"));
-		pTooltipComponents.add(new TextComponent("§8§oProtects against chaotic effects when charged."));
+		pTooltipComponents.add(new TextComponent("Anti-Entropy Field Generator").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+		pTooltipComponents.add(new TextComponent("Protects against chaotic effects when charged.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 	}
 	
 	@Override

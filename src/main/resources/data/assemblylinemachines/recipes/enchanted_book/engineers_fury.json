@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"tag": "assemblylinemachines:crafting/gears/precious"
+		"tag": "assemblylinemachines:precious_gears"
 	},
 	"amount": 2,
 	"enchantment": "assemblylinemachines:engineers_fury",

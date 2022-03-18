@@ -19,6 +19,7 @@ import me.haydenb.assemblylinemachines.registry.Utils.*;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkHandler.QuantumLinkNetwork;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkStatus;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -404,23 +405,23 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			@Override
 			public void renderToolTip(PoseStack pMatrixStack, int pMouseX, int pMouseY) {
 				if(this.isHoveredOrFocused()) {
-					List<String> vals = new ArrayList<>();
+					List<Component> vals = new ArrayList<>();
 					switch(tsfm.pfi[channel]) {
 					case 0:
-						vals.add(tooltip + " Receive Mode");
-						vals.add("§8§oWill receive " + tooltip + " from other QLs.");
+						vals.add(new TextComponent(tooltip + " Receive Mode"));
+						vals.add(new TextComponent("Will receive " + tooltip + " from other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
 						break;
 					case 1:
-						vals.add(tooltip + " Send Mode");
-						vals.add("§8§oWill transfer " + tooltip + " to other QLs.");
+						vals.add(new TextComponent(tooltip + " Send Mode"));
+						vals.add(new TextComponent("Will transfer " + tooltip + " to other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
 						break;
 					case 2:
-						vals.add(tooltip + " Disabled");
-						vals.add("§8§oWill not interact with " + tooltip + ".");
+						vals.add(new TextComponent(tooltip + " Disabled"));
+						vals.add(new TextComponent("Will not interact with " + tooltip + ".").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
 						break;
 					}
 					
-					renderComponentTooltip(vals, pMouseX, pMouseY);
+					renderComponentTooltip(pMatrixStack, vals, pMouseX, pMouseY);
 				}
 			}
 		}

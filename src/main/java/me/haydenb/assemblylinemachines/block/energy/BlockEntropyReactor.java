@@ -594,18 +594,18 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
 			if(cyclesRemaining != 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§aDischarging...")).text(new TextComponent("§a+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Discharging...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t").withStyle(ChatFormatting.GREEN));
 			}else {
 				if(shardMap.isEmpty()) {
-					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§cIdle")).text(new TextComponent("0 FE/t"));
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Idle").withStyle(ChatFormatting.RED)).text(new TextComponent("0 FE/t"));
 				}else {
-					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("§dWarming Up...")).text(new TextComponent("0 FE/t"));
+					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Warming Up...").withStyle(ChatFormatting.LIGHT_PURPLE)).text(new TextComponent("0 FE/t"));
 				}
 			}
 			
-			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text(new TextComponent("§dShards")).progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
-			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new TextComponent("§eVariety")).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
-			probeInfo.horizontal().item(new ItemStack(Items.COAL)).vertical().text(new TextComponent("§cEntropy")).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Registry.getItem("corrupted_shard"))).vertical().text(new TextComponent("Shards").withStyle(ChatFormatting.LIGHT_PURPLE)).progress(Math.round(total), Math.round(capacity), probeInfo.defaultProgressStyle().filledColor(0xfff003fc).alternateFilledColor(0xfff003fc));
+			probeInfo.horizontal().item(new ItemStack(Items.GREEN_DYE)).vertical().text(new TextComponent("Variety").withStyle(ChatFormatting.YELLOW)).progress(Math.round(varietyRating * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffc4d10f).alternateFilledColor(0xffc4d10f).suffix("%"));
+			probeInfo.horizontal().item(new ItemStack(Items.COAL)).vertical().text(new TextComponent("Entropy").withStyle(ChatFormatting.RED)).progress(Math.round(entropy * 100f), 100, probeInfo.defaultProgressStyle().filledColor(0xffd10f42).alternateFilledColor(0xffd10f42).suffix("%"));
 		}
 		
 		@Override
@@ -1208,73 +1208,74 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
 			if(mouseX >= x + 50 && mouseY >= y + 17 && mouseX <= x + 55 && mouseY <= y + 68) {
-				ArrayList<String> str = new ArrayList<>();
+				ArrayList<Component> str = new ArrayList<>();
 				if(tsfm.total != 0) {
-					str.add("§5Total Shards Stored");
-					str.add("§d" + num.format(tsfm.total) + "/" + num.format(tsfm.capacity));
+					str.add(new TextComponent("Total Shards Stored").withStyle(ChatFormatting.DARK_PURPLE));
+					str.add(new TextComponent(num.format(tsfm.total) + "/" + num.format(tsfm.capacity)).withStyle(ChatFormatting.LIGHT_PURPLE));
 				}else {
-					str.add("§4Shard Tank Empty");
+					str.add(new TextComponent("Shard Tank Empty").withStyle(ChatFormatting.DARK_RED));
 				}
 				
-				str.add("§7Runs at " + Formatting.GENERAL_FORMAT.format((tsfm.total * 6000f) / 20f) + " FE/t.");
+				str.add(new TextComponent("Runs at " + Formatting.GENERAL_FORMAT.format((tsfm.total * 6000f) / 20f) + " FE/t.").withStyle(ChatFormatting.GRAY));
 
-				this.renderComponentTooltip(str, mouseX - x, mouseY - y);
+				this.renderComponentTooltip(this.mx, str, mouseX - x, mouseY - y);
 			}
 
 			if(mouseX >= x + 37 && mouseY >= y + 17 && mouseX <= x + 42 && mouseY <= y + 68) {
-				ArrayList<String> str = new ArrayList<>();
+				ArrayList<Component> str = new ArrayList<>();
 				
-				String cc;
+				ChatFormatting cc;
 				if(tsfm.varietyRating < 0.2f) {
 					
-					cc = "4";
+					cc = ChatFormatting.DARK_RED;
 					
 				}else if(tsfm.varietyRating < 0.5f) {
 					
-					cc = "6";
+					cc = ChatFormatting.GOLD;
 				}else if(tsfm.varietyRating < 0.7f) {
 					
-					cc = "a";
+					cc = ChatFormatting.GREEN;
 				}else {
 					
-					cc = "2";
+					cc = ChatFormatting.DARK_GREEN;
 				}
 				
 				
-				str.add("§eVariety Rating: §" + cc + num.format(tsfm.varietyRating * 100f) + "%");
+				str.add(new TextComponent("Variety Rating: ").withStyle(ChatFormatting.YELLOW).append(new TextComponent(num.format(tsfm.varietyRating * 100f) + "%").withStyle(cc)));
 				
 				int cycles = Math.round(tsfm.varietyRating * 9f);
 				
 				if(cycles == 1) {
-					str.add("§7Powered for 1 second.");
+					str.add(new TextComponent("Powered for 1 second.").withStyle(ChatFormatting.GRAY));
 				}else {
-					str.add("§7Powered for " + cycles + " seconds.");
+					str.add(new TextComponent("Powered for " + cycles + " seconds.").withStyle(ChatFormatting.GRAY));
 				}
 				
-				this.renderComponentTooltip(str, mouseX - x, mouseY - y);
+				this.renderComponentTooltip(this.mx, str, mouseX - x, mouseY - y);
 				
 			}
 			
 			if(mouseX >= x + 63 && mouseY >= y + 63 && mouseX <= x + 141 && mouseY <= y + 68) {
-				ArrayList<String> str = new ArrayList<>();
+				ArrayList<Component> str = new ArrayList<>();
 				
-				String cc;
+				ChatFormatting cc;
 				if(tsfm.entropy < 0.05f) {
-					cc = "2";
+					cc = ChatFormatting.DARK_GREEN;
 				}else if(tsfm.entropy < 0.2f) {
-					cc = "c";
+					cc = ChatFormatting.RED;
 				}else {
-					cc = "4";
+					cc = ChatFormatting.DARK_RED;
 				}
 				
-				str.add("§cCore Entropy Levels: §" + cc + num.format(tsfm.entropy * 100f) + "%");
+				str.add(new TextComponent("Core Entropy Levels: ").withStyle(ChatFormatting.RED).append(new TextComponent(num.format(tsfm.entropy * 100f) + "%").withStyle(cc)));
+				
 				
 				if(tsfm.entropy > 0.1f) {
-					str.add("§7Bad things will happen if this is not lowered.");
-					str.add("§7Lower by keeping Variety high!");
+					str.add(new TextComponent("Bad things will happen if this is not lowered.").withStyle(ChatFormatting.GRAY));
+					str.add(new TextComponent("Lower by keeping Variety high!").withStyle(ChatFormatting.GRAY));
 				}
 				
-				this.renderComponentTooltip(str, mouseX - x, mouseY - y);
+				this.renderComponentTooltip(this.mx, str, mouseX - x, mouseY - y);
 			}
 			
 		}

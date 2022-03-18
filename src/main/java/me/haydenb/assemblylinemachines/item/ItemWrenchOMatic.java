@@ -12,6 +12,7 @@ import com.google.common.collect.Multimap;
 import me.haydenb.assemblylinemachines.block.pipes.BlockPipe;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -50,9 +51,9 @@ public class ItemWrenchOMatic extends Item {
 			};
 			
 			pPlayer.displayClientMessage(new TextComponent(switch(newMode) {
-			case 1 -> "Switched to §1Interact Mode.";
-			case 2 -> "Switched to §4Wrath Mode.";
-			default -> "Switched to §2Wrench Mode.";
+			case 1 -> "Switched to Interact Mode.";
+			case 2 -> "Switched to Wrath Mode.";
+			default -> "Switched to Wrench Mode.";
 			}), true);
 			
 			compound.putInt("assemblylinemachines:wrenchmode", newMode);
@@ -90,11 +91,12 @@ public class ItemWrenchOMatic extends Item {
 			TooltipFlag pIsAdvanced) {
 		pTooltipComponents.addAll(switch(pStack.getOrCreateTag().getInt("assemblylinemachines:wrenchmode")) {
 		//Interact
-		case 1 -> List.of(new TextComponent("§1§oInteract Mode:"), new TextComponent("§7§o- Can rotate machines and other blocks."));
+		case 1 -> List.of(new TextComponent("Interact Mode:").withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC), new TextComponent("- Can rotate machines and other blocks.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		//Wrath
-		case 2 -> List.of(new TextComponent("§4§oWrath Mode:"), new TextComponent("§7§o- Deals additional damage and knockback."), new TextComponent("§7§o- Can be enchanted with Engineer's Fury."));
+		case 2 -> List.of(new TextComponent("Wrath Mode:").withStyle(ChatFormatting.DARK_RED, ChatFormatting.ITALIC), new TextComponent("- Deals additional damage and knockback.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC),
+				new TextComponent("- Can be enchanted with Engineer's Fury.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		//Wrench
-		default -> List.of(new TextComponent("§2§oWrench Mode:"), new TextComponent("§7§o- Can reconfigure connections on Pipes."));
+		default -> List.of(new TextComponent("Wrench Mode:").withStyle(ChatFormatting.DARK_GREEN, ChatFormatting.ITALIC), new TextComponent("- Can reconfigure connections on Pipes.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		});
 		super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
 	}

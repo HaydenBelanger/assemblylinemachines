@@ -7,10 +7,7 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockCorruptingBasin.TECorruptingBasin;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.helpers.IGuiHelper;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -27,7 +24,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-@SuppressWarnings("removal")
 public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCategoryBuilder {
 
 	public static final RecipeType<WorldCorruptionCrafting> WORLD_CORRUPTION_RECIPE = new RecipeType<WorldCorruptionCrafting>() {
@@ -111,46 +107,18 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 	}
 	
 	@Override
-	public List<Ingredient> getJEIItemIngredients() {
-		return !input.get().isEmpty() ? List.of(input.get()) : null;
-	}
-	
-	@Override
-	public List<FluidStack> getJEIFluidInputs() {
-		return !inputFluid.equals(Fluids.EMPTY) ? List.of(new FluidStack(inputFluid, 1000)) : null;
-	}
-	
-	@Override
-	public List<List<ItemStack>> getJEIItemOutputLists() {
+	public List<?> getJEIComponents() {
+		
+		List<ItemStack> stacks = new ArrayList<>();
 		if(!output.equals(Blocks.AIR)) {
-			List<ItemStack> stacks = new ArrayList<>();
 			stacks.add(output.asItem().getDefaultInstance());
 			for(Pair<Float, Block> pair : this.additionalOutputs) {
 				stacks.add(pair.getSecond().asItem().getDefaultInstance());
 			}
-			return List.of(stacks);
 		}
-		return null;
+		
+		return List.of(!input.get().isEmpty() ? input.get() : new FluidStack(inputFluid, 1000), !outputFluid.equals(Fluids.EMPTY) ? new FluidStack(outputFluid, 1000) : stacks);
 	}
-	
-	@Override
-	public List<FluidStack> getJEIFluidOutputs() {
-		return !outputFluid.equals(Fluids.EMPTY) ? List.of(new FluidStack(outputFluid, 1000)) : null;
-	}
-	
-	@Override
-	public void setupSlots(IRecipeLayout layout, IGuiHelper helper, RecipeCategoryBuilder category) {
-		if(!input.get().isEmpty()) {
-			layout.getItemStacks().init(0, false, 0, 4);
-			layout.getItemStacks().init(1, false, category.getBasicRenderer(ItemStack.class, this), 47, 4, 18, 18, 1, 1);
-		}else if(!inputFluid.equals(Fluids.EMPTY)){
-			layout.getFluidStacks().init(0, false, 1, 5, 16, 16, 1, false, null);
-			layout.getFluidStacks().init(1, false, 48, 5, 16, 16, 1, false, null);
-		}else {
-			throw new IllegalArgumentException("Item Input and Fluid Input are both non-present!");
-		}
-	}
-	
 	
 	public Optional<Block> testBlock(Random rand, Block test){
 		if(input.get().isEmpty() || !input.get().test(test.asItem().getDefaultInstance())) return Optional.empty();

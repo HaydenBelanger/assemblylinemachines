@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockExperienceMill.TEExperienceMill;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -135,13 +135,8 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	}
 	
 	@Override
-	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(input.get(), BOOK);
-	}
-	
-	@Override
-	public List<ItemStack> getJEIItemOutputs() {
-		return List.of(getResultItem());
+	public List<?> getJEIComponents() {
+		return List.of(input.get(), BOOK, getResultItem());
 	}
 
 	@Override

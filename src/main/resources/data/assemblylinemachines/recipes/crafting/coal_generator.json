@@ -16,7 +16,7 @@
 			"item": "minecraft:furnace"
 		},
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/precious"
+			"tag": "assemblylinemachines:precious_gears"
 		},
 		"c":{
 			"item": "assemblylinemachines:convection_component"

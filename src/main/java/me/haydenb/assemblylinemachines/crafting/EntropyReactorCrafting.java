@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -67,13 +67,8 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 	}
 	
 	@Override
-	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(Ingredient.of(Registry.getItem("corrupted_shard")));
-	}
-	
-	@Override
-	public List<ItemStack> getJEIItemOutputs() {
-		return List.of(output);
+	public List<?> getJEIComponents() {
+		return List.of(Ingredient.of(Registry.getItem("corrupted_shard")), output);
 	}
 
 	@Override

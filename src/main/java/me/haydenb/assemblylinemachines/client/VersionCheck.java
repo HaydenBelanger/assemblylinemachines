@@ -2,9 +2,9 @@ package me.haydenb.assemblylinemachines.client;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.ClickEvent.Action;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,7 +29,7 @@ public class VersionCheck {
 				CheckResult result = VersionChecker.getResult(imi);
 				
 				if(result.status() == Status.BETA_OUTDATED || result.status() == Status.OUTDATED) {
-					TextComponent tc = new TextComponent("[§aAssemblyLineMachines§f] Update available, version §e" + result.target().getCanonical() + ",§f you're using §e" + imi.getVersion().toString() + ". §2Click to Update!");
+					MutableComponent tc = new TextComponent("[AssemblyLineMachines] Update available, version " + result.target().getCanonical() + ", you're using " + imi.getVersion().toString() + ". ").append(new TextComponent("Click to Update!").withStyle(ChatFormatting.DARK_GREEN));
 					tc.withStyle(tc.getStyle().withClickEvent(new ClickEvent(Action.OPEN_URL, result.url())));
 					player.sendMessage(tc, null);
 				}

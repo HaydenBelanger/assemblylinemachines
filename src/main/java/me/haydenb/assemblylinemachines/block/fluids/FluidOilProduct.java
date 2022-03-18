@@ -39,7 +39,7 @@ public class FluidOilProduct extends ALMFluid {
 			while(iter.hasNext()) {
 				BlockPos cor = iter.next();
 				
-				if(Utils.isInTag(world.getBlockState(cor), new ResourceLocation("assemblylinemachines", "world/gas_flammable"))) {
+				if(Utils.isInTag(world.getBlockState(cor), new ResourceLocation("assemblylinemachines", "gas_flammable"))) {
 					if(world.getRandom().nextInt(3) == 0) {
 						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), breakAndBreakConnected(world, state, cor), true, BlockInteraction.BREAK);
 						

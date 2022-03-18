@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "assemblylinemachines:mushroom_blocks"
+	},
+	"output":{
+		"item": "assemblylinemachines:spores",
+		"count": 4
+	},
+	"grinds": 16,
+	"bladetype": "TITANIUM"
+}

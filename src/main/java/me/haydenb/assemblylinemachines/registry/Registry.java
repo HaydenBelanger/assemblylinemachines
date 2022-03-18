@@ -79,6 +79,7 @@ import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderCo
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
 import me.haydenb.assemblylinemachines.world.effects.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -94,6 +95,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
@@ -136,6 +138,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
@@ -289,9 +292,9 @@ public class Registry {
 		createItem("entropy_reactor_upgrade_variety", new ItemUpgrade(false, "Higher Variety has greater performance.", "Lower Variety has worsened performance."));
 		createItem("entropy_reactor_upgrade_entropic_harnesser", new ItemUpgrade(false, new String[] {"Most Entropy effects are prevented."}, new String[] {"Frequency & range for Entropy effects is greater.", "Entropy is generated instead of FE."}));
 		
-		createItem("semi_dense_neutron_matter", new ItemReactorOutput("§7Low-Quality"));
-		createItem("quark_matter", new ItemReactorOutput("§9Medium-Quality"));
-		createItem("strange_matter", new ItemReactorOutput("§aHigh-Quality"));
+		createItem("semi_dense_neutron_matter", new ItemReactorOutput(new TextComponent("Low-Quality").withStyle(ChatFormatting.GRAY)));
+		createItem("quark_matter", new ItemReactorOutput(new TextComponent("Medium-Quality").withStyle(ChatFormatting.BLUE)));
+		createItem("strange_matter", new ItemReactorOutput(new TextComponent("High-Quality").withStyle(ChatFormatting.GREEN)));
 		
 		createItem("corrupt_shell_spawn_egg", new ForgeSpawnEggItem(() -> EntityCorruptShell.CORRUPT_SHELL, 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
 		createItem("reality_crystal");
@@ -331,7 +334,11 @@ public class Registry {
 		createItem("greenhouse_upgrade_florists_specialization", new ItemUpgrade(false, "Greenhouse can support Flowers."));
 		createItem("greenhouse_upgrade_interdimensional_specialization", new ItemUpgrade(false, "Greenhouse can support otherworldly crops."));
 		createItem("greenhouse_upgrade_internal_lamp", new ItemUpgrade(false, new String[]{"Allows sunlight crops to grow in dark environments.", "Increases speed of operation."}, new String[] {"Increases power consumption.", "Becomes too bright to sustain darkness crops."}));
-		createItem("greenhouse_upgrade_blackout_glass", new ItemUpgrade(false, "Allows darkness crops to grow in light environments.", "Won't allow sunlight crops to get enough sun."));
+		createItem("greenhouse_upgrade_blackout_glass", new ItemUpgrade(false, new String[]{"Allows darkness crops to grow in light environments.", "Increases speed of operation."}, new String[]{"Increases power consumption.", "Won't allow sunlight crops to get enough sun."}));
+		
+		createItem("spores", new ItemSpores(Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "spores_plantable")), Blocks.MYCELIUM));
+		createItem("forest_fungus", new ItemSpores(Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "forest_fungus_plantable")), Blocks.PODZOL));
+		createItem("grass_seeds", new ItemSpores(Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "grass_seeds_plantable")), Blocks.GRASS_BLOCK));
 		
 		MOD_ITEM_REGISTRY.values().forEach((i) -> event.getRegistry().register(i));
 	}

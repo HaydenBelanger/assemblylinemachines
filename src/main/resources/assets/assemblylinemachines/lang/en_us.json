@@ -202,6 +202,9 @@
 	"item.assemblylinemachines.greenhouse_upgrade_interdimensional_specialization": "Greenhouse Upgrade: Interdimensional Specialization",
 	"item.assemblylinemachines.greenhouse_upgrade_internal_lamp": "Greenhouse Upgrade: Internal Lamp",
 	"item.assemblylinemachines.greenhouse_upgrade_blackout_glass": "Greenhouse Upgrade: Blackout Glass",
+	"item.assemblylinemachines.spores": "Spores",
+	"item.assemblylinemachines.forest_fungus": "Forest Fungus",
+	"item.assemblylinemachines.grass_seeds": "Grass Seeds",
 	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",

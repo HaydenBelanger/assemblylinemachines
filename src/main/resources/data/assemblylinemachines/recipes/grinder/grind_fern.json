@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:fern"
+	},
+	"output":{
+		"item": "assemblylinemachines:forest_fungus"
+	},
+	"grinds": 6,
+	"bladetype": "TITANIUM"
+}

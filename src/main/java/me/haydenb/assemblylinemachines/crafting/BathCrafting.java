@@ -12,7 +12,7 @@ import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlock
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.IFluidHandlerBypass;
@@ -23,7 +23,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
@@ -186,31 +185,17 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	}
 	
 	@Override
-	public List<Ingredient> getJEIItemIngredients() {
-		ArrayList<ItemLike> items = new ArrayList<>();
+	public List<?> getJEIComponents() {
+		ArrayList<Item> items = new ArrayList<>();
 		switch(this.type) {
-		case MIXER_ONLY:
-		case ALL:
-			items.add(Registry.getItem("simple_fluid_mixer"));
-			items.add(Registry.getItem("electric_fluid_mixer"));
-			items.add(Registry.getItem("mkii_fluid_mixer"));
+		case MIXER_ONLY, ALL:
+			items.addAll(List.of(Registry.getItem("simple_fluid_mixer"), Registry.getItem("electric_fluid_mixer"), Registry.getItem("mkii_fluid_mixer")));
 			if(this.type == BathOption.MIXER_ONLY) break;
 		case BASIN_ONLY:
 			items.add(Registry.getItem("fluid_bath"));
-			break;
 		}
 		
-		return List.of(inputa.get(), inputb.get(), Ingredient.of(items.toArray(new ItemLike[items.size()])));
-	}
-	
-	@Override
-	public List<FluidStack> getJEIFluidInputs() {
-		return List.of(new FluidStack(fluid.getAssocFluid(), percent.getMB()));
-	}
-	
-	@Override
-	public List<ItemStack> getJEIItemOutputs() {
-		return List.of(output);
+		return List.of(inputa.get(), inputb.get(), Ingredient.of(items.toArray(new Item[items.size()])), new FluidStack(fluid.getAssocFluid(), percent.getMB()), output);
 	}
 	
 	public BathCraftingFluids getFluid() {

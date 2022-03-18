@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/all"
+			"tag": "assemblylinemachines:all_gears"
 		},
 		"c":{
 			"tag": "forge:plates/iron"

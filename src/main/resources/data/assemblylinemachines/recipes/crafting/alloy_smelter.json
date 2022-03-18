@@ -16,7 +16,7 @@
 			"item": "assemblylinemachines:temperature_regulator"
 		},
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+			"tag": "assemblylinemachines:industrial_gears"
 		},
 		"m":{
 			"item": "assemblylinemachines:conduction_component"

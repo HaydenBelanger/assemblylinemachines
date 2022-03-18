@@ -12,6 +12,7 @@ import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlock
 import me.haydenb.assemblylinemachines.block.machines.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockOmnivoid.TEOmnivoid;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
+import me.haydenb.assemblylinemachines.item.ItemSpores;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -44,6 +45,7 @@ public class PacketHandler {
 		//SERVER -> CLIENT
 		PACKET_TARGETS.put("vacuum_hopper_particles", (pd, world) -> BlockVacuumHopper.spawnTeleparticles(pd));
 		PACKET_TARGETS.put("experience_hopper_particles", (pd, world) -> BlockExperienceHopper.spawnTeleparticles(pd));
+		PACKET_TARGETS.put("spores_growth", (pd, world) -> ItemSpores.spawnGrowParticles(pd));
 	}
 	
 	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);

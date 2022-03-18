@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "assemblylinemachines:block/corrupt/chaosbark_sapling"
+    "cross": "assemblylinemachines:block/chaosbark_sapling"
   }
 }

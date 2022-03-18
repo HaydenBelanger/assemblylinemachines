@@ -6,7 +6,7 @@
 		"amount": 500
 	},
 	"input_item":{
-		"tag": "assemblylinemachines:crafting/carbon_small"
+		"tag": "assemblylinemachines:carbon_small"
 	},
 	"proc_time": 18,
 	"output_fluid_a":{

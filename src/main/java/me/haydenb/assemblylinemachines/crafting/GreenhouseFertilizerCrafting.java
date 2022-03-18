@@ -1,9 +1,11 @@
 package me.haydenb.assemblylinemachines.crafting;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockGreenhouse.TEGreenhouse;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -75,6 +77,11 @@ public class GreenhouseFertilizerCrafting implements Recipe<TEGreenhouse>, IReci
 	@Override
 	public boolean isSpecial() {
 		return true;
+	}
+	
+	@Override
+	public List<Ingredient> getJEIComponents() {
+		return List.of(fertilizer.get());
 	}
 	
 	public static class GreenhouseFertilizerSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GreenhouseFertilizerCrafting>{

@@ -4,19 +4,19 @@ Assembly Line Machines has a couple of tags that are important as datapack devel
 
 ### Gas Flammable
 
-Block Tag namespace: `assemblylinemachines:world/gas_flammable`
+Block Tag namespace: `assemblylinemachines:gas_flammable`
 
 Blocks in this tag, when placed in the world next to a pool of Diesel or Gasoline, will cause an explosion.
 
 ### Mystium Axe Mineable
 
-Block Tag namespace: `assemblylinemachines:world/mystium_axe_mineable`
+Block Tag namespace: `assemblylinemachines:mystium_axe_mineable`
 
 Blocks in this tag can be mined treefeller-style (breaks all connected blocks in one action) when using Mystium Axe's Secondary Ability.
 
 ### Naphtha Fireproof
 
-Block Tag namespace: `assemblylinemachines:world/naphtha_fireproof`
+Block Tag namespace: `assemblylinemachines:naphtha_fireproof`
 
 Naphtha Fire, spread from pools of Naphtha, can spread onto any block and will never burn out, unless that block is contained within this tag.
 

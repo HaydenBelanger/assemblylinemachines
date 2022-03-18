@@ -6,22 +6,16 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.util.TriConsumer;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.TERefinery;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting.RefineryIO.RefineryIOType;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.helpers.IGuiHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -36,7 +30,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-@SuppressWarnings({"removal", "unchecked"})
+@SuppressWarnings("unchecked")
 public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 	
@@ -48,7 +42,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	};
 	
 	public static final RefiningSerializer SERIALIZER = new RefiningSerializer();
-	private static final List<Pair<Integer, Integer>> SLOTS = List.of(Pair.of(0, 0), Pair.of(0, 23), Pair.of(34, 0), Pair.of(54, 0), Pair.of(24, 23), Pair.of(44, 23), Pair.of(64, 23));
 	
 	private final Cache<Integer, List<?>> streamCache = CacheBuilder.newBuilder().build();
 	
@@ -198,7 +191,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		return REFINING_RECIPE;
 	}
 	
-	@Override
 	public List<FluidStack> getJEIFluidInputs() {
 		try {
 			return (List<FluidStack>) streamCache.get(0, () -> io.stream().filter((rio) -> rio.isInput && !rio.fluid.isEmpty()).map((rio) -> rio.fluid).toList());
@@ -208,7 +200,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 	}
 	
-	@Override
 	public List<Ingredient> getJEIItemIngredients() {
 		try {
 			return (List<Ingredient>) streamCache.get(1, () -> Stream.concat(getCraftingStationIngredients().stream(), getItemIngredients().stream()).toList());
@@ -236,7 +227,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 	}
 	
-	@Override
 	public List<FluidStack> getJEIFluidOutputs() {
 		try {
 			return (List<FluidStack>) streamCache.get(4, () -> io.stream().filter((rio) -> !rio.isInput && !rio.fluid.isEmpty()).map((rio) -> rio.fluid).toList());
@@ -246,7 +236,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 	}
 	
-	@Override
 	public List<ItemStack> getJEIItemOutputs() {
 		try {
 			return (List<ItemStack>) streamCache.get(5, () -> io.stream().filter((rio) -> !rio.isInput && !rio.output.isEmpty()).map((rio) -> rio.output).toList());
@@ -266,30 +255,24 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	
 	@Override
-	public void setupSlots(IRecipeLayout supplier, IGuiHelper helper, RecipeCategoryBuilder category) {
-		HashMap<String, Integer> data = new HashMap<>();
-		data.put("item", 0);
-		data.put("fluid", 0);
-		data.put("total", 0);
-		data.put("input", 1);
-		
-		TriConsumer<Integer, Integer, Boolean> itemConsumer = (type, total, isInput) -> supplier.getItemStacks().init(type, isInput, SLOTS.get(total).getFirst(), SLOTS.get(total).getSecond());
-		TriConsumer<Integer, Integer, Boolean> fluidConsumer = (type, total, isInput) -> supplier.getFluidStacks().init(type, isInput, SLOTS.get(total).getFirst() + 1, SLOTS.get(total).getSecond() + 1, 16, 16, 1, false, null);
-		
-		incrementAndApply(getJEIItemIngredients(), data, "item", itemConsumer);
-		incrementAndApply(getJEIFluidInputs(), data, "fluid", fluidConsumer);
-		data.put("total", 4);
-		data.put("input", 0);
-		incrementAndApply(getJEIItemOutputs(), data, "item", itemConsumer);
-		incrementAndApply(getJEIFluidOutputs(), data, "fluid", fluidConsumer);
-	}
-	
-	@SuppressWarnings("unused")
-	private void incrementAndApply(List<?> object, HashMap<String, Integer> data, String typeKey, TriConsumer<Integer, Integer, Boolean> apply) {
-		for(Object obj : object) {
-			apply.accept(data.get(typeKey), data.get("total"), data.get("input") == 1);
-			data.computeIfPresent(typeKey, (k, v) -> v + 1);
-			data.computeIfPresent("total", (k, v) -> v + 1);
+	public List<?> getJEIComponents() {
+		try {
+			return (List<?>) streamCache.get(8, () -> {
+				ArrayList<Object> inputs = new ArrayList<>((List<Object>) Stream.of(getJEIItemIngredients(), getJEIFluidInputs()).flatMap(Collection::stream).toList());
+				while(inputs.size() < 4) {
+					inputs.add(Ingredient.EMPTY);
+				}
+				
+				ArrayList<Object> outputs = new ArrayList<>((List<Object>) Stream.of(inputs, getJEIItemOutputs(), getJEIFluidOutputs()).flatMap(Collection::stream).toList());
+				while(outputs.size() < 7) {
+					outputs.add(Ingredient.EMPTY);
+				}
+				
+				return outputs;
+			});
+		}catch(ExecutionException e) {
+			e.printStackTrace();
+			return List.of();
 		}
 	}
 	

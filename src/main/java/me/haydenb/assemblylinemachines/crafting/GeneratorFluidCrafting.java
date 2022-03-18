@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.FluidGeneratorTypes;
 import me.haydenb.assemblylinemachines.block.energy.BlockFluidGenerator.TEFluidGenerator;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -91,13 +91,8 @@ public class GeneratorFluidCrafting implements Recipe<Container>, IRecipeCategor
 	}
 	
 	@Override
-	public List<FluidStack> getJEIFluidInputs() {
-		return List.of(new FluidStack(fluid, 1000));
-	}
-	
-	@Override
-	public List<Ingredient> getJEIItemIngredients() {
-		return List.of(fluidType.jeiIngredient.get());
+	public List<?> getJEIComponents() {
+		return List.of(fluidType.jeiIngredient.get(), new FluidStack(fluid, 1000));
 	}
 	
 	public static class GeneratorFluidSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GeneratorFluidCrafting>{

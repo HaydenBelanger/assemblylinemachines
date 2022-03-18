@@ -10,7 +10,7 @@
 			"tag": "forge:plates/steel"
 		},
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+			"tag": "assemblylinemachines:industrial_gears"
 		},
 		"b":{
 			"item": "assemblylinemachines:convection_component"

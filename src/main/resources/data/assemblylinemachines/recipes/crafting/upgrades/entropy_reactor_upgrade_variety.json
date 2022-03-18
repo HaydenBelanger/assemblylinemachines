@@ -13,7 +13,7 @@
 			"item": "assemblylinemachines:strange_matter"
 		},
 		"y":{
-			"tag": "assemblylinemachines:crafting/entropy_reactor_outputs"
+			"tag": "assemblylinemachines:entropy_reactor_outputs"
 		}
 	},
 	"result":{

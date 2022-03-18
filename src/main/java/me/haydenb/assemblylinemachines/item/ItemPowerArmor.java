@@ -9,6 +9,7 @@ import me.haydenb.assemblylinemachines.client.armor.ArmorData;
 import me.haydenb.assemblylinemachines.client.armor.ArmorModel;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -59,7 +60,7 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents,
 			TooltipFlag pIsAdvanced) {
 		this.addEnergyInfoToHoverText(pStack, pTooltipComponents);
-		if(ptt == PowerToolType.ENHANCED_MYSTIUM) pTooltipComponents.add(new TextComponent("§7§oEnables creative flight at the cost of power."));
+		if(ptt == PowerToolType.ENHANCED_MYSTIUM) pTooltipComponents.add(new TextComponent("Enables creative flight at the cost of power.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 	}
 	
 	@Override

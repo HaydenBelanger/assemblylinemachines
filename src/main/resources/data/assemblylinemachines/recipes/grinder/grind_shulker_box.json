@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"tag": "assemblylinemachines:crafting/shulker_boxes"
+		"tag": "assemblylinemachines:shulker_boxes"
 	},
 	"output":{
 		"item": "minecraft:shulker_shell",

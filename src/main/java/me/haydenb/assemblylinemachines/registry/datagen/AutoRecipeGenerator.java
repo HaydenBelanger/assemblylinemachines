@@ -158,7 +158,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		MYSTIUM(true, false, true, false, Triple.of(true, false, 2), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/steel")), FLEROVIUM(true, true, false, false, Triple.of(true, false, 4), Triple.of(true, true, 1)), 
 		ENERGIZED_GOLD(true, false, false, false, Triple.of(true, false, 4), Triple.of(false, false, 0)), RAW_CHROMIUM(() -> Ingredient.of(Registry.getItem("raw_chromium")), null, false),
 		NOVASTEEL(true, false, true, false, Triple.of(true, false, 1), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/graphene")), 
-		CRANK(false, false, true, false, Triple.of(false, false, 0), Triple.of(false, false, 0), getItemTagIngredient(AssemblyLineMachines.MODID, "crafting/gears/precious"), getItemTagIngredient("forge", "rods/steel")),
+		CRANK(false, false, true, false, Triple.of(false, false, 0), Triple.of(false, false, 0), getItemTagIngredient(AssemblyLineMachines.MODID, "precious_gears"), getItemTagIngredient("forge", "rods/steel")),
 		CRAFTING_TABLE(() -> Ingredient.of(Blocks.CRAFTING_TABLE), () -> Ingredient.of(Registry.getBlock("compressed_crafting_table")), false), RAW_TITANIUM(() -> Ingredient.of(Registry.getItem("raw_titanium")), null, false),
 		RAW_FLEROVIUM(() -> Ingredient.of(Registry.getItem("raw_flerovium")), null, false);
 		
@@ -270,7 +270,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			if(this.hasPlate.getLeft()) {
 				Ingredient metalInput = this.hasPlate.getMiddle() ? getItemTagIngredient("forge", "ingots/pure_" + typeName).get() : toolMaterial.get();
 				String type = this.isSheetInsteadOfPlate ? "_sheet" : "_plate";
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.getRight(), List.of(metalInput, getItemTagIngredient(AssemblyLineMachines.MODID, "crafting/hammers").get())));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.getRight(), List.of(metalInput, getItemTagIngredient(AssemblyLineMachines.MODID, "hammers").get())));
 				consumer.accept(new MetalShaperResult(getRecipeLoc("metalshaper", typeName + type), metalInput, new ItemStack(Registry.getItem(typeName + type), this.hasPlate.getRight()), 6));
 				logText = logText + "Plate, ";
 			}

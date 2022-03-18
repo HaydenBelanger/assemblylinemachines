@@ -94,6 +94,10 @@ public class ItemUpgrade extends Item {
 			this.name = name;
 		}
 		
+		public Item getItem() {
+			return Registry.getItem(name);
+		}
+		
 		public static Upgrades match(ItemStack i) {
 			return match(i.getItem());
 		}

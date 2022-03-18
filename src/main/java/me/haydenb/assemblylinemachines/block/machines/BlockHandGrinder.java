@@ -9,6 +9,7 @@ import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -66,9 +67,9 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
 		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
-			tooltip.add(new TextComponent("§8XL+ Definitive Edition"));
-			tooltip.add(new TextComponent("§8With Sonic & Knuckles"));
-			tooltip.add(new TextComponent("§8Season Pass"));
+			tooltip.add(new TextComponent("XL+ Definitive Edition").withStyle(ChatFormatting.DARK_GRAY));
+			tooltip.add(new TextComponent("With Sonic & Knuckles").withStyle(ChatFormatting.DARK_GRAY));
+			tooltip.add(new TextComponent("Season Pass").withStyle(ChatFormatting.DARK_GRAY));
 		}
 		super.appendHoverText(stack, level, tooltip, flag);
 	}

@@ -1,7 +1,7 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -15,8 +15,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
 import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.GeneratorFluidTypes;
-import me.haydenb.assemblylinemachines.plugins.jei.IRecipeCategoryBuilder.ICatalystProvider;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder.ICatalystProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -28,18 +27,19 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableAnimated.StartDirection;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
 
 @JeiPlugin
 public class JEICategoryRegistry implements IModPlugin{
@@ -48,229 +48,213 @@ public class JEICategoryRegistry implements IModPlugin{
 	
 	@Override
 	public ResourceLocation getPluginUid() {
-		return new ResourceLocation(AssemblyLineMachines.MODID, "alm");
+		return new ResourceLocation(AssemblyLineMachines.MODID, "assemblylinemachines");
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void registerCategories(IRecipeCategoryRegistration registration) {
-		if(ConfigHolder.getCommonConfig().jeiSupport.get() == true) {
-			IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
-			
-			//Note: Catalysts not yet set for:
-			//Grinding, Fluid Bath, Generator Fluids, or Refining, due to the variable nature of the accepted crafting inventories.
-			
-			CATEGORY_REGISTRY.put(LumberCrafting.LUMBER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("lumber").title("Lumber Mill Crafting")
-					.background("gui_set_pre2022", 145, 69, 102, 30).icon(Registry.getBlock("lumber_mill")).progressBar("gui_set_pre2022", 199, 99, 19, 5, 200, StartDirection.LEFT, false, 23, 13)
-					.itemSlots(1, Pair.of(2, 6), Pair.of(49, 6), Pair.of(82, 6)).catalysts(Registry.getBlock("lumber_mill"))
-					.itemTooltip(new TriFunction<>() {
-						@Override
-						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
-							if(pP1 instanceof LumberCrafting) {
-								LumberCrafting recipe = (LumberCrafting) pP1;
-								if(!recipe.outputb.isEmpty() && pP2.is(recipe.outputb.getItem())){
-									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.opbchance * 100f)) + " Chance"));
-								}
-							}
-							return null;
-						}
-					}).build(LumberCrafting.class));
-			
-			CATEGORY_REGISTRY.put(AlloyingCrafting.ALLOYING_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("alloying").title("Alloying Crafting")
-					.background("gui_set_pre2022", 104, 112, 62, 41).icon(Registry.getBlock("alloy_smelter")).progressBar("gui_set_pre2022", 202, 104, 16, 14, 200, StartDirection.LEFT, false, 19, 13)
-					.itemSlots(2, Pair.of(0, 0), Pair.of(0, 23), Pair.of(40, 11)).catalysts(Registry.getBlock("alloy_smelter"), Registry.getBlock("mkii_alloy_smelter")).build(AlloyingCrafting.class));
-			
-			CATEGORY_REGISTRY.put(GrinderCrafting.GRINDER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("grinding").title("Grinding Crafting")
-					.background("gui_set_pre2022", 166, 145, 90, 44).icon(Registry.getBlock("electric_grinder")).progressBar("gui_set_pre2022", 237, 131, 19, 14, 200, StartDirection.LEFT, false, 42, 24)
-					.itemSlots(1, Pair.of(21, 22), Pair.of(0, 22), Pair.of(0, 0), Pair.of(68, 22))
-					.itemTooltip(new TriFunction<>() {
-						@Override
-						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
-							if(pP1 instanceof GrinderCrafting) {
-								GrinderCrafting recipe = (GrinderCrafting) pP1;
-								if(recipe.chanceToDouble != 0 && pP2.getCount() == recipe.getResultItem().getCount() * 2) {
-									return List.of(new TextComponent("§b" + String.format("%.0f%%", (recipe.chanceToDouble * 100f)) + " Chance"));
-								}
-							}
-							return null;
-						}
-					}).build(GrinderCrafting.class));
-			
-			CATEGORY_REGISTRY.put(PurifierCrafting.PURIFIER_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("purifying").title("Purifier Crafting")
-					.background("gui_set_pre2022", 0, 153, 90, 44).icon(Registry.getBlock("electric_purifier")).progressBar("gui_set_pre2022", 90, 153, 43, 32, 200, StartDirection.LEFT, false, 20, 6)
-					.itemSlots(3, Pair.of(0, 0), Pair.of(0, 26), Pair.of(21, 13), Pair.of(68, 13)).catalysts(Registry.getBlock("electric_purifier"), Registry.getBlock("mkii_purifier")).build(PurifierCrafting.class));
-			
-			CATEGORY_REGISTRY.put(MetalCrafting.METAL_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("metal_shaping").title("Metal Shaper Crafting")
-					.background("gui_set_pre2022", 168, 119, 69, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_pre2022", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
-					.itemSlots(1, Pair.of(0, 4), Pair.of(47, 4)).catalysts(Registry.getBlock("metal_shaper")).build(MetalCrafting.class));
-			
-			CATEGORY_REGISTRY.put(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("world_corruption").title("World Corruption")
-					.background("gui_set_pre2022", 168, 119, 69, 26).icon(Registry.getBlock("corrupt_diamond_ore")).progressBar("gui_set_pre2022", 218, 99, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
-					.itemTooltip(new TriFunction<>() {
-						@Override
-						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
-							if(pP1 instanceof WorldCorruptionCrafting) {
-								WorldCorruptionCrafting recipe = (WorldCorruptionCrafting) pP1;
-								if(recipe.hasOptionalResults()) {
-									Optional<Float> amount = recipe.getChanceOfSubdrop(pP2.getItem());
-									if(amount.isPresent()) {
-										return List.of(new TextComponent("§b" + String.format("%.0f%%", (amount.get() * 100f)) + " Chance"));
-									}
-								}
-							}
-							return null;
-						}
-					}).catalysts(Registry.getBlock("entropy_reactor_block"), Registry.getBlock("entropy_reactor_core"), Registry.getBlock("corrupting_basin"))
-					.build(WorldCorruptionCrafting.class));
-			
-			CATEGORY_REGISTRY.put(GeneratorFluidCrafting.GENFLUID_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("generator_fluid").title("Generator Fluids").background("gui_set_pre2022", 166, 0, 90, 26)
-					.icon(Items.WATER_BUCKET).itemSlots(0, Pair.of(0, 4)).fluidSlots(1, Pair.of(22, 5)).draw(new TriConsumer<>() {
-						private final DecimalFormat df = new DecimalFormat("#.0");
-						@Override
-						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
-							if(k instanceof GeneratorFluidCrafting) {
-								GeneratorFluidCrafting recipe = (GeneratorFluidCrafting) k;
-								TextComponent l1 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent("Coolant") : new TextComponent("Fuel");
-								TextComponent l2 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.coolantStrength) + "x") : new TextComponent(Formatting.formatToSuffix(recipe.powerPerUnit) + " FE");
-								Utils.drawCenteredStringWithoutShadow(v, l1, 64, 6);
-								Utils.drawCenteredStringWithoutShadow(v, l2, 64, 15);
-							}
-						}
-					}).build(GeneratorFluidCrafting.class));
-			
-			CATEGORY_REGISTRY.put(EntropyReactorCrafting.ERO_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("entropy_reactor_output").title("Entropy Reactor Waste")
-					.background("gui_set_pre2022", 194, 43, 62, 26).icon(Registry.getBlock("entropy_reactor_core")).progressBar("gui_set_pre2022", 240, 29, 16, 14, 100, StartDirection.LEFT, false, 19, 6)
-					.itemTooltip(new TriFunction<>() {
-						@Override
-						public List<Component> apply(Recipe<?> pP1, ItemStack pP2, TooltipFlag pP3) {
-							if(pP1 instanceof EntropyReactorCrafting) {
-								EntropyReactorCrafting recipe = (EntropyReactorCrafting) pP1;
-								if(recipe.getResultItem().is(pP2.getItem())) {
-									String text = recipe.varietyReqd < 0.01f ? "§5Any Variety" :  "§5 > " + String.format("%.0f%%", (recipe.varietyReqd * 100f)) + " Variety";
-									return List.of(new TextComponent(text));
-								}
-							}
-							return null;
-						}
-					}).catalysts(Registry.getBlock("entropy_reactor_block"), Registry.getBlock("entropy_reactor_core")).itemSlots(1, Pair.of(0, 4), Pair.of(40, 4)).build(EntropyReactorCrafting.class));
-			
-			CATEGORY_REGISTRY.put(BathCrafting.BATH_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("bathing").title("Fluid Bath Crafting")
-					.background("gui_set_pre2022", 0, 197, 87, 41).icon(Registry.getBlock("electric_fluid_mixer"))
-					.draw(new TriConsumer<>() {
-						private HashMap<BathCraftingFluids, IDrawableAnimated> progressBars = new HashMap<>();
-						@Override
-						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
-							if(k instanceof BathCrafting) {
-								BathCrafting recipe = (BathCrafting) k;
-								IDrawableAnimated anim = progressBars.get(recipe.getFluid());
-								if(anim == null) {
-									anim = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_pre2022"), recipe.getFluid().getJeiBlitPiece().getFirst(), recipe.getFluid().getJeiBlitPiece().getSecond(), 15, 16).buildAnimated(200, StartDirection.LEFT, false);
-									progressBars.put(recipe.getFluid(), anim);
-								}
-								anim.draw(v, 42, 5);
-							}
-						}
-					}).itemSlots(2, Pair.of(0, 4), Pair.of(21, 4), Pair.of(0, 23), Pair.of(65, 4)).fluidSlots(1, Pair.of(42, 24)).build(BathCrafting.class));
-			
-			CATEGORY_REGISTRY.put(FluidInGroundRecipe.FIG_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("fig").title("Pump Output")
-					.background("gui_set_pre2022", 0, 34, 36, 77).icon(Registry.getBlock("pump"))
-					.draw(new TriConsumer<>() {
-						HashMap<FluidInGroundCriteria, IDrawable> drawables = new HashMap<>();
-						@Override
-						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
-							if(k instanceof FluidInGroundRecipe) {
-								FluidInGroundRecipe recipe = (FluidInGroundRecipe) k;
-								IDrawable drawable = drawables.get(recipe.criteria);
-								if(drawable == null) {
-									drawable = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_pre2022"), recipe.criteria.getJeiBlitX(), recipe.criteria.getJeiBlitY(), 34, 34).build();
-									drawables.put(recipe.criteria, drawable);
-								}
-								drawable.draw(v, 1, 42);
-							}
-						}
-					}).fluidTooltip(new TriFunction<>() {
-						@Override
-						public List<Component> apply(Recipe<?> pP1, FluidStack pP2, TooltipFlag pP3) {
-							if(pP1 instanceof FluidInGroundRecipe) {
-								FluidInGroundRecipe recipe = (FluidInGroundRecipe) pP1;
-								return recipe.criteria.getTooltip(recipe.odds);
-							}
-							return null;
-						}
-					}).catalysts(Registry.getBlock("pump"), Registry.getBlock("pumpshaft")).fluidSlots(0, Pair.of(10, 51)).build(FluidInGroundRecipe.class));
-			
-			CATEGORY_REGISTRY.put(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("enchantment_book").title("Enchantment Crafting")
-					.background("gui_set_pre2022", 174, 209, 82, 47).icon(Registry.getBlock("experience_mill")).progressBar("gui_set_pre2022", 228, 200, 28, 9, 120, StartDirection.LEFT, false, 23, 19)
-					.itemSlots(2, Pair.of(0, 0), Pair.of(0, 29), Pair.of(60, 15))
-					.itemStackModifier(new BiFunction<>() {
-						@Override
-						public List<List<ItemStack>> apply(Recipe<?> t, List<Ingredient> u) {
-							List<List<ItemStack>> result = new ArrayList<>();
-							for(Ingredient ing : u) {
-								result.add(Arrays.asList(ing.getItems()));
-							}
-							if(t instanceof EnchantmentBookCrafting && result.size() > 0) {
-								EnchantmentBookCrafting recipe = (EnchantmentBookCrafting) t;
-								for(ItemStack item : result.get(0)) {
-									item.setCount(recipe.amount);
-								}
-							}
-							return result;
-						}
-					}).catalysts(Registry.getBlock("experience_mill")).build(EnchantmentBookCrafting.class));
-			
-			CATEGORY_REGISTRY.put(RefiningCrafting.REFINING_RECIPE, new RecipeCategoryBuilder(guiHelper).uid("refining").title("Refinery Crafting")
-					.background("gui_set_pre2022", 112, 26, 82, 41).icon(Registry.getBlock("refinery"))
-					.draw(new TriConsumer<>() {
-						IDrawableAnimated progBar = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_pre2022"), 194, 26, 7, 3).buildAnimated(400, StartDirection.TOP, false);
-						@Override
-						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
-							progBar.draw(v, 35, 19);
-							progBar.draw(v, 44, 19);
-							progBar.draw(v, 55, 19);
-							progBar.draw(v, 64, 19);
-						}
-					}).build(RefiningCrafting.class));
-			
-			registration.addRecipeCategories(CATEGORY_REGISTRY.values().toArray(new IRecipeCategory<?>[CATEGORY_REGISTRY.size()]));
-			AssemblyLineMachines.LOGGER.info("JEI plugin for Assembly Line Machines loaded.");
-		}
+		IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
 		
+		CATEGORY_REGISTRY.put(LumberCrafting.LUMBER_RECIPE, new RecipeCategoryBuilder(guiHelper, "lumber", "Lumber Mill Crafting")
+				.background("gui_set_a", 145, 69, 102, 30).icon(Registry.getBlock("lumber_mill")).progressBar("gui_set_a", 199, 99, 19, 5, 200, StartDirection.LEFT, false, 23, 13)
+				.slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(3, 7), Pair.of(50, 7), Pair.of(83, 7)).catalysts(Registry.getBlock("lumber_mill"))
+				.tooltip((pP1, pP2, tooltip) -> {
+					if(pP1 instanceof LumberCrafting recipe && pP2 instanceof ItemStack stack) {
+						if(!recipe.outputb.isEmpty() && stack.is(recipe.outputb.getItem())) tooltip.add(new TextComponent(String.format("%.0f%%", (recipe.opbchance * 100f)) + " Chance").withStyle(ChatFormatting.AQUA));
+					}
+				}).build(LumberCrafting.class));
 		
+		CATEGORY_REGISTRY.put(AlloyingCrafting.ALLOYING_RECIPE, new RecipeCategoryBuilder(guiHelper, "alloying", "Alloying Crafting")
+				.background("gui_set_a", 104, 112, 62, 41).icon(Registry.getBlock("alloy_smelter")).progressBar("gui_set_a", 202, 104, 16, 14, 200, StartDirection.LEFT, false, 19, 13)
+				.slots((i) -> i == 2 ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT, Pair.of(1, 1), Pair.of(1, 24), Pair.of(41, 12)).catalysts(Registry.getBlock("alloy_smelter"), Registry.getBlock("mkii_alloy_smelter")).build(AlloyingCrafting.class));
+		
+		CATEGORY_REGISTRY.put(GrinderCrafting.GRINDER_RECIPE, new RecipeCategoryBuilder(guiHelper, "grinding", "Grinding Crafting")
+				.background("gui_set_a", 166, 145, 90, 44).icon(Registry.getBlock("electric_grinder")).progressBar("gui_set_a", 237, 131, 19, 14, 200, StartDirection.LEFT, false, 42, 24)
+				.slots((i) -> switch(i) {
+				default -> RecipeIngredientRole.INPUT;
+				case 1, 2 -> RecipeIngredientRole.CATALYST;
+				case 3 -> RecipeIngredientRole.OUTPUT;
+				}, Pair.of(22, 23), Pair.of(1, 23), Pair.of(1, 1), Pair.of(69, 23))
+				.tooltip((pP1, pP2, tooltip) -> {
+					if(pP1 instanceof GrinderCrafting recipe && pP2 instanceof ItemStack stack) {
+						if(recipe.chanceToDouble != 0 && stack.getCount() == recipe.getResultItem().getCount() * 2) tooltip.add(new TextComponent(String.format("%.0f%%", (recipe.chanceToDouble * 100f)) + " Chance").withStyle(ChatFormatting.AQUA));
+					}
+				}).build(GrinderCrafting.class));
+		
+		CATEGORY_REGISTRY.put(PurifierCrafting.PURIFIER_RECIPE, new RecipeCategoryBuilder(guiHelper, "purifying", "Purifier Crafting")
+				.background("gui_set_a", 0, 153, 90, 44).icon(Registry.getBlock("electric_purifier")).progressBar("gui_set_a", 90, 153, 43, 32, 200, StartDirection.LEFT, false, 20, 6)
+				.slots((i) -> i == 3 ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT, Pair.of(1, 1), Pair.of(1, 27), Pair.of(22, 14), Pair.of(69, 14)).catalysts(Registry.getBlock("electric_purifier"), Registry.getBlock("mkii_purifier")).build(PurifierCrafting.class));
+		
+		CATEGORY_REGISTRY.put(MetalCrafting.METAL_RECIPE, new RecipeCategoryBuilder(guiHelper, "metal_shaping", "Metal Shaper Crafting")
+				.background("gui_set_a", 168, 119, 69, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_a", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
+				.slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(1, 5), Pair.of(48, 5)).catalysts(Registry.getBlock("metal_shaper")).build(MetalCrafting.class));
+		
+		CATEGORY_REGISTRY.put(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, new RecipeCategoryBuilder(guiHelper, "world_corruption", "World Corruption")
+				.background("gui_set_a", 168, 119, 69, 26).icon(Registry.getBlock("corrupt_diamond_ore")).progressBar("gui_set_a", 218, 99, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
+				.tooltip((pP1, pP2, tooltip) -> {
+					if(pP1 instanceof WorldCorruptionCrafting recipe && pP2 instanceof ItemStack stack) {
+						if(recipe.hasOptionalResults()) {
+							Optional<Float> amount = recipe.getChanceOfSubdrop(stack.getItem());
+							if(amount.isPresent()) {
+								tooltip.add(new TextComponent(String.format("%.0f%%", (amount.get() * 100f)) + " Chance").withStyle(ChatFormatting.AQUA));
+							}
+						}
+					}
+				}).slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(1, 5), Pair.of(48, 5)).catalysts(Registry.getBlock("entropy_reactor_block"), Registry.getBlock("entropy_reactor_core"), Registry.getBlock("corrupting_basin"))
+				.build(WorldCorruptionCrafting.class));
+		
+		CATEGORY_REGISTRY.put(GeneratorFluidCrafting.GENFLUID_RECIPE, new RecipeCategoryBuilder(guiHelper, "generator_fluid", "Generator Fluids").background("gui_set_a", 166, 0, 90, 26)
+				.icon(Items.WATER_BUCKET).slots((i) -> i == 0 ? RecipeIngredientRole.CATALYST : RecipeIngredientRole.INPUT, Pair.of(1, 5), Pair.of(22, 5)).draw(new TriConsumer<>() {
+					private final DecimalFormat df = new DecimalFormat("#.0");
+					@Override
+					public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+						if(k instanceof GeneratorFluidCrafting) {
+							GeneratorFluidCrafting recipe = (GeneratorFluidCrafting) k;
+							TextComponent l1 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent("Coolant") : new TextComponent("Fuel");
+							TextComponent l2 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.coolantStrength) + "x") : new TextComponent(Formatting.formatToSuffix(recipe.powerPerUnit) + " FE");
+							Utils.drawCenteredStringWithoutShadow(v, l1, 64, 6);
+							Utils.drawCenteredStringWithoutShadow(v, l2, 64, 15);
+						}
+					}
+				}).build(GeneratorFluidCrafting.class));
+		
+		CATEGORY_REGISTRY.put(EntropyReactorCrafting.ERO_RECIPE, new RecipeCategoryBuilder(guiHelper, "entropy_reactor_output", "Entropy Reactor Waste")
+				.background("gui_set_a", 194, 43, 62, 26).icon(Registry.getBlock("entropy_reactor_core")).progressBar("gui_set_a", 240, 29, 16, 14, 100, StartDirection.LEFT, false, 19, 6)
+				.tooltip((pP1, pP2, tooltip) -> {
+					if(pP1 instanceof EntropyReactorCrafting recipe && pP2 instanceof ItemStack stack) {
+						if(recipe.getResultItem().is(stack.getItem())) {
+							String text = recipe.varietyReqd < 0.01f ? "Any Variety" :  " > " + String.format("%.0f%%", (recipe.varietyReqd * 100f)) + " Variety";
+							tooltip.add(new TextComponent(text).withStyle(ChatFormatting.DARK_PURPLE));
+						}
+					}
+				}).catalysts(Registry.getBlock("entropy_reactor_block"), Registry.getBlock("entropy_reactor_core")).slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(1, 5), Pair.of(41, 5)).build(EntropyReactorCrafting.class));
+		
+		CATEGORY_REGISTRY.put(BathCrafting.BATH_RECIPE, new RecipeCategoryBuilder(guiHelper, "bathing", "Fluid Bath Crafting")
+				.background("gui_set_a", 0, 197, 87, 41).icon(Registry.getBlock("electric_fluid_mixer"))
+				.draw(new TriConsumer<>() {
+					private HashMap<BathCraftingFluids, IDrawableAnimated> progressBars = new HashMap<>();
+					@Override
+					public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+						if(k instanceof BathCrafting) {
+							BathCrafting recipe = (BathCrafting) k;
+							IDrawableAnimated anim = progressBars.get(recipe.getFluid());
+							if(anim == null) {
+								anim = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), recipe.getFluid().getJeiBlitPiece().getFirst(), recipe.getFluid().getJeiBlitPiece().getSecond(), 15, 16).buildAnimated(200, StartDirection.LEFT, false);
+								progressBars.put(recipe.getFluid(), anim);
+							}
+							anim.draw(v, 42, 5);
+						}
+					}
+				}).slots((i) -> switch(i) {
+				default -> RecipeIngredientRole.INPUT;
+				case 2 -> RecipeIngredientRole.CATALYST;
+				case 4 -> RecipeIngredientRole.OUTPUT;
+				}, Pair.of(1, 5), Pair.of(22, 5), Pair.of(1, 24), Pair.of(42, 24), Pair.of(66, 5)).build(BathCrafting.class));
+		
+		CATEGORY_REGISTRY.put(FluidInGroundRecipe.FIG_RECIPE, new RecipeCategoryBuilder(guiHelper, "fig", "Pump Output")
+				.background("gui_set_a", 0, 34, 36, 77).icon(Registry.getBlock("pump"))
+				.draw(new TriConsumer<>() {
+					HashMap<FluidInGroundCriteria, IDrawable> drawables = new HashMap<>();
+					@Override
+					public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+						if(k instanceof FluidInGroundRecipe) {
+							FluidInGroundRecipe recipe = (FluidInGroundRecipe) k;
+							IDrawable drawable = drawables.get(recipe.criteria);
+							if(drawable == null) {
+								drawable = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), recipe.criteria.getJeiBlitX(), recipe.criteria.getJeiBlitY(), 34, 34).build();
+								drawables.put(recipe.criteria, drawable);
+							}
+							drawable.draw(v, 1, 42);
+						}
+					}
+				}).tooltip((pP1, pP2, tooltip) -> {
+					if(pP1 instanceof FluidInGroundRecipe recipe) {
+						tooltip.addAll(recipe.criteria.getTooltip(recipe.odds));
+					}
+				}).catalysts(Registry.getBlock("pump"), Registry.getBlock("pumpshaft")).slots((i) -> RecipeIngredientRole.OUTPUT, Pair.of(10, 51)).build(FluidInGroundRecipe.class));
+		
+		CATEGORY_REGISTRY.put(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, new RecipeCategoryBuilder(guiHelper, "enchantment_book", "Enchantment Crafting")
+				.background("gui_set_a", 174, 209, 82, 47).icon(Registry.getBlock("experience_mill")).progressBar("gui_set_a", 228, 200, 28, 9, 120, StartDirection.LEFT, false, 23, 19)
+				.slots((i) -> i == 2 ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT, Pair.of(1, 1), Pair.of(1, 30), Pair.of(61, 16))
+				.itemStackModifier((t, u) -> {
+					List<ItemStack> items = Arrays.asList(u.getItems());
+					if(t instanceof EnchantmentBookCrafting recipe && items.size() > 0) {
+						for(ItemStack item : items) {
+							item.setCount(recipe.amount);
+						}
+					}
+					return items;
+				}).catalysts(Registry.getBlock("experience_mill")).build(EnchantmentBookCrafting.class));
+		
+		CATEGORY_REGISTRY.put(RefiningCrafting.REFINING_RECIPE, new RecipeCategoryBuilder(guiHelper, "refining", "Refinery Crafting")
+				.background("gui_set_a", 112, 26, 82, 41).icon(Registry.getBlock("refinery"))
+				.draw(new TriConsumer<>() {
+					IDrawableAnimated progBar = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), 194, 26, 7, 3).buildAnimated(400, StartDirection.TOP, false);
+					@Override
+					public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+						progBar.draw(v, 35, 19);
+						progBar.draw(v, 44, 19);
+						progBar.draw(v, 55, 19);
+						progBar.draw(v, 64, 19);
+					}
+				}).slots((i) -> switch(i) {
+				case 0, 1 -> RecipeIngredientRole.CATALYST;
+				case 2, 3 -> RecipeIngredientRole.INPUT;
+				default -> RecipeIngredientRole.OUTPUT;
+				}, Pair.of(1, 1), Pair.of(1, 24), Pair.of(35, 1), Pair.of(55, 1), Pair.of(25, 24), Pair.of(45, 24), Pair.of(65, 24)).build(RefiningCrafting.class));
+		
+		CATEGORY_REGISTRY.put(GreenhouseCrafting.GREENHOUSE_RECIPE, new RecipeCategoryBuilder(guiHelper, "greenhouse", "Greenhouse Crops")
+				.background("gui_set_a", 48, 0, 64, 60).icon(Registry.getBlock("greenhouse")).slots((i) -> switch(i) {
+				case 0 -> RecipeIngredientRole.INPUT;
+				default -> RecipeIngredientRole.CATALYST;
+				case 4 -> RecipeIngredientRole.OUTPUT;
+				}, Pair.of(1, 1), Pair.of(1, 23), Pair.of(1, 43), Pair.of(20, 43), Pair.of(43, 12))
+				.draw(new TriConsumer<>() {
+					IDrawableAnimated progBarDay = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), 76, 60, 18, 12).buildAnimated(200, StartDirection.LEFT, false);
+					IDrawableAnimated progBarNight = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), 58, 60, 18, 12).buildAnimated(200, StartDirection.LEFT, false);
+					IDrawableAnimated progBarReg = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), 94, 60, 18, 12).buildAnimated(200, StartDirection.LEFT, false);
+					@Override
+					public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+						if(k instanceof GreenhouseCrafting recipe) {
+							Supplier<IDrawableAnimated> bar;
+							if(recipe.sprout.sunlightReq == null) {
+								bar = () -> progBarReg;
+							}else {
+								bar = recipe.sprout.sunlightReq.test(recipe.soil) ? () -> progBarDay : () -> progBarNight;
+							}
+							bar.get().draw(v, 19, 14);
+						}
+					}
+				}).catalysts(Registry.getItem("greenhouse")).build(GreenhouseCrafting.class));
+		
+		CATEGORY_REGISTRY.put(GreenhouseFertilizerCrafting.FERTILIZER_RECIPE, new RecipeCategoryBuilder(guiHelper, "fertilizer", "Greenhouse Fertilizer")
+				.background("gui_set_a", 187, 0, 69, 26).icon(Items.BONE_MEAL).slots((i) -> RecipeIngredientRole.INPUT, Pair.of(1, 5)).draw((k, v, s) -> {
+					if(k instanceof GreenhouseFertilizerCrafting recipe) {
+						String uses = recipe.usesPerItem == 1 ? "Use" : "Uses";
+						Utils.drawCenteredStringWithoutShadow(v, new TextComponent(recipe.usesPerItem + " " + uses), 43, 6);
+						Utils.drawCenteredStringWithoutShadow(v, new TextComponent(recipe.multiplication + "x Yield"), 43, 15);
+						
+					}
+				}).catalysts(Registry.getBlock("greenhouse")).build(GreenhouseFertilizerCrafting.class));
+		
+		registration.addRecipeCategories(CATEGORY_REGISTRY.values().toArray(new IRecipeCategory<?>[CATEGORY_REGISTRY.size()]));
+		AssemblyLineMachines.LOGGER.info("JEI plugin for Assembly Line Machines loaded.");
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void registerRecipes(IRecipeRegistration registration) {
-		if(ConfigHolder.getCommonConfig().jeiSupport.get() == true) {
-			
-			ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = getRecipes();
-			for(RecipeType<?> type : CATEGORY_REGISTRY.keySet()) {
-				registration.addRecipes(allRecipes.get(type), CATEGORY_REGISTRY.get(type).getUid());
-			}
-			
-		}
+		ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = getRecipes();
+		for(RecipeType<?> type : CATEGORY_REGISTRY.keySet()) registration.addRecipes(allRecipes.get(type), CATEGORY_REGISTRY.get(type).getUid());
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		if(ConfigHolder.getCommonConfig().jeiSupport.get() == true) {
-			for(IRecipeCategory<?> category : CATEGORY_REGISTRY.values()) {
-				if(category instanceof ICatalystProvider) {
-					ItemStack[] catalysts = ((ICatalystProvider) category).getCatalysts();
-					if(catalysts != null) {
-						for(ItemStack stack : catalysts) {
-							registration.addRecipeCatalyst(stack, category.getUid());
-						}
-					}
-					
-					
-				}
-			}
-			
-			registration.addRecipeCatalyst(Registry.getBlock("electric_furnace").asItem().getDefaultInstance(), VanillaRecipeCategoryUid.FURNACE);
-		}
+		CATEGORY_REGISTRY.values().stream().filter((c) -> (c instanceof ICatalystProvider)).forEach((c) -> ((ICatalystProvider) c).getCatalysts().forEach((i) -> registration.addRecipeCatalyst(i, c.getUid())));
+		
+		registration.addRecipeCatalyst(Registry.getBlock("electric_furnace").asItem().getDefaultInstance(), VanillaRecipeCategoryUid.FURNACE);
 	}
 	
 	private static ListMultimap<RecipeType<?>, Recipe<?>> getRecipes(){
@@ -278,13 +262,9 @@ public class JEICategoryRegistry implements IModPlugin{
 		ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = ArrayListMultimap.create();
 		Minecraft minecraft = Minecraft.getInstance();
 		minecraft.level.getRecipeManager().getRecipes().forEach((recipe) -> {
-			if(CATEGORY_REGISTRY.containsKey(recipe.getType())) {
-				allRecipes.put(recipe.getType(), recipe);
-			}
+			if(CATEGORY_REGISTRY.containsKey(recipe.getType())) allRecipes.put(recipe.getType(), recipe);
 		});
 		
 		return allRecipes;
 	}
-
 }
-

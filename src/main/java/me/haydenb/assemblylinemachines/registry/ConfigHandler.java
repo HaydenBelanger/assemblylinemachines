@@ -122,7 +122,6 @@ public class ConfigHandler {
 		
 		//CLIENT
 		public final BooleanValue coolDudeMode;
-		public final BooleanValue jeiSupport;
 		public final BooleanValue customTooltipColors;
 		public final BooleanValue customTooltipFrames;
 		
@@ -246,7 +245,6 @@ public class ConfigHandler {
 			
 			builder.push("Client");
 			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
-			jeiSupport = builder.comment("If JEI is installed, should support be enabled?").define("jeiSupport", true);
 			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
 			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
 			builder.pop();

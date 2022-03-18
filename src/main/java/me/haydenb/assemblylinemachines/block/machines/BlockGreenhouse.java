@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -26,6 +25,7 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
 import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -134,7 +134,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 	
 	public static enum Sprout implements StringRepresentable{
 		EMPTY, CACTUS((s) -> true), CORRUPT_SPROUT((s) -> false), NETHER_SPROUT((s) -> false), SAPLING((s) -> s != Soil.SOUL_SAND, Upgrades.GREENHOUSE_ARBORIST, (i) -> SAPLING_TINT_INDEXER.get(i)), 
-		MUSHROOM((s) -> false), SPROUT((s) -> true), SUGAR_CANE((s) -> true), CHORUS((s) -> false), BRAIN_CACTUS((s) -> false), CHAOSBARK_SAPLING((s) -> false), FLOWER((s) -> true, Upgrades.GREENHOUSE_FLORIST, (i) -> FLOWER_TINT_INDEXER.get(i));
+		MUSHROOM((s) -> false), SPROUT((s) -> true), SUGAR_CANE((s) -> true), CHORUS((s) -> false), BRAIN_CACTUS((s) -> false), CHAOSBARK_SAPLING((s) -> false), FLOWER((s) -> s != Soil.CORRUPT, Upgrades.GREENHOUSE_FLORIST, (i) -> FLOWER_TINT_INDEXER.get(i));
 		
 		public final Function<Item, Pair<Integer, Integer>> tintIndexer;
 		public final Predicate<Soil> sunlightReq;
@@ -166,7 +166,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 	}
 	
 	public static enum Soil implements StringRepresentable{
-		EMPTY(Lazy.of(() -> null)), DIRT(Lazy.of(() -> Ingredient.of(Blocks.DIRT, Blocks.GRASS, Blocks.COARSE_DIRT, Blocks.ROOTED_DIRT))), 
+		EMPTY(Lazy.of(() -> null)), DIRT(Lazy.of(() -> Ingredient.of(Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.COARSE_DIRT, Blocks.ROOTED_DIRT))), 
 		MYCELIUM(Lazy.of(() -> Ingredient.of(Blocks.MYCELIUM))), SAND(Lazy.of(() -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("minecraft", "sand"))))),
 		SOUL_SAND(Lazy.of(() -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("minecraft", "soul_fire_base_blocks")))), Upgrades.GREENHOUSE_INTERDIM), 
 		CORRUPT(Lazy.of(() -> Ingredient.of(Registry.getBlock("corrupt_dirt"), Registry.getBlock("corrupt_grass"))), Upgrades.GREENHOUSE_INTERDIM), END_STONE(Lazy.of(() -> Ingredient.of(Blocks.END_STONE)), Upgrades.GREENHOUSE_INTERDIM);
@@ -233,7 +233,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 						yield 240;
 					};
 					
-					if(this.getUpgradeAmount(Upgrades.GREENHOUSE_LAMP) != 0) {
+					if(this.getUpgradeAmount(Upgrades.GREENHOUSE_LAMP) != 0 || this.getUpgradeAmount(Upgrades.GREENHOUSE_BLACKOUT) != 0) {
 						baseCost *= 2.5;
 						nTimer = Math.round((int) nTimer * 0.75f);
 					}
@@ -507,24 +507,11 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 			}
 		}
 		
-		@Override
-		protected void renderTooltip(PoseStack pPoseStack, ItemStack pItemStack, int pMouseX, int pMouseY) {
-			int x = (this.width - this.imageWidth) / 2;
-			int y = (this.height - this.imageHeight) / 2;
-			
-			List<Component> tooltip = getTooltipFromItem(pItemStack);
-			if(MathHelper.isMouseBetween(x, y, pMouseX, pMouseY, 53, 33, 70, 50)) {
-				tooltip.addAll(1, getFertilizerInformation());
-			}
-			
-			super.renderComponentTooltip(pPoseStack, tooltip, pMouseX, pMouseY);
-		}
-		
 		private List<Component> getFertilizerInformation(){
 			if(tsfm.currentFertilizerRemaining <= 0) return List.of();
 			List<Component> list = new ArrayList<>();
-			if(tsfm.currentFertilizerMultiplier != 1) list.add(new TextComponent("§9Fertilizer Power: §b" + tsfm.currentFertilizerMultiplier + "x Yield"));
-			list.add(new TextComponent("§2Uses Remaining: §a" + tsfm.currentFertilizerRemaining + "/" + tsfm.currentFertilizerMax));
+			if(tsfm.currentFertilizerMultiplier != 1) list.add(new TextComponent("Fertilizer Power: ").withStyle(ChatFormatting.BLUE).append(new TextComponent(tsfm.currentFertilizerMultiplier + "x Yield").withStyle(ChatFormatting.AQUA)));
+			list.add(new TextComponent("Uses Remaining: ").withStyle(ChatFormatting.DARK_GREEN).append(new TextComponent(tsfm.currentFertilizerRemaining + "/" + tsfm.currentFertilizerMax).withStyle(ChatFormatting.GREEN)));
 			return list;
 		}
 	}

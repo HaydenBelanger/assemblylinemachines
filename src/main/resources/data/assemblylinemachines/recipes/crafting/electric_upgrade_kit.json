@@ -6,7 +6,7 @@
 	],
 	"key":{
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/industrial"
+			"tag": "assemblylinemachines:industrial_gears"
 		},
 		"b":{
 			"item": "assemblylinemachines:basic_battery"

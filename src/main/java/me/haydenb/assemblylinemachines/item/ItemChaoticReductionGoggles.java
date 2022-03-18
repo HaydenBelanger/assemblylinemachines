@@ -4,6 +4,7 @@ import java.util.List;
 
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +20,7 @@ public class ItemChaoticReductionGoggles extends ArmorItem implements ISpecialTo
 	
 	@Override
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-		pTooltipComponents.add(new TextComponent("§8§oKeeps Dark Energy out of your eyes."));
+		pTooltipComponents.add(new TextComponent("Keeps Dark Energy out of your eyes.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 	}
 	
 	@Override

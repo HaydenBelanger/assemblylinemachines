@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "assemblylinemachines:mushrooms"
+	},
+	"output":{
+		"item": "assemblylinemachines:spores"
+	},
+	"grinds": 4,
+	"bladetype": "TITANIUM"
+}

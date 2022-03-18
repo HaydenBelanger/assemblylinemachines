@@ -43,7 +43,7 @@ public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTo
 		if(canUseSecondaryAbilities(stack)) {
 			BlockState bs = world.getBlockState(pos);
 
-			if(Utils.isInTag(bs, new ResourceLocation(AssemblyLineMachines.MODID, "world/mystium_axe_mineable"))) {
+			if(Utils.isInTag(bs, new ResourceLocation(AssemblyLineMachines.MODID, "mystium_axe_mineable"))) {
 				int cmax = ptt == IToolWithCharge.PowerToolType.NOVASTEEL ? 50 : 10;
 				stack.hurtAndBreak(Utils.breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 			}

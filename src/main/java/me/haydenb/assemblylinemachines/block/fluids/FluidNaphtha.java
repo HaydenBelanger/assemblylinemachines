@@ -38,7 +38,7 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 			
 			BlockPos cor = iter.next();
 			
-			if(world.getBlockState(cor).getBlock() == Blocks.AIR && (world.isLoaded(cor.below()) || isSurroundingBlockFlammable(world, cor)) && !Utils.isInTag(world.getBlockState(cor.below()), new ResourceLocation(AssemblyLineMachines.MODID, "world/naphtha_fireproof"))) {
+			if(world.getBlockState(cor).getBlock() == Blocks.AIR && (world.isLoaded(cor.below()) || isSurroundingBlockFlammable(world, cor)) && !Utils.isInTag(world.getBlockState(cor.below()), new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof"))) {
 				
 				world.setBlockAndUpdate(cor, ForgeEventFactory.fireFluidPlaceBlockEvent(world, cor, pos, Registry.getBlock("naphtha_fire").defaultBlockState()));
 				
@@ -130,7 +130,7 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 								int xAge = age + 1 + rand.nextInt(4);
 								if(nAge > 15) nAge = 15;
 								if(xAge > 15) xAge = 15;
-								if(world.isLoaded(posx.below()) && !Utils.isInTag(world.getBlockState(posx.below()), new ResourceLocation(AssemblyLineMachines.MODID, "world/naphtha_fireproof"))) {
+								if(world.isLoaded(posx.below()) && !Utils.isInTag(world.getBlockState(posx.below()), new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof"))) {
 									world.setBlockAndUpdate(posx, ForgeEventFactory.fireFluidPlaceBlockEvent(world, posx, pos, state.setValue(FireBlock.AGE, nAge)));
 									
 									world.setBlockAndUpdate(pos, state.setValue(FireBlock.AGE, xAge));

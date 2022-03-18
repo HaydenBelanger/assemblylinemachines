@@ -16,7 +16,7 @@
 			"tag": "forge:storage_blocks/lapis"
 		},
 		"g":{
-			"tag": "assemblylinemachines:crafting/gears/precious"
+			"tag": "assemblylinemachines:precious_gears"
 		},
 		"q":{
 			"item": "assemblylinemachines:black_granite"

@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:grass"
+	},
+	"output":{
+		"item": "assemblylinemachines:grass_seeds"
+	},
+	"grinds": 6,
+	"bladetype": "TITANIUM"
+}

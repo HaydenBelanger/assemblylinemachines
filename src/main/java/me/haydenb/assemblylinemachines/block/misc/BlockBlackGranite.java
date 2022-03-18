@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -48,9 +49,9 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 		if(state.getValue(NATURAL_GRANITE) == true) {
 			if(canToolMine(player, state)) {
-				probeInfo.horizontal().text(new TextComponent("§aBlock will drop when mined."));
+				probeInfo.horizontal().text(new TextComponent("Block will drop when mined.").withStyle(ChatFormatting.GREEN));
 			}else {
-				probeInfo.horizontal().text(new TextComponent("§cBlock will not drop when mined."));
+				probeInfo.horizontal().text(new TextComponent("Block will not drop when mined.").withStyle(ChatFormatting.RED));
 			}
 		}
 		
@@ -60,7 +61,7 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 	@Override
 	public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 		if(!player.isCreative() && !canToolMine(player, state)) {
-			player.displayClientMessage(new TextComponent("§cA Pickaxe with mechanical power is needed to extract the Black Granite."), true);
+			player.displayClientMessage(new TextComponent("A Pickaxe with mechanical power is needed to extract the Black Granite.").withStyle(ChatFormatting.RED), true);
 		}
 		return super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
 	}

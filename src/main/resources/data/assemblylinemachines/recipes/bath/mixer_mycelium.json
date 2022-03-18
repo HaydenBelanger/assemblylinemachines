@@ -1,18 +1,17 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"tag": "assemblylinemachines:organics"
+		"tag": "assemblylinemachines:spores_plantable"
 	},
 	"input_b":{
-		"tag": "assemblylinemachines:organics"
+		"item": "assemblylinemachines:spores"
 	},
 	"output":{
-		"item": "assemblylinemachines:sludge",
-		"count": 2
+		"item": "minecraft:mycelium"
 	},
 	"stirs": 5,
 	"fluid": "water",
 	"mix_color": "0",
 	"mixer_type": "MIXER_ONLY",
-	"drain_percent": "HALF"
+	"drain_percent": "QUARTER"
 }
