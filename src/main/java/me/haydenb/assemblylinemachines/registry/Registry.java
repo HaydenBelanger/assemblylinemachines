@@ -181,11 +181,11 @@ public class Registry {
 		
 		createItem("steel_ingot", "steel_nugget", "steel_rod");
 		
-		createItem("pure_iron", "pure_gold", "pure_titanium", "pure_steel", "pure_copper");
+		createItem("pure_iron_ingot", "pure_gold_ingot", "pure_titanium_ingot", "pure_steel_ingot", "pure_copper_ingot");
 		
-		createItem("steel_plate", "wooden_board", "iron_plate", "gold_plate", "titanium_plate", "copper_plate", "mystium_plate");
+		createItem("pure_steel_plate", "wooden_board", "pure_iron_plate", "pure_gold_plate", "pure_titanium_plate", "pure_copper_plate", "mystium_plate");
 		
-		createItem("gold_gear", "steel_gear", "iron_gear", "titanium_gear", "copper_gear");
+		createItem("pure_gold_gear", "pure_steel_gear", "pure_iron_gear", "pure_titanium_gear", "pure_copper_gear");
 		
 		createItem("empowered_coal", new ItemGearboxFuel(3200));
 		createItem("empowered_fuel", new ItemGearboxFuel(6400));
@@ -345,8 +345,6 @@ public class Registry {
 	
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
-		MOD_BLOCK_REGISTRY.add();
 		
 		TransmissionType.getPipeRegistryValues().forEach((pipeData) -> createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true));
 		
@@ -534,7 +532,7 @@ public class Registry {
 		createFluid("propane", 0, true, false, false, 0, 0, 0);
 		createFluid("propylene", 0, true, false, false, 0, 0, 0);
 		
-		MOD_BLOCK_REGISTRY.values().forEach((b) -> event.getRegistry().register(b));
+		MOD_BLOCK_REGISTRY.add().values().forEach((b) -> event.getRegistry().register(b));
 	}
 	
 	@SubscribeEvent
@@ -545,8 +543,6 @@ public class Registry {
 	
 	@SubscribeEvent
 	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		
-		MOD_BLOCKENTITY_REGISTRY.add();
 		
 		createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, Lists.transform(TransmissionType.getPipeRegistryValues(), (t) -> MOD_BLOCK_REGISTRY.get(t.getLeft())));
 		createBlockEntity("hand_grinder", TEHandGrinder.class);
@@ -581,13 +577,11 @@ public class Registry {
 		createBlockEntity("omnivoid", TEOmnivoid.class);
 		createBlockEntity("greenhouse", TEGreenhouse.class);
 		
-		MOD_BLOCKENTITY_REGISTRY.values().forEach((be) -> event.getRegistry().register(be));
+		MOD_BLOCKENTITY_REGISTRY.add().values().forEach((be) -> event.getRegistry().register(be));
 	}
 	
 	@SubscribeEvent
 	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		
-		MOD_CONTAINER_REGISTRY.add();
 		
 		createContainer("simple_fluid_mixer", ContainerSimpleFluidMixer.class);
 		createContainer("simple_grinder", ContainerSimpleGrinder.class);
@@ -611,7 +605,7 @@ public class Registry {
 		createContainer("omnivoid", ContainerOmnivoid.class);
 		createContainer("greenhouse", ContainerGreenhouse.class);
 		
-		MOD_CONTAINER_REGISTRY.values().forEach((p) -> event.getRegistry().register(p.getFirst()));
+		MOD_CONTAINER_REGISTRY.add().values().forEach((p) -> event.getRegistry().register(p.getFirst()));
 		
 	}
 	
@@ -689,7 +683,6 @@ public class Registry {
 	}
 	
 	//CLIENT-RELATED SETUP EVENTS - RENDER LAYERS, TERs, SCREENS, ITEM PROPERTIES, TINTING HANDLERS, ENTITY RENDERERS
-	
 	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
@@ -852,10 +845,7 @@ public class Registry {
 		event.registerEntityRenderer(EntityCorruptShell.CORRUPT_SHELL, new EntityCorruptShellRenderFactory());
 	}
 	
-	
-	
-	//CONFIG CREATOR/DATA GENERATOR
-	
+	//DATAGEN
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) throws Exception {
 		

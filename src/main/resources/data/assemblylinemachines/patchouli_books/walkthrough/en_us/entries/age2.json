@@ -1,7 +1,7 @@
 {
 	"name": "Crank Age",
 	"category": "assemblylinemachines:walkthrough",
-	"icon": "assemblylinemachines:gold_gear",
+	"icon": "assemblylinemachines:pure_gold_gear",
 	"pages":[
 		{
 			"type": "text",
@@ -78,8 +78,8 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/plates/iron_plate",
-			"recipe2": "assemblylinemachines:crafting/gears/iron_gear"
+			"recipe": "assemblylinemachines:crafting/plates/pure_iron_plate",
+			"recipe2": "assemblylinemachines:crafting/gears/pure_iron_gear"
 		},
 		{
 			"type": "text",

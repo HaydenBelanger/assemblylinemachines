@@ -2,7 +2,7 @@
 
 The Upgrading recipes are for processes you want to happen when you use an Upgrade Kit in-world on a specified block. Using this process, you are able to specify slot transformations which relocate stored items into specific new slots.
 
-!!! error "1.18.1+ Feature"
+!!! error "1.18.2+ Feature"
     This recipe type was made available in Assembly Line Machines 1.18.2-1.4, as a new mechanic.
 
 ## Recipe Specification

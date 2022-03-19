@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"tag": "forge:plates/steel"
+			"tag": "forge:plates/pure_steel"
 		},
 		"i":{
 			"item": "assemblylinemachines:item_pipe"

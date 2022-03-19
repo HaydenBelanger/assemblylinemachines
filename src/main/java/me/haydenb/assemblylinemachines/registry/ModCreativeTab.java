@@ -20,7 +20,7 @@ public class ModCreativeTab extends CreativeModeTab {
 	
 	@Override
 	public ItemStack makeIcon() {
-		return new ItemStack(Registry.getItem("steel_gear"));
+		return new ItemStack(Registry.getItem("pure_steel_gear"));
 	}
 	
 	@Override

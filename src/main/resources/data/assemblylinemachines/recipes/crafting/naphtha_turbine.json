@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"i":{
-			"tag": "forge:plates/steel"
+			"tag": "forge:plates/pure_steel"
 		},
 		"s":{
 			"item": "assemblylinemachines:smoldering_stone"

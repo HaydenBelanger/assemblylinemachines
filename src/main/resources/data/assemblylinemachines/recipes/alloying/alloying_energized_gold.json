@@ -4,7 +4,7 @@
 		"tag": "forge:dusts/redstone"
 	},
 	"part_b":{
-		"tag": "forge:plates/gold"
+		"tag": "forge:plates/pure_gold"
 	},
 	"output":{
 		"item": "assemblylinemachines:energized_gold_ingot"

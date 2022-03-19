@@ -61,8 +61,8 @@ public class TagMaster {
 		
 		//New tags
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "all_gears"), List.of(Pair.of("assemblylinemachines", "industrial_gears"), Pair.of("assemblylinemachines", "precious_gears")));
-		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "industrial_gears"), List.of(Pair.of("forge", "gears/copper"), Pair.of("forge", "gears/iron"), Pair.of("forge", "gears/steel")));
-		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "precious_gears"), List.of(Pair.of("forge", "gears/gold"), Pair.of("forge", "gears/titanium"), Pair.of("forge", "gears/flerovium")));
+		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "industrial_gears"), List.of(Pair.of("forge", "gears/pure_copper"), Pair.of("forge", "gears/pure_iron"), Pair.of("forge", "gears/pure_steel")));
+		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "precious_gears"), List.of(Pair.of("forge", "gears/pure_gold"), Pair.of("forge", "gears/pure_titanium"), Pair.of("forge", "gears/flerovium")));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "entropy_reactor_outputs"), List.of("semi_dense_neutron_matter", "quark_matter", "strange_matter"));
 		TAG_SINGLE_MASTER.putAll(wrap(TagType.ITEM, "hammers"), List.of("steel_hammer", "crank_hammer", "titanium_hammer", "mystium_hammer", "novasteel_hammer"));
 		TAG_GROUP_MASTER.putAll(wrap(TagType.ITEM, "organics"), List.of(Pair.of("minecraft", "flowers"), Pair.of("minecraft", "leaves"), Pair.of("minecraft", "saplings")));
@@ -105,16 +105,16 @@ public class TagMaster {
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
 				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"), Pair.of("emerald", "ground_emerald"),
 				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust"), Pair.of("chromium", "ground_chromium")));
-		forgeTags.putAll("gears", List.of(Pair.of("copper", "copper_gear"), Pair.of("gold", "gold_gear"), Pair.of("iron", "iron_gear"),
-				Pair.of("steel", "steel_gear"), Pair.of("titanium", "titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
+		forgeTags.putAll("gears", List.of(Pair.of("pure_copper", "pure_copper_gear"), Pair.of("pure_gold", "pure_gold_gear"), Pair.of("pure_iron", "pure_iron_gear"),
+				Pair.of("pure_steel", "pure_steel_gear"), Pair.of("pure_titanium", "pure_titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
 		forgeTags.putAll("ingots", List.of(Pair.of("attuned_titanium", "attuned_titanium_ingot"), Pair.of("chromium", "chromium_ingot"),
-				Pair.of("energized_gold", "energized_gold_ingot"), Pair.of("mystium", "mystium_ingot"), Pair.of("pure_copper", "pure_copper"), Pair.of("pure_gold", "pure_gold"),
-				Pair.of("pure_iron", "pure_iron"), Pair.of("pure_steel", "pure_steel"), Pair.of("pure_titanium", "pure_titanium"), Pair.of("steel", "steel_ingot"), 
+				Pair.of("energized_gold", "energized_gold_ingot"), Pair.of("mystium", "mystium_ingot"), Pair.of("pure_copper", "pure_copper_ingot"), Pair.of("pure_gold", "pure_gold_ingot"),
+				Pair.of("pure_iron", "pure_iron_ingot"), Pair.of("pure_steel", "pure_steel_ingot"), Pair.of("pure_titanium", "pure_titanium_ingot"), Pair.of("steel", "steel_ingot"), 
 				Pair.of("titanium", "titanium_ingot"), Pair.of("flerovium", "flerovium_ingot"), Pair.of("raw_novasteel", "raw_novasteel_compound"), Pair.of("novasteel", "novasteel_ingot")));
 		forgeTags.putAll("nuggets", List.of(Pair.of("chromium", "chromium_nugget"), Pair.of("steel", "steel_nugget"), Pair.of("titanium", "titanium_nugget"), Pair.of("flerovium", "flerovium_nugget")));
-		forgeTags.putAll("plates", List.of(Pair.of("attuned_titanium", "attuned_titanium_plate"), Pair.of("chromium", "chromium_plate"), Pair.of("copper", "copper_plate"), 
-				Pair.of("energized_gold", "energized_gold_plate"), Pair.of("gold", "gold_plate"), Pair.of("iron", "iron_plate"), Pair.of("mystium", "mystium_plate"),
-				Pair.of("stainless_steel", "stainless_steel_plate"), Pair.of("steel", "steel_plate"), Pair.of("titanium", "titanium_plate"), Pair.of("flerovium", "flerovium_plate"),
+		forgeTags.putAll("plates", List.of(Pair.of("attuned_titanium", "attuned_titanium_plate"), Pair.of("chromium", "chromium_plate"), Pair.of("pure_copper", "pure_copper_plate"), 
+				Pair.of("energized_gold", "energized_gold_plate"), Pair.of("pure_gold", "pure_gold_plate"), Pair.of("pure_iron", "pure_iron_plate"), Pair.of("mystium", "mystium_plate"),
+				Pair.of("stainless_steel", "stainless_steel_plate"), Pair.of("pure_steel", "pure_steel_plate"), Pair.of("pure_titanium", "pure_titanium_plate"), Pair.of("flerovium", "flerovium_plate"),
 				Pair.of("novasteel", "novasteel_plate")));
 		forgeTags.putAll("rods", List.of(Pair.of("steel", "steel_rod"), Pair.of("graphene", "graphene_rod")));
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));

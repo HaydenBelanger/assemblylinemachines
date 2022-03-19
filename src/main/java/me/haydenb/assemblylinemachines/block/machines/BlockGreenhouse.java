@@ -134,7 +134,8 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 	
 	public static enum Sprout implements StringRepresentable{
 		EMPTY, CACTUS((s) -> true), CORRUPT_SPROUT((s) -> false), NETHER_SPROUT((s) -> false), SAPLING((s) -> s != Soil.SOUL_SAND, Upgrades.GREENHOUSE_ARBORIST, (i) -> SAPLING_TINT_INDEXER.get(i)), 
-		MUSHROOM((s) -> false), SPROUT((s) -> true), SUGAR_CANE((s) -> true), CHORUS((s) -> false), BRAIN_CACTUS((s) -> false), CHAOSBARK_SAPLING((s) -> false), FLOWER((s) -> s != Soil.CORRUPT, Upgrades.GREENHOUSE_FLORIST, (i) -> FLOWER_TINT_INDEXER.get(i));
+		MUSHROOM((s) -> false), SPROUT((s) -> true), SUGAR_CANE((s) -> true), CHORUS((s) -> false), BRAIN_CACTUS((s) -> false), CHAOSBARK_SAPLING((s) -> false, Upgrades.GREENHOUSE_ARBORIST),
+		FLOWER((s) -> s != Soil.CORRUPT, Upgrades.GREENHOUSE_FLORIST, (i) -> FLOWER_TINT_INDEXER.get(i));
 		
 		public final Function<Item, Pair<Integer, Integer>> tintIndexer;
 		public final Predicate<Soil> sunlightReq;
@@ -382,7 +383,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 		}
 		
 		public int getTint(int index) {
-			Pair<Integer, Integer> pair = Optional.ofNullable(this.getBlockState().getValue(SPROUT).tintIndexer).map((f) -> f.apply(this.getItem(1).getItem())).orElse(Pair.of(0, 0));
+			Pair<Integer, Integer> pair = Optional.ofNullable(this.getBlockState().getValue(SPROUT).tintIndexer).map((f) -> f.apply(this.getItem(1).getItem())).orElse(Pair.of(0x40f029, 0x40f029));
 			return index == 0 ? pair.getFirst() : pair.getSecond();
 		}
 	}

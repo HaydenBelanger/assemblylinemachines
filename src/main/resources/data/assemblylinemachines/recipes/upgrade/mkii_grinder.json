@@ -1,10 +1,10 @@
 {
 	"type": "assemblylinemachines:upgrade_kit",
 	"input_block":{
-		"item": "assemblylinemachines:electric_purifier"
+		"item": "assemblylinemachines:electric_grinder"
 	},
 	"upgrade_kit": "MKII",
-	"output_block": "assemblylinemachines:mkii_purifier",
+	"output_block": "assemblylinemachines:mkii_grinder",
 	"slot_copy":{
 		"0": 0,
 		"1": 2,

@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"g":{
-			"tag": "forge:plates/gold"
+			"tag": "forge:plates/pure_gold"
 		},
 		"x":{
 			"item": "minecraft:sugar"

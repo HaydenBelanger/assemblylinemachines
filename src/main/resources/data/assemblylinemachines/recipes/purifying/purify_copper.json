@@ -10,7 +10,7 @@
 		"tag": "forge:ingots/copper"
 	},
 	"output":{
-		"item": "assemblylinemachines:pure_copper"
+		"item": "assemblylinemachines:pure_copper_ingot"
 	},
 	"time": 200
 }

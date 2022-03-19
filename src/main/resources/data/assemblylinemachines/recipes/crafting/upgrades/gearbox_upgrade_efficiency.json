@@ -7,10 +7,10 @@
 	],
 	"key":{
 		"i":{
-			"tag": "forge:plates/iron"
+			"tag": "forge:plates/pure_iron"
 		},
 		"g":{
-			"tag": "forge:plates/gold"
+			"tag": "forge:plates/pure_gold"
 		},
 		"r":{
 			"tag": "forge:storage_blocks/lapis"

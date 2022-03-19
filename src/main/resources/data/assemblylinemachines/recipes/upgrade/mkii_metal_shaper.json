@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:upgrade_kit",
+	"input_block":{
+		"item": "assemblylinemachines:metal_shaper"
+	},
+	"upgrade_kit": "MKII",
+	"output_block": "assemblylinemachines:mkii_metal_shaper",
+	"slot_copy":{
+		"0": 0,
+		"1": 2,
+		"2": 4,
+		"3": 5,
+		"4": 6
+	}
+}

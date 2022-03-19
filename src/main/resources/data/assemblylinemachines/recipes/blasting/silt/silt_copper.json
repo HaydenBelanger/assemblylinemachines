@@ -3,6 +3,6 @@
 	"ingredient":{
 		"item": "assemblylinemachines:silt_copper"
 	},
-	"result": "assemblylinemachines:pure_copper",
+	"result": "assemblylinemachines:pure_copper_ingot",
 	"cookingtime": 200
 }

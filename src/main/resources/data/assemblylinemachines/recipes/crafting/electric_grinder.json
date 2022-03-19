@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"tag": "forge:plates/steel"
+			"tag": "forge:plates/pure_steel"
 		},
 		"m":{
 			"item": "assemblylinemachines:simple_grinder"

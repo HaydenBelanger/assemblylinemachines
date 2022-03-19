@@ -39,7 +39,7 @@ The Traditional ItemStack uses an exact item for the specified output.
 
 ``` json
 "output":{
-	"item": "assemblylinemachines:titanium_plate",
+	"item": "assemblylinemachines:pure_titanium_plate",
 	"count": 5
 }
 ```
@@ -53,7 +53,7 @@ The Tag ItemStack is a hybrid of an *Ingredient* and an *ItemStack* used and ref
 
 ``` json
 "output":{
-	"tag":"forge:plates/titanium",
+	"tag":"forge:plates/pure_titanium",
 	"count": 5
 }
 ```

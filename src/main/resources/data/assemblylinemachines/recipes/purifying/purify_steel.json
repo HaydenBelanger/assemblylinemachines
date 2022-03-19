@@ -10,7 +10,7 @@
 		"tag": "forge:ingots/steel"
 	},
 	"output":{
-		"item": "assemblylinemachines:pure_steel"
+		"item": "assemblylinemachines:pure_steel_ingot"
 	},
 	"time": 800
 }

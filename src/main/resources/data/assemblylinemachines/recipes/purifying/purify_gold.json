@@ -10,7 +10,7 @@
 		"tag": "forge:ingots/gold"
 	},
 	"output":{
-		"item": "assemblylinemachines:pure_gold"
+		"item": "assemblylinemachines:pure_gold_ingot"
 	},
 	"time": 200
 }

@@ -3,6 +3,6 @@
 	"ingredient":{
 		"item": "assemblylinemachines:silt_gold"
 	},
-	"result": "assemblylinemachines:pure_gold",
+	"result": "assemblylinemachines:pure_gold_ingot",
 	"cookingtime": 200
 }

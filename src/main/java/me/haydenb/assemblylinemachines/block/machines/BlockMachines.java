@@ -567,6 +567,49 @@ public class BlockMachines {
 	public static void metalShaperScreen() {
 		MachineBuilder.screen().blitLRProgressBar(92, 37, 176, 52, 19, 10).buildAndRegister("metal_shaper");
 	}
+	
+	//MKII METAL SHAPER
+	
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="mkii_metal_shaper")
+	public static Block mkIIMetalShaper() {
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
+				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 3, 16),
+				Block.box(1, 3, 1, 15, 14, 16),Block.box(1, 6, 0, 15, 14, 1),
+				Block.box(0, 3, 0, 3, 6, 1),Block.box(0, 3, 1, 1, 6, 16),
+				Block.box(15, 3, 1, 16, 6, 16),Block.box(15, 10, 0, 16, 14, 16),
+				Block.box(0, 10, 0, 1, 14, 16),Block.box(13, 3, 0, 16, 6, 1),
+				Block.box(9, 3, 0, 12, 6, 1),Block.box(4, 3, 0, 7, 6, 1),
+				Block.box(3, 3, 1, 13, 6, 2),Block.box(0, 6, 0, 1, 10, 1),
+				Block.box(0, 6, 15, 1, 10, 16),Block.box(15, 6, 15, 16, 10, 16),
+				Block.box(15, 6, 0, 16, 10, 1),Block.box(0, 6, 1, 1, 7, 15),
+				Block.box(0, 9, 1, 1, 10, 15),Block.box(15, 9, 1, 16, 10, 15),Block.box(15, 6, 1, 16, 7, 15)
+				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).build("mkii_metal_shaper");
+	}
+	
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="mkii_metal_shaper")
+	public static MenuType<?> mkIIMetalShaperContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(2, 6).playerInventoryPos(8, 106).playerHotbarPos(8, 164).slotCoordinates(List.of(Triple.of(53, 69, true), Triple.of(107, 69, true), Triple.of(53, 22, false), Triple.of(107, 22, false),
+				Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false), Triple.of(167, 21, false), Triple.of(167, 39, false), Triple.of(167, 57, false))).build("mkii_metal_shaper");
+	}
+	
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="mkii_metal_shaper")
+	public static BlockEntityType<?> mkIIMetalShaperEntity(){
+		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(360, 16).recipeProcessor(Utils.recipeFunction(MetalCrafting.METAL_RECIPE)).slotInfo(10, 6)
+				.slotIDTransformer((in) -> switch(in) {
+				case 1 -> 2;
+				default -> in;
+				}).outputSlots(0, 0, 1).dualProcessorIDTransformer((in) -> switch(in) {
+				case 0 -> 1;
+				case 1 -> 3;
+				default -> in;
+				}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).build("mkii_metal_shaper");
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_metal_shaper")
+	public static void mkIIMetalShaperScreen() {
+		MachineBuilder.screen().defaultMKIIOptions().blitUDProgressBar(56, 42, 190, 52, 10, 19).blitUDDuplicateBar(110, 42).buildAndRegister("mkii_metal_shaper");
+	}
 
 	//LUMBER MILL
 	

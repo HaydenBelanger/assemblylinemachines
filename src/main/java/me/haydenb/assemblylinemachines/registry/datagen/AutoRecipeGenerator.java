@@ -152,15 +152,16 @@ public class AutoRecipeGenerator extends RecipeProvider {
 	
 	private static enum MetalRecipeGeneration {
 		
-		COPPER(false, false, false, false, Triple.of(true, true, 3), Triple.of(true, false, 5)), IRON(false, false, false, false, Triple.of(true, true, 3), Triple.of(true, false, 4)), GOLD(false, false, false, false, Triple.of(true, true, 3), Triple.of(true, false, 1)),
-		TITANIUM(true, true, true, true, Triple.of(true, true, 5), Triple.of(true, false, 2)), STEEL(true, true, true, true, Triple.of(true, true, 8), Triple.of(true, false, 3)), CHROMIUM(true, true, false, false, Triple.of(true, false, 3), Triple.of(false, false, 0)),
-		ATTUNED_TITANIUM(true, false, false, false, Triple.of(true, false, 3), Triple.of(false, false, 0)), PLASTIC(3), RUBBER(4),
-		MYSTIUM(true, false, true, false, Triple.of(true, false, 2), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/steel")), FLEROVIUM(true, true, false, false, Triple.of(true, false, 4), Triple.of(true, true, 1)), 
-		ENERGIZED_GOLD(true, false, false, false, Triple.of(true, false, 4), Triple.of(false, false, 0)), RAW_CHROMIUM(() -> Ingredient.of(Registry.getItem("raw_chromium")), null, false),
-		NOVASTEEL(true, false, true, false, Triple.of(true, false, 1), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/graphene")), 
-		CRANK(false, false, true, false, Triple.of(false, false, 0), Triple.of(false, false, 0), getItemTagIngredient(AssemblyLineMachines.MODID, "precious_gears"), getItemTagIngredient("forge", "rods/steel")),
+		TITANIUM(true, true, true, true, Optional.empty(), Triple.of(false, false, 0)), STEEL(true, true, true, true, Optional.empty(), Triple.of(false, false, 0)), CHROMIUM(true, true, false, false, Optional.of(3), Triple.of(false, false, 0)),
+		ATTUNED_TITANIUM(true, false, false, false, Optional.of(3), Triple.of(false, false, 0)), PLASTIC(3), RUBBER(4),
+		MYSTIUM(true, false, true, false, Optional.of(2), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/steel")), FLEROVIUM(true, true, false, false, Optional.of(4), Triple.of(true, true, 1)), 
+		ENERGIZED_GOLD(true, false, false, false, Optional.of(4), Triple.of(false, false, 0)), RAW_CHROMIUM(() -> Ingredient.of(Registry.getItem("raw_chromium")), null, false),
+		NOVASTEEL(true, false, true, false, Optional.of(1), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/graphene")), 
+		CRANK(false, false, true, false, Optional.empty(), Triple.of(false, false, 0), getItemTagIngredient(AssemblyLineMachines.MODID, "precious_gears"), getItemTagIngredient("forge", "rods/steel")),
 		CRAFTING_TABLE(() -> Ingredient.of(Blocks.CRAFTING_TABLE), () -> Ingredient.of(Registry.getBlock("compressed_crafting_table")), false), RAW_TITANIUM(() -> Ingredient.of(Registry.getItem("raw_titanium")), null, false),
-		RAW_FLEROVIUM(() -> Ingredient.of(Registry.getItem("raw_flerovium")), null, false);
+		RAW_FLEROVIUM(() -> Ingredient.of(Registry.getItem("raw_flerovium")), null, false),
+		PURE_COPPER(Optional.of(3), Triple.of(true, false, 5)), PURE_IRON(Optional.of(3), Triple.of(true, false, 4)), PURE_GOLD(Optional.of(3), Triple.of(true, false, 1)), PURE_TITANIUM(Optional.of(5), Triple.of(true, false, 2)), 
+		PURE_STEEL(Optional.of(8), Triple.of(true, false, 3));
 		
 		private static final HashMap<String, List<String>> ARMOR_PATTERNS = new HashMap<>();
 		private static final HashMap<String, List<String>> TOOL_PATTERNS = new HashMap<>();
@@ -187,7 +188,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		private final boolean hasNugget;
 		private final boolean hasTools;
 		private final boolean hasArmor;
-		private final Triple<Boolean, Boolean, Integer> hasPlate;
+		private final Optional<Integer> hasPlate;
 		private final Triple<Boolean, Boolean, Integer> hasGear;
 		private final Supplier<Ingredient> toolMaterial;
 		private final Supplier<Ingredient> toolRod;
@@ -195,16 +196,19 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		private final boolean addIngot;
 		private final boolean isSheetInsteadOfPlate;
 		
-		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Triple<Boolean, Boolean, Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear){
-			
+		MetalRecipeGeneration(Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear){
+			this(false, false, false, false, hasPlate, hasGear);
+		}
+		
+		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear){
 			this(hasStorageBlock, hasNugget, hasTools, hasArmor, hasPlate, hasGear, null, null);
 		}
 		
-		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Triple<Boolean, Boolean, Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear, Supplier<Ingredient> toolRod){
+		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear, Supplier<Ingredient> toolRod){
 			this(hasStorageBlock, hasNugget, hasTools, hasArmor, hasPlate, hasGear, null, toolRod);
 		}
 		
-		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Triple<Boolean, Boolean, Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear, Supplier<Ingredient> toolMaterial, Supplier<Ingredient> toolRod){
+		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear, Supplier<Ingredient> toolMaterial, Supplier<Ingredient> toolRod){
 			this.hasStorageBlock = hasStorageBlock;
 			this.hasNugget = hasNugget;
 			this.hasTools = hasTools;
@@ -221,7 +225,8 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		MetalRecipeGeneration(Supplier<Ingredient> toolMaterial, Supplier<Ingredient> specialStorageBlock, boolean addIngot){
 			this.hasStorageBlock = true;
 			this.hasNugget = this.hasTools = this.hasArmor = this.isSheetInsteadOfPlate = false;
-			this.hasPlate = this.hasGear = Triple.of(false, false, 0);
+			this.hasPlate = Optional.empty();
+			this.hasGear = Triple.of(false, false, 0);
 			this.toolMaterial = this.toolRod = toolMaterial;
 			this.specialStorageBlock = specialStorageBlock;
 			this.addIngot = addIngot;
@@ -229,7 +234,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		
 		MetalRecipeGeneration(int plateCount){
 			this.hasStorageBlock = this.hasNugget = this.hasTools = this.hasArmor = false;
-			this.hasPlate = Triple.of(true, false, plateCount);
+			this.hasPlate = Optional.of(plateCount);
 			this.hasGear = Triple.of(false, false, 0);
 			this.toolMaterial = this.toolRod = () -> Ingredient.of(Registry.getItem(this.toString().toLowerCase() + "_ball"));
 			this.isSheetInsteadOfPlate = this.addIngot = true;
@@ -267,11 +272,10 @@ public class AutoRecipeGenerator extends RecipeProvider {
 				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/ingot_to_nugget/" + typeName), Registry.getItem(typeName + "_nugget"), 9, List.of(this.toolMaterial.get())));
 				logText = logText + "Nugget, ";
 			}
-			if(this.hasPlate.getLeft()) {
-				Ingredient metalInput = this.hasPlate.getMiddle() ? getItemTagIngredient("forge", "ingots/pure_" + typeName).get() : toolMaterial.get();
+			if(this.hasPlate.isPresent()) {
 				String type = this.isSheetInsteadOfPlate ? "_sheet" : "_plate";
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.getRight(), List.of(metalInput, getItemTagIngredient(AssemblyLineMachines.MODID, "hammers").get())));
-				consumer.accept(new MetalShaperResult(getRecipeLoc("metalshaper", typeName + type), metalInput, new ItemStack(Registry.getItem(typeName + type), this.hasPlate.getRight()), 6));
+				consumer.accept(new AdvancementlessResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.get(), List.of(toolMaterial.get(), getItemTagIngredient(AssemblyLineMachines.MODID, "hammers").get())));
+				consumer.accept(new MetalShaperResult(getRecipeLoc("metalshaper", typeName + type), toolMaterial.get(), new ItemStack(Registry.getItem(typeName + type), this.hasPlate.get()), 6));
 				logText = logText + "Plate, ";
 			}
 			if(this.hasGear.getLeft()) {

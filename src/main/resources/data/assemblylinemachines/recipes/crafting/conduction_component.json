@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"i":{
-			"tag": "forge:plates/iron"
+			"tag": "forge:plates/pure_iron"
 		},
 		"r":{
 			"tag": "forge:dusts/redstone"
 		},
 		"s":{
-			"tag": "forge:gears/steel"
+			"tag": "forge:gears/pure_steel"
 		}
 	},
 	"result":{

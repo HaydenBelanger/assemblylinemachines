@@ -262,11 +262,12 @@ public class Utils {
 			this.phase = phase;
 		}
 		
-		public void add() {
+		public PhasedMap<K, V> add() {
 			List<Method> methods = MethodUtils.getMethodsListWithAnnotation(BlockMachines.class, RegisterableMachine.class);
 			methods.removeIf((m) -> m.getAnnotation(RegisterableMachine.class).phase() != phase);
 			Consumer<Method> typedConsumer = getTypedConsumer(phase);
 			methods.forEach((m) -> typedConsumer.accept(m));
+			return this;
 		}
 		
 		private static Consumer<Method> getTypedConsumer(Phases phase){

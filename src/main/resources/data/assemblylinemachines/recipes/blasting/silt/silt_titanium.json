@@ -3,6 +3,6 @@
 	"ingredient":{
 		"item": "assemblylinemachines:silt_titanium"
 	},
-	"result": "assemblylinemachines:pure_titanium",
+	"result": "assemblylinemachines:pure_titanium_ingot",
 	"cookingtime": 200
 }

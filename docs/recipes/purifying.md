@@ -45,7 +45,7 @@ This will use Gravel and Sand to purify a Copper Ingot into a Pure Copper Ingot.
 		"item": "minecraft:copper_ingot"
 	},
 	"output":{
-		"item": "assemblylinemachines:pure_copper"
+		"item": "assemblylinemachines:pure_copper_ingot"
 	},
 	"time": 200
 }
@@ -63,7 +63,7 @@ This one will use a Mystium Blend and an Ender Pearl to purfy a Pure Titanium In
 		"tag": "forge:ender_pearls"
 	},
 	"tobepurified":{
-		"tag": "forge:ingots/pure_titanium"
+		"tag": "forge:ingots/pure_titanium_ingot"
 	},
 	"output":{
 		"item": "assemblylinemachines:attuned_titanium_ingot"

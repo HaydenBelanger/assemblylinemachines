@@ -7,7 +7,7 @@
 	],
 	"key":{
 		"s":{
-			"tag": "forge:plates/titanium"
+			"tag": "forge:plates/pure_titanium"
 		},
 		"x":{
 			"item": "minecraft:hopper"

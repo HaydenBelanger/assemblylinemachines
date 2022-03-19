@@ -10,7 +10,7 @@
 			"tag": "assemblylinemachines:all_gears"
 		},
 		"c":{
-			"tag": "forge:plates/iron"
+			"tag": "forge:plates/pure_iron"
 		},
 		"p":{
 			"item": "assemblylinemachines:empowered_coal"
