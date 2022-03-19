@@ -30,7 +30,7 @@ Recipe namespace: `assemblylinemachines:grinder`
 - `output`: ItemStack, *optional*  
 *The resulting output from the recipe. As of 1.18.2-1.4, this may be a [Tag ItemStack.](../miscdev/datatypes.md#tag-itemstack)*
 
-## Example
+## Examples
 
 Below is an example of a Grinding recipe. This will take Chromium Ore and produce 2 Ground Chromium, and this recipe requires a Simple or Electric Grinder.
 

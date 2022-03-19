@@ -31,7 +31,6 @@ nav:
       - Upgrading: recipes/upgrading.md
       - Greenhouse:
         - Crops: recipes/greenhousecrops.md
-        - Fertilizer: recipes/greenhousefertilizer.md
     - Tags: miscdev/tags.md
     - Reservoir Capability: miscdev/fluidreservoir.md
 
