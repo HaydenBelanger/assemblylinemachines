@@ -3,7 +3,7 @@
 The Greenhouse Crop recipes are for seeds or other growables you wish to function inside of the Greenhouse. When provided with a Soil and Fertilizer, your crop will grow into a specified output.
 
 !!! error "1.18.2+ Feature"
-    This recipe type was made available in Assembly Line Machines 1.18.2-1.4, in conjunction with the addition of The Greenhouse.
+    This recipe type was made available in Assembly Line Machines 1.18.2-1.4, in conjunction with the addition of the Greenhouse.
 
 ## Recipe Specification
 

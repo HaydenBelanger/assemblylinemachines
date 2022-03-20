@@ -1,4 +1,4 @@
-# Electricity Age part a (Logistics and Machines)
+# Electricity Age Part A (Logistics and Machines)
 
 !!! danger "Out-of-date Information"
     The information contained in this article is not up-to-date and will not be maintained. For documentation, install [Patchouli](https://www.curseforge.com/minecraft/mc-mods/patchouli), an in-game rich documentation viewer.
