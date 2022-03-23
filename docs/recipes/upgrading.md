@@ -20,13 +20,13 @@ Recipe namespace: `assemblylinemachines:upgrade_kit`.
 
 ## Example
 
-This is an example of an Upgrading recipe. In this example, this allows the upgrade of Simple Grinder to Electric Grinder using the Electric Upgrade Kit. Slot 1 is copied, as it is the input slot in both machines. Since the Electric Grinder does not need a Blade to operate, there is no slot to move the Blade from slot 0 in the Simple Grinder to, so the Blade is ejected when the upgrade kit is used.
+This is an example of an Upgrading recipe. In this example, this allows the upgrade of Kinetic Grinder to Electric Grinder using the Electric Upgrade Kit. Slot 1 is copied, as it is the input slot in both machines. Since the Electric Grinder does not need a Blade to operate, there is no slot to move the Blade from slot 0 in the Kinetic Grinder to, so the Blade is ejected when the upgrade kit is used.
 
 ``` json
 {
 	"type": "assemblylinemachines:upgrade_kit",
 	"input_block":{
-		"item": "assemblylinemachines:simple_grinder"
+		"item": "assemblylinemachines:kinetic_grinder"
 	},
 	"upgrade_kit": "ELECTRIC",
 	"output_block": "assemblylinemachines:electric_grinder",

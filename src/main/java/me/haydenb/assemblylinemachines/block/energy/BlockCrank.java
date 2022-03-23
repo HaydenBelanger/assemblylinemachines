@@ -4,7 +4,6 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -60,10 +59,10 @@ public class BlockCrank extends Block {
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		for(Direction d : Utils.CARDINAL_DIRS) {
-			BlockState state = context.getLevel().getBlockState(context.getClickedPos().relative(d));
-			Block block = state.getBlock();
-			if(block instanceof ICrankableBlock) {
-				if(((ICrankableBlock) block).validSide(state, d.getOpposite()) && !((ICrankableBlock) block).needsGearbox()) {
+			BlockEntity entity = context.getLevel().getBlockEntity(context.getClickedPos().relative(d));
+			
+			if(entity instanceof ICrankableMachine crankable) {
+				if(crankable.validFrom(d.getOpposite()) && !crankable.requiresGearbox()) {
 					return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, d.getOpposite());
 				}
 			}
@@ -77,8 +76,7 @@ public class BlockCrank extends Block {
 		if(!world.isClientSide) {
 			if(handIn.equals(InteractionHand.MAIN_HAND)) {
 				BlockEntity te = world.getBlockEntity(pos.relative(state.getValue(HorizontalDirectionalBlock.FACING).getOpposite()));
-				if(te != null && te instanceof ICrankableMachine) {
-					ICrankableMachine crankable = (ICrankableMachine) te;
+				if(te != null && te instanceof ICrankableMachine crankable) {
 					if(crankable.perform()) {
 						world.playSound(null, pos, SoundEvents.WOOD_STEP, SoundSource.BLOCKS, 0.7f, 1f + getPitchNext(world.getRandom()));
 					}else {

@@ -19,7 +19,7 @@
 			"item": "assemblylinemachines:conduction_component"
 		},
 		"g":{
-			"item": "assemblylinemachines:simple_fluid_mixer"
+			"item": "assemblylinemachines:kinetic_fluid_mixer"
 		}
 	},
 	"result":{

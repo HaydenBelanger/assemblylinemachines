@@ -164,6 +164,8 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 		protected final boolean usesfept;
 		protected int startx;
 		
+		protected boolean usesFe = true;
+		
 		public ScreenALMEnergyBased(T screenContainer, Inventory inv, Component titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
 				String guipath, boolean hasCool, Pair<Integer, Integer> energyMeterLoc,
@@ -190,25 +192,27 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 			
-			int x = (this.width - this.imageWidth) / 2;
-			int y = (this.height - this.imageHeight) / 2;
-			if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
+			if(usesFe) {
+				int x = (this.width - this.imageWidth) / 2;
+				int y = (this.height - this.imageHeight) / 2;
+				if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
 
-				if(Screen.hasShiftDown()) {
-					ArrayList<String> str = new ArrayList<>();
-					str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.capacity) + "FE");
-					if(usesfept) {
-						
-						
-						str.add(Formatting.GENERAL_FORMAT.format(machine.fept) + " FE/tick");
+					if(Screen.hasShiftDown()) {
+						ArrayList<String> str = new ArrayList<>();
+						str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.capacity) + "FE");
+						if(usesfept) {
+							
+							
+							str.add(Formatting.GENERAL_FORMAT.format(machine.fept) + " FE/tick");
+						}
+						this.renderComponentTooltip(str,
+								mouseX - x, mouseY - y);
+					}else {
+						this.renderComponentTooltip(Formatting.formatToSuffix(machine.amount) + "/" + Formatting.formatToSuffix(machine.properties.capacity) + "FE",
+								mouseX - x, mouseY - y);
 					}
-					this.renderComponentTooltip(str,
-							mouseX - x, mouseY - y);
-				}else {
-					this.renderComponentTooltip(Formatting.formatToSuffix(machine.amount) + "/" + Formatting.formatToSuffix(machine.properties.capacity) + "FE",
-							mouseX - x, mouseY - y);
+					
 				}
-				
 			}
 		}
 		
@@ -216,10 +220,12 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			
-			int x = (this.width - this.imageWidth) / 2;
-			int y = (this.height - this.imageHeight) / 2;
-			int prog = Math.round(((float) machine.amount / (float) machine.properties.capacity) * 52F);
-			super.blit(x + energyMeterLoc.getFirst(), y + energyMeterLoc.getSecond() + (52 - prog), startx, (52 - prog), 16, prog);
+			if(usesFe) {
+				int x = (this.width - this.imageWidth) / 2;
+				int y = (this.height - this.imageHeight) / 2;
+				int prog = Math.round(((float) machine.amount / (float) machine.properties.capacity) * 52F);
+				super.blit(x + energyMeterLoc.getFirst(), y + energyMeterLoc.getSecond() + (52 - prog), startx, (52 - prog), 16, prog);
+			}
 		}
 		
 		

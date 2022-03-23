@@ -42,8 +42,8 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> naphthaTurbineMultiplier;
 		public final ConfigValue<List<? extends String>> disallowedFluidBathItems;
 		public final BooleanValue invalidBathReturnsSludge;
-		public final ConfigValue<Integer> simpleGrinderCycleMultiplier;
-		public final ConfigValue<Double> simpleFluidMixerCycleMultiplier;
+		public final ConfigValue<Double> kineticGrinderCycleMultiplier;
+		public final ConfigValue<Double> kineticFluidMixerCycleMultiplier;
 		
 		//MISC/WORLD
 		public final BooleanValue updateChecker;
@@ -143,8 +143,8 @@ public class ConfigHandler {
 			disallowedFluidBathItems = builder.comment("What items should be blacklisted from being accepted into the Fluid Bath?", "A handful of items cannot be accepted regardless of list content.").defineListAllowEmpty(List.of("disallowedFluidBathItems"), () -> List.of(), 
 					(s) -> ForgeRegistries.ITEMS.containsKey(new ResourceLocation(s.toString())));
 			invalidBathReturnsSludge = builder.comment("On a failed recipe, should the Fluid Bath return Sludge when emptied?", "If false, it will instead return both of the input items.").define("invalidBathReturnsSludge", true);
-			simpleGrinderCycleMultiplier = builder.comment("What should the multiplier for the amount of grinds (uses of the Manual Grinder) to convert to minimum seconds in the Simple Grinder be?", "For example, a recipe with 10 grinds with a multiplier of 2 will take a minimum of 20 seconds to craft.").defineInRange("simpleGrinderCycleModifier", 2, 1, 100);
-			simpleFluidMixerCycleMultiplier = builder.comment("What should the multiplier for the amount of stirs (uses of a Stirring Stick on Fluid Bath) to convert to minimum seconds in the Simple Fluid Mixer be?", "For example, a recipe with 10 stirs with a multiplier of 0.7 will take a minimum of 7 seconds to craft.").defineInRange("simpleFluidMixerCycleModifier", 1d, 0.01d, 100d);
+			kineticGrinderCycleMultiplier = builder.comment("What should the multiplier for the amount of grinds (uses of the Manual Grinder) to convert to minimum seconds in the Kinetic Grinder be?", "For example, a recipe with 10 grinds with a multiplier of 2 will take a minimum of 20 seconds to craft.").defineInRange("simpleGrinderCycleModifier", 2d, 0.01d, 100d);
+			kineticFluidMixerCycleMultiplier = builder.comment("What should the multiplier for the amount of stirs (uses of a Stirring Stick on Fluid Bath) to convert to minimum seconds in the Kinetic Fluid Mixer be?", "For example, a recipe with 10 stirs with a multiplier of 0.7 will take a minimum of 7 seconds to craft.").defineInRange("simpleFluidMixerCycleModifier", 1d, 0.01d, 100d);
 			builder.pop();
 			
 			builder.push("Tools");

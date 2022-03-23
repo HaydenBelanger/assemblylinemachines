@@ -51,8 +51,6 @@ import me.haydenb.assemblylinemachines.block.machines.BlockQuarry.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockQuarryAddon.QuarryAddonShapes;
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.BlockRefineryAddon.RefineryAddon;
-import me.haydenb.assemblylinemachines.block.machines.BlockSimpleFluidMixer.*;
-import me.haydenb.assemblylinemachines.block.machines.BlockSimpleGrinder.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockVacuumHopper.TEVacuumHopper;
 import me.haydenb.assemblylinemachines.block.misc.*;
 import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite.BlockBlackGranitePillar;
@@ -360,8 +358,6 @@ public class Registry {
 		createBlock("gearbox", new BlockGearbox(), true);
 		
 		createBlock("simple_crank_charger", new BlockSimpleCrankCharger(), true);
-		createBlock("simple_fluid_mixer", BlockSimpleFluidMixer.simpleFluidMixer(), true);
-		createBlock("simple_grinder", BlockSimpleGrinder.simpleGrinder(), true);
 		
 		createBlock("steel_fluid_tank", new BlockFluidTank(20000, TemperatureResistance.HOT, 0xff545454), true);
 		createBlock("wooden_fluid_tank", new BlockFluidTank(6000, TemperatureResistance.COLD, 0xff826a4a), true);
@@ -547,8 +543,6 @@ public class Registry {
 		createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, Lists.transform(TransmissionType.getPipeRegistryValues(), (t) -> MOD_BLOCK_REGISTRY.get(t.getLeft())));
 		createBlockEntity("hand_grinder", TEHandGrinder.class);
 		createBlockEntity("fluid_bath", TEFluidBath.class);
-		createBlockEntity("simple_fluid_mixer", TESimpleFluidMixer.class);
-		createBlockEntity("simple_grinder", TESimpleGrinder.class);
 		createBlockEntity("simple_crank_charger", TESimpleCrankCharger.class);
 		createBlockEntity("gearbox", TEGearbox.class);
 		createBlockEntity("fluid_tank", TEFluidTank.class, MOD_BLOCK_REGISTRY.get("wooden_fluid_tank"), MOD_BLOCK_REGISTRY.get("steel_fluid_tank"), MOD_BLOCK_REGISTRY.get("mystium_fluid_tank"),
@@ -583,8 +577,6 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
-		createContainer("simple_fluid_mixer", ContainerSimpleFluidMixer.class);
-		createContainer("simple_grinder", ContainerSimpleGrinder.class);
 		createContainer("gearbox", ContainerGearbox.class);
 		createContainer("pipe_connector", PipeConnectorContainer.class);
 		createContainer("coal_generator", ContainerCoalGenerator.class);
@@ -732,8 +724,6 @@ public class Registry {
 		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
 		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());
 		
-		registerScreen("simple_fluid_mixer", ContainerSimpleFluidMixer.class, ScreenSimpleFluidMixer.class); 
-		registerScreen("simple_grinder", ContainerSimpleGrinder.class, ScreenSimpleGrinder.class);
 		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
 		registerScreen("pipe_connector", PipeConnectorContainer.class, PipeConnectorScreen.class);
 		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);

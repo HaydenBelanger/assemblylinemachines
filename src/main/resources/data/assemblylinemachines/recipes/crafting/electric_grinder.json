@@ -10,7 +10,7 @@
 			"tag": "forge:plates/pure_steel"
 		},
 		"m":{
-			"item": "assemblylinemachines:simple_grinder"
+			"item": "assemblylinemachines:kinetic_grinder"
 		},
 		"v":{
 			"item": "assemblylinemachines:conduction_component"

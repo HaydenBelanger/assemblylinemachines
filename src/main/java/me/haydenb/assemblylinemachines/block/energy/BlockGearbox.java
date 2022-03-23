@@ -8,7 +8,6 @@ import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.item.IGearboxFuel;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
@@ -71,11 +70,9 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		for(Direction d : Utils.CARDINAL_DIRS) {
-			BlockState state = context.getLevel().getBlockState(context.getClickedPos().relative(d));
-			if(state.getBlock() instanceof ICrankableBlock) {
-				if(((ICrankableBlock) state.getBlock()).validSide(state, d.getOpposite())) {
-					return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, d);
-				}
+			BlockEntity entity = context.getLevel().getBlockEntity(context.getClickedPos().relative(d));
+			if(entity instanceof ICrankableMachine crankable) {
+				if(crankable.validFrom(d.getOpposite())) return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, d);
 			}
 		}
 		return null;

@@ -1,0 +1,55 @@
+{
+    "multipart": [
+    	{   "when": { "active": false, "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer"}
+        },
+        {   "when": { "active": false, "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer", "y": 90}
+        },
+		{   "when": { "active": false, "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer", "y": 180}
+        },
+		{   "when": { "active": false, "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer", "y": 270}
+        },
+        
+    	{   "when": { "active": true, "fluid": "none", "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer"}
+        },
+        {   "when": { "active": true, "fluid": "none", "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer", "y": 90}
+        },
+		{   "when": { "active": true, "fluid": "none", "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer", "y": 180}
+        },
+		{   "when": { "active": true, "fluid": "none", "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer", "y": 270}
+        },
+    	
+    	{   "when": { "active": true, "fluid": "water", "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_water"}
+        },
+        {   "when": { "active": true, "fluid": "water", "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_water", "y": 90}
+        },
+		{   "when": { "active": true, "fluid": "water", "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_water", "y": 180}
+        },
+		{   "when": { "active": true, "fluid": "water", "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_water", "y": 270}
+        },
+        
+        {   "when": { "active": true, "fluid": "lava", "facing": "north" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_lava"}
+        },
+        {   "when": { "active": true, "fluid": "lava", "facing": "east" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_lava", "y": 90}
+        },
+		{   "when": { "active": true, "fluid": "lava", "facing": "south" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_lava", "y": 180}
+        },
+		{   "when": { "active": true, "fluid": "lava", "facing": "west" },
+            "apply": { "model": "assemblylinemachines:block/kinetic_fluid_mixer_lava", "y": 270}
+        }
+    ]
+}

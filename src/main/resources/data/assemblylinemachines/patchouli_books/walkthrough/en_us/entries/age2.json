@@ -14,15 +14,15 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/simple_grinder",
-			"text": "Next up, using your Grindstone and some materials, you will be able to make the $(item)Simple Grinder.$()$(br)This is your first machine. On the right is an example."
+			"recipe": "assemblylinemachines:crafting/kinetic_grinder",
+			"text": "Next up, using your Grindstone and some materials, you will be able to make the $(item)Kinetic Grinder.$()$(br)This is your first machine. On the right is an example."
 		},
 		{
 			"type": "multiblock",
 			"multiblock":{
 				"mapping":{
 					"c": "assemblylinemachines:crank",
-					"0": "assemblylinemachines:simple_grinder[facing=west]",
+					"0": "assemblylinemachines:kinetic_grinder[facing=west]",
 					"f": "minecraft:chest[facing=west]"
 				},
 				
@@ -30,7 +30,7 @@
 					["c0f"]
 				]
 			},
-			"name": "Simple Grinder",
+			"name": "Kinetic Grinder",
 			"enable_visualize": false,
 			"text": "$(7)$(o)The Chest needs to be placed to the right of the machine, while the Crank can be placed on any of the other sides."
 			
@@ -47,14 +47,14 @@
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/steel_fluid_tank",
-			"recipe2": "assemblylinemachines:crafting/simple_fluid_mixer"
+			"recipe2": "assemblylinemachines:crafting/kinetic_fluid_mixer"
 		},
 		{
 			"type": "multiblock",
 			"multiblock":{
 				"mapping": {
 					"c": "assemblylinemachines:crank",
-					"0": "assemblylinemachines:simple_fluid_mixer[facing=west]",
+					"0": "assemblylinemachines:kinetic_fluid_mixer[facing=west]",
 					"f": "minecraft:chest[facing=west]",
 					"t": "assemblylinemachines:steel_fluid_tank"
 				},
@@ -62,13 +62,13 @@
 					["c0f"],[" t "]
 				]
 			},
-			"name": "Simple Fluid Mixer",
+			"name": "Kinetic Fluid Mixer",
 			"enable_visualize": false,
-			"text": "$(7)$(o)Just like the last machine, but a Wooden or Steel tank needs to be under the Simple Fluid Mixer."
+			"text": "$(7)$(o)Just like the last machine, but a Wooden or Steel tank needs to be under the Kinetic Fluid Mixer."
 		},
 		{
 			"type": "text",
-			"text": "Just like the Simple Grinder, two items will be loaded into the machine, same as for the Fluid Bath, fluid will be added to the Tank below. Crank, and the result will be placed in the Chest!$(p)The first recipe you need to use this machine for is $(item)Empowered Coal.$() Mix $(thing)Ground Coal$() and $(thing)Redstone Dust$() in the Simple Fluid Mixer with Lava..$(br)$(6)TIP: You can make all recipes you could make in the Fluid Bath in the Simple Fluid Mixer."
+			"text": "Just like the Kinetic Grinder, two items will be loaded into the machine, same as for the Fluid Bath, fluid will be added to the Tank below. Crank, and the result will be placed in the Chest!$(p)The first recipe you need to use this machine for is $(item)Empowered Coal.$() Mix $(thing)Ground Coal$() and $(thing)Redstone Dust$() in the Kinetic Fluid Mixer with Lava..$(br)$(6)TIP: You can make all recipes you could make in the Fluid Bath in the Kinetic Fluid Mixer."
 		},
 		{
 			"type": "crafting",

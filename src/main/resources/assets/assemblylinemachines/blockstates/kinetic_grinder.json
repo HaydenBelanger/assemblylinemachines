@@ -1,0 +1,12 @@
+{
+    "variants": {
+        "facing=north,active=false": { "model": "assemblylinemachines:block/kinetic_grinder" },
+        "facing=south,active=false": { "model": "assemblylinemachines:block/kinetic_grinder", "y": 180 },
+        "facing=west,active=false":  { "model": "assemblylinemachines:block/kinetic_grinder", "y": 270 },
+        "facing=east,active=false":  { "model": "assemblylinemachines:block/kinetic_grinder", "y": 90 },
+		"facing=north,active=true": { "model": "assemblylinemachines:block/kinetic_grinder_active" },
+        "facing=south,active=true": { "model": "assemblylinemachines:block/kinetic_grinder_active", "y": 180 },
+        "facing=west,active=true":  { "model": "assemblylinemachines:block/kinetic_grinder_active", "y": 270 },
+        "facing=east,active=true":  { "model": "assemblylinemachines:block/kinetic_grinder_active", "y": 90 }
+    }
+}

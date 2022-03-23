@@ -1,5 +1,5 @@
 {
-    "parent": "assemblylinemachines:block/simple_grinder",
+    "parent": "assemblylinemachines:block/kinetic_grinder",
     "textures": {
         "front": "assemblylinemachines:block/simple_grinder_active"
     }

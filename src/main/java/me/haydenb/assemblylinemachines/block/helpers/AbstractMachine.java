@@ -514,6 +514,9 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			}
 		}
 
+		public PoseStack getPoseStack() {
+			return this.mx;
+		}
 	}
 
 }

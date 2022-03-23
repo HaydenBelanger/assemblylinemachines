@@ -5,27 +5,24 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.logging.log4j.util.TriConsumer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
-import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineScreenBuilder.IScreenDataBridge;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineScreenBuilder.PBDirection;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine.Phases;
+import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.registry.StateProperties;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -81,7 +78,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="alloy_smelter")
 	public static void alloySmelterScreen() {
-		MachineBuilder.screen().blitLRProgressBar(95, 35, 176, 64, 16, 14).blitWhenActive(76, 53, 176, 52, 13, 12).buildAndRegister("alloy_smelter");
+		MachineBuilder.screen().addBar(95, 35, 176, 64, 16, 14, PBDirection.LR).addBar(76, 53, 176, 52, 13, 12, PBDirection.STATIC).buildAndRegister("alloy_smelter");
 	}
 	
 	//MKII ALLOY SMELTER
@@ -138,7 +135,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_alloy_smelter")
 	public static void mkIIAlloySmelterScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().blitUDProgressBar(57, 42, 190, 66, 8, 11).blitUDDuplicateBar(111, 42).blitWhenActive(80, 43, 190, 52, 16, 14).buildAndRegister("mkii_alloy_smelter");
+		MachineBuilder.screen().defaultMKIIOptions().addBar(57, 42, 190, 66, 8, 11, PBDirection.UD, 0, 0, List.of(Pair.of(111, 42))).addBar(80, 43, 190, 52, 16, 14, PBDirection.STATIC).buildAndRegister("mkii_alloy_smelter");
 	}
 
 	//ELECTRIC FURNACE
@@ -186,7 +183,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="electric_furnace")
 	public static void electricFurnaceScreen() {
-		MachineBuilder.screen().blitLRProgressBar(95, 35, 176, 64, 16, 14).blitWhenActive(76, 53, 176, 52, 13, 12).buildAndRegister("electric_furnace");
+		MachineBuilder.screen().addBar(95, 35, 176, 64, 16, 14, PBDirection.LR).addBar(76, 53, 176, 52, 13, 12, PBDirection.STATIC).buildAndRegister("electric_furnace");
 	}
 	
 	@RegisterableMachine(phase=Phases.BLOCK, blockName="mkii_furnace")
@@ -232,9 +229,35 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_furnace")
 	public static void mkIIFurnaceScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().blitUDProgressBar(57, 42, 190, 66, 8, 11).blitUDDuplicateBar(111, 42).blitWhenActive(81, 44, 191, 53, 13, 12).buildAndRegister("mkii_furnace");
+		MachineBuilder.screen().defaultMKIIOptions()
+		.addBar(57, 42, 190, 66, 8, 11, PBDirection.UD, 0, 0, List.of(Pair.of(111, 42)))
+		.addBar(81, 44, 191, 53, 13, 12, PBDirection.STATIC).buildAndRegister("mkii_furnace");
 	}
 
+	//KINETIC GRINDER
+	
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="kinetic_grinder")
+	public static Block kineticGrinder() {
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Shapes.block(), true).build("kinetic_grinder");
+	}
+	
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="kinetic_grinder")
+	public static MenuType<?> kineticGrinderContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(0, 0).slotCoordinates(List.of(Triple.of(53, 26, false), Triple.of(75, 48, false))).build("kinetic_grinder");
+	}
+	
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="kinetic_grinder")
+	public static BlockEntityType<?> kineticGrinderBlockEntity(){
+		return MachineBuilder.blockEntity().crankMachine(1).baseProcessingStats(0, 16).recipeProcessor(Utils.recipeFunction(GrinderCrafting.GRINDER_RECIPE))
+				.slotInfo(2, 0).outputToRight().allowedInZero().slotExtractableFunction((i) -> false).slotContentsValidator((i, is, be) -> Blade.getBladeFromItem(is.getItem()) != null).build("kinetic_grinder");
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="kinetic_grinder")
+	public static void kineticGrinderScreen() {
+		MachineBuilder.screen().doesNotUseFE().doesNotUseFEPT().addBar(73, 19, 176, 0, 20, 24, PBDirection.DU).buildAndRegister("kinetic_grinder");
+	}
+	
 	//ELECTRIC GRINDER
 	
 	@RegisterableMachine(phase=Phases.BLOCK, blockName="electric_grinder")
@@ -263,7 +286,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="electric_grinder")
 	public static void electricGrinderScreen() {
-		MachineBuilder.screen().blitLRProgressBar(92, 35, 176, 52, 19, 14).buildAndRegister("electric_grinder");
+		MachineBuilder.screen().addBar(92, 35, 176, 52, 19, 14, PBDirection.LR).buildAndRegister("electric_grinder");
 	}
 	
 	//MKII GRINDER
@@ -304,7 +327,34 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_grinder")
 	public static void mkIIGrinderScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().blitUDProgressBar(54, 42, 190, 52, 14, 19).blitUDDuplicateBar(108, 42).buildAndRegister("mkii_grinder");
+		MachineBuilder.screen().defaultMKIIOptions().addBar(54, 42, 190, 52, 14, 19, PBDirection.UD, 0, 0, List.of(Pair.of(108, 42))).buildAndRegister("mkii_grinder");
+	}
+	
+	//KINETIC FLUID MIXER
+	
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="kinetic_fluid_mixer")
+	public static Block kineticFluidMixer() {
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Shapes.block(), true).additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE), (builder) -> builder.add(StateProperties.FLUID)).build("kinetic_fluid_mixer");
+	}
+	
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="kinetic_fluid_mixer")
+	public static MenuType<?> kineticFluidMixerContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(0, 0).slotCoordinates(List.of(Triple.of(63, 48, false), Triple.of(88, 48, false))).build("kinetic_fluid_mixer");
+	}
+	
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="kinetic_fluid_mixer")
+	public static BlockEntityType<?> kineticFluidMixerEntity(){
+		return MachineBuilder.blockEntity().crankMachine(1).baseProcessingStats(0, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE))
+				.slotInfo(2, 0).outputToRight().allowedInZero().slotExtractableFunction((i) -> false).processesFluids(0, true).hasNoInternalTank()
+				.specialStateModifier((recipe, state) -> state.setValue(StateProperties.FLUID, ((BathCrafting) recipe).getFluid()))
+				.duplicateCheckingGroup(List.of(0, 1)).build("kinetic_fluid_mixer");
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="kinetic_fluid_mixer")
+	public static void kineticFluidMixerScreen() {
+		MachineBuilder.screen().doesNotUseFE().doesNotUseFEPT().addBar(71, 19, 0, 0, 24, 24, PBDirection.DU)
+		.stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getSimpleBlitPiece()).buildAndRegister("kinetic_fluid_mixer");
 	}
 	
 	//ELECTRIC FLUID MIXER
@@ -353,16 +403,8 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="electric_fluid_mixer")
 	public static void electricFluidMixerScreen() {
-		MachineBuilder.screen().renderFluidBar(41, 23, 37, 176, 84).addCustomBackgroundRenderer((screen, x, y) ->{
-			IScreenDataBridge data = (IScreenDataBridge) screen;
-			if(data.getDataBridge().getCycles() != 0f) {
-				BathCraftingFluids bcf = ((BlockEntity)data.getDataBridge()).getBlockState().getValue(StateProperties.FLUID);
-				if(bcf != BathCraftingFluids.NONE) {
-					int prog = Math.round((data.getDataBridge().getProgress() / data.getDataBridge().getCycles()) * 15f);
-					screen.blit(data.getPoseStack(), x+95, y+34, bcf.getElectricBlitPiece().getFirst(), bcf.getElectricBlitPiece().getSecond(), prog, 16);
-				}
-			}
-		}).internalTankSwitchingButton(129, 57, 192, 41, 11, 11).buildAndRegister("electric_fluid_mixer");
+		MachineBuilder.screen().renderFluidBar(41, 23, 37, 176, 84).stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getElectricBlitPiece())
+		.addBar(95, 34, 0, 0, 15, 16, PBDirection.LR).internalTankSwitchingButton(129, 57, 192, 41, 11, 11).buildAndRegister("electric_fluid_mixer");
 	}
 	
 	//MKII FLUID MIXER
@@ -434,17 +476,8 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_fluid_mixer")
 	public static void mkIIFluidMixerScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().renderFluidBar(84, 33, 37, 190, 52).internalTankSwitchingButton(82, 72, 206, 40, 12, 12).addCustomBackgroundRenderer((screen, x, y) ->{
-			IScreenDataBridge data = (IScreenDataBridge) screen;
-			if(data.getDataBridge().getCycles() != 0f) {
-				BathCraftingFluids bcf = ((BlockEntity)data.getDataBridge()).getBlockState().getValue(StateProperties.FLUID);
-				if(bcf != BathCraftingFluids.NONE) {
-					int prog = Math.round((data.getDataBridge().getProgress() / data.getDataBridge().getCycles()) * 14f);
-					screen.blit(data.getPoseStack(), x+53, y+42, bcf.getMKIIBlitPiece().getFirst(), bcf.getMKIIBlitPiece().getSecond(), 16, prog);
-					screen.blit(data.getPoseStack(), x+107, y+42, bcf.getMKIIBlitPiece().getFirst(), bcf.getMKIIBlitPiece().getSecond(), 16, prog);
-				}
-			}
-		}).buildAndRegister("mkii_fluid_mixer");
+		MachineBuilder.screen().defaultMKIIOptions().renderFluidBar(84, 33, 37, 190, 52).internalTankSwitchingButton(82, 72, 206, 40, 12, 12)
+		.stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getMKIIBlitPiece()).addBar(53, 42, 0, 0, 16, 14, PBDirection.UD, 0, 0, List.of(Pair.of(107, 42))).buildAndRegister("mkii_fluid_mixer");
 	}
 	
 	//ELECTRIC PURIFIER
@@ -482,7 +515,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="electric_purifier")
 	public static void electricPurifierScreen() {
-		MachineBuilder.screen().blitLRProgressBar(70, 26, 176, 52, 43, 32).blitLRFrameData(2, 10).buildAndRegister("electric_purifier");
+		MachineBuilder.screen().addBar(70, 26, 176, 52, 43, 32, PBDirection.LR, 2, 10, List.of()).buildAndRegister("electric_purifier");
 	}
 	
 	//MKII PURIFIER
@@ -532,8 +565,8 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_purifier")
 	public static void mkIIPurifierScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().blitUDProgressBar(57, 59, 190, 52, 8, 12).blitUDFrameData(2, 20).blitUDDuplicateBar(111, 59)
-		.blitWhenActive(59, 20, 190, 88, 58, 21).blitWhenActiveFrameData(3, 40).buildAndRegister("mkii_purifier");
+		MachineBuilder.screen().defaultMKIIOptions().addBar(57, 59, 190, 52, 8, 12, PBDirection.UD, 2, 20, List.of(Pair.of(111, 59)))
+		.addBar(59, 20, 190, 88, 58, 21, PBDirection.STATIC, 3, 40, List.of()).buildAndRegister("mkii_purifier");
 	}
 
 	//METAL SHAPER
@@ -565,7 +598,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="metal_shaper")
 	public static void metalShaperScreen() {
-		MachineBuilder.screen().blitLRProgressBar(92, 37, 176, 52, 19, 10).buildAndRegister("metal_shaper");
+		MachineBuilder.screen().addBar(92, 37, 176, 52, 19, 10, PBDirection.LR).buildAndRegister("metal_shaper");
 	}
 	
 	//MKII METAL SHAPER
@@ -608,7 +641,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_metal_shaper")
 	public static void mkIIMetalShaperScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().blitUDProgressBar(56, 42, 190, 52, 10, 19).blitUDDuplicateBar(110, 42).buildAndRegister("mkii_metal_shaper");
+		MachineBuilder.screen().defaultMKIIOptions().addBar(56, 42, 190, 52, 10, 19, PBDirection.UD, 0, 0, List.of(Pair.of(110, 42))).buildAndRegister("mkii_metal_shaper");
 	}
 
 	//LUMBER MILL
@@ -642,27 +675,7 @@ public class BlockMachines {
 	@OnlyIn(Dist.CLIENT)
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="lumber_mill")
 	public static void lumberMillScreen() {
-		MachineBuilder.screen().addCustomBackgroundRenderer(new TriConsumer<>() {
-			private int f, ff, t, tt = 0;
-			@Override
-			public void accept(AbstractContainerScreen<AbstractContainerMenu> screen, Integer x, Integer y) {
-				if(t++ == 10) {
-					t = 0;
-					f = f >= 1 ? 0 : f + 1;
-				}
-				if(tt++ == 20) {
-					tt = 0;
-					ff = ff >= 7 ? 0 : ff + 1;
-				}
-				IMachineDataBridge data = ((IScreenDataBridge) screen).getDataBridge();
-				PoseStack ps = ((IScreenDataBridge) screen).getPoseStack();
-				int prog = Math.round((data.getProgress()/data.getCycles()) * 19f);
-				screen.blit(ps, x+71, y+40, 176, 64, prog, 5);
-				screen.blit(ps, x+71, y+34, 176, 52 + (6*f), prog, 6);
-				screen.blit(ps, x+71, y+34, 196, 52 + (6*ff), prog, 6);
-			}
-		}).buildAndRegister("lumber_mill");
+		MachineBuilder.screen().addBar(71, 40, 176, 64, 19, 5, PBDirection.LR).addBar(71, 34, 176, 52, 19, 6, PBDirection.LR, 1, 10, List.of())
+		.addBar(71, 34, 196, 52, 19, 6, PBDirection.LR, 7, 20, List.of()).buildAndRegister("lumber_mill");
 	}
-	
-
 }

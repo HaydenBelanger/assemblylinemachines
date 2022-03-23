@@ -10,6 +10,7 @@ import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -64,7 +66,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			if(input.get().test(pinv.getItem(pinv.selected))) {
 				return true;
 			}
-		}else {
+		}else if(inv instanceof BlockEntity be){
+			if(be.getLevel().getBlockState(be.getBlockPos()).is(Registry.getBlock("kinetic_grinder"))) {
+				Blade blade = Blade.getBladeFromItem(inv.getItem(0).getItem());
+				if(blade == null || blade.tier < tier.tier) return false;
+			}
 			if(input.get().test(inv.getItem(1))) {
 				return true;
 			}
@@ -75,9 +81,18 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	@Override
 	public ItemStack assemble(Container inv) {
 		
-		if(inv instanceof IMachineDataBridge) {
+		if(inv instanceof IMachineDataBridge data && inv instanceof BlockEntity be) {
 			inv.getItem(1).shrink(1);
-			((IMachineDataBridge) inv).setCycles(grinds * 2.3f);
+			if(be.getLevel().getBlockState(be.getBlockPos()).is(Registry.getBlock("kinetic_grinder"))){
+				int i = be.getLevel().getRandom().nextInt(0, grinds + 1);
+				Blade b = Blade.getBladeFromItem(inv.getItem(0).getItem());
+				if(b == null || b.tier < this.tier.tier) return ItemStack.EMPTY;
+				inv.getItem(0).setDamageValue(inv.getItem(0).getDamageValue() + i);
+				if(inv.getItem(0).getDamageValue() >= inv.getItem(0).getMaxDamage()) inv.getItem(0).shrink(1);
+				data.setCycles((float) grinds * ConfigHolder.getCommonConfig().kineticGrinderCycleMultiplier.get().floatValue());
+			}else {
+				data.setCycles((float) grinds * 2.3f);
+			}
 		}
 		ItemStack stack = output.get().copy();
 		if(chanceToDouble != 0f && RAND.nextFloat() <= chanceToDouble) stack.setCount(stack.getCount() * 2);
@@ -101,8 +116,8 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	@Override
 	public List<?> getJEIComponents() {
-		Ingredient ing = this.machineReqd ? Ingredient.of(Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder")) 
-				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("simple_grinder"), Registry.getItem("electric_grinder"));
+		Ingredient ing = this.machineReqd ? Ingredient.of(Registry.getItem("kinetic_grinder"), Registry.getItem("electric_grinder")) 
+				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("kinetic_grinder"), Registry.getItem("electric_grinder"));
 		List<ItemStack> stacks = new ArrayList<>();
 		stacks.add(output.get());
 		if(chanceToDouble != 0f) stacks.add(new ItemStack(output.get().getItem(), output.get().getCount() * 2));

@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
@@ -20,7 +19,7 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankableBlock{
+public class BlockSimpleCrankCharger extends BlockTileEntity{
 
 	public BlockSimpleCrankCharger() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_crank_charger");
@@ -81,6 +80,16 @@ public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankab
 			return false;
 		}
 		
+		@Override
+		public boolean requiresGearbox() {
+			return true;
+		}
+		
+		@Override
+		public boolean validFrom(Direction dir) {
+			return true;
+		}
+		
 		private boolean getCapability() {
 			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
@@ -110,16 +119,4 @@ public class BlockSimpleCrankCharger extends BlockTileEntity implements ICrankab
 		
 		
 	}
-
-	@Override
-	public boolean validSide(BlockState state, Direction dir) {
-		return true;
-	}
-
-
-	@Override
-	public boolean needsGearbox() {
-		return true;
-	}
-
 }

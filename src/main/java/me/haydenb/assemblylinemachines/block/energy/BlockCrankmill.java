@@ -9,7 +9,6 @@ import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
@@ -37,7 +36,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 
-public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECrankmill> implements ICrankableBlock {
+public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECrankmill> {
 
 	private static final VoxelShape SHAPE_N = Stream.of(Block.box(7, 7, 2, 9, 9, 6),
 			Block.box(5, 5, 6, 11, 11, 8), Block.box(0, 0, 0, 16, 16, 2),
@@ -87,18 +86,6 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 		}
 	}
 	
-	@Override
-	public boolean validSide(BlockState state, Direction dir) {
-		if(state.getValue(HorizontalDirectionalBlock.FACING) == dir) {
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean needsGearbox() {
-		return false;
-	}
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(HorizontalDirectionalBlock.FACING);
@@ -163,6 +150,16 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 			timer = 0;
 			sendUpdates();
 			return true;
+		}
+		
+		@Override
+		public boolean validFrom(Direction dir) {
+			return this.getBlockState().getValue(HorizontalDirectionalBlock.FACING) == dir;
+		}
+		
+		@Override
+		public boolean requiresGearbox() {
+			return false;
 		}
 
 		@Override

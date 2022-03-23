@@ -4,14 +4,11 @@ import java.lang.annotation.*;
 import java.util.*;
 import java.util.function.*;
 
-import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import io.netty.buffer.Unpooled;
@@ -20,9 +17,7 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.SlotWithRes
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.EnergyProperties;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
-import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine.ICrankableBlock;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
-import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineContainerBuilder.IContainerDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.*;
@@ -65,11 +60,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.*;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.*;
 
 public class MachineBuilder {
 
@@ -97,7 +93,6 @@ public class MachineBuilder {
 		private HashMap<Direction, VoxelShape> shapes = new HashMap<>();
 		private Pair<Function<BlockState, BlockState>, Consumer<Builder<Block, BlockState>>> additionalProperties = null;
 		private QuadFunction<BlockState, Level, BlockPos, Player, InteractionResult> rightClickAction = null;
-		private Pair<Boolean, BiFunction<BlockState, Direction, Boolean>> crankable = null;
 		
 		private MachineBlockBuilder() {}
 		
@@ -130,11 +125,6 @@ public class MachineBuilder {
 		
 		public MachineBlockBuilder rightClickAction(QuadFunction<BlockState, Level, BlockPos, Player, InteractionResult> function) {
 			rightClickAction = function;
-			return this;
-		}
-		
-		public MachineBlockBuilder crankable(boolean requiresGearbox, BiFunction<BlockState, Direction, Boolean> validSides) {
-			crankable = Pair.of(requiresGearbox, validSides);
 			return this;
 		}
 		
@@ -192,31 +182,7 @@ public class MachineBuilder {
 				
 			}
 			
-			if(crankable != null) {
-				class CrankableMachineBlock extends MachineBlock implements ICrankableBlock{
-
-					public CrankableMachineBlock(Properties properties, String teName, Class<T> clazz) {
-						super(properties, teName, clazz);
-					}
-
-					@Override
-					public boolean validSide(BlockState state, Direction dir) {
-						return crankable.getSecond() != null ? crankable.getSecond().apply(state, dir) : true;
-					}
-
-					@Override
-					public boolean needsGearbox() {
-						return crankable.getFirst();
-					}
-					
-					
-					
-				}
-				
-				return new CrankableMachineBlock(properties, teName, clazz);
-			}else {
-				return new MachineBlock(properties, teName, clazz);
-			}
+			return new MachineBlock(properties, teName, clazz);
 			
 		}
 		
@@ -228,24 +194,22 @@ public class MachineBuilder {
 		private EnergyProperties energy = new EnergyProperties(true, false, 20000);
 		private int baseNTimer = 16;
 		private int baseFECost = 100;
+		private int upgradeSlotNumber, primaryOutputSlot, capacity, crankThreshold = 0;
 		private BiFunction<BlockEntity, Container, Optional<Recipe<Container>>> recipeProcessor = null;
-		private int totalSlots = 1;
-		private int upgradeSlotNumber = 0;
+		private float cycleCountModifier = 1f;
+		private int secondaryOutputSlot, totalSlots = 1;
+		private int dualProcessingOutputSlot = 2;
+		private boolean processesFluids, hasExternalTank, crankable, outputToRight, allowedInZero = false;
+		private boolean usesFE = true;
+		private boolean hasInternalTank = true;
 		private BiConsumer<Container, Recipe<Container>> executeOnRecipeCompletion = null;
 		private Function<Integer, Integer> slotIDTransformer = null;
 		private Function<Integer, Integer> dualFunctionIDTransformer = null;
-		private Function<Integer, Boolean> isExtractableSlot = null;
+		private Predicate<Integer> isExtractableSlot = null;
 		private BiFunction<Recipe<Container>, BlockState, BlockState> specialStateModifier = null;
-		private float cycleCountModifier = 1f;
-		private int primaryOutputSlot = 0;
-		private int secondaryOutputSlot = 1;
-		private int dualProcessingOutputSlot = 2;
-		private boolean processesFluids = false;
-		private int capacity = 0;
-		private boolean hasExternalTank = false;
 		private Function<Integer, List<Integer>> mustBeFullBefore = null;
 		private List<List<Integer>> slotDuplicateCheckingGroups = null;
-		private TriFunction<Integer, ItemStack, BlockEntity, Boolean> slotValidator = null;
+		private TriPredicate<Integer, ItemStack, BlockEntity> slotValidator = null;
 		
 		private MachineBlockEntityBuilder() {}
 		
@@ -257,6 +221,13 @@ public class MachineBuilder {
 		public MachineBlockEntityBuilder energy(int capacity) {
 			energy = new EnergyProperties(true, false, capacity);
 			return this;
+		}
+		
+		public MachineBlockEntityBuilder crankMachine(int crankThresholdPerCycle) {
+			usesFE = false;
+			crankable = true;
+			crankThreshold = crankThresholdPerCycle;
+			return energy(false, false, 0);
 		}
 		
 		public MachineBlockEntityBuilder baseProcessingStats(int feCost, int nTimer) {
@@ -291,7 +262,7 @@ public class MachineBuilder {
 			return this;
 		}
 		
-		public MachineBlockEntityBuilder slotExtractableFunction(Function<Integer, Boolean> isExtractableSlot) {
+		public MachineBlockEntityBuilder slotExtractableFunction(Predicate<Integer> isExtractableSlot) {
 			this.isExtractableSlot = isExtractableSlot;
 			return this;
 		}
@@ -320,6 +291,11 @@ public class MachineBuilder {
 			return this;
 		}
 		
+		public MachineBlockEntityBuilder hasNoInternalTank() {
+			this.hasInternalTank = false;
+			return this;
+		}
+		
 		public MachineBlockEntityBuilder duplicateCheckingGroups(List<List<Integer>> slotGroups) {
 			this.slotDuplicateCheckingGroups = slotGroups;
 			return this;
@@ -335,16 +311,29 @@ public class MachineBuilder {
 			return this;
 		}
 		
-		public MachineBlockEntityBuilder slotContentsValidator(TriFunction<Integer, ItemStack, BlockEntity, Boolean> validator) {
+		public MachineBlockEntityBuilder slotContentsValidator(TriPredicate<Integer, ItemStack, BlockEntity> validator) {
 			this.slotValidator = validator;
+			return this;
+		}
+		
+		public MachineBlockEntityBuilder outputToRight() {
+			this.outputToRight = true;
+			this.primaryOutputSlot = -1;
+			this.secondaryOutputSlot = -1;
+			this.dualProcessingOutputSlot = -1;
+			return this;
+		}
+		
+		public MachineBlockEntityBuilder allowedInZero() {
+			this.allowedInZero = true;
 			return this;
 		}
 		
 		public BlockEntityType<?> build(String blockName, Block... validBlocks) {
 			
-			class MachineBlockEntity extends ManagedSidedMachine<AbstractContainerMenu> implements ALMTicker<MachineBlockEntity>, IMachineDataBridge{
+			class MachineBlockEntity extends ManagedSidedMachine<AbstractContainerMenu> implements ALMTicker<MachineBlockEntity>, IMachineDataBridge, ICrankableMachine{
 
-				private int timer, nTimer;
+				private int timer, nTimer, cranks;
 				private float progress, cycles;
 				private ItemStack output = ItemStack.EMPTY;
 				private ItemStack secondaryOutput = ItemStack.EMPTY;
@@ -353,8 +342,10 @@ public class MachineBuilder {
 				private Container dualFunctionProcessorContainer = null;
 				private LazyOptional<IFluidHandler> internalLazy = null;
 				private LazyOptional<IFluidHandler> externalLazy = null;
+				private LazyOptional<IItemHandler> rightOutput = null;
 				private FluidStack internalTank = FluidStack.EMPTY;
 				private boolean useInternalTank = true;
+				private boolean allowCranks = false;
 				
 				public MachineBlockEntity(BlockPos pos, BlockState state) {
 					super(Registry.getBlockEntity(blockName), totalSlots, new TranslatableComponent(Registry.getBlock(blockName).getDescriptionId())
@@ -375,6 +366,10 @@ public class MachineBuilder {
 						if(timer++ >= nTimer) {
 							timer = 0;
 							boolean sendUpdates = false;
+							if(allowCranks) {
+								allowCranks = false;
+								sendUpdates = true;
+							}
 							int speedUpgrades = getUpgradeAmount(Upgrades.UNIVERSAL_SPEED);
 							nTimer = speedUpgrades == 0 ? baseNTimer : Math.max(1, Math.round(baseNTimer / speedUpgrades));
 							int cost = (int) (speedUpgrades == 0 ? baseFECost : Math.round(((speedUpgrades + 1) * baseFECost) * Math.pow(1.1d, speedUpgrades + 1)));
@@ -398,35 +393,55 @@ public class MachineBuilder {
 								}
 								
 							}else if(!output.isEmpty() || !secondaryOutput.isEmpty() || !dualProcessorOutput.isEmpty()){
-								if(amount - cost >= 0) {
-									if(progress >= cycles) {
-										List<Triple<Supplier<Integer>, Supplier<ItemStack>, Consumer<Void>>> outputs = new ArrayList<>();
-										if(!output.isEmpty()) outputs.add(Triple.of(() -> primaryOutputSlot, () -> output, (v) -> output = ItemStack.EMPTY));
-										if(!secondaryOutput.isEmpty()) outputs.add(Triple.of(() -> secondaryOutputSlot, () -> secondaryOutput, (v) -> secondaryOutput = ItemStack.EMPTY));
-										if(!dualProcessorOutput.isEmpty()) outputs.add(Triple.of(() -> dualProcessingOutputSlot, () -> dualProcessorOutput, (v) -> dualProcessorOutput = ItemStack.EMPTY));
-										ListIterator<Triple<Supplier<Integer>, Supplier<ItemStack>, Consumer<Void>>> listIterator = outputs.listIterator();
-										while(listIterator.hasNext()) {
-											Triple<Supplier<Integer>, Supplier<ItemStack>, Consumer<Void>> outputVals = listIterator.next();
-											ItemStack curStack = contents.get(outputVals.getLeft().get());
-											ItemStack targStack = outputVals.getMiddle().get();
-											if(curStack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(curStack, targStack) && curStack.getCount() + targStack.getCount() <= curStack.getMaxStackSize())){
-												if(curStack.isEmpty()) {
-													contents.set(outputVals.getLeft().get(), targStack);
+								if(!usesFE || amount - cost >= 0) {
+									if(!crankable || cranks >= crankThreshold) {
+										if(progress >= cycles) {
+											List<Triple<Supplier<Integer>, Supplier<ItemStack>, Consumer<Void>>> outputs = new ArrayList<>();
+											if(!output.isEmpty()) outputs.add(Triple.of(() -> primaryOutputSlot, () -> output, (v) -> output = ItemStack.EMPTY));
+											if(!secondaryOutput.isEmpty()) outputs.add(Triple.of(() -> secondaryOutputSlot, () -> secondaryOutput, (v) -> secondaryOutput = ItemStack.EMPTY));
+											if(!dualProcessorOutput.isEmpty()) outputs.add(Triple.of(() -> dualProcessingOutputSlot, () -> dualProcessorOutput, (v) -> dualProcessorOutput = ItemStack.EMPTY));
+											ListIterator<Triple<Supplier<Integer>, Supplier<ItemStack>, Consumer<Void>>> listIterator = outputs.listIterator();
+											while(listIterator.hasNext()) {
+												Triple<Supplier<Integer>, Supplier<ItemStack>, Consumer<Void>> outputVals = listIterator.next();
+												if(outputToRight) {
+													IItemHandler handler = getOrCreateRightOutput();
+													if(handler != null) {
+														ItemStack resultOfInsert = Utils.attemptDepositIntoAllSlots(outputVals.getMiddle().get(), handler);
+														if(resultOfInsert.isEmpty()) {
+															outputVals.getRight().accept(null);
+															listIterator.remove();
+														}else {
+															outputVals.getMiddle().get().setCount(resultOfInsert.getCount());
+														}
+													}
 												}else {
-													curStack.grow(targStack.getCount());
+													ItemStack curStack = contents.get(outputVals.getLeft().get());
+													ItemStack targStack = outputVals.getMiddle().get();
+													if(curStack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(curStack, targStack) && curStack.getCount() + targStack.getCount() <= curStack.getMaxStackSize())){
+														if(curStack.isEmpty()) {
+															contents.set(outputVals.getLeft().get(), targStack);
+														}else {
+															curStack.grow(targStack.getCount());
+														}
+														outputVals.getRight().accept(null);
+														listIterator.remove();
+													}
 												}
-												outputVals.getRight().accept(null);
-												listIterator.remove();
 											}
+											if(outputs.isEmpty()) {
+												cycles = 0;
+												progress = 0;
+												if(crankable) allowCranks = true;
+												
+											}
+										}else {
+											if(usesFE) {
+												amount -= cost;
+												fept = (float) cost / (float) nTimer;
+											}
+											progress++;
 										}
-										if(outputs.isEmpty()) {
-											cycles = 0;
-											progress = 0;
-										}
-									}else {
-										amount -= cost;
-										fept = (float) cost / (float) nTimer;
-										progress++;
+										cranks = 0;
 									}
 								}
 								
@@ -448,19 +463,23 @@ public class MachineBuilder {
 						}
 					}
 				}
-				
+
+				@Override
+				public boolean validFrom(Direction dir) {
+					return crankable;
+				}
 				
 				@Override
-				public int getUpgradeAmount(Upgrades upgrade) {
-					if(upgradeSlotNumber == 0) return 0;
-					int ii = 0;
-					for (int i = totalSlots - upgradeSlotNumber; i < totalSlots; i++) {
-						if (Upgrades.match(contents.get(i)) == upgrade) {
-							ii++;
-						}
-					}
-
-					return ii;
+				public boolean requiresGearbox() {
+					return false;
+				}
+				
+				@Override
+				public boolean perform() {
+					if(allowCranks) return true;
+					if(output.isEmpty()) return false;
+					cranks++;
+					return true;
 				}
 				
 				@Override
@@ -481,7 +500,7 @@ public class MachineBuilder {
 						}
 					}
 					if(slotValidator != null) {
-						if(!slotValidator.apply(slot, stack, this)) return false;
+						if(!slotValidator.test(slot, stack, this)) return false;
 					}
 					
 					if(slotDuplicateCheckingGroups != null) {
@@ -493,21 +512,25 @@ public class MachineBuilder {
 							}
 						}
 					}
+					
+					if(slot == 0 && allowedInZero) return true;
 					return super.isAllowedInSlot(slot, stack);
 				}
 				
 				@Override
 				public boolean canInsertToSide(boolean isEnergy, int slot, Direction direction) {
+					if(isEnergy && !usesFE) return false;
 					if(isEnergy || isExtractableSlot == null) return super.canInsertToSide(isEnergy, slot, direction);
 					if(enabledSides.getOrDefault(direction, true) == false) return false;
-					return !isExtractableSlot.apply(slot);
+					return !isExtractableSlot.test(slot);
 				}
 				
 				@Override
 				public boolean canExtractFromSide(boolean isEnergy, int slot, Direction direction) {
+					if(isEnergy && !usesFE) return false;
 					if(isEnergy || isExtractableSlot == null) return super.canExtractFromSide(isEnergy, slot, direction);
 					if(enabledSides.getOrDefault(direction, true) == false) return false;
-					return isExtractableSlot.apply(slot);
+					return isExtractableSlot.test(slot);
 				}
 				
 				@Override
@@ -522,43 +545,41 @@ public class MachineBuilder {
 					progress = compound.getFloat("assemblylinemachines:progress");
 					internalTank = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:fluid"));
 					useInternalTank = compound.getBoolean("assemblylinemachines:useinternaltank");
+					cranks = compound.getInt("assemblylinemachines:cranks");
+					allowCranks = compound.getBoolean("assemblylinemachines:allowcranks");
 				}
 				
 				@Override
 				public void saveAdditional(CompoundTag compound) {
 					compound.putInt("assemblylinemachines:ntimer", nTimer);
-					compound.putFloat("assemblylinemachines:cycles", cycles);
-					compound.putFloat("assemblylinemachines:progress", progress);
-					compound.put("assemblylinemachines:output", output.save(new CompoundTag()));
-					compound.put("assemblylinemachines:secondaryoutput", secondaryOutput.save(new CompoundTag()));
-					compound.put("assemblylinemachines:dualprocessoroutput", dualProcessorOutput.save(new CompoundTag()));
-					compound.put("assemblylinemachines:fluid", internalTank.writeToNBT(new CompoundTag()));
-					compound.putBoolean("assemblylinemachines:useinternaltank", useInternalTank);
+					if(cycles != 0) compound.putFloat("assemblylinemachines:cycles", cycles);
+					if(progress != 0) compound.putFloat("assemblylinemachines:progress", progress);
+					if(!output.isEmpty()) compound.put("assemblylinemachines:output", output.save(new CompoundTag()));
+					if(!secondaryOutput.isEmpty()) compound.put("assemblylinemachines:secondaryoutput", secondaryOutput.save(new CompoundTag()));
+					if(!dualProcessorOutput.isEmpty()) compound.put("assemblylinemachines:dualprocessoroutput", dualProcessorOutput.save(new CompoundTag()));
+					if(!internalTank.isEmpty()) compound.put("assemblylinemachines:fluid", internalTank.writeToNBT(new CompoundTag()));
+					if(useInternalTank) compound.putBoolean("assemblylinemachines:useinternaltank", useInternalTank);
+					if(cranks != 0) compound.putInt("assemblylinemachines:cranks", cranks);
+					if(allowCranks) compound.putBoolean("assemblylinemachines:allowcranks", allowCranks);
 					
 					super.saveAdditional(compound);
 				}
 				
 				@Override
 				public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-					if(processesFluids && cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-						if(useInternalTank) return LazyOptional.of(() -> getCraftingFluidHandler(Optional.of(true))).cast();
-					}
+					if(!usesFE && cap == CapabilityEnergy.ENERGY) return LazyOptional.empty();
+					if(processesFluids && hasInternalTank && useInternalTank && cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return LazyOptional.of(() -> getCraftingFluidHandler(Optional.of(true))).cast();
 					return super.getCapability(cap, side);
 				}
 				
 				@Override
 				public float getCycles() {
-					return cycles;
-				}
-
-				@Override
-				public float getProgress() {
-					return progress;
+					return this.cycles;
 				}
 				
 				@Override
-				public void setCycles(float cycles) {
-					if(this.cycles < (cycles * cycleCountModifier)) this.cycles = (cycles * cycleCountModifier);
+				public float getProgress() {
+					return this.progress;
 				}
 				
 				@Override
@@ -567,11 +588,23 @@ public class MachineBuilder {
 				}
 				
 				@Override
+				public void setCycles(float cycles) {
+					if(this.cycles < (cycles * cycleCountModifier)) this.cycles = (cycles * cycleCountModifier);
+				}
+				
+				@Override
+				public boolean getUsingInternalTank() {
+					if(!hasExternalTank) return true;
+					if(!hasInternalTank) return false;
+					return useInternalTank;
+				}
+				
+				@Override
 				public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal) {
 					
-					boolean useInternal = preferInternal.isPresent() ? preferInternal.get() : useInternalTank;
+					boolean useInternal = preferInternal.isPresent() ? preferInternal.get() : getUsingInternalTank();
 					
-					if(useInternal) {
+					if(useInternal && hasInternalTank) {
 						if(internalLazy == null) {
 							internalLazy = LazyOptional.of(() -> Utils.getSimpleOneTankHandler(null, capacity, (oFs) -> {
 								if(oFs.isPresent()) internalTank = oFs.get();
@@ -599,16 +632,44 @@ public class MachineBuilder {
 				}
 				
 				@Override
-				public boolean getUsingExternalTank() {
-					return !useInternalTank;
-				}
-				
-				@Override
 				public void receiveButtonPacket(PacketData pd) {
 					if(pd.get("function", String.class).equals("toggle_source_tank")) {
 						this.useInternalTank = !this.useInternalTank;
 						this.sendUpdates();
 					}
+				}
+				
+				@Override
+				public int getUpgradeAmount(Upgrades upgrade) {
+					if(upgradeSlotNumber == 0) return 0;
+					int ii = 0;
+					for (int i = totalSlots - upgradeSlotNumber; i < totalSlots; i++) {
+						if (Upgrades.match(contents.get(i)) == upgrade) {
+							ii++;
+						}
+					}
+
+					return ii;
+				}
+				
+				private IItemHandler getOrCreateRightOutput() {
+					if(rightOutput != null && rightOutput.isPresent()) return rightOutput.orElse(null);
+					Direction toRight = this.getBlockState().getValue(HorizontalDirectionalBlock.FACING).getCounterClockWise();
+					BlockEntity be = this.getLevel().getBlockEntity(this.getBlockPos().relative(toRight));
+					if(be != null) {
+						LazyOptional<?> handler = be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, toRight.getOpposite());
+						if(handler.isPresent()) {
+							this.rightOutput = handler.cast();
+							this.rightOutput.addListener(new NonNullConsumer<LazyOptional<IItemHandler>>() {
+								@Override
+								public void accept(LazyOptional<IItemHandler> t) {
+									MachineBlockEntity.this.rightOutput = null;
+								}
+							});
+							return rightOutput.orElse(null);
+						}
+					}
+					return null;
 				}
 				
 				class SlotTransformer implements Container, IMachineDataBridge{
@@ -664,6 +725,11 @@ public class MachineBuilder {
 					}
 					
 					@Override
+					public boolean isAllowedInSlot(int slot, ItemStack stack) {
+						return MachineBlockEntity.this.isAllowedInSlot(slot, stack);
+					}
+
+					@Override
 					public void setCycles(float cycles) {
 						MachineBlockEntity.this.setCycles(cycles);
 					}
@@ -671,11 +737,6 @@ public class MachineBuilder {
 					@Override
 					public int getUpgradeAmount(Upgrades upgrade) {
 						return MachineBlockEntity.this.getUpgradeAmount(upgrade);
-					}
-					
-					@Override
-					public boolean isAllowedInSlot(int slot, ItemStack stack) {
-						return MachineBlockEntity.this.isAllowedInSlot(slot, stack);
 					}
 					
 					@Override
@@ -699,8 +760,8 @@ public class MachineBuilder {
 					}
 					
 					@Override
-					public boolean getUsingExternalTank() {
-						return MachineBlockEntity.this.getUsingExternalTank();
+					public boolean getUsingInternalTank() {
+						return MachineBlockEntity.this.getUsingInternalTank();
 					}
 					
 					@Override
@@ -717,21 +778,13 @@ public class MachineBuilder {
 		public static interface IMachineDataBridge {
 			
 			public void setCycles(float cycles);
-			
 			public int getUpgradeAmount(Upgrades upgrade);
-			
 			public boolean isAllowedInSlot(int slot, ItemStack stack);
-			
 			public float getProgress();
-			
 			public float getCycles();
-			
 			public void setSecondaryOutput(ItemStack output);
-			
 			public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal);
-			
-			public boolean getUsingExternalTank();
-			
+			public boolean getUsingInternalTank();
 			public void receiveButtonPacket(PacketData pd);
 		}
 	}
@@ -769,7 +822,7 @@ public class MachineBuilder {
 		
 		public MenuType<?> build(String blockName){
 			
-			class MachineContainer extends ContainerALMBase<RandomizableContainerBlockEntity> implements IContainerDataBridge{
+			class MachineContainer extends ContainerALMBase<RandomizableContainerBlockEntity>{
 				
 				public MachineContainer(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
 					this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data));
@@ -786,25 +839,9 @@ public class MachineBuilder {
 						i++;
 					}
 				}
-
-				@Override
-				public IMachineDataBridge getEntityDataBridge() {
-					return (IMachineDataBridge) this.tileEntity;
-				}
-				
-				@Override
-				public BlockEntity getBlockEntity() {
-					return this.tileEntity;
-				}
 			}
 			
 			return IForgeMenuType.create((windowId, inv, data) -> new MachineContainer(windowId, inv, data));
-		}
-		
-		public static interface IContainerDataBridge{
-			public IMachineDataBridge getEntityDataBridge();
-			
-			public BlockEntity getBlockEntity();
 		}
 		
 	}
@@ -815,24 +852,16 @@ public class MachineBuilder {
 		private Pair<Integer, Integer> inventorySize = Pair.of(176, 166);
 		private Pair<Integer, Integer> inventoryTitleLoc = Pair.of(11, 6);
 		private Pair<Integer, Integer> playerInvTitleLoc = Pair.of(11, 73);
-		private boolean hasCoolMode = false;
 		private Pair<Integer, Integer> energyBarLoc = Pair.of(14, 17);
 		private boolean usesFept = true;
-		private int[] blitLRProgressBar = null;
-		private int[] blitUDProgressBar = null;
-		private Pair<Integer, Integer> blitUDDuplicateBar = null;
-		private int framesLR = 0;
-		private int frameTimeLR = 0;
-		private int framesUD = 0;
-		private int frameTimeUD = 0;
-		private int framesStatic = 0;
-		private int frameTimeStatic = 0;
+		private boolean usesFe = true;
 		private boolean renderTitleText = true;
 		private boolean renderInventoryText = true;
+		private List<ProgressBar> progressBars = new ArrayList<>();
 		private int energyMeterStartX = 176;
-		private int[] blitWhenActive = null;
-		private TriConsumer<AbstractContainerScreen<AbstractContainerMenu>, Integer, Integer> backgroundCustomRendering = null;
+		private Function<BlockState, Pair<Integer, Integer>> uvModifier = null;
 		private boolean renderFluidBar = false;
+		private boolean hasCoolMode = false;
 		private int fluidBarTopLeftX = 0;
 		private int fluidBarTopLeftY = 0;
 		private int fluidBarHeight = 0;
@@ -868,61 +897,17 @@ public class MachineBuilder {
 			return this;
 		}
 		
-		public MachineScreenBuilder usesFept(boolean usesFept) {
-			this.usesFept = usesFept;
+		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction) {
+			return this.addBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, direction, 0, 0, List.of());
+		}
+		
+		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {
+			this.progressBars.add(new ProgressBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, direction, frames, frameTime, duplicateAt));
 			return this;
 		}
 		
-		public MachineScreenBuilder blitLRProgressBar(int renderX, int renderY, int blitX, int blitY, int maxWidth, int height) {
-			this.blitLRProgressBar = new int[] {renderX, renderY, blitX, blitY, maxWidth, height};
-			return this;
-		}
-		
-		public MachineScreenBuilder blitUDProgressBar(int renderX, int renderY, int blitX, int blitY, int width, int maxHeight) {
-			this.blitUDProgressBar = new int[] {renderX, renderY, blitX, blitY, width, maxHeight};
-			return this;
-		}
-		
-		public MachineScreenBuilder blitUDDuplicateBar(int renderX, int renderY) {
-			this.blitUDDuplicateBar = Pair.of(renderX, renderY);
-			return this;
-		}
-		
-		public MachineScreenBuilder blitUDFrameData(int numberOfAdditionalFrames, int countToCycle) {
-			this.framesUD = numberOfAdditionalFrames;
-			this.frameTimeUD = countToCycle;
-			return this;
-		}
-		
-		public MachineScreenBuilder blitWhenActive(int renderX, int renderY, int blitX, int blitY, int width, int height) {
-			this.blitWhenActive = new int[] {renderX, renderY, blitX, blitY, width, height};
-			return this;
-		}
-		
-		public MachineScreenBuilder blitWhenActiveFrameData(int numberOfAdditionalFrames, int countToCycle) {
-			this.framesStatic = numberOfAdditionalFrames;
-			this.frameTimeStatic = countToCycle;
-			return this;
-		}
-		
-		public MachineScreenBuilder blitLRFrameData(int numberOfAdditionalFrames, int countToCycle) {
-			this.framesLR = numberOfAdditionalFrames;
-			this.frameTimeLR = countToCycle;
-			return this;
-		}
-		
-		public MachineScreenBuilder addCustomBackgroundRenderer(TriConsumer<AbstractContainerScreen<AbstractContainerMenu>, Integer, Integer> backgroundCustomRendering) {
-			this.backgroundCustomRendering = backgroundCustomRendering;
-			return this;
-		}
-		
-		public MachineScreenBuilder doNotRenderTitleText() {
-			this.renderTitleText = false;
-			return this;
-		}
-		
-		public MachineScreenBuilder doNotRenderInventoryText() {
-			this.renderInventoryText = false;
+		public MachineScreenBuilder stateBasedBlitPieceModifier(Function<BlockState, Pair<Integer, Integer>> function) {
+			this.uvModifier = function;
 			return this;
 		}
 		
@@ -946,26 +931,44 @@ public class MachineBuilder {
 			return this;
 		}
 		
+		public MachineScreenBuilder doesNotUseFE() {
+			this.usesFe = false;
+			return doesNotUseFEPT();
+		}
+		
+		public MachineScreenBuilder doesNotUseFEPT() {
+			this.usesFept = false;
+			return this;
+		}
+		
 		public MachineScreenBuilder defaultMKIIOptions() {
-			return this.inventorySize(190, 188).energyMeterStartX(190).doNotRenderInventoryText().doNotRenderTitleText();
+			this.renderInventoryText = false;
+			this.renderTitleText = false;
+			return this.inventorySize(190, 188).energyMeterStartX(190);
 		}
 		
 		@SuppressWarnings("unchecked")
 		public void buildAndRegister(String blockName) {
 			
-			class MachineScreen extends ScreenALMEnergyBased<AbstractContainerMenu> implements IScreenDataBridge{
+			class MachineScreen extends ScreenALMEnergyBased<ContainerALMBase<RandomizableContainerBlockEntity>>{
 				
 				private IMachineDataBridge data;
 				private Cache<Fluid, TextureAtlasSprite> cache = CacheBuilder.newBuilder().build();
-				private int currentFrameLR, tickCountLR, currentFrameUD, tickCountUD, currentFrameStatic, tickCountStatic;
+				private ArrayList<ProgressBarInstance> progressBars = new ArrayList<>();
 				
-				public MachineScreen(AbstractContainerMenu screenContainer, Inventory inv, Component titleIn) {
+				public MachineScreen(ContainerALMBase<RandomizableContainerBlockEntity> screenContainer, Inventory inv, Component titleIn) {
 					super(screenContainer, inv, titleIn, inventorySize, inventoryTitleLoc, playerInvTitleLoc, blockName, hasCoolMode,
-							energyBarLoc, (EnergyMachine<?>) ((IContainerDataBridge) screenContainer).getBlockEntity(), usesFept);
-					this.data = ((IContainerDataBridge) screenContainer).getEntityDataBridge();
+							energyBarLoc, (EnergyMachine<?>) screenContainer.tileEntity, usesFept);
+					this.data = (IMachineDataBridge) screenContainer.tileEntity;
 					this.renderTitleText = MachineScreenBuilder.this.renderTitleText;
 					this.renderInventoryText = MachineScreenBuilder.this.renderInventoryText;
 					this.startx = energyMeterStartX;
+					
+					for(ProgressBar pb : MachineScreenBuilder.this.progressBars) {
+						this.progressBars.add(new ProgressBarInstance(this, pb));
+					}
+					
+					this.usesFe = MachineScreenBuilder.this.usesFe;
 				}
 				
 				@Override
@@ -974,7 +977,7 @@ public class MachineBuilder {
 					
 					
 					if(tankButtonStats != null) this.addRenderableWidget(new TrueFalseButton(leftPos+tankButtonStats[0], topPos+tankButtonStats[1], tankButtonStats[2], tankButtonStats[3], tankButtonStats[4], tankButtonStats[5],
-							new TrueFalseButtonSupplier("Draw From External Tank", "Draw From Internal Tank", () -> data.getUsingExternalTank()), (b) -> {
+							new TrueFalseButtonSupplier("Draw From Internal Tank", "Draw From External Tank", () -> data.getUsingInternalTank()), (b) -> {
 						PacketData packet = new PacketData("machine_builder_gui");
 						packet.writeBlockPos("pos", ((BlockEntity) data).getBlockPos());
 						packet.writeUtf("function", "toggle_source_tank");
@@ -1004,48 +1007,7 @@ public class MachineBuilder {
 						super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidOverlayStartX, fluidOverlayStartY, 8, fluidBarHeight - fAmount);
 					}
 					
-					if(blitLRProgressBar != null) {
-						if(framesLR != 0) {
-							if(tickCountLR++ >= frameTimeLR) {
-								tickCountLR = 0;
-								currentFrameLR = currentFrameLR >= framesLR ? 0 : currentFrameLR + 1;
-							}
-							
-						}
-						int prog = Math.round((data.getProgress()/data.getCycles()) * blitLRProgressBar[4]);
-						super.blit(x+blitLRProgressBar[0], y+blitLRProgressBar[1], blitLRProgressBar[2], 
-								blitLRProgressBar[3] + (blitLRProgressBar[5] * currentFrameLR), prog, blitLRProgressBar[5]);
-					}
-					
-					if(blitUDProgressBar != null) {
-						
-						if(framesUD != 0) {
-							if(tickCountUD++ >= frameTimeUD) {
-								tickCountUD = 0;
-								currentFrameUD = currentFrameUD >= framesUD ? 0 : currentFrameUD + 1;
-							}
-							
-						}
-						
-						int prog = Math.round((data.getProgress()/data.getCycles()) * blitUDProgressBar[5]);
-						super.blit(x+blitUDProgressBar[0], y+blitUDProgressBar[1], blitUDProgressBar[2], blitUDProgressBar[3] + (blitUDProgressBar[5] * currentFrameUD), blitUDProgressBar[4], prog);
-						if(blitUDDuplicateBar != null) super.blit(x+blitUDDuplicateBar.getFirst(), y+blitUDDuplicateBar.getSecond(), blitUDProgressBar[2], blitUDProgressBar[3] + (blitUDProgressBar[5] * currentFrameUD), 
-								blitUDProgressBar[4], prog);
-					}
-					
-					if(blitWhenActive != null && data.getCycles() != 0f) {
-						if(framesStatic != 0) {
-							if(tickCountStatic++ >= frameTimeStatic) {
-								tickCountStatic = 0;
-								currentFrameStatic = currentFrameStatic >= framesStatic ? 0 : currentFrameStatic + 1;
-							}
-							
-						}
-						super.blit(x+blitWhenActive[0], y+blitWhenActive[1], blitWhenActive[2], 
-								blitWhenActive[3] + (blitWhenActive[5] * currentFrameStatic), blitWhenActive[4], blitWhenActive[5]);
-					}
-					
-					if(backgroundCustomRendering != null) backgroundCustomRendering.accept(this, x, y);
+					for(ProgressBarInstance pbi : this.progressBars) pbi.render(x, y);
 				}
 				
 				@Override
@@ -1068,35 +1030,83 @@ public class MachineBuilder {
 						}
 					}
 				}
-
-				@Override
-				public PoseStack getPoseStack() {
-					return this.mx;
-				}
-
-				@Override
-				public IMachineDataBridge getDataBridge() {
-					return data;
-				}
 			}
 			
-			MenuScreens.register((MenuType<AbstractContainerMenu>)Registry.getContainerType(blockName), new ScreenConstructor<AbstractContainerMenu, AbstractContainerScreen<AbstractContainerMenu>>() {
+			MenuScreens.register((MenuType<ContainerALMBase<RandomizableContainerBlockEntity>>)Registry.getContainerType(blockName), 
+					new ScreenConstructor<ContainerALMBase<RandomizableContainerBlockEntity>, AbstractContainerScreen<ContainerALMBase<RandomizableContainerBlockEntity>>>() {
 
 				@Override
-				public AbstractContainerScreen<AbstractContainerMenu> create(AbstractContainerMenu container, Inventory pInv, Component component) {
+				public AbstractContainerScreen<ContainerALMBase<RandomizableContainerBlockEntity>> create(ContainerALMBase<RandomizableContainerBlockEntity> container, Inventory pInv, Component component) {
 					return new MachineScreen(container, pInv, component);
 				}
 				
 			});
 		}
 		
-		@OnlyIn(Dist.CLIENT)
-		public static interface IScreenDataBridge{
+		class ProgressBarInstance{
 			
-			public PoseStack getPoseStack();
+			private final IMachineDataBridge bridge;
+			private final ScreenALMEnergyBased<ContainerALMBase<RandomizableContainerBlockEntity>> screen;
+			private final ProgressBar pb;
+			private int frame, tick = 0;
 			
-			public IMachineDataBridge getDataBridge();
+			ProgressBarInstance(ScreenALMEnergyBased<ContainerALMBase<RandomizableContainerBlockEntity>> screen, ProgressBar pb){
+				this.bridge = (IMachineDataBridge) screen.getMenu().tileEntity;
+				this.screen = screen;
+				this.pb = pb;
+			}
+			
+			void render(int x, int y) {
+				
+				if(pb.frames != 0) {
+					if(tick++ >= pb.frameTime) {
+						tick = 0;
+						frame = frame >= pb.frames ? 0 : frame + 1;
+					}
+				}
+
+				this.render(x, y, this.pb.blitx, this.pb.blity, true);
+			}
+			
+			void render(int x, int y, int blitx, int blity, boolean renderDuplicates) {
+				float progress = bridge.getProgress();
+				float cycles = bridge.getCycles();
+				
+				if(progress != 0f && cycles != 0f) {
+					int piecex = pb.uvx;
+					int piecey = pb.uvy;
+					if(uvModifier != null) {
+						Pair<Integer, Integer> pieces = uvModifier.apply(screen.getMenu().tileEntity.getBlockState());
+						piecex = pieces.getFirst();
+						piecey = pieces.getSecond();
+					}
+					switch(pb.direction) {
+					case LR -> {
+						int prog = Math.round((progress/cycles) * pb.defaultWidth);
+						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), prog, pb.defaultHeight);
+					}
+					case UD -> {
+						int prog = Math.round((progress/cycles) * pb.defaultHeight);
+						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, prog);
+					}
+					case DU -> {
+						int prog = Math.round((progress/cycles) * pb.defaultHeight);
+						screen.blit(x+blitx, y+blity + (pb.defaultHeight - prog), piecex, piecey + (pb.defaultHeight - prog) + (pb.defaultHeight * this.frame), pb.defaultWidth, prog);
+					}
+					case STATIC -> {
+						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
+					}}
+					
+					if(renderDuplicates) for(Pair<Integer, Integer> pair : pb.duplicateAt) this.render(x, y, pair.getFirst(), pair.getSecond(), false);
+				}
+			}
 		}
+		
+		public enum PBDirection{
+			LR, UD, DU, STATIC;
+		}
+		
+		record ProgressBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {}
 	}
 	
 	@Retention(RetentionPolicy.RUNTIME)

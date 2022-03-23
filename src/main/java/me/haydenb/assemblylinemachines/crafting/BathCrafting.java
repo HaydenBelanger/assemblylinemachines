@@ -14,6 +14,7 @@ import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Utils.IFluidHandlerBypass;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,6 +25,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -101,7 +103,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 					return true;
 				}
 			}
-		}else if(inv instanceof IMachineDataBridge){
+		}else if(inv instanceof IMachineDataBridge && !((BlockEntity) inv).getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))){
 			if(type == BathOption.BASIN_ONLY) {
 				return false;
 			}
@@ -166,10 +168,18 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			}
 			
 			drain.apply(cons, FluidAction.EXECUTE);
+			if(((BlockEntity) inv).getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
+				inv.getItem(0).shrink(1);
+				inv.getItem(1).shrink(1);
+				data.setCycles((float) stirs * ConfigHolder.getCommonConfig().kineticFluidMixerCycleMultiplier.get().floatValue());
+			}else {
+				inv.getItem(1).shrink(1);
+				inv.getItem(2).shrink(1);
+				data.setCycles((float) stirs * 3.6f);
+			}
 			
-			inv.getItem(1).shrink(1);
-			inv.getItem(2).shrink(1);
-			data.setCycles((float) stirs * 3.6f);
+			
+			
 		}
 		return this.output.copy();
 	}
@@ -189,7 +199,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		ArrayList<Item> items = new ArrayList<>();
 		switch(this.type) {
 		case MIXER_ONLY, ALL:
-			items.addAll(List.of(Registry.getItem("simple_fluid_mixer"), Registry.getItem("electric_fluid_mixer"), Registry.getItem("mkii_fluid_mixer")));
+			items.addAll(List.of(Registry.getItem("kinetic_fluid_mixer"), Registry.getItem("electric_fluid_mixer"), Registry.getItem("mkii_fluid_mixer")));
 			if(this.type == BathOption.MIXER_ONLY) break;
 		case BASIN_ONLY:
 			items.add(Registry.getItem("fluid_bath"));

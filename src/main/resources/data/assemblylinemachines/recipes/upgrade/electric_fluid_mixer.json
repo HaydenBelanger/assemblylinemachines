@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:upgrade_kit",
 	"input_block":{
-		"item": "assemblylinemachines:simple_fluid_mixer"
+		"item": "assemblylinemachines:kinetic_fluid_mixer"
 	},
 	"upgrade_kit": "ELECTRIC",
 	"output_block": "assemblylinemachines:electric_fluid_mixer",
