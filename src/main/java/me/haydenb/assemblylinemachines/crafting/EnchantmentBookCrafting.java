@@ -10,6 +10,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockExperienceMill.TEExperienceMill;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.Utils.CountIngredient;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -36,19 +37,17 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	public static final EnchantmentBookSerializer SERIALIZER = new EnchantmentBookSerializer();
 	private static final Ingredient BOOK = Ingredient.of(Items.BOOK);
 	
-	private final Lazy<Ingredient> input;
+	private final Lazy<CountIngredient> input;
 	private final Enchantment enchantment;
 	private final int cost;
-	public final int amount;
 	private final ResourceLocation id;
 	private final LoadingCache<Integer, ItemStack> bookCache;
 	
-	public EnchantmentBookCrafting(ResourceLocation id, Lazy<Ingredient> input, Enchantment enchantment, int cost, int amount) {
+	public EnchantmentBookCrafting(ResourceLocation id, Lazy<CountIngredient> input, Enchantment enchantment, int cost) {
 		this.input = input;
 		this.enchantment = enchantment;
 		this.id = id;
 		this.cost = cost;
-		this.amount = amount;
 		this.bookCache = CacheBuilder.newBuilder().build(CacheLoader.from((key) -> EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, key))));
 	}
 	@Override
@@ -94,11 +93,11 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 			
 			int bookSlot = inv.getItem(1).getItem() == Items.BOOK ? 1 : 2;
 			int catalystSlot = bookSlot == 2 ? 1 : 2;
-			if(inv.getItem(catalystSlot).getCount() < this.amount * level) return ItemStack.EMPTY;
+			if(inv.getItem(catalystSlot).getCount() < this.input.get().getCount() * level) return ItemStack.EMPTY;
 			
 			te.tank.shrink(cost);
 			inv.getItem(bookSlot).shrink(1);
-			inv.getItem(catalystSlot).shrink(this.amount * level);
+			inv.getItem(catalystSlot).shrink(this.input.get().getCount() * level);
 			te.cycles = cycles;
 		}
 		try {
@@ -149,13 +148,12 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		@Override
 		public EnchantmentBookCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				Lazy<Ingredient> ingredient = Lazy.of(() -> {
-					Ingredient i = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-					if(i.test(Items.BOOK.getDefaultInstance())) throw new IllegalArgumentException(recipeId + " used an illegal item as input.");
+				Lazy<CountIngredient> ingredient = Lazy.of(() -> {
+					CountIngredient i = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+					if(i.test(Items.BOOK.getDefaultInstance(), true)) throw new IllegalArgumentException(recipeId + " used an illegal item as input.");
 					return i;
 				});
 				
-				int amt = GsonHelper.getAsInt(json, "amount");
 				int cost = GsonHelper.getAsInt(json, "cost");
 				Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "enchantment")));
 				
@@ -163,7 +161,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 					throw new IllegalArgumentException("This enchantment does not exist.");
 				}
 				
-				return new EnchantmentBookCrafting(recipeId, ingredient, enchantment, cost, amt);
+				return new EnchantmentBookCrafting(recipeId, ingredient, enchantment, cost);
 			}catch(Exception e) {
 				AssemblyLineMachines.LOGGER.error("Error deserializing Enchantment Book Crafting Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
@@ -175,12 +173,11 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 
 		@Override
 		public EnchantmentBookCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			Ingredient input = Ingredient.fromNetwork(buffer);
+			CountIngredient input = CountIngredient.fromNetwork(buffer);
 			Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(buffer.readResourceLocation());
 			int cost = buffer.readInt();
-			int amount = buffer.readInt();
 			
-			return new EnchantmentBookCrafting(recipeId, Lazy.of(() -> input), enchantment, cost, amount);
+			return new EnchantmentBookCrafting(recipeId, Lazy.of(() -> input), enchantment, cost);
 		}
 
 		@Override
@@ -188,7 +185,6 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 			recipe.input.get().toNetwork(buffer);
 			buffer.writeResourceLocation(recipe.enchantment.getRegistryName());
 			buffer.writeInt(recipe.cost);
-			buffer.writeInt(recipe.amount);
 		}
 		
 	}

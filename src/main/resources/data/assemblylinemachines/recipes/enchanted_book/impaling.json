@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:arrow"
+		"item": "minecraft:arrow",
+		"count": 5
 	},
-	"amount": 5,
 	"enchantment": "minecraft:impaling",
 	"cost": 100
 }

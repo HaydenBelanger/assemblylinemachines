@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "assemblylinemachines:black_granite"
+		"item": "assemblylinemachines:black_granite",
+		"count": 3
 	},
-	"amount": 3,
 	"enchantment": "minecraft:projectile_protection",
 	"cost": 100
 }

@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:kelp"
+		"item": "minecraft:kelp",
+		"count": 6
 	},
-	"amount": 6,
 	"enchantment": "minecraft:lure",
 	"cost": 125
 }

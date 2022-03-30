@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"tag": "forge:gems/diamond"
+		"tag": "forge:gems/diamond",
+		"count": 3
 	},
-	"amount": 3,
 	"enchantment": "minecraft:silk_touch",
 	"cost": 225
 }

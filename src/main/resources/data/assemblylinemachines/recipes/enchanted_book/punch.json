@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:sticky_piston"
+		"item": "minecraft:sticky_piston",
+		"count": 2
 	},
-	"amount": 2,
 	"enchantment": "minecraft:punch",
 	"cost": 150
 }

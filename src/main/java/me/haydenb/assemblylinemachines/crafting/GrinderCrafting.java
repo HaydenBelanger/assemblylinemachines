@@ -8,9 +8,9 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -19,7 +19,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -58,6 +57,8 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
+		if(input.get().isEmpty() || output.get().isEmpty()) return false;
+		
 		if(inv instanceof Inventory) {
 			if(machineReqd == true) {
 				return false;
@@ -66,8 +67,8 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			if(input.get().test(pinv.getItem(pinv.selected))) {
 				return true;
 			}
-		}else if(inv instanceof BlockEntity be){
-			if(be.getLevel().getBlockState(be.getBlockPos()).is(Registry.getBlock("kinetic_grinder"))) {
+		}else if(inv instanceof IMachineDataBridge data){
+			if(data.getBlockState().is(Registry.getBlock("kinetic_grinder"))) {
 				Blade blade = Blade.getBladeFromItem(inv.getItem(0).getItem());
 				if(blade == null || blade.tier < tier.tier) return false;
 			}
@@ -81,10 +82,10 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	@Override
 	public ItemStack assemble(Container inv) {
 		
-		if(inv instanceof IMachineDataBridge data && inv instanceof BlockEntity be) {
+		if(inv instanceof IMachineDataBridge data) {
 			inv.getItem(1).shrink(1);
-			if(be.getLevel().getBlockState(be.getBlockPos()).is(Registry.getBlock("kinetic_grinder"))){
-				int i = be.getLevel().getRandom().nextInt(0, grinds + 1);
+			if(data.getBlockState().is(Registry.getBlock("kinetic_grinder"))){
+				int i = RAND.nextInt(0, grinds + 1);
 				Blade b = Blade.getBladeFromItem(inv.getItem(0).getItem());
 				if(b == null || b.tier < this.tier.tier) return ItemStack.EMPTY;
 				inv.getItem(0).setDamageValue(inv.getItem(0).getDamageValue() + i);
@@ -112,6 +113,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	@Override
 	public boolean isSpecial() {
 		return true;
+	}
+	
+	@Override
+	public boolean showInJEI() {
+		return !this.input.get().isEmpty() && !this.output.get().isEmpty();
 	}
 	
 	@Override
@@ -145,7 +151,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		@Override
 		public GrinderCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
+				Lazy<Ingredient> input = Utils.getValidatedIngredient(GsonHelper.getAsJsonObject(json, "input"));
 				Lazy<ItemStack> supplier = Utils.getTaggedOutputFromJson(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
 				
 				int grinds = GsonHelper.getAsInt(json, "grinds");

@@ -768,6 +768,11 @@ public class MachineBuilder {
 					public void receiveButtonPacket(PacketData pd) {
 						MachineBlockEntity.this.receiveButtonPacket(pd);
 					}
+					
+					@Override
+					public BlockState getBlockState() {
+						return MachineBlockEntity.this.getBlockState();
+					}
 				}
 			}
 			
@@ -786,6 +791,7 @@ public class MachineBuilder {
 			public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal);
 			public boolean getUsingInternalTank();
 			public void receiveButtonPacket(PacketData pd);
+			public BlockState getBlockState();
 		}
 	}
 	

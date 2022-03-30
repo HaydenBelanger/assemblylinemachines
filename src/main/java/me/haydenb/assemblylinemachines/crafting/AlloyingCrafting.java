@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Utils.CountIngredient;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -30,13 +32,13 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	public static final AlloyingSerializer SERIALIZER = new AlloyingSerializer();
 	
 	
-	private final Lazy<Ingredient> parta;
-	private final Lazy<Ingredient> partb;
-	private final ItemStack output;
+	private final Lazy<CountIngredient> parta;
+	private final Lazy<CountIngredient> partb;
+	private final Lazy<ItemStack> output;
 	private final int time;
 	private final ResourceLocation id;
 	
-	public AlloyingCrafting(ResourceLocation id, Lazy<Ingredient> parta, Lazy<Ingredient> partb, ItemStack output, int time) {
+	public AlloyingCrafting(ResourceLocation id, Lazy<CountIngredient> parta, Lazy<CountIngredient> partb, Lazy<ItemStack> output, int time) {
 		this.parta = parta;
 		this.partb = partb;
 		this.output = output;
@@ -46,6 +48,7 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
+		if(parta.get().isEmpty() || partb.get().isEmpty() || output.get().isEmpty()) return false;
 		return ((parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) || (partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2))));
 	}
 	
@@ -53,11 +56,23 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	public ItemStack assemble(Container inv) {
 		
 		if(inv instanceof IMachineDataBridge) {
-			inv.getItem(1).shrink(1);
-			inv.getItem(2).shrink(1);
+			int shra = 0;
+			int shrb = 0;
+			if(parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) {
+				shra = parta.get().getCount();
+				shrb = partb.get().getCount();
+			}else if(partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2))) {
+				shrb = parta.get().getCount();
+				shra = partb.get().getCount();
+			}else {
+				return ItemStack.EMPTY;
+			}
+			
+			inv.getItem(1).shrink(shra);
+			inv.getItem(2).shrink(shrb);
 			((IMachineDataBridge) inv).setCycles(time / 10f);
 		}
-		return this.output.copy();
+		return this.output.get().copy();
 	}
 
 	@Override
@@ -67,7 +82,7 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 
 	@Override
 	public ItemStack getResultItem() {
-		return output;
+		return output.get();
 	}
 
 	@Override
@@ -90,8 +105,13 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	
 	@Override
+	public boolean showInJEI() {
+		return !this.parta.get().isEmpty() && !this.partb.get().isEmpty() && !this.output.get().isEmpty();
+	}
+	
+	@Override
 	public List<?> getJEIComponents() {
-		return List.of(parta.get(), partb.get(), output);
+		return List.of(parta.get(), partb.get(), output.get());
 	}
 	
 	@Override
@@ -104,10 +124,10 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		@Override
 		public AlloyingCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				Lazy<Ingredient> ingredienta = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a")));
-				Lazy<Ingredient> ingredientb = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b")));
+				Lazy<CountIngredient> ingredienta = Lazy.of(() -> CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a")));
+				Lazy<CountIngredient> ingredientb = Lazy.of(() -> CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b")));
+				Lazy<ItemStack> output = Utils.getTaggedOutputFromJson(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
 				
-				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				int time = GsonHelper.getAsInt(json, "time");
 				
 				return new AlloyingCrafting(recipeId, ingredienta, ingredientb, output, time);
@@ -122,19 +142,19 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 
 		@Override
 		public AlloyingCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-			Ingredient inputa = Ingredient.fromNetwork(buffer);
-			Ingredient inputb = Ingredient.fromNetwork(buffer);
+			CountIngredient inputa = CountIngredient.fromNetwork(buffer);
+			CountIngredient inputb = CountIngredient.fromNetwork(buffer);
 			ItemStack output = buffer.readItem();
 			int time = buffer.readInt();
 			
-			return new AlloyingCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, time);
+			return new AlloyingCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), Lazy.of(() -> output), time);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, AlloyingCrafting recipe) {
 			recipe.parta.get().toNetwork(buffer);
 			recipe.partb.get().toNetwork(buffer);
-			buffer.writeItem(recipe.output);
+			buffer.writeItem(recipe.output.get());
 			buffer.writeInt(recipe.time);
 			
 		}

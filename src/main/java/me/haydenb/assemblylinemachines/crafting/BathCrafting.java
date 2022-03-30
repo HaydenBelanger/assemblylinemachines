@@ -25,7 +25,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -103,33 +102,24 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 					return true;
 				}
 			}
-		}else if(inv instanceof IMachineDataBridge && !((BlockEntity) inv).getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))){
+		}else if(inv instanceof IMachineDataBridge data){
 			if(type == BathOption.BASIN_ONLY) {
 				return false;
 			}
-			if(inputa.get().test(inv.getItem(1))) {
-				if(inputb.get().test(inv.getItem(2))) {
+			int sla = 1;
+			int slb = 2;
+			if(data.getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
+				sla = 0;
+				slb = 1;
+			}
+			if(inputa.get().test(inv.getItem(sla))) {
+				if(inputb.get().test(inv.getItem(slb))) {
 					return true;
 				}
 			}
 			
-			if(inputa.get().test(inv.getItem(2))) {
-				if(inputb.get().test(inv.getItem(1))) {
-					return true;
-				}
-			}
-		}else {
-			if(type == BathOption.BASIN_ONLY) {
-				return false;
-			}
-			if(inputa.get().test(inv.getItem(0))) {
-				if(inputb.get().test(inv.getItem(1))) {
-					return true;
-				}
-			}
-			
-			if(inputa.get().test(inv.getItem(1))) {
-				if(inputb.get().test(inv.getItem(0))) {
+			if(inputa.get().test(inv.getItem(slb))) {
+				if(inputb.get().test(inv.getItem(sla))) {
 					return true;
 				}
 			}
@@ -168,7 +158,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			}
 			
 			drain.apply(cons, FluidAction.EXECUTE);
-			if(((BlockEntity) inv).getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
+			if(data.getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
 				inv.getItem(0).shrink(1);
 				inv.getItem(1).shrink(1);
 				data.setCycles((float) stirs * ConfigHolder.getCommonConfig().kineticFluidMixerCycleMultiplier.get().floatValue());

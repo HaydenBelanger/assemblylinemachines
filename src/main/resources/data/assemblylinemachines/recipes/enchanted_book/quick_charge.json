@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:honeycomb"
+		"item": "minecraft:honeycomb",
+		"count": 2
 	},
-	"amount": 2,
 	"enchantment": "minecraft:quick_charge",
 	"cost": 150
 }

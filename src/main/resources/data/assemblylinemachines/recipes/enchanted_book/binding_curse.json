@@ -3,7 +3,6 @@
 	"input":{
 		"item": "minecraft:cobweb"
 	},
-	"amount": 1,
 	"enchantment": "minecraft:binding_curse",
 	"cost": 50
 }

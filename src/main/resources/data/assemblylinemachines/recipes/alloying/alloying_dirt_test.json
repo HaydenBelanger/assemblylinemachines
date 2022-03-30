@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:gems/diamond",
+		"count": 16
+	},
+	"part_b":{
+		"tag": "forge:gems/emerald",
+		"count": 8
+	},
+	"output":{
+		"tag": "minecraft:fuckiwucki",
+		"count": 2
+	},
+	"time": 50
+}

@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -12,6 +11,7 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder.ICatalystProvider;
+import me.haydenb.assemblylinemachines.registry.Utils.CountIngredient;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -48,7 +48,6 @@ public class RecipeCategoryBuilder {
 	private Function<Integer, RecipeIngredientRole> role = null;
 	private TriConsumer<Recipe<?>, Object, List<Component>> tooltip = null;
 	private Pair<Integer, Boolean> ftCapacity = Pair.of(1, false);
-	private BiFunction<Recipe<?>, Ingredient, List<ItemStack>> stackModifier = null;
 	
 	RecipeCategoryBuilder(IGuiHelper helper, String uid, String title) {
 		this.helper = helper;
@@ -83,11 +82,6 @@ public class RecipeCategoryBuilder {
 	
 	RecipeCategoryBuilder fluidTooltipOptions(int capacity, boolean showCapacity) {
 		this.ftCapacity = Pair.of(capacity, showCapacity);
-		return this;
-	}
-	
-	RecipeCategoryBuilder itemStackModifier(BiFunction<Recipe<?>, Ingredient, List<ItemStack>> stackModifier) {
-		this.stackModifier = stackModifier;
 		return this;
 	}
 	
@@ -156,18 +150,19 @@ public class RecipeCategoryBuilder {
 					int i = 0;
 					for(Object obj : recipe.getJEIComponents()) {
 						IRecipeSlotBuilder sb = builder.addSlot(role.apply(i), slots.get(i).getFirst(), slots.get(i).getSecond()).addTooltipCallback(cb).setFluidRenderer(ftCapacity.getFirst(), ftCapacity.getSecond(), 16, 16);
-						if(obj instanceof Ingredient ing) {
-							if(stackModifier != null) {
-								sb.addItemStacks(stackModifier.apply(recipe, ing));
-							}else {
-								sb.addIngredients(ing);
-							}
+						
+						if(obj instanceof CountIngredient cIng) {
+							sb.addItemStacks(cIng.getCountModifiedItemStacks());
+						}else if(obj instanceof Ingredient ing) {
+							sb.addIngredients(ing);
 						}else if(obj instanceof FluidStack fs) {
 							sb.addIngredient(VanillaTypes.FLUID, fs);
 						}else if(obj instanceof ItemStack is) {
 							sb.addItemStack(is);
 						}else if(obj instanceof List<?> isl) {
 							sb.addIngredientsUnsafe(isl);
+						}else {
+							throw new IllegalArgumentException("JEI received an invalid component \"" + obj.toString() + "\" of type " + obj.getClass().getName() + " for recipe " + recipe.getId().toString() + ".");
 						}
 						i++;
 					}
@@ -190,7 +185,17 @@ public class RecipeCategoryBuilder {
 	
 	public static interface IRecipeCategoryBuilder {
 		
+		/**
+		 * 
+		 * @return A list of components you wish to show in the JEI view for this recipe, in slot-order. Can be mixed-type, but all elements of the list must be one of:
+		 * <br>- Ingredient<br>- CountIngredient<br>- FluidStack<br>- ItemStack<br>- A List of any of the above
+		 * @throws IllegalArgumentException if the returned list contains any of the non-accepted types.
+		 */
 		public List<?> getJEIComponents();
+		
+		public default boolean showInJEI() {
+			return true;
+		}
 		
 		public static interface ICatalystProvider{
 			

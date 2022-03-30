@@ -9,7 +9,8 @@ import java.util.function.Supplier;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
@@ -23,9 +24,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.NotCondition;
-import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
@@ -127,12 +125,12 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			this.consumer = (consumer) ->{
 				String name = this.toString().toLowerCase();
 				
-				consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "block_ores/" + name), Ingredient.of(getNamed("forge", "ores/" + name)), getNamed("forge", "dusts/" + name), countFromOre, 10, 0f, machineRequired, bladeType));
-				if(hasRaw) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), Ingredient.of(getNamed("forge", "raw_materials/" + name)), getNamed("forge", "dusts/" + name), 1, 5, 0.25f, machineRequired, bladeType));
-				if(hasRawBlock) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), Ingredient.of(getNamed("forge", "storage_blocks/raw_" + name)), getNamed("forge", "dusts/" + name), 9, 10, 0.25f, machineRequired, bladeType));
-				if(input != null ) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "ingots/" + name), input.orElse(Ingredient.of(getNamed("forge", "ingots/" + this.toString().toLowerCase()))), 
+				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "block_ores/" + name), Ingredient.of(getNamed("forge", "ores/" + name)), getNamed("forge", "dusts/" + name), countFromOre, 10, 0f, machineRequired, bladeType));
+				if(hasRaw) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), Ingredient.of(getNamed("forge", "raw_materials/" + name)), getNamed("forge", "dusts/" + name), 1, 5, 0.25f, machineRequired, bladeType));
+				if(hasRawBlock) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), Ingredient.of(getNamed("forge", "storage_blocks/raw_" + name)), getNamed("forge", "dusts/" + name), 9, 10, 0.25f, machineRequired, bladeType));
+				if(input != null ) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "ingots/" + name), input.orElse(Ingredient.of(getNamed("forge", "ingots/" + this.toString().toLowerCase()))), 
 						getNamed("forge", "dusts/" + name), 1, 4, 0f, machineRequired, bladeType));
-				if(corruptOre) consumer.accept(new NativeGrinderResult(getRecipeLoc("grinder", "corrupt_block_ores/" + name), Ingredient.of(getNamed("forge", "ores/corrupt_" + name)), getNamed("forge", "dusts/" + name),
+				if(corruptOre) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "corrupt_block_ores/" + name), Ingredient.of(getNamed("forge", "ores/corrupt_" + name)), getNamed("forge", "dusts/" + name),
 						Math.round((float) countFromOre * 1.5f), 15, 0f, true, bladeType));
 				
 			};
@@ -416,37 +414,41 @@ public class AutoRecipeGenerator extends RecipeProvider {
 	
 	public static class GrinderResult implements FinishedRecipe{
 		private final ResourceLocation rl;
-		private final TagKey<Item> inputTag;
+		private final Ingredient input;
 		private final TagKey<Item> outputTag;
 		private final int outputCount;
 		private final int grinds;
 		private final float chanceToDouble;
+		private final boolean machineRequired;
+		private final Blade bladeType;
 		
 		public GrinderResult(ResourceLocation rl, TagKey<Item> inputTag, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble) {
+			this(rl, Ingredient.of(inputTag), outputTag, outputCount, grinds, chanceToDouble, false, Blade.TITANIUM);
+		}
+		
+		public GrinderResult(ResourceLocation rl, Ingredient input, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
 			this.rl = rl;
-			this.inputTag = inputTag;
+			this.input = input;
 			this.outputTag = outputTag;
 			this.outputCount = outputCount;
 			this.grinds = grinds;
 			this.chanceToDouble = chanceToDouble;
+			this.machineRequired = machineRequired;
+			this.bladeType = bladeType;
 		}
 		
 		@Override
 		public void serializeRecipeData(JsonObject json) {
-			json.add("input", Ingredient.of(inputTag).toJson());
+			json.add("input", input.toJson());
 			if(chanceToDouble != 0f) json.addProperty("chanceToDouble", chanceToDouble);
-			json.addProperty("bladetype", "TITANIUM");
+			json.addProperty("bladetype", bladeType.toString());
 			json.addProperty("grinds", grinds);
+			if(machineRequired) json.addProperty("machine_required", true);
 			
 			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("name", outputTag.location().toString());
+			outputJson.addProperty("tag", outputTag.location().toString());
 			if(outputCount != 1) outputJson.addProperty("count", outputCount);
-			json.add("output_tag", outputJson);
-			
-			JsonArray conditionArray = new JsonArray();
-			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(inputTag.location()))));
-			conditionArray.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(outputTag.location()))));
-			json.add("conditions", conditionArray);
+			json.add("output", outputJson);
 		}
 		
 		@Override
@@ -470,34 +472,4 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		}
 		
 	}
-	
-	public static class NativeGrinderResult extends GrinderResult{
-
-		private final Ingredient input;
-		private final boolean machineRequired;
-		private final Blade bladeType;
-		
-		public NativeGrinderResult(ResourceLocation rl, Ingredient input, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
-			super(rl, null, outputTag, outputCount, grinds, chanceToDouble);
-			this.input = input;
-			this.machineRequired = machineRequired;
-			this.bladeType = bladeType;
-		}
-		
-		@Override
-		public void serializeRecipeData(JsonObject json) {
-			json.add("input", input.toJson());
-			if(super.chanceToDouble != 0f) json.addProperty("chanceToDouble", super.chanceToDouble);
-			json.addProperty("bladetype", bladeType.toString());
-			json.addProperty("grinds", super.grinds);
-			if(machineRequired) json.addProperty("machine_required", true);
-			
-			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("tag", super.outputTag.location().toString());
-			if(super.outputCount != 1) outputJson.addProperty("count", super.outputCount);
-			json.add("output", outputJson);
-		}
-		
-	}
-	
 }

@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:magma_cream"
+		"item": "minecraft:magma_cream",
+		"count": 8
 	},
-	"amount": 8,
 	"enchantment": "minecraft:flame",
 	"cost": 200
 }

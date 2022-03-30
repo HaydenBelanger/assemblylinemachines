@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:popped_chorus_fruit"
+		"item": "minecraft:popped_chorus_fruit",
+		"count": 6
 	},
-	"amount": 6,
 	"enchantment": "minecraft:unbreaking",
 	"cost": 100
 }

@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:feather"
+		"item": "minecraft:feather",
+		"count": 3
 	},
-	"amount": 3,
 	"enchantment": "minecraft:feather_falling",
 	"cost": 125
 }

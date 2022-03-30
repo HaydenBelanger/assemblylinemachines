@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"tag": "forge:dusts/mystium"
+		"tag": "forge:dusts/mystium",
+		"count": 2
 	},
-	"amount": 2,
 	"enchantment": "minecraft:infinity",
 	"cost": 300
 }

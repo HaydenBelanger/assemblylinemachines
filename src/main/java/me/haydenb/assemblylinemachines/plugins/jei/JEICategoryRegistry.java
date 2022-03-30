@@ -15,6 +15,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
 import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.GeneratorFluidTypes;
+import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder.ICatalystProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
@@ -88,7 +89,7 @@ public class JEICategoryRegistry implements IModPlugin{
 		
 		CATEGORY_REGISTRY.put(MetalCrafting.METAL_RECIPE, new RecipeCategoryBuilder(guiHelper, "metal_shaping", "Metal Shaper Crafting")
 				.background("gui_set_a", 168, 119, 69, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_a", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
-				.slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(1, 5), Pair.of(48, 5)).catalysts(Registry.getBlock("metal_shaper")).build(MetalCrafting.class));
+				.slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(1, 5), Pair.of(48, 5)).catalysts(Registry.getBlock("metal_shaper"), Registry.getBlock("mkii_metal_shaper")).build(MetalCrafting.class));
 		
 		CATEGORY_REGISTRY.put(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, new RecipeCategoryBuilder(guiHelper, "world_corruption", "World Corruption")
 				.background("gui_set_a", 168, 119, 69, 26).icon(Registry.getBlock("corrupt_diamond_ore")).progressBar("gui_set_a", 218, 99, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
@@ -176,16 +177,7 @@ public class JEICategoryRegistry implements IModPlugin{
 		
 		CATEGORY_REGISTRY.put(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, new RecipeCategoryBuilder(guiHelper, "enchantment_book", "Enchantment Crafting")
 				.background("gui_set_a", 174, 209, 82, 47).icon(Registry.getBlock("experience_mill")).progressBar("gui_set_a", 228, 200, 28, 9, 120, StartDirection.LEFT, false, 23, 19)
-				.slots((i) -> i == 2 ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT, Pair.of(1, 1), Pair.of(1, 30), Pair.of(61, 16))
-				.itemStackModifier((t, u) -> {
-					List<ItemStack> items = Arrays.asList(u.getItems());
-					if(t instanceof EnchantmentBookCrafting recipe && items.size() > 0) {
-						for(ItemStack item : items) {
-							item.setCount(recipe.amount);
-						}
-					}
-					return items;
-				}).catalysts(Registry.getBlock("experience_mill")).build(EnchantmentBookCrafting.class));
+				.slots((i) -> i == 2 ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT, Pair.of(1, 1), Pair.of(1, 30), Pair.of(61, 16)).catalysts(Registry.getBlock("experience_mill")).build(EnchantmentBookCrafting.class));
 		
 		CATEGORY_REGISTRY.put(RefiningCrafting.REFINING_RECIPE, new RecipeCategoryBuilder(guiHelper, "refining", "Refinery Crafting")
 				.background("gui_set_a", 112, 26, 82, 41).icon(Registry.getBlock("refinery"))
@@ -245,7 +237,17 @@ public class JEICategoryRegistry implements IModPlugin{
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void registerRecipes(IRecipeRegistration registration) {
-		ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = getRecipes();
+		ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = ArrayListMultimap.create();
+		Minecraft minecraft = Minecraft.getInstance();
+		minecraft.level.getRecipeManager().getRecipes().forEach((recipe) -> {
+			if(CATEGORY_REGISTRY.containsKey(recipe.getType())) {
+				if(recipe instanceof IRecipeCategoryBuilder cb) {
+					if(!cb.showInJEI()) return;
+				}
+				allRecipes.put(recipe.getType(), recipe);
+			}
+		});
+		
 		for(RecipeType<?> type : CATEGORY_REGISTRY.keySet()) registration.addRecipes(allRecipes.get(type), CATEGORY_REGISTRY.get(type).getUid());
 	}
 	
@@ -255,16 +257,6 @@ public class JEICategoryRegistry implements IModPlugin{
 		CATEGORY_REGISTRY.values().stream().filter((c) -> (c instanceof ICatalystProvider)).forEach((c) -> ((ICatalystProvider) c).getCatalysts().forEach((i) -> registration.addRecipeCatalyst(i, c.getUid())));
 		
 		registration.addRecipeCatalyst(Registry.getBlock("electric_furnace").asItem().getDefaultInstance(), VanillaRecipeCategoryUid.FURNACE);
-	}
-	
-	private static ListMultimap<RecipeType<?>, Recipe<?>> getRecipes(){
-		
-		ListMultimap<RecipeType<?>, Recipe<?>> allRecipes = ArrayListMultimap.create();
-		Minecraft minecraft = Minecraft.getInstance();
-		minecraft.level.getRecipeManager().getRecipes().forEach((recipe) -> {
-			if(CATEGORY_REGISTRY.containsKey(recipe.getType())) allRecipes.put(recipe.getType(), recipe);
-		});
-		
-		return allRecipes;
+		registration.addRecipeCatalyst(Registry.getBlock("mkii_furnace").asItem().getDefaultInstance(), VanillaRecipeCategoryUid.FURNACE);
 	}
 }

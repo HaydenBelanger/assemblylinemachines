@@ -7,7 +7,7 @@ Pages describing recipes or tags refer to different data types, depending on the
 | Type Name | Description | JSON Example &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
 | -----------: | ----------- | ----------- |
 | Integer | Any whole number. May be listed with a range to indicate valid numbers. | `"amount": 250` |
-| Decimal | Any number including decimals. May be listed with a range to indicate valid numbers. | `"chance": 0.75` |
+| Decimal | Any number including decimals. May be listed with a range to indicate valid numbers, for example "Chance between 0 and 1" or "Chance greater than 0". | `"chance": 0.75` |
 | Boolean | A value of `true` or `false`. | `"enabled": true` |
 | String | Any text value. Description of field may include valid values. | `"text": "ABC"` |
 | Namespace | A string that is specifically a Minecraft `ResourceLocation`. Would be the same as when using `/give` or `/setblock`. Typically is used for providing a block or fluid NOT in the context of an input or output. | `"fluid":"minecraft:lava"` |
@@ -20,22 +20,35 @@ The Ingredient type is used primarily for inputs on recipes. It allows the setti
     Tags are the preferred method, as other mods or datapacks would be able to dynamically add equivalent items to your recipe without any additional effort/recipes!
 
 ``` json
-"input_as_tag":{
-	"tag": "forge:dusts/coal"
-},
-
-"input_as_exact_item":{
+"input":{
 	"item": "assemblylinemachines:ground_coal"
+},
+"input":{
+	"tag": "forge:dusts/coal"
+}
+```
+
+## Ingredient With Count
+
+??? error "1.18.2+ Feature"
+	This Data Type was made available in 1.18.2-1.4. Prior versions did not have this option and only supported regular Ingredients. Any field that specifies a Count Ingredient requires a traditional Ingredient in versions prior to 1.18.2-1.4.
+
+The Count Ingredient is a special type which allows the addition of the specification of a `count` for an input, to change the amount consumed when a recipe is executed. Just like a traditional Ingredient, it supports tags and items. In any place you see a Count Ingredient, a traditional Ingredient will also work in its place by excluding the additional field.
+
+``` json
+"input":{
+	"item": "minecraft:lapis_lazuli",
+	"count": 15
+},
+"input":{
+	"tag": "forge:gems/lapis",
+	"count": 15
 }
 ```
 
 ## ItemStack
 
-The ItemStack type is used primarily for outputs from recipes, and can always contain a count.
-
-### Traditional ItemStack
-
-The Traditional ItemStack uses an exact item for the specified output.
+The ItemStack is used as an output for most recipe types, and can always have a specific count specified. An ItemStack always uses a specific item, and cannot use a tag.
 
 ``` json
 "output":{
@@ -44,12 +57,12 @@ The Traditional ItemStack uses an exact item for the specified output.
 }
 ```
 
-### Tag ItemStack
+## ItemStack With Tag
 
 ??? error "1.18.2+ Feature"
-	This Data Type was made available in 1.18.2-1.4. Prior versions did not have this option and only supported regular ItemStacks.
+	This Data Type was made available in 1.18.2-1.4. Prior versions did not have this option and only supported regular ItemStacks. Any field that specifies a Tag ItemStack requires a traditional ItemStack in versions prior to 1.18.2-1.4.
 
-The Tag ItemStack is a hybrid of an *Ingredient* and an *ItemStack* used and referenced in certain recipe types which support it. It allows you to specify a tag to pull from for a recipe result as opposed to a static single-item result that one would normally expect with an ItemStack. If the tag has multiple like-type results, set `preferredModid` in `assemblylinemachines-common.toml`. For more information, see comments in the configuration file.
+The Tag ItemStack is a special type which allows specification of a tag to pull an item from instead of a static item for a recipe result. In a case where a tag has multiple items from different mods, you can specify a preferred Mod ID. For more information, see the configuration file. In any place you see a Tag ItemStack, a traditional ItemStack will also work in its place.
 
 ``` json
 "output":{

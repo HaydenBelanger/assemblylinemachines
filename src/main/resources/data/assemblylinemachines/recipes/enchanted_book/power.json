@@ -3,7 +3,6 @@
 	"input":{
 		"tag": "forge:dusts/titanium"
 	},
-	"amount": 1,
 	"enchantment": "minecraft:power",
 	"cost": 125
 }

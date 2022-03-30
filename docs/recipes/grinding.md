@@ -27,8 +27,8 @@ Recipe namespace: `assemblylinemachines:grinder`
 *If this is set to true, the recipe will not work in the Manual Grinder, and will only work in the Simple or Electric Grinder.*  
 - `chanceToDouble`: Decimal between 0 and 1, **1.18-1.3.3+ only,** *optional*  
 *If set, this will be the percentage likelihood that the output is doubled when the operation is completed. If unset, the chance is 0%.*
-- `output`: ItemStack, *optional*  
-*The resulting output from the recipe. As of 1.18.2-1.4, this may be a [Tag ItemStack.](../miscdev/datatypes.md#tag-itemstack)*
+- `output`: ItemStack With Tag, *optional*  
+*The resulting output from the recipe.*
 
 ## Examples
 

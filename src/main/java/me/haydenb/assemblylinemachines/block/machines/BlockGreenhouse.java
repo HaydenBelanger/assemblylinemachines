@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.SlotWithRestrictions;
@@ -59,7 +58,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
@@ -431,7 +429,6 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 	public static class ScreenGreenhouse extends ScreenALMEnergyBased<ContainerGreenhouse>{
 		
 		private HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();

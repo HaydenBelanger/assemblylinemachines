@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"tag": "assemblylinemachines:precious_gears"
+		"tag": "assemblylinemachines:precious_gears",
+		"count": 2
 	},
-	"amount": 2,
 	"enchantment": "assemblylinemachines:engineers_fury",
 	"cost": 100
 }

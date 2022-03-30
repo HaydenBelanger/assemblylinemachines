@@ -6,11 +6,11 @@ The Alloying recipe are for recipes you want to be performed in the Alloy Smelte
 
 Recipe namespace: `assemblylinemachines:alloying`.
 
-- `part_a`: Ingredient, required  
+- `part_a`: Ingredient With Count, required  
 *The first item in the recipe.*
-- `part_b`: Ingredient, required  
+- `part_b`: Ingredient With Count, required  
 *The second item in the recipe.*
-- `output`: ItemStack, required  
+- `output`: ItemStack With Tag, required  
 *The result stack for the recipe.*
 - `time`: Positive Integer, required  
 *The time required to complete the operation. Every 12.5 in this value is equal to 1 second.  

@@ -3,7 +3,6 @@
 	"input":{
 		"item": "minecraft:pufferfish"
 	},
-	"amount": 1,
 	"enchantment": "minecraft:depth_strider",
 	"cost": 125
 }

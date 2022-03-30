@@ -134,6 +134,9 @@ dependencies {
     implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.2-66-SNAPSHOT")
     implementation fg.deobf("curse.maven:theoneprobe-245211:3671753")
     
+    //Runtime - for testing purposes to make sure certain mechanics work.
+    runtimeOnly fg.deobf("curse.maven:ato-405593:3711468")
+    
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

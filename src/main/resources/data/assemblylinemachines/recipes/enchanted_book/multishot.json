@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"item": "minecraft:golden_carrot"
+		"item": "minecraft:golden_carrot",
+		"count": 2
 	},
-	"amount": 2,
 	"enchantment": "minecraft:multishot",
 	"cost": 100
 }

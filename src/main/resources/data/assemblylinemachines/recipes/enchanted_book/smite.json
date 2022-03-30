@@ -3,7 +3,6 @@
 	"input":{
 		"item": "minecraft:zombie_head"
 	},
-	"amount": 1,
 	"enchantment": "minecraft:smite",
 	"cost": 75
 }

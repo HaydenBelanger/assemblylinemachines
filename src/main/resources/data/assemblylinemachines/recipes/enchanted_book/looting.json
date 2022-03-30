@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"tag": "forge:gems/lapis"
+		"tag": "forge:gems/lapis",
+		"count": 15
 	},
-	"amount": 15,
 	"enchantment": "minecraft:looting",
 	"cost": 125
 }

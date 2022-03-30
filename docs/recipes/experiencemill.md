@@ -6,10 +6,8 @@ The Experience Mill recipes are available for Book Mode enchanting while inside 
 
 Recipe namespace: `assemblylinemachines:enchantment_book`
 
-- `input`: Ingredient, required  
+- `input`: Ingredient With Count, required  
 *The item to be combined with the book to produce an enchantment.*
-- `amount`: Positive Integer, required  
-*The count of the `input` required for every 1 level of the enchantment.*
 - `enchantment`: Namespace, required  
 *The enchantment that will be applied to the Book.*
 
@@ -20,7 +18,6 @@ Recipe namespace: `assemblylinemachines:enchantment_book`
     Running the recipe with **2 upgrades** will result in an enchantment two-thirds of the maximum level available for that enchantment, rounded up to the next nearest level.  
     Running the recipe with **3 upgrades** will result in the maximum level enchantment available.
 
-
 - `cost`: Positive Integer, required  
 *The base 'cost' to apply the enchantment to the Book.*
 
@@ -28,6 +25,9 @@ Recipe namespace: `assemblylinemachines:enchantment_book`
     The `cost` is used both to determine the length of the recipe as well as the required Liquid Experience to perform the recipe. 1 `cost` is equivalent to 0.5 seconds and 1 mB of Liquid Experience.  
     The actual result to the processing time and mB usage, in practice, is increased exponentially depending on a number of factors. If Speed Upgrades are present, the processing time is decreased by 25% and the mB usage is increased by 10% for each upgrade.  
     Finally, the processing time and mB usage is multiplied by the level of the enchantment being produced (See Enchantment Level Calculations above) to get the final resulting true cost to the player.
+
+- `amount`: Positive Integer, *removed in 1.18.2-1.4*  
+*The count of the `input` required for every 1 level of the enchantment. To specify count in newer versions, use an Ingredient With Count.*
 
 ## Example
 
@@ -39,7 +39,6 @@ Below is an example of an Experience Mill recipe. The Experience Mill will use 1
 	"input":{
 		"item": "minecraft:emerald"
 	},
-	"amount": 1,
 	"enchantment": "minecraft:fortune",
 	"cost": 125
 }

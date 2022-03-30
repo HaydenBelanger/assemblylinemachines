@@ -27,8 +27,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -127,33 +126,46 @@ public class Utils {
 		};
 	}
 	
-	private static final Cache<String, Item> CACHED_SORTED_TAGS = CacheBuilder.newBuilder().build();
+	private static final Cache<String, Optional<Item>> CACHED_SORTED_TAGS = CacheBuilder.newBuilder().build();
 	
-	/**
-	 * Supplier comes pre-memoized.
-	 */
 	@SuppressWarnings("deprecation")
 	public static Lazy<ItemStack> getPreferredOrAlphabeticTagItemStack(TagKey<Item> tag, int count){
 		return Lazy.of(() -> {
 			try {
-				Item preferredResult = CACHED_SORTED_TAGS.get(tag.location().toString(), () ->{
+				Optional<Item> preferredResult = CACHED_SORTED_TAGS.get(tag.location().toString(), () ->{
 					List<Item> values = new ArrayList<>();
 					net.minecraft.core.Registry.ITEM.getTagOrEmpty(tag).forEach((holder) -> values.add(holder.value()));
 					String preferredModid = ConfigHolder.getCommonConfig().preferredModid.get();
 					if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
 						Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
-						if(optionalItem.isPresent()) return optionalItem.get();
+						if(optionalItem.isPresent()) return optionalItem;
 					}
 					
 					Collections.sort(values, (a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString()));
-					return values.get(0);
+					
+					if(values.isEmpty()) return Optional.empty();
+					return Optional.of(values.get(0));
 				});
 				
-				return new ItemStack(preferredResult, count);
+				if(preferredResult.isEmpty()) return ItemStack.EMPTY;
+				return new ItemStack(preferredResult.get(), count);
 			}catch(ExecutionException e) {
 				e.printStackTrace();
 				return null;
 			}
+		});
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static Lazy<Ingredient> getValidatedIngredient(JsonObject json){
+		return Lazy.of(() -> {
+				if(GsonHelper.isValidNode(json, "tag")) {
+					TagKey<Item> tag = Utils.getTagKey(Keys.ITEMS, new ResourceLocation(GsonHelper.getAsString(json, "tag")));
+					List<Holder<Item>> values = new ArrayList<>();
+					net.minecraft.core.Registry.ITEM.getTagOrEmpty(tag).forEach(values::add);
+					if(values.isEmpty()) return Ingredient.EMPTY;
+				}
+				return Ingredient.fromJson(json);
 		});
 	}
 	
@@ -494,6 +506,59 @@ public class Utils {
 				return true;
 			}
 			return false;
+		}
+	}
+	
+	public static class CountIngredient {
+		
+		private final int count;
+		private final Ingredient ingredient;
+		
+		public CountIngredient(Ingredient ingredient, int count) {
+			this.count = count;
+			this.ingredient = ingredient;
+		}
+		
+		public boolean test(ItemStack stack) {
+			return test(stack, false);
+		}
+		
+		public boolean test(ItemStack stack, boolean ignoreCount) {
+			if(!ingredient.test(stack)) return false;
+			return ignoreCount || stack.getCount() >= count;
+		}
+		
+		public void toNetwork(FriendlyByteBuf buffer) {
+			ingredient.toNetwork(buffer);
+			buffer.writeInt(count);
+		}
+		
+		public int getCount() {
+			return count;
+		}
+		
+		public boolean isEmpty() {
+			return ingredient.isEmpty();
+		}
+		
+		public List<ItemStack> getCountModifiedItemStacks(){
+			return Arrays.asList(ingredient.getItems()).stream().map((is) -> {
+				ItemStack cs = is.copy();
+				cs.setCount(count);
+				return cs;
+			}).toList();
+		}
+		
+		public static CountIngredient fromNetwork(FriendlyByteBuf buffer) {
+			Ingredient ingredient = Ingredient.fromNetwork(buffer);
+			int count = buffer.readInt();
+			return new CountIngredient(ingredient, count);
+		}
+		
+		public static CountIngredient fromJson(JsonObject json) {
+			Ingredient ingredient = Ingredient.fromJson(json);
+			int count = GsonHelper.isValidNode(json, "count") ? GsonHelper.getAsInt(json, "count") : 1;
+			return new CountIngredient(ingredient, count);
 		}
 	}
 	

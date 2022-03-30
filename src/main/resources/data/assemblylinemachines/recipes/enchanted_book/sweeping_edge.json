@@ -1,9 +1,9 @@
 {
 	"type": "assemblylinemachines:enchantment_book",
 	"input":{
-		"tag": "forge:dusts/lapis"
+		"tag": "forge:dusts/lapis",
+		"count": 2
 	},
-	"amount": 2,
 	"enchantment": "minecraft:sweeping",
 	"cost": 100
 }

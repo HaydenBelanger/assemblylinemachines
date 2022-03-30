@@ -249,7 +249,7 @@ public class BlockMachines {
 	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="kinetic_grinder")
 	public static BlockEntityType<?> kineticGrinderBlockEntity(){
 		return MachineBuilder.blockEntity().crankMachine(1).baseProcessingStats(0, 16).recipeProcessor(Utils.recipeFunction(GrinderCrafting.GRINDER_RECIPE))
-				.slotInfo(2, 0).outputToRight().allowedInZero().slotExtractableFunction((i) -> false).slotContentsValidator((i, is, be) -> Blade.getBladeFromItem(is.getItem()) != null).build("kinetic_grinder");
+				.slotInfo(2, 0).outputToRight().allowedInZero().slotExtractableFunction((i) -> false).slotContentsValidator((i, is, be) -> i == 0 ? Blade.getBladeFromItem(is.getItem()) != null : true).build("kinetic_grinder");
 	}
 	
 	@OnlyIn(Dist.CLIENT)

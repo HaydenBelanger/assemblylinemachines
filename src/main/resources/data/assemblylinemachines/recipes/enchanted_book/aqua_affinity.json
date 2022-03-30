@@ -3,7 +3,6 @@
 	"input":{
 		"item": "minecraft:nautilus_shell"
 	},
-	"amount": 1,
 	"enchantment": "minecraft:aqua_affinity",
 	"cost": 125
 }
