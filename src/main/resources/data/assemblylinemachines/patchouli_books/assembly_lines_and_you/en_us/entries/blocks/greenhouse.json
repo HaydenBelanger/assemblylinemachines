@@ -1,0 +1,11 @@
+{
+	"name": "The Greenhouse",
+	"category": "assemblylinemachines:blocks",
+	"icon": "assemblylinemachines:greenhouse",
+	"pages":[
+		{
+			"type": "text",
+			"text": "This section is all about The Greenhouse and its upgrades, a block which will allow you to grow crops within a contained ecosystem."
+		}
+	]
+}

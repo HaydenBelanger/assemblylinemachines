@@ -1,0 +1,83 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_coral_stem",
+		"1": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_coral_sides",
+		"2": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_coral_top",
+		"particle": "assemblylinemachines:block/greenhouse/sprouts/greenhouse_coral_stem"
+	},
+	"elements": [
+		{
+			"name": "stem",
+			"from": [7, 9, 7],
+			"to": [9, 14, 9],
+			"faces": {
+				"north": {"uv": [6, 6, 10, 16], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [6, 6, 10, 16], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [10, 16, 6, 6], "rotation": 180, "texture": "#0", "tintindex": 0},
+				"west": {"uv": [6, 6, 10, 16], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [6, 6, 10, 10], "texture": "#2", "tintindex": 0}
+			}
+		},
+		{
+			"name": "branch1",
+			"from": [5, 10, 7],
+			"to": [7, 11, 8],
+			"rotation": {"angle": 0, "axis": "z", "origin": [7, 10, 7]},
+			"faces": {
+				"north": {"uv": [10, 9, 14, 11], "texture": "#1", "tintindex": 0},
+				"south": {"uv": [10, 9, 14, 11], "texture": "#1", "tintindex": 0},
+				"west": {"uv": [14, 9, 16, 11], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [10, 9, 14, 11], "rotation": 180, "texture": "#1", "tintindex": 0},
+				"down": {"uv": [10, 9, 14, 11], "texture": "#1", "tintindex": 0}
+			}
+		},
+		{
+			"name": "branch2",
+			"from": [9, 11.5, 8],
+			"to": [11, 12.5, 9],
+			"rotation": {"angle": 0, "axis": "z", "origin": [7, 10, 7]},
+			"faces": {
+				"north": {"uv": [2, 8, 6, 10], "texture": "#1", "tintindex": 0},
+				"east": {"uv": [0, 8, 2, 10], "texture": "#1", "tintindex": 0},
+				"south": {"uv": [2, 8, 6, 10], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [2, 8, 6, 10], "texture": "#1", "tintindex": 0},
+				"down": {"uv": [2, 8, 6, 10], "texture": "#1", "tintindex": 0}
+			}
+		},
+		{
+			"name": "branch3",
+			"from": [10, 12.5, 8],
+			"to": [11, 14.5, 9],
+			"rotation": {"angle": 0, "axis": "z", "origin": [5, 12, 7]},
+			"faces": {
+				"north": {"uv": [2, 8, 6, 10], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"east": {"uv": [2, 8, 6, 10], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"south": {"uv": [2, 8, 6, 10], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"west": {"uv": [2, 8, 6, 10], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"up": {"uv": [6, 6, 10, 10], "texture": "#2", "tintindex": 0}
+			}
+		},
+		{
+			"name": "branch4",
+			"from": [5, 11, 7],
+			"to": [6, 14, 8],
+			"rotation": {"angle": 0, "axis": "z", "origin": [5, 12, 7]},
+			"faces": {
+				"north": {"uv": [10, 9, 16, 11], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"east": {"uv": [10, 9, 16, 11], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"south": {"uv": [10, 9, 16, 11], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"west": {"uv": [10, 9, 16, 11], "rotation": 90, "texture": "#1", "tintindex": 0},
+				"up": {"uv": [6, 6, 10, 10], "texture": "#2", "tintindex": 0}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4]
+		}
+	]
+}

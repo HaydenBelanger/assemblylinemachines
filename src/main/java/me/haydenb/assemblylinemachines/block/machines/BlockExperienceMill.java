@@ -13,11 +13,11 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBa
 import me.haydenb.assemblylinemachines.crafting.EnchantmentBookCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -71,7 +71,7 @@ public class BlockExperienceMill {
 		//3 - Anvil
 		private int timer = 0;
 		public FluidStack tank = FluidStack.EMPTY;
-		private IFluidHandler handler = Utils.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Registry.getFluid("liquid_experience")), 6000, (oFs) -> {
+		private IFluidHandler handler = IFluidHandlerBypass.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Registry.getFluid("liquid_experience")), 6000, (oFs) -> {
 			if(oFs.isPresent()) tank = oFs.get();
 			return tank;
 		}, (v) -> this.sendUpdates(), false);
@@ -431,9 +431,9 @@ public class BlockExperienceMill {
 					str.add(tsfm.tank.getDisplayName().getString());
 					if (Screen.hasShiftDown()) {
 
-						str.add(Formatting.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
+						str.add(FormattingHelper.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					} else {
-						str.add(Formatting.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000D) + " B");
 					}
 					this.renderComponentTooltip(str, mouseX - x, mouseY - y);
 				} else {

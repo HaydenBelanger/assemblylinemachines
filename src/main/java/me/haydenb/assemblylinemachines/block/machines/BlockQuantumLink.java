@@ -12,10 +12,11 @@ import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.*;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkHandler.QuantumLinkNetwork;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkStatus;
@@ -69,7 +70,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 		String status = "";
 		int statusTimer = 0;
 
-		IFluidHandler handler = Utils.getSimpleOneTankHandler(null, 4000, (oFs) -> {
+		IFluidHandler handler = IFluidHandlerBypass.getSimpleOneTankHandler(null, 4000, (oFs) -> {
 				if(oFs.isPresent()) tank = oFs.get();
 				return tank;
 		}, (v) -> this.sendUpdates(), true);
@@ -449,7 +450,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 
 			if(!tsfm.status.isEmpty()) {
 				float wsc = 35f / (float) this.font.width(tsfm.status);
-				MathHelper.renderScaledText(font, x + 136, y + 35, wsc, tsfm.status, false, 0xffffff);
+				ScreenMath.renderScaledText(font, x + 136, y + 35, wsc, tsfm.status, false, 0xffffff);
 			}
 
 
@@ -482,11 +483,11 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 
 				if(Screen.hasShiftDown()) {
 					ArrayList<String> str = new ArrayList<>();
-					str.add(Formatting.GENERAL_FORMAT.format(tsfm.amount) + "/" + Formatting.GENERAL_FORMAT.format(tsfm.properties.getCapacity()) + "FE");
+					str.add(FormattingHelper.GENERAL_FORMAT.format(tsfm.amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(tsfm.properties.getCapacity()) + "FE");
 					this.renderComponentTooltip(str,
 							mouseX - x, mouseY - y);
 				}else {
-					this.renderComponentTooltip(Formatting.formatToSuffix(tsfm.amount) + "/" + Formatting.formatToSuffix(tsfm.properties.getCapacity()) + "FE",
+					this.renderComponentTooltip(FormattingHelper.formatToSuffix(tsfm.amount) + "/" + FormattingHelper.formatToSuffix(tsfm.properties.getCapacity()) + "FE",
 							mouseX - x, mouseY - y);
 				}
 
@@ -531,10 +532,10 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 					str.add(fs.getDisplayName().getString());
 					if (Screen.hasShiftDown()) {
 
-						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
+						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
 					} else {
-						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
 					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);
@@ -547,7 +548,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 
 		public static void pressButton(int button, BlockPos pos) {
 			PacketData pd = new PacketData("quantum_link_gui");
-			pd.writeUtf("type", "io");
+			pd.writeString("type", "io");
 			pd.writeBlockPos("location", pos);
 			pd.writeInteger("button", button);
 
@@ -556,7 +557,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 
 		public static void pressConnectButton(int channel, Integer password, BlockPos pos) {
 			PacketData pd = new PacketData("quantum_link_gui");
-			pd.writeUtf("type", "enable");
+			pd.writeString("type", "enable");
 			pd.writeBlockPos("location", pos);
 			pd.writeInteger("channel", channel);
 			if(password != null) {

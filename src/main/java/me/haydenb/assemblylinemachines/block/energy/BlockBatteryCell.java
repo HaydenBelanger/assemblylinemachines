@@ -14,9 +14,8 @@ import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -128,7 +127,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		if(stack.hasTag()) {
 			CompoundTag nbt = stack.getTag();
 			if(nbt.contains("assemblylinemachines:stored")) {
-				tooltip.add(1, new TextComponent("This Cell has " + Formatting.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
+				tooltip.add(1, new TextComponent("This Cell has " + FormattingHelper.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
 			}
 		}
 		super.appendHoverText(stack, level, tooltip, flag);
@@ -384,20 +383,20 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
-			this.drawCenteredString(this.font, Formatting.GENERAL_FORMAT.format(tsfm.fept), x + 122, y + 38, 0xffffff);
+			this.drawCenteredString(this.font, FormattingHelper.GENERAL_FORMAT.format(tsfm.fept), x + 122, y + 38, 0xffffff);
 		}
 
 		public static void sendCellUpdatePacket(BlockPos pos, String button) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
-			pd.writeUtf("button", button);
+			pd.writeString("button", button);
 			PacketHandler.INSTANCE.sendToServer(pd);
 		}
 		
 		public static void sendCellUpdatePacket(BlockPos pos, String button, Boolean shifting, Boolean ctrling) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);
-			pd.writeUtf("button", button);
+			pd.writeString("button", button);
 			pd.writeBoolean("shifting", shifting);
 			pd.writeBoolean("ctrling", ctrling);
 			PacketHandler.INSTANCE.sendToServer(pd);

@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.world;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.client.model.ZombieModel;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -19,14 +18,8 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ObjectHolder;
 
-@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class EntityCorruptShell extends Zombie{
 
 	@ObjectHolder("assemblylinemachines:corrupt_shell")
@@ -75,24 +68,6 @@ public class EntityCorruptShell extends Zombie{
 			entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 140));
 		}
 	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@SubscribeEvent
-	public static void playSound(PlaySoundAtEntityEvent event) {
-		
-		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
-			String regLoc = event.getSound().getRegistryName().getPath();
-			if(regLoc.equals("corrupt_shell_ambient")) {
-				event.setSound(Registry.getSound("corrupt_shell_cool_ambient"));
-			}else if(regLoc.equals("corrupt_shell_hurt")) {
-				event.setSound(Registry.getSound("corrupt_shell_cool_hurt"));
-			}else if(regLoc.equals("corrupt_shell_death")) {
-				event.setSound(Registry.getSound("corrupt_shell_cool_death"));
-			}else if(regLoc.equals("corrupt_shell_step")) {
-				event.setSound(Registry.getSound("corrupt_shell_cool_step"));
-			}
-		}
-	}
 
 	public static class EntityCorruptShellRender extends LivingEntityRenderer<EntityCorruptShell, EntityCorruptShellModel>{
 
@@ -103,12 +78,7 @@ public class EntityCorruptShell extends Zombie{
 
 		@Override
 		public ResourceLocation getTextureLocation(EntityCorruptShell entity) {
-			if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
-				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/shadow.png");
-			}else {
-				return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/corrupt_shell.png");
-			}
-			
+			return new ResourceLocation(AssemblyLineMachines.MODID, "textures/entity/corrupt_shell.png");
 		}
 
 		@Override

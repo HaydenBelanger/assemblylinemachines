@@ -1,0 +1,32 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"bso",
+		"sjs",
+		"asp"
+	],
+	"key":{
+		"b":{
+			"item": "minecraft:blue_orchid"
+		},
+		"o":{
+			"item": "minecraft:allium"
+		},
+		"j":{
+			"item": "minecraft:wither_rose"
+		},
+		"a":{
+			"item": "minecraft:lily_of_the_valley"
+		},
+		"p":{
+			"item": "minecraft:oxeye_daisy"
+		},
+		"s":{
+			"tag": "forge:plates/pure_steel"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:greenhouse_upgrade_florists_specialization"
+	}
+}

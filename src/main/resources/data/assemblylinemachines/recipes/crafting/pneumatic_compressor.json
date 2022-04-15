@@ -1,0 +1,31 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"bsb",
+		"pvp",
+		"imi"
+	],
+	"key":{
+		"s":{
+			"tag": "forge:plates/pure_steel"
+		},
+		"m":{
+			"item": "assemblylinemachines:crank_shaft"
+		},
+		"v":{
+			"item": "assemblylinemachines:conduction_component"
+		},
+		"i":{
+			"tag": "forge:ingots/iron"
+		},
+		"b":{
+			"tag": "forge:rods/steel"
+		},
+		"p":{
+			"item": "assemblylinemachines:basic_pneumatic_device"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:pneumatic_compressor"
+	}
+}

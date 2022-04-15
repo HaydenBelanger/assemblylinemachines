@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "forge:storage_blocks/steel"
+	},
+	"output":{
+		"item": "assemblylinemachines:steel_rod",
+		"count": 9
+	},
+	"grinds": 32,
+	"bladetype": "PUREGOLD",
+	"machine_required": true
+}

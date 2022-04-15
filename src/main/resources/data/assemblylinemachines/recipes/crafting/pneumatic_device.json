@@ -7,13 +7,13 @@
 	],
 	"key":{
 		"s":{
-			"tag": "forge:rods/steel"
+			"tag": "forge:rods/copper"
 		},
 		"c":{
 			"tag": "forge:plates/chromium"
 		},
 		"p":{
-			"item": "minecraft:sticky_piston"
+			"item": "assemblylinemachines:basic_pneumatic_device"
 		}
 		
 	},

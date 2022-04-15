@@ -1,0 +1,11 @@
+{
+  "type": "assemblylinemachines:pneumatic",
+  "input": {
+    "item": "minecraft:dead_tube_coral_fan",
+    "count": 8
+  },
+  "output": {
+    "item": "minecraft:dead_tube_coral_block"
+  },
+  "time": 9
+}

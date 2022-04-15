@@ -6,8 +6,9 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.item.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class FluidCondensedVoid extends ALMFluid {
 
@@ -32,7 +34,7 @@ public class FluidCondensedVoid extends ALMFluid {
 	protected int getDropOff(LevelReader worldIn) {
 		return 2;
 	}
-	
+
 	@Override	
 	protected void randomTick(Level world, BlockPos pos, FluidState state, Random randomom) {
 		/*if(!world.dimension().location().equals(DimensionChaosPlane.CHAOS_PLANE_LOCATION.location())) {*/
@@ -42,7 +44,10 @@ public class FluidCondensedVoid extends ALMFluid {
 				if(randomom.nextInt(2) == 0) {
 					Block block = world.getBlockState(cor).getBlock();
 					if(world.getBlockState(cor).getDestroySpeed(world, cor) != -1f) {
-						if(Utils.isInAnyTag(world.getBlockState(cor), "leaves", "logs", "flowers", "planks", "wool")
+						BlockState bst = world.getBlockState(cor);
+						if(bst.is(TagKey.create(Keys.BLOCKS, new ResourceLocation("minecraft", "leaves"))) || bst.is(TagKey.create(Keys.BLOCKS, new ResourceLocation("minecraft", "logs")))
+								|| bst.is(TagKey.create(Keys.BLOCKS, new ResourceLocation("minecraft", "flowers"))) || bst.is(TagKey.create(Keys.BLOCKS, new ResourceLocation("minecraft", "planks")))
+								|| bst.is(TagKey.create(Keys.BLOCKS, new ResourceLocation("minecraft", "wool")))
 								|| block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.DEAD_BUSH || block == Blocks.FERN || block == Blocks.COARSE_DIRT
 								|| block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.MYCELIUM || block == Blocks.DIRT_PATH) {
 							world.destroyBlock(cor, false);

@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" xx",
+		" b ",
+		"x  "
+	],
+	"key":{
+		"x":{
+			"tag": "forge:rods/steel"
+		},
+		"b":{
+			"item": "assemblylinemachines:basic_battery"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:wrench_o_matic"
+	}
+}

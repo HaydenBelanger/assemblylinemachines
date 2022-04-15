@@ -6,8 +6,10 @@ import java.util.stream.Stream;
 import com.mojang.math.Vector3f;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,6 +34,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -149,7 +152,15 @@ public class BlockExperienceHopper extends BlockTileEntity {
 					timer = 0;
 					
 					if(output == null) {
-						output = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) output = null;}, getBlockState().getValue(BlockStateProperties.FACING_HOPPER), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						Direction dir = this.getBlockState().getValue(BlockStateProperties.FACING_HOPPER);
+						BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(dir));
+						if(te != null) {
+							LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir.getOpposite());
+							output = cap.orElse(null);
+							if(output != null) {
+								cap.addListener((h) -> output = null);
+							}
+						}
 					}
 					if(output != null) {
 						if(internalStoredXp != 0 && subTimer++ == 5) {

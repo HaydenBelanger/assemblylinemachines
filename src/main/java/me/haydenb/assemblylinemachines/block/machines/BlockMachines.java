@@ -15,11 +15,13 @@ import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.Registerable
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.RegisterableMachine.Phases;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.crafting.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.block.Block;
@@ -477,7 +479,7 @@ public class BlockMachines {
 	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_fluid_mixer")
 	public static void mkIIFluidMixerScreen() {
 		MachineBuilder.screen().defaultMKIIOptions().renderFluidBar(84, 33, 37, 190, 52).internalTankSwitchingButton(82, 72, 206, 40, 12, 12)
-		.stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getMKIIBlitPiece()).addBar(53, 42, 0, 0, 16, 14, PBDirection.UD, 0, 0, List.of(Pair.of(107, 42))).buildAndRegister("mkii_fluid_mixer");
+		.stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getMKIIBlitPiece()).addBar(53, 42, 0, 0, 16, 15, PBDirection.UD, 0, 0, List.of(Pair.of(107, 42))).buildAndRegister("mkii_fluid_mixer");
 	}
 	
 	//ELECTRIC PURIFIER
@@ -490,7 +492,7 @@ public class BlockMachines {
 				Block.box(11, 2, 0, 12, 7, 1),Block.box(0, 7, 0, 16, 16, 16),
 				Block.box(0, 2, 0, 2, 7, 16),Block.box(14, 2, 0, 16, 7, 16),Block.box(2, 2, 2, 14, 7, 16)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true).additionalProperties((state) -> 
-				state.setValue(Utils.PURIFIER_STATES, false), (builder) -> builder.add(Utils.PURIFIER_STATES)).build("electric_purifier");
+				state.setValue(StateProperties.PURIFIER_STATES, false), (builder) -> builder.add(StateProperties.PURIFIER_STATES)).build("electric_purifier");
 	}
 	
 	@RegisterableMachine(phase=Phases.CONTAINER, blockName="electric_purifier")
@@ -504,7 +506,7 @@ public class BlockMachines {
 	public static BlockEntityType<?> electricPurifierEntity(){
 		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(100, 16).recipeProcessor(Utils.recipeFunction(PurifierCrafting.PURIFIER_RECIPE))
 				.slotInfo(7, 3).specialStateModifier((recipe, state) -> {
-					return ((PurifierCrafting) recipe).requiresUpgrade() ? state.setValue(Utils.PURIFIER_STATES, true) : state.setValue(Utils.PURIFIER_STATES, false);
+					return ((PurifierCrafting) recipe).requiresUpgrade() ? state.setValue(StateProperties.PURIFIER_STATES, true) : state.setValue(StateProperties.PURIFIER_STATES, false);
 				}).duplicateCheckingGroup(List.of(1, 2, 3)).mustBeFullBefore((i) -> i == 1 || i == 2 ? List.of(3) : null)
 				.slotContentsValidator((slot, is, be) -> {
 					if(slot != 3) return true;
@@ -532,7 +534,7 @@ public class BlockMachines {
 				Block.box(0, 2, 0, 2, 7, 16),
 				Block.box(14, 2, 0, 16, 7, 16),
 				Block.box(2, 2, 2, 14, 7, 16)
-				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).additionalProperties((state) -> state.setValue(Utils.PURIFIER_STATES, false), (builder) -> builder.add(Utils.PURIFIER_STATES)).build("mkii_purifier");
+				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).additionalProperties((state) -> state.setValue(StateProperties.PURIFIER_STATES, false), (builder) -> builder.add(StateProperties.PURIFIER_STATES)).build("mkii_purifier");
 	}
 	
 	@RegisterableMachine(phase=Phases.CONTAINER, blockName="mkii_purifier")
@@ -544,7 +546,7 @@ public class BlockMachines {
 	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="mkii_purifier")
 	public static BlockEntityType<?> mkIIPurifierEntity(){
 		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(400, 16).recipeProcessor(Utils.recipeFunction(PurifierCrafting.PURIFIER_RECIPE)).slotInfo(12, 6).specialStateModifier((recipe, state) -> {
-			return ((PurifierCrafting) recipe).requiresUpgrade() ? state.setValue(Utils.PURIFIER_STATES, true) : state.setValue(Utils.PURIFIER_STATES, false);
+			return ((PurifierCrafting) recipe).requiresUpgrade() ? state.setValue(StateProperties.PURIFIER_STATES, true) : state.setValue(StateProperties.PURIFIER_STATES, false);
 		}).slotIDTransformer((in) -> switch(in) {
 		case 1 -> 4;
 		case 2 -> 5;
@@ -569,10 +571,10 @@ public class BlockMachines {
 		.addBar(59, 20, 190, 88, 58, 21, PBDirection.STATIC, 3, 40, List.of()).buildAndRegister("mkii_purifier");
 	}
 
-	//METAL SHAPER
+	//PNEUMATIC COMPRESSOR
 
-	@RegisterableMachine(phase=Phases.BLOCK, blockName="metal_shaper")
-	public static Block metalShaper() {
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="pneumatic_compressor")
+	public static Block pneumaticCompressor() {
 		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
 				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 3, 16),
 				Block.box(1, 3, 2, 15, 14, 16),Block.box(1, 6, 0, 15, 14, 1),
@@ -581,30 +583,30 @@ public class BlockMachines {
 				Block.box(0, 10, 0, 1, 14, 16),Block.box(13, 3, 0, 16, 6, 1),
 				Block.box(9, 3, 0, 12, 6, 1),Block.box(4, 3, 0, 7, 6, 1),
 				Block.box(3, 3, 1, 13, 6, 2),Block.box(1, 6, 1, 15, 12, 2)
-				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true).build("metal_shaper");
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true).build("pneumatic_compressor");
 	}
 
-	@RegisterableMachine(phase=Phases.CONTAINER, blockName="metal_shaper")
-	public static MenuType<?> metalShaperContainer(){
-		return MachineBuilder.container().shiftMergeableSlots(1, 3).slotCoordinates(List.of(Triple.of(119, 34, true),
-				Triple.of(72, 34, false), Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false))).build("metal_shaper");
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="pneumatic_compressor")
+	public static MenuType<?> pneumaticCompressorContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(1, 3).slotCoordinates(List.of(Triple.of(120, 34, true),
+				Triple.of(72, 34, false), Triple.of(94, 17, false), Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false))).build("pneumatic_compressor");
 	}
 
-	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="metal_shaper")
-	public static BlockEntityType<?> metalShaperEntity(){
-		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(90, 16).recipeProcessor(Utils.recipeFunction(MetalCrafting.METAL_RECIPE)).slotInfo(5, 3).build("metal_shaper");
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="pneumatic_compressor")
+	public static BlockEntityType<?> pneumaticCompressorEntity(){
+		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(90, 16).recipeProcessor(Utils.recipeFunction(PneumaticCrafting.PNEUMATIC_RECIPE)).slotInfo(6, 3).build("pneumatic_compressor");
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	@RegisterableMachine(phase=Phases.SCREEN, blockName="metal_shaper")
-	public static void metalShaperScreen() {
-		MachineBuilder.screen().addBar(92, 37, 176, 52, 19, 10, PBDirection.LR).buildAndRegister("metal_shaper");
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="pneumatic_compressor")
+	public static void pneumaticCompressorScreen() {
+		MachineBuilder.screen().addBar(92, 37, 176, 52, 20, 10, PBDirection.LR).addBar(94, 17, 176, 62, 16, 16, 2).buildAndRegister("pneumatic_compressor");
 	}
 	
-	//MKII METAL SHAPER
+	//MKII PNEUMATIC COMPRESSOR
 	
-	@RegisterableMachine(phase=Phases.BLOCK, blockName="mkii_metal_shaper")
-	public static Block mkIIMetalShaper() {
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="mkii_pneumatic_compressor")
+	public static Block mkIIPneumaticCompressor() {
 		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
 				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 3, 16),
 				Block.box(1, 3, 1, 15, 14, 16),Block.box(1, 6, 0, 15, 14, 1),
@@ -616,18 +618,18 @@ public class BlockMachines {
 				Block.box(0, 6, 15, 1, 10, 16),Block.box(15, 6, 15, 16, 10, 16),
 				Block.box(15, 6, 0, 16, 10, 1),Block.box(0, 6, 1, 1, 7, 15),
 				Block.box(0, 9, 1, 1, 10, 15),Block.box(15, 9, 1, 16, 10, 15),Block.box(15, 6, 1, 16, 7, 15)
-				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).build("mkii_metal_shaper");
+				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).build("mkii_pneumatic_compressor");
 	}
 	
-	@RegisterableMachine(phase=Phases.CONTAINER, blockName="mkii_metal_shaper")
-	public static MenuType<?> mkIIMetalShaperContainer(){
-		return MachineBuilder.container().shiftMergeableSlots(2, 6).playerInventoryPos(8, 106).playerHotbarPos(8, 164).slotCoordinates(List.of(Triple.of(53, 69, true), Triple.of(107, 69, true), Triple.of(53, 22, false), Triple.of(107, 22, false),
-				Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false), Triple.of(167, 21, false), Triple.of(167, 39, false), Triple.of(167, 57, false))).build("mkii_metal_shaper");
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="mkii_pneumatic_compressor")
+	public static MenuType<?> mkIIPneumaticCompressorContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(2, 6).playerInventoryPos(8, 106).playerHotbarPos(8, 164).slotCoordinates(List.of(Triple.of(53, 66, true), Triple.of(107, 66, true), Triple.of(53, 22, false), Triple.of(107, 22, false),
+				Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false), Triple.of(167, 21, false), Triple.of(167, 39, false), Triple.of(167, 57, false))).build("mkii_pneumatic_compressor");
 	}
 	
-	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="mkii_metal_shaper")
-	public static BlockEntityType<?> mkIIMetalShaperEntity(){
-		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(360, 16).recipeProcessor(Utils.recipeFunction(MetalCrafting.METAL_RECIPE)).slotInfo(10, 6)
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="mkii_pneumatic_compressor")
+	public static BlockEntityType<?> mkIIPneumaticCompressorEntity(){
+		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(360, 16).recipeProcessor(Utils.recipeFunction(PneumaticCrafting.PNEUMATIC_RECIPE)).slotInfo(10, 6)
 				.slotIDTransformer((in) -> switch(in) {
 				case 1 -> 2;
 				default -> in;
@@ -635,13 +637,19 @@ public class BlockMachines {
 				case 0 -> 1;
 				case 1 -> 3;
 				default -> in;
-				}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).build("mkii_metal_shaper");
+				}).slotExtractableFunction((slot) -> slot < 2)
+				.getCapturer((i) -> i == 2, (b, i) -> switch(((IMachineDataBridge) b).getOrSetMKIIPCSelMold(Optional.empty())) {
+				case 1 -> Registry.getItem("rod_mold").getDefaultInstance();
+				case 2 -> Registry.getItem("plate_mold").getDefaultInstance();
+				case 3 -> Registry.getItem("gear_mold").getDefaultInstance();
+				default -> ItemStack.EMPTY;
+				}).cycleCountModifier(0.5f).build("mkii_pneumatic_compressor");
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_metal_shaper")
-	public static void mkIIMetalShaperScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().addBar(56, 42, 190, 52, 10, 19, PBDirection.UD, 0, 0, List.of(Pair.of(110, 42))).buildAndRegister("mkii_metal_shaper");
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_pneumatic_compressor")
+	public static void mkIIPneumaticCompressorScreen() {
+		MachineBuilder.screen().defaultMKIIOptions().addBar(56, 40, 190, 52, 10, 20, PBDirection.UD, 0, 0, List.of(Pair.of(110, 40))).mkiiPneumaticCompressorButtons().buildAndRegister("mkii_pneumatic_compressor");
 	}
 
 	//LUMBER MILL
@@ -669,7 +677,7 @@ public class BlockMachines {
 	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="lumber_mill")
 	public static BlockEntityType<?> lumberMillEntity(){
 		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(90, 16).recipeProcessor(Utils.recipeFunction(LumberCrafting.LUMBER_RECIPE))
-				.slotInfo(6, 3).slotExtractableFunction((slot) -> slot <= 1).build("lumber_mill");
+				.slotInfo(6, 3).outputSlots(0, 1, 0).slotExtractableFunction((slot) -> slot <= 1).build("lumber_mill");
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -677,5 +685,48 @@ public class BlockMachines {
 	public static void lumberMillScreen() {
 		MachineBuilder.screen().addBar(71, 40, 176, 64, 19, 5, PBDirection.LR).addBar(71, 34, 176, 52, 19, 6, PBDirection.LR, 1, 10, List.of())
 		.addBar(71, 34, 196, 52, 19, 6, PBDirection.LR, 7, 20, List.of()).buildAndRegister("lumber_mill");
+	}
+	
+	//MKII LUMBER MILL
+	
+	@RegisterableMachine(phase=Phases.BLOCK, blockName="mkii_lumber_mill")
+	public static Block mkIILumberMill() {
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
+				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 3, 16),
+				Block.box(1, 3, 1, 15, 14, 16),Block.box(1, 6, 0, 15, 14, 1),
+				Block.box(0, 3, 0, 3, 6, 1),Block.box(0, 3, 1, 1, 6, 16),
+				Block.box(15, 3, 1, 16, 6, 16),Block.box(15, 10, 0, 16, 14, 16),
+				Block.box(0, 10, 0, 1, 14, 16),Block.box(13, 3, 0, 16, 6, 1),
+				Block.box(9, 3, 0, 12, 6, 1),Block.box(4, 3, 0, 7, 6, 1),
+				Block.box(3, 3, 1, 13, 6, 2),Block.box(0, 6, 0, 1, 10, 1),
+				Block.box(0, 6, 15, 1, 10, 16),Block.box(15, 6, 15, 16, 10, 16),
+				Block.box(15, 6, 0, 16, 10, 1),Block.box(0, 6, 1, 1, 7, 15),
+				Block.box(0, 9, 1, 1, 10, 15),Block.box(15, 9, 1, 16, 10, 15),Block.box(15, 6, 1, 16, 7, 15)
+				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).build("mkii_lumber_mill");
+	}
+	
+	@RegisterableMachine(phase=Phases.CONTAINER, blockName="mkii_lumber_mill")
+	public static MenuType<?> mkIILumberMillContainer(){
+		return MachineBuilder.container().shiftMergeableSlots(3, 6).playerInventoryPos(8, 106).playerHotbarPos(8, 164).slotCoordinates(List.of(Triple.of(53, 64, true), Triple.of(107, 64, true), Triple.of(80, 64, true), Triple.of(53, 22, false),
+				Triple.of(107, 22, false), Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false), Triple.of(167, 21, false), Triple.of(167, 39, false), Triple.of(167, 57, false))).build("mkii_lumber_mill");
+	}
+	
+	@RegisterableMachine(phase=Phases.BLOCK_ENTITY, blockName="mkii_lumber_mill")
+	public static BlockEntityType<?> mkIILumberMillBlockEntity(){
+		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(360, 16).recipeProcessor(Utils.recipeFunction(LumberCrafting.LUMBER_RECIPE))
+				.slotInfo(11, 6).slotExtractableFunction((slot) -> slot < 3).outputSlots(0, 2, 1)
+				.slotIDTransformer((in) -> switch(in) {
+				case 2 -> 3;
+				default -> in;
+				}).dualProcessorIDTransformer((in) -> switch(in) {
+				case 2 -> 4;
+				default -> in;
+				}).build("mkii_lumber_mill");
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@RegisterableMachine(phase=Phases.SCREEN, blockName="mkii_lumber_mill")
+	public static void mkIILumberMillScreen() {
+		MachineBuilder.screen().defaultMKIIOptions().addBar(54, 40, 190, 52, 14, 18, PBDirection.UD, 2, 10, List.of(Pair.of(108, 40))).buildAndRegister("mkii_lumber_mill");
 	}
 }

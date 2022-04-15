@@ -16,9 +16,9 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.Util;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
@@ -622,8 +622,8 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 
 		PacketData pd = new PacketData("item_pipe_gui");
 		pd.writeBlockPos("location", pos);
-		pd.writeUtf("button", button);
-		pd.writeUtf("transmissiontype", "none");
+		pd.writeString("button", button);
+		pd.writeString("transmissiontype", "none");
 		
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
@@ -631,8 +631,8 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 	public static void sendPipeUpdatePacket(BlockPos pos, String button, String type) {
 		PacketData pd = new PacketData("item_pipe_gui");
 		pd.writeBlockPos("location", pos);
-		pd.writeUtf("button", button);
-		pd.writeUtf("transmissiontype", type);
+		pd.writeString("button", button);
+		pd.writeString("transmissiontype", type);
 
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}

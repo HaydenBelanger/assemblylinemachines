@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:upgrade_kit",
+	"input_block":{
+		"item": "assemblylinemachines:lumber_mill"
+	},
+	"upgrade_kit": "MKII",
+	"output_block": "assemblylinemachines:mkii_lumber_mill",
+	"slot_copy":{
+		"0": 0,
+		"1": 2,
+		"2": 3,
+		"3": 5,
+		"4": 6,
+		"5": 7
+	}
+}

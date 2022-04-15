@@ -1,0 +1,11 @@
+{
+  "type": "assemblylinemachines:pneumatic",
+  "input": {
+    "item": "minecraft:horn_coral_fan",
+    "count": 8
+  },
+  "output": {
+    "item": "minecraft:horn_coral_block"
+  },
+  "time": 9
+}

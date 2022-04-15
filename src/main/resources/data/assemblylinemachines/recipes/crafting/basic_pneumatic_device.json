@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"c  ",
+		"ssp",
+		"c  "
+	],
+	"key":{
+		"s":{
+			"tag": "forge:rods/steel"
+		},
+		"c":{
+			"tag": "forge:plates/pure_titanium"
+		},
+		"p":{
+			"item": "minecraft:sticky_piston"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:basic_pneumatic_device"
+	}
+}

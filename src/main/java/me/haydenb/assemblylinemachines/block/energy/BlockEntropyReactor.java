@@ -19,9 +19,7 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
+import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -594,7 +592,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
 			
 			if(cyclesRemaining != 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Discharging...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + Formatting.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t").withStyle(ChatFormatting.GREEN));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Discharging...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + FormattingHelper.FEPT_FORMAT.format((float)genPerCycle / 20f) + " FE/t").withStyle(ChatFormatting.GREEN));
 			}else {
 				if(shardMap.isEmpty()) {
 					probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Idle").withStyle(ChatFormatting.RED)).text(new TextComponent("0 FE/t"));
@@ -1011,7 +1009,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				}
 			}
 			
-			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.getCommonConfig().reactorExplosions.get()) {
+			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.getServerConfig().reactorExplosions.get()) {
 				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
 				entropy = 0f;
 			}
@@ -1164,7 +1162,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 			if(tsfm.cyclesRemaining != 0) {
 				color = 0x44a300;
-				status = "Status: Generating...\nRemaining time: " + tsfm.cyclesRemaining + " seconds!\nGenerating " + Formatting.FEPT_FORMAT.format((float)tsfm.genPerCycle / 20f) + " FE/t!";
+				status = "Status: Generating...\nRemaining time: " + tsfm.cyclesRemaining + " seconds!\nGenerating " + FormattingHelper.FEPT_FORMAT.format((float)tsfm.genPerCycle / 20f) + " FE/t!";
 			}else {
 				if(tsfm.shardMap.isEmpty()) {
 					color = 0xffffff;
@@ -1187,9 +1185,9 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				if(wsc > 1f) wsc = 1f;
 
 				if(s.equals("Status:")) {
-					MathHelper.renderScaledText(this.font, x+66, y+20+(i*9), wsc, s, false, color);
+					ScreenMath.renderScaledText(this.font, x+66, y+20+(i*9), wsc, s, false, color);
 				}else {
-					MathHelper.renderScaledText(this.font, x+66, y+20+(i*9), wsc, s, false, 0xffffff);
+					ScreenMath.renderScaledText(this.font, x+66, y+20+(i*9), wsc, s, false, 0xffffff);
 				}
 
 				i++;
@@ -1216,7 +1214,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 					str.add(new TextComponent("Shard Tank Empty").withStyle(ChatFormatting.DARK_RED));
 				}
 				
-				str.add(new TextComponent("Runs at " + Formatting.GENERAL_FORMAT.format((tsfm.total * 6000f) / 20f) + " FE/t.").withStyle(ChatFormatting.GRAY));
+				str.add(new TextComponent("Runs at " + FormattingHelper.GENERAL_FORMAT.format((tsfm.total * 6000f) / 20f) + " FE/t.").withStyle(ChatFormatting.GRAY));
 
 				this.renderComponentTooltip(this.mx, str, mouseX - x, mouseY - y);
 			}

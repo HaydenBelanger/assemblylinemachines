@@ -4,6 +4,8 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Stream;
 
+import org.codehaus.plexus.util.ExceptionUtils;
+
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -15,9 +17,9 @@ import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.DebugOptions;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -126,8 +128,6 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 
 	public static class TEInteractor extends SimpleMachine<ContainerInteractor> implements ALMTicker<TEInteractor> {
 		
-		private static boolean hasSentInteractorMessage = false;
-		
 		private int timer = 0;
 		private int nTimer = 0;
 		private int mode = 0;
@@ -217,26 +217,21 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 							if(mode == 1) {
 								
 								if(checkInteractMode == null) {
-									checkInteractMode = ConfigHolder.getCommonConfig().interactorInteractMode.get();
+									checkInteractMode = ConfigHolder.getServerConfig().interactMode.get();
 								}
 								if(checkInteractMode) {
 									try {
 										fp.gameMode.useItemOn(fp, this.getLevel(), stack, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(0.5d, 0.5d, 0.5d), getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite(), offsetPos, false));
 									}catch(Exception e) {
 										
-										DebugOptions db = ConfigHolder.getCommonConfig().interactorInteractDebug.get();
-										if(db == DebugOptions.BASIC) {
-											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + this.getBlockPos().getX() + ", " + this.getBlockPos().getY() + ", " + this.getBlockPos().getZ() + " triggered exception: " + e.getMessage() + ".");
-										}else if(db == DebugOptions.COMPLETE) {
-											AssemblyLineMachines.LOGGER.warn("Interactor set to Interact Mode @ " + this.getBlockPos().getX() + ", " + this.getBlockPos().getY() + ", " + this.getBlockPos().getZ() + " triggered stack trace: ");
-											e.printStackTrace();
+										DebugOptions db = ConfigHolder.getServerConfig().interactExceptionReporting.get();
+										if(db != DebugOptions.NONE) {
+											var level = org.apache.logging.log4j.Level.getLevel(ConfigHolder.getServerConfig().interactExceptionReportLevel.get());
+											AssemblyLineMachines.LOGGER.log(level, switch(db) {
+											case STACK_TRACE -> "Interactor @ " + this.getBlockPos().toString() + " triggered exception:\n" + ExceptionUtils.getStackTrace(e);
+											default -> "Interactor @ " + this.getBlockPos().toString() + " triggered exception:\n" + e.getMessage();
+											});
 										}
-										
-										if(db != DebugOptions.NONE && hasSentInteractorMessage == false) {
-											hasSentInteractorMessage = true;
-											AssemblyLineMachines.LOGGER.info("Tip: Interactor Interact Mode logging can be enabled or disabled in the config, as well as the feature disabled completely.");
-										}
-										
 									}
 									
 									
@@ -431,7 +426,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 	private static void sendSelChange(BlockPos pos) {
 		PacketData pd = new PacketData("interactor_gui");
 		pd.writeBlockPos("pos", pos);
-		pd.writeUtf("button", "dir");
+		pd.writeString("button", "dir");
 
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
@@ -439,7 +434,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 	private static void sendModeChange(BlockPos pos) {
 		PacketData pd = new PacketData("interactor_gui");
 		pd.writeBlockPos("pos", pos);
-		pd.writeUtf("button", "mode");
+		pd.writeString("button", "mode");
 
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
@@ -456,7 +451,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 					if (te.mode == 3) {
 						te.mode = 0;
 					} else if(te.mode == 0) {
-						if(ConfigHolder.getCommonConfig().interactorInteractMode.get() == true) {
+						if(ConfigHolder.getServerConfig().interactMode.get() == true) {
 							te.mode++;
 						}else {
 							te.mode = 2;

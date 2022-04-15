@@ -7,11 +7,11 @@ import java.util.function.Supplier;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,6 +24,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 	
@@ -38,7 +39,7 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 			
 			BlockPos cor = iter.next();
 			
-			if(world.getBlockState(cor).getBlock() == Blocks.AIR && (world.isLoaded(cor.below()) || isSurroundingBlockFlammable(world, cor)) && !Utils.isInTag(world.getBlockState(cor.below()), new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof"))) {
+			if(world.getBlockState(cor).getBlock() == Blocks.AIR && (world.isLoaded(cor.below()) || isSurroundingBlockFlammable(world, cor)) && !world.getBlockState(cor.below()).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof")))) {
 				
 				world.setBlockAndUpdate(cor, ForgeEventFactory.fireFluidPlaceBlockEvent(world, cor, pos, Registry.getBlock("naphtha_fire").defaultBlockState()));
 				
@@ -130,7 +131,7 @@ public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
 								int xAge = age + 1 + rand.nextInt(4);
 								if(nAge > 15) nAge = 15;
 								if(xAge > 15) xAge = 15;
-								if(world.isLoaded(posx.below()) && !Utils.isInTag(world.getBlockState(posx.below()), new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof"))) {
+								if(world.isLoaded(posx.below()) && !world.getBlockState(posx.below()).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof")))) {
 									world.setBlockAndUpdate(posx, ForgeEventFactory.fireFluidPlaceBlockEvent(world, posx, pos, state.setValue(FireBlock.AGE, nAge)));
 									
 									world.setBlockAndUpdate(pos, state.setValue(FireBlock.AGE, xAge));

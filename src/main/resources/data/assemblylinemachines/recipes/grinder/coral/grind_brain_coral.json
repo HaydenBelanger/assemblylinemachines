@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:brain_coral"
+	},
+	"output":{
+		"item": "minecraft:brain_coral_fan",
+		"count": 2
+	},
+	"grinds": 7,
+	"bladetype": "TITANIUM"
+}

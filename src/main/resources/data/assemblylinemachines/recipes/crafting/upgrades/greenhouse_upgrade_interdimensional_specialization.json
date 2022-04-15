@@ -1,0 +1,32 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"bso",
+		"sjs",
+		"asp"
+	],
+	"key":{
+		"b":{
+			"item": "minecraft:crimson_fungus"
+		},
+		"o":{
+			"item": "minecraft:warped_fungus"
+		},
+		"j":{
+			"item": "minecraft:chorus_flower"
+		},
+		"a":{
+			"item": "assemblylinemachines:mandelbloom"
+		},
+		"p":{
+			"item": "assemblylinemachines:prism_rose"
+		},
+		"s":{
+			"tag": "forge:plates/pure_steel"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:greenhouse_upgrade_interdimensional_specialization"
+	}
+}

@@ -12,11 +12,11 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -398,9 +398,9 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 					str.add(tsfm.tank.getDisplayName().getString());
 					if (Screen.hasShiftDown()) {
 
-						str.add(Formatting.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
+						str.add(FormattingHelper.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					} else {
-						str.add(Formatting.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000D) + " B");
 					}
 
 					str.add("Left-Click to set as LEFT filter.");

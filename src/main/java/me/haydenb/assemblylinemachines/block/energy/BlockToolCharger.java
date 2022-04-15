@@ -3,9 +3,9 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -120,8 +120,8 @@ public class BlockToolCharger extends BlockTileEntity{
 		
 		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
-			this.configMaxChargeRate = ConfigHolder.getCommonConfig().toolChargerChargeRate.get();
-			this.configMaxCapacity = ConfigHolder.getCommonConfig().toolChargerMaxEnergyStorage.get();
+			this.configMaxChargeRate = ConfigHolder.getServerConfig().toolChargerChargeRate.get();
+			this.configMaxCapacity = ConfigHolder.getServerConfig().toolChargerMaxEnergyStorage.get();
 		}
 
 		public TEToolCharger(BlockPos pos, BlockState state) {
@@ -275,7 +275,7 @@ public class BlockToolCharger extends BlockTileEntity{
 							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						}
 					}
-					prevStatusMessage = prevStatusMessage + " (" + Formatting.GENERAL_FORMAT.format(amount) + "/" + Formatting.GENERAL_FORMAT.format(configMaxCapacity) + " FE)";
+					prevStatusMessage = prevStatusMessage + " (" + FormattingHelper.GENERAL_FORMAT.format(amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(configMaxCapacity) + " FE)";
 					sendUpdates();
 				}
 			}

@@ -1,0 +1,11 @@
+{
+  "type": "assemblylinemachines:pneumatic",
+  "input": {
+    "item": "minecraft:tube_coral",
+    "count": 4
+  },
+  "output": {
+    "item": "minecraft:tube_coral_block"
+  },
+  "time": 9
+}

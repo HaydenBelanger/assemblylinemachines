@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "minecraft:dead_tube_coral_block"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:fertilizer"
+	},
+	"output":{
+		"item": "minecraft:tube_coral_block"
+	},
+	"stirs": 4,
+	"fluid": "water",
+	"mix_color": "#7985d4",
+	"drain_percent": "QUARTER"
+}

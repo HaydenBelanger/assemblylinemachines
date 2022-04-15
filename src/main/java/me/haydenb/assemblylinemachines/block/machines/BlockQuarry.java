@@ -12,9 +12,8 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -465,7 +464,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 				if(s.equals("Error")) {
 					c = 0xff2626;
 				}
-				MathHelper.renderScaledText(this.font, x+33, y+13+(i*9), wsc, s, false, c);
+				ScreenMath.renderScaledText(this.font, x+33, y+13+(i*9), wsc, s, false, c);
 				i++;
 			}
 			drawCenteredString(this.font, tsfm.range + "", x+148, y+34, 0xffffff);
@@ -525,7 +524,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 	public static void sendDirChange(BlockPos pos) {
 		
 		PacketData pd = new PacketData("quarry_gui");
-		pd.writeUtf("cat", "dir");
+		pd.writeString("cat", "dir");
 		pd.writeBlockPos("pos", pos);
 		
 		PacketHandler.INSTANCE.sendToServer(pd);
@@ -533,7 +532,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 	
 	public static void sendChangeNum(BlockPos pos, boolean incr) {
 		PacketData pd = new PacketData("quarry_gui");
-		pd.writeUtf("cat", "num");
+		pd.writeString("cat", "num");
 		pd.writeBlockPos("pos", pos);
 		pd.writeBoolean("incr", incr);
 		
@@ -542,7 +541,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 	
 	public static void sendInitQuarry(BlockPos pos) {
 		PacketData pd = new PacketData("quarry_gui");
-		pd.writeUtf("cat", "init");
+		pd.writeString("cat", "init");
 		pd.writeBlockPos("pos", pos);
 		
 		PacketHandler.INSTANCE.sendToServer(pd);

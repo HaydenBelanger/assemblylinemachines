@@ -71,9 +71,10 @@ import me.haydenb.assemblylinemachines.item.ItemWrenchOMatic.EnchantmentEngineer
 import me.haydenb.assemblylinemachines.item.powertools.*;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.PowerToolType;
-import me.haydenb.assemblylinemachines.registry.Utils.PhasedMap;
 import me.haydenb.assemblylinemachines.registry.datagen.*;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer;
+import me.haydenb.assemblylinemachines.registry.utils.ConfigCondition.ConfigConditionSerializer;
+import me.haydenb.assemblylinemachines.registry.utils.PhasedMap;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
 import me.haydenb.assemblylinemachines.world.effects.*;
@@ -98,11 +99,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.effect.*;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
@@ -124,6 +125,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -133,6 +135,7 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -166,7 +169,6 @@ public class Registry {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		
-		createItem("guidebook", new ItemGuidebook());
 		createItem("titanium_ingot", "titanium_nugget", "raw_titanium");
 		
 		createItem("titanium_blade_piece", "pure_gold_blade_piece", "steel_blade_piece");
@@ -262,7 +264,7 @@ public class Registry {
 		createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
 		
 		createItem("crank_shaft", "convection_component", "conduction_component", "empowered_conduction_component", "empowered_convection_component", "basic_battery",
-				"temperature_regulator", "fluid_regulator", "stainless_steel_tank_component", "steel_tank_component", "pneumatic_device");
+				"temperature_regulator", "fluid_regulator", "stainless_steel_tank_component", "steel_tank_component", "pneumatic_device", "basic_pneumatic_device");
 		createItem("chromium_ingot", "chromium_nugget", "chromium_plate", "raw_chromium", "stainless_steel_plate", "ground_chromium");
 		createItem("energized_gold_ingot", "energized_gold_plate");
 		
@@ -334,9 +336,18 @@ public class Registry {
 		createItem("greenhouse_upgrade_internal_lamp", new ItemUpgrade(false, new String[]{"Allows sunlight crops to grow in dark environments.", "Increases speed of operation."}, new String[] {"Increases power consumption.", "Becomes too bright to sustain darkness crops."}));
 		createItem("greenhouse_upgrade_blackout_glass", new ItemUpgrade(false, new String[]{"Allows darkness crops to grow in light environments.", "Increases speed of operation."}, new String[]{"Increases power consumption.", "Won't allow sunlight crops to get enough sun."}));
 		
-		createItem("spores", new ItemSpores(Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "spores_plantable")), Blocks.MYCELIUM));
-		createItem("forest_fungus", new ItemSpores(Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "forest_fungus_plantable")), Blocks.PODZOL));
-		createItem("grass_seeds", new ItemSpores(Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "grass_seeds_plantable")), Blocks.GRASS_BLOCK));
+		createItem("spores", new ItemSpores(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "spores_plantable")), Blocks.MYCELIUM));
+		createItem("forest_fungus", new ItemSpores(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "forest_fungus_plantable")), Blocks.PODZOL));
+		createItem("grass_seeds", new ItemSpores(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "grass_seeds_plantable")), Blocks.GRASS_BLOCK));
+		
+		createItem("gear_mold", new Item.Properties().stacksTo(1).tab(CREATIVE_TAB));
+		createItem("plate_mold", new Item.Properties().stacksTo(1).tab(CREATIVE_TAB));
+		createItem("rod_mold", new Item.Properties().stacksTo(1).tab(CREATIVE_TAB));
+		
+		createItem("chromium_rod", "copper_rod", "gold_rod", "iron_rod", "mystium_gear", "ground_steel", "mystium_rod", "novasteel_gear", "novasteel_rod", "titanium_rod", "ground_amethyst",
+				"graphene_gear", "graphene_ingot", "graphene_plate");
+		createItem("quantum_fuel", new ItemGearboxFuel(12800));
+		createItem("glacier_sauce", new Item.Properties().rarity(Rarity.UNCOMMON).tab(Registry.CREATIVE_TAB).food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 3600), 1f).nutrition(1).fast().saturationMod(2.4f).alwaysEat().build()));
 		
 		MOD_ITEM_REGISTRY.values().forEach((i) -> event.getRegistry().register(i));
 	}
@@ -645,7 +656,7 @@ public class Registry {
 		createRecipe(RefiningCrafting.REFINING_RECIPE, RefiningCrafting.SERIALIZER);
 		createRecipe(EnchantmentBookCrafting.ENCHANTMENT_BOOK_RECIPE, EnchantmentBookCrafting.SERIALIZER);
 		createRecipe(LumberCrafting.LUMBER_RECIPE, LumberCrafting.SERIALIZER);
-		createRecipe(MetalCrafting.METAL_RECIPE, MetalCrafting.SERIALIZER);
+		createRecipe(PneumaticCrafting.PNEUMATIC_RECIPE, PneumaticCrafting.SERIALIZER);
 		createRecipe(EntropyReactorCrafting.ERO_RECIPE, EntropyReactorCrafting.SERIALIZER);
 		createRecipe(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, WorldCorruptionCrafting.SERIALIZER);
 		createRecipe(GeneratorFluidCrafting.GENFLUID_RECIPE, GeneratorFluidCrafting.SERIALIZER);
@@ -665,13 +676,14 @@ public class Registry {
 		MOD_SOUND_REGISTRY.put("corrupt_shell_hurt", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_hurt")).setRegistryName("corrupt_shell_hurt"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_death")).setRegistryName("corrupt_shell_death"));
 		MOD_SOUND_REGISTRY.put("corrupt_shell_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_step")).setRegistryName("corrupt_shell_step"));
-		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_ambient", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_ambient")).setRegistryName("corrupt_shell_cool_ambient"));
-		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_hurt", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_hurt")).setRegistryName("corrupt_shell_cool_hurt"));
-		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_death", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_death")).setRegistryName("corrupt_shell_cool_death"));
-		MOD_SOUND_REGISTRY.put("corrupt_shell_cool_step", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_cool_step")).setRegistryName("corrupt_shell_cool_step"));
 		MOD_SOUND_REGISTRY.put("assembly_required", new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "assembly_required")).setRegistryName("assembly_required"));
 		
 		MOD_SOUND_REGISTRY.values().forEach((s) -> event.getRegistry().register(s));
+	}
+	
+	@SubscribeEvent
+	public static void registerRecipeConditions(FMLCommonSetupEvent event) {
+		CraftingHelper.register(ConfigConditionSerializer.INSTANCE);
 	}
 	
 	//CLIENT-RELATED SETUP EVENTS - RENDER LAYERS, TERs, SCREENS, ITEM PROPERTIES, TINTING HANDLERS, ENTITY RENDERERS
@@ -791,7 +803,7 @@ public class Registry {
 			@Override
 			public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
 				if(level.getBlockEntity(pos) instanceof TEGreenhouse greenhouse) {
-					return greenhouse.getTint(tint);
+					return greenhouse.getBlockState().getValue(BlockGreenhouse.SPROUT).getTint(greenhouse.getItem(1).getItem(), tint);
 				}
 				return 0;
 			}
@@ -838,6 +850,8 @@ public class Registry {
 	//DATAGEN
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) throws Exception {
+		
+		registerRecipeConditions(null);
 		
 		PrintWriter pw = new PrintWriter("logs/almdatagen.log", "UTF-8");
 		pw.println("[DATAGEN SYSTEM - INFO]: Commencing ALM data generation...");
@@ -942,7 +956,7 @@ public class Registry {
 		createBlock(name, b, item);
 	}
 	
-	static void createBlock(String name, Block block, boolean item) {
+	public static void createBlock(String name, Block block, boolean item) {
 		block.setRegistryName(name);
 		MOD_BLOCK_REGISTRY.put(name, block);
 		if(item) {

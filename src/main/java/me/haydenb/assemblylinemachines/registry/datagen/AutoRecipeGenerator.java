@@ -3,31 +3,49 @@ package me.haydenb.assemblylinemachines.registry.datagen;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.tuple.Triple;
+import org.apache.commons.lang3.tuple.Pair;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
-import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.crafting.MetalCrafting;
+import me.haydenb.assemblylinemachines.crafting.AlloyingCrafting.AlloyResult;
+import me.haydenb.assemblylinemachines.crafting.GrinderCrafting.GrinderResult;
+import me.haydenb.assemblylinemachines.crafting.PneumaticCrafting.Mold;
+import me.haydenb.assemblylinemachines.crafting.PneumaticCrafting.PneumaticResult;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class AutoRecipeGenerator extends RecipeProvider {
+	
+	private static final LinkedHashMap<String, List<String>> EQUIPMENT_PATTERNS = new LinkedHashMap<>();
+	static {
+		EQUIPMENT_PATTERNS.put("helmet", List.of("AAA", "A A"));
+		EQUIPMENT_PATTERNS.put("chestplate", List.of("A A", "AAA", "AAA"));
+		EQUIPMENT_PATTERNS.put("leggings", List.of("AAA", "A A", "A A"));
+		EQUIPMENT_PATTERNS.put("boots", List.of("A A", "A A"));
+		EQUIPMENT_PATTERNS.put("pickaxe", List.of("AAA", " B ", " B "));
+		EQUIPMENT_PATTERNS.put("axe", List.of("AA", "AB", " B"));
+		EQUIPMENT_PATTERNS.put("sword", List.of("A", "A", "B"));
+		EQUIPMENT_PATTERNS.put("shovel", List.of("A", "B", "B"));
+		EQUIPMENT_PATTERNS.put("hoe", List.of("AA", " B", " B"));
+		EQUIPMENT_PATTERNS.put("hammer", List.of(" A ", " BA", "B  "));
+	}
+	private static final List<String> BLOCK_PATTERN = List.of("AAA", "AAA", "AAA");
+	private static final List<String> GEAR_PATTERN = List.of(" A ", "ABA", " A ");
+	
 	
 	private final PrintWriter writer;
 	private final Collection<Path> inputFolders;
@@ -43,8 +61,6 @@ public class AutoRecipeGenerator extends RecipeProvider {
 	@Override
 	protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
 		
-		
-		
 		if(inputFolders.size() == 0) {
 			writer.println("[FURNACE RECIPES - WARNING]: Datagen was not provided with any input folders, so no Blasting to Furnace auto-recipes will be generated.");
 		}else {
@@ -56,18 +72,227 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			}
 		}
 		
-		writer.println("[METAL RECIPES - INFO]: Starting auto-generation of metal-related recipes...");
+		writer.println("[FURNACE RECIPES - INFO]: Finished generating Blasting to Furnace recipe copy(s).");
+		writer.println("[METAL RECIPES - INFO]: Starting generation of general metal-related Crafting, Grinding, and Compressing recipes...");
 		
-		for(MetalRecipeGeneration mrg : MetalRecipeGeneration.values()) {
-			writer.println(mrg.generateRecipes(consumer));
+		ArrayList<FinishedRecipe> recipes = new ArrayList<>();
+		
+		//IMC
+		new Builder(recipes, "constantan", true).alloy("copper", 1, "nickel", 1, 2).imcOptions();
+		new Builder(recipes, "electrum", true).alloy("gold", 1, "silver", 1, 2).imcOptions();
+		new Builder(recipes, "bronze", true).alloy("copper", 3, "tin", 1, 4).imcOptions();
+		new Builder(recipes, "brass", true).alloy("copper", 1, "zinc", 1, 2).imcOptions();
+		new Builder(recipes, "invar", true).alloy("iron", 2, "nickel", 1, 3).imcOptions();
+		new Builder(recipes, "rose_gold", true).alloy("copper", 3, "gold", 1, 4).imcOptions();
+		new Builder(recipes, "manyullyn", true).alloy(Ingredient.of(getNamed("forge", "ingots/cobalt")), 3, Ingredient.of(Items.NETHERITE_SCRAP), 1, 4).imcOptions();
+		new Builder(recipes, "aluminum", true).imcOptions();
+		new Builder(recipes, "lead", true).imcOptions();
+		new Builder(recipes, "silver", true).imcOptions();
+		new Builder(recipes, "nickel", true).imcOptions();
+		new Builder(recipes, "uranium", true).imcOptions();
+		new Builder(recipes, "tin", true).imcOptions();
+		new Builder(recipes, "zinc", true).imcOptions();
+		new Builder(recipes, "platinum", true).imcOptions();
+		new Builder(recipes, "tungsten", true).imcOptions();
+		new Builder(recipes, "osmium", true).imcOptions();
+		new Builder(recipes, "cobalt", true).imcOptions();
+		new Builder(recipes, "ardite", true).imcOptions();
+		
+		//Builtin
+		new Builder(recipes, "raw_novasteel").alloy("flerovium", 1, "attuned_titanium", 1, 2);
+		new Builder(recipes, "energized_gold").alloy(Pair.of("dusts", "redstone"), 3, Pair.of("ingots", "pure_gold"), 1, 1).storageBlock(false).plate(4, RecipeState.CONDITIONAL);
+		new Builder(recipes, "novasteel").alloy(Pair.of("ingots", "raw_novasteel"), 1, Pair.of("dusts", "novasteel"), 1, 1).tools().storageBlock(false).plate(1, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
+		new Builder(recipes, "coal").alternateInput(Ingredient.of(Items.COAL)).grinder(true, false, false, Blade.PUREGOLD, 4).storageBlock(true);
+		new Builder(recipes, "diamond").alternateInput(Ingredient.of(getNamed("forge", "gems/diamond"))).grinder(true, false, false, Blade.PUREGOLD, 2).storageBlock(true);
+		new Builder(recipes, "lapis").alternateInput(Ingredient.of(getNamed("forge", "gems/lapis"))).grinder(true, true, false, Blade.TITANIUM, 8).storageBlock(true);
+		new Builder(recipes, "redstone").alternateInput(null).grinder(true, false, false, Blade.TITANIUM, 10).alternateInput(Ingredient.of(getNamed("forge", "dusts/redstone"))).storageBlock(true);
+		new Builder(recipes, "emerald").alternateInput(Ingredient.of(getNamed("forge", "gems/emerald"))).grinder(true, false, false, Blade.PUREGOLD, 2).storageBlock(true);
+		new Builder(recipes, "flerovium").grinder(false, true).storageBlock(false).nugget(false).plate(4, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL);
+		new Builder(recipes, "chromium").grinder(false, true).storageBlock(false).nugget(false).plate(3, RecipeState.CONDITIONAL).rod();
+		new Builder(recipes, "copper").grinder(true, false).storageBlock(true).nugget(true).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
+		new Builder(recipes, "iron").grinder(true, false).storageBlock(true).nugget(true).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
+		new Builder(recipes, "gold").grinder(true, false).storageBlock(true).nugget(true).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
+		new Builder(recipes, "titanium").grinder(true, false).armor().tools().storageBlock(false).nugget(false).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
+		new Builder(recipes, "steel").grinder().armor().tools().storageBlock(false).nugget(false).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
+		new Builder(recipes, "attuned_titanium").plate(3, RecipeState.CONDITIONAL);
+		new Builder(recipes, "amethyst").alternateInput(Ingredient.of(getNamed("forge", "gems/amethyst"))).grinder().storageBlock(true);
+		new Builder(recipes, "crank").alternateInput(Ingredient.of(getNamed(AssemblyLineMachines.MODID, "precious_gears"))).alternateToolRod(Ingredient.of(getNamed("forge", "rods/steel"))).tools();
+		new Builder(recipes, "crafting_table").storageBlockResult(Registry.getItem("compressed_crafting_table"), Items.CRAFTING_TABLE).storageBlock(false);
+		new Builder(recipes, "raw_chromium").storageBlockResult(Registry.getItem("raw_chromium_block"), Registry.getItem("raw_chromium")).alternateInput(Ingredient.of(getNamed("forge", "raw_materials/chromium"))).storageBlock(false);
+		new Builder(recipes, "raw_titanium").storageBlockResult(Registry.getItem("raw_titanium_block"), Registry.getItem("raw_titanium")).alternateInput(Ingredient.of(getNamed("forge", "raw_materials/titanium"))).storageBlock(false);
+		new Builder(recipes, "raw_flerovium").storageBlockResult(Registry.getItem("raw_flerovium_block"), Registry.getItem("raw_flerovium")).alternateInput(Ingredient.of(getNamed("forge", "raw_materials/flerovium"))).storageBlock(false);
+		new Builder(recipes, "pure_copper").plate(3, RecipeState.TRUE).gear(5, RecipeState.TRUE);
+		new Builder(recipes, "pure_iron").plate(3, RecipeState.TRUE).gear(4, RecipeState.TRUE);
+		new Builder(recipes, "pure_gold").plate(3, RecipeState.TRUE).gear(1, RecipeState.TRUE);
+		new Builder(recipes, "pure_titanium").plate(5, RecipeState.TRUE).gear(2, RecipeState.TRUE);
+		new Builder(recipes, "pure_steel").plate(8, RecipeState.TRUE).gear(3, RecipeState.TRUE);
+		new Builder(recipes, "graphene").plate(1, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
+		new Builder(recipes, "plastic").alternateInput(Ingredient.of(Registry.getItem("plastic_ball"))).plate(3, true, RecipeState.CONDITIONAL);
+		new Builder(recipes, "rubber").alternateInput(Ingredient.of(Registry.getItem("rubber_ball"))).plate(4, true, RecipeState.CONDITIONAL);
+		new Builder(recipes, "mystium").alloy(Pair.of("dusts", "mystium"), 1, Pair.of("dusts", "electrified_netherite"), 1, 1)
+		.armor(() -> {
+			LinkedHashMap<String, List<String>> patterns = new LinkedHashMap<>();
+			patterns.put("helmet", List.of("BCB", "A A"));
+			patterns.put("chestplate", List.of("B B", "BCB", "AAA"));
+			patterns.put("leggings", List.of("AAA", "B B", "B B"));
+			patterns.put("boots", List.of("A A", "B B"));
+			return patterns;
+		}, (s) -> {
+			Ingredient[] ingredients;
+			if(s.equals("helmet") || s.equals("chestplate")) {
+				ingredients = new Ingredient[3];
+				ingredients[2] = Ingredient.of(Registry.getItem("mystium_crystal"));
+			}else {
+				ingredients = new Ingredient[2];
+			}
+			ingredients[0] = Ingredient.of(getNamed("forge", "plates/pure_steel"));
+			ingredients[1] = Ingredient.of(Registry.getItem("mystium_armor_plating"));
+			return ingredients;
+		}).alternateToolRod(Ingredient.of(getNamed("forge", "rods/steel"))).tools().storageBlock(false).plate(2, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
+		
+		recipes.forEach((fr) -> consumer.accept(fr));
+		
+		writer.println("[METAL RECIPES - INFO]: Generated " + recipes.size() + " Metal recipe(s).");
+	}
+	
+	private static class Builder{
+		
+		private final ArrayList<FinishedRecipe> recipes;
+		private final String name;
+		private final boolean modCompat;
+		private Supplier<Ingredient> input;
+		private Supplier<Ingredient> toolRod;
+		private Supplier<Pair<Item, Item>> storageBlockResult;
+		
+		private Builder(ArrayList<FinishedRecipe> recipes, String name, boolean modCompat) {
+			this.recipes = recipes;
+			this.name = name;
+			this.modCompat = modCompat;
+			this.input = () -> Ingredient.of(getNamed("forge", "ingots/" + name));
+			this.toolRod = () -> Ingredient.of(getNamed("forge", "rods/wooden"));
+			this.storageBlockResult = () -> Pair.of(Registry.getItem(name + "_block"), Registry.getItem(name + "_ingot"));
 		}
 		
-		writer.println("[GRINDER RECIPES - INFO]: Starting auto-generation of mod-compat-Grinder recipes...");
-		for(GrinderRecipeGeneration grg : GrinderRecipeGeneration.values()) {
-			grg.consumer.accept(consumer);
+		private Builder(ArrayList<FinishedRecipe> recipes, String name) {
+			this(recipes, name, false);
 		}
-		writer.println("[GRINDER RECIPES - INFO]: Generated Ore Block, Raw Ore, and Ingot pulverizing recipes for " + GrinderRecipeGeneration.values().length + " metal(s).");
 		
+		private Builder alternateInput(Ingredient input) {
+			this.input = () -> input;
+			return this;
+		}
+		
+		private Builder alternateToolRod(Ingredient toolRod) {
+			this.toolRod = () -> toolRod;
+			return this;
+		}
+		
+		private Builder storageBlockResult(Item resultBlock, Item resultIngot) {
+			this.storageBlockResult = () -> Pair.of(resultBlock, resultIngot);
+			return this.alternateInput(Ingredient.of(resultIngot));
+		}
+		
+		private Builder imcOptions() {
+			return this.grinder().storageBlock(true).nugget(true).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
+		}
+		
+		private Builder alloy(String inputA, int inputACount, String inputB, int inputBCount, int outputCount) {
+			return this.alloy(Pair.of("ingots", inputA), inputACount, Pair.of("ingots", inputB), inputBCount, outputCount);
+		}
+		
+		private Builder alloy(Pair<String, String> inputA, int inputACount, Pair<String, String> inputB, int inputBCount, int outputCount) {
+			return this.alloy(Ingredient.of(getNamed("forge", inputA.getKey() + "/" + inputA.getValue())), inputACount, Ingredient.of(getNamed("forge", inputB.getKey() + "/" + inputB.getValue())), inputBCount, outputCount);
+		}
+		
+		private Builder alloy(Ingredient inputA, int inputACount, Ingredient inputB, int inputBCount, int outputCount) {
+			recipes.add(new AlloyResult(getRecipeLoc("alloying", name), CountIngredient.of(inputA, inputACount), CountIngredient.of(inputB, inputBCount), getNamed("forge", "ingots/" + name), outputCount).addIMCIfTrue(modCompat));
+			return this;
+		}
+		
+		private Builder grinder() {
+			return this.grinder(false, false);
+		}
+		
+		private Builder grinder(boolean corruptOre, boolean machineRequired) {
+			return this.grinder(corruptOre, machineRequired, true, Blade.TITANIUM, 2);
+		}
+		
+		private Builder grinder(boolean corruptOre, boolean machineRequired, boolean hasRaw, Blade bladeType, int countFromOre) {
+			recipes.add(new GrinderResult(getRecipeLoc("grinder", "block_ores/" + name), Ingredient.of(getNamed("forge", "ores/" + name)), getNamed("forge", "dusts/" + name), countFromOre, 10, 0f, machineRequired, bladeType).addIMCIfTrue(modCompat));
+			if(hasRaw) {
+				recipes.add(new GrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), Ingredient.of(getNamed("forge", "raw_materials/" + name)), getNamed("forge", "dusts/" + name), 1, 5, 0.25f, machineRequired, bladeType).addIMCIfTrue(modCompat));
+				recipes.add(new GrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), Ingredient.of(getNamed("forge", "storage_blocks/raw_" + name)), getNamed("forge", "dusts/" + name), 9, 10, 0.25f, machineRequired, bladeType).addIMCIfTrue(modCompat));
+			}
+			if(input.get() != null) recipes.add(new GrinderResult(getRecipeLoc("grinder", "ingots/" + name), input.get(), getNamed("forge", "dusts/" + name), 1, 4, 0f, machineRequired, bladeType).addIMCIfTrue(modCompat));
+			if(corruptOre) recipes.add(new GrinderResult(getRecipeLoc("grinder", "block_ores/corrupt_" + name), Ingredient.of(getNamed("forge", "ores/corrupt_" + name)), getNamed("forge", "dusts/" + name), Math.round((float) countFromOre * 1.5f), 15, 0f, true, Blade.TITANIUM));
+			return this;
+		}
+		
+		private Builder armor() {
+			return this.armor(() -> EQUIPMENT_PATTERNS, (s) -> new Ingredient[] {this.input.get()});
+		}
+		
+		private Builder armor(Supplier<LinkedHashMap<String, List<String>>> patterns, Function<String, Ingredient[]> ingredients) {
+			for(String slot : patterns.get().keySet().stream().limit(4).toList()) {
+				recipes.add(new AdvancementlessResult(getRecipeLoc("tools/" + name + "/" + name + "_" + slot), Registry.getItem(name + "_" + slot), 1, patterns.get().get(slot), getShapedKey(ingredients.apply(slot))));
+			}
+			return this;
+		}
+		
+		private Builder tools() {
+			for(String tool : EQUIPMENT_PATTERNS.keySet().stream().skip(4).toList()) {
+				recipes.add(new AdvancementlessResult(getRecipeLoc("tools/" + name + "/" + name + "_" + tool), Registry.getItem(name + "_" + tool), 1, EQUIPMENT_PATTERNS.get(tool), getShapedKey(this.input.get(), this.toolRod.get())));
+			}
+			return this;
+		}
+		
+		private Builder storageBlock(boolean metalShaperOnly) {
+			recipes.add(new PneumaticResult(getRecipeLoc("pneumatic", "ingot_to_block/" + name), CountIngredient.of(input.get(), 9), getNamed("forge", "storage_blocks/" + name), 1, Mold.NONE, 9).addIMCIfTrue(modCompat, "compressorStorageBlockIMC"));
+			if(!metalShaperOnly) {
+				recipes.add(new AdvancementlessResult(getRecipeLoc("ingot_to_block/" + name), storageBlockResult.get().getKey(), 1, BLOCK_PATTERN, getShapedKey(this.input.get())));
+				recipes.add(new AdvancementlessResult(getRecipeLoc("block_to_ingot/" + name), storageBlockResult.get().getValue(), 9, List.of(Ingredient.of(getNamed("forge", "storage_blocks/" + name)))));
+			}
+			return this;
+		}
+		
+		private Builder nugget(boolean metalShaperOnly) {
+			recipes.add(new PneumaticResult(getRecipeLoc("pneumatic", "nugget_to_ingot/" + name), CountIngredient.of(Ingredient.of(getNamed("forge", "nuggets/" + name)), 9), getNamed("forge", "ingots/" + name), 1, Mold.NONE, 5).addIMCIfTrue(modCompat, "compressorNuggetIMC"));
+			if(!metalShaperOnly) {
+				recipes.add(new AdvancementlessResult(getRecipeLoc("nugget_to_ingot/" + name), storageBlockResult.get().getValue(), 1, BLOCK_PATTERN, getShapedKey(Ingredient.of(getNamed("forge", "nuggets/" + name)))));
+				recipes.add(new AdvancementlessResult(getRecipeLoc("ingot_to_nugget/" + name), Registry.getItem(name + "_nugget"), 9, List.of(this.input.get())));
+			}
+			return this;
+		}
+		
+		private Builder plate(int plateCount, RecipeState state) {
+			return this.plate(plateCount, false, state);
+		}
+		
+		private Builder plate(int plateCount, boolean isSheet, RecipeState state) {
+			String category = isSheet ? "sheet" : "plate";
+			recipes.add(new PneumaticResult(getRecipeLoc("pneumatic/plates", name), CountIngredient.of(this.input.get()), getNamed("forge", category + "s/" + name), plateCount, Mold.PLATE, 7).addIMCIfTrue(state == RecipeState.IMC || modCompat, "compressorPlateIMC"));
+			if(state != RecipeState.IMC) {
+				AdvancementlessResult ar = new AdvancementlessResult(getRecipeLoc("plates/" + name), Registry.getItem(name + "_" + category), plateCount, List.of(this.input.get(), Ingredient.of(getNamed(AssemblyLineMachines.MODID, "hammers"))));
+				if(state == RecipeState.CONDITIONAL) ar = ar.configCondition("lateGamePlatesRequireCompressor", false);
+				recipes.add(ar);
+			}
+			return this;
+		}
+		
+		private Builder gear(int gearCount, RecipeState state) {
+			recipes.add(new PneumaticResult(getRecipeLoc("pneumatic/gears", name), CountIngredient.of(Ingredient.of(getNamed("forge", "plates/" + name)), 4), getNamed("forge", "gears/" + name), gearCount, Mold.GEAR, 9).addIMCIfTrue(state == RecipeState.IMC || modCompat, "compressorGearIMC"));
+			if(state != RecipeState.IMC) {
+				AdvancementlessResult ar = new AdvancementlessResult(getRecipeLoc("gears/" + name), Registry.getItem(name + "_gear"), 1, GEAR_PATTERN, getShapedKey(Ingredient.of(getNamed("forge", "plates/" + name)), Ingredient.of(getNamed("forge", "rods/wooden"))));
+				if(state == RecipeState.CONDITIONAL) ar = ar.configCondition("lateGameGearsRequireCompressor", false);
+				recipes.add(ar);
+			}
+			return this;
+		}
+		
+		private Builder rod() {
+			recipes.add(new PneumaticResult(getRecipeLoc("pneumatic/rods", name), CountIngredient.of(this.input.get()), getNamed("forge", "rods/" + name), 1, Mold.ROD, 8).addIMCIfTrue(modCompat, "compressorRodIMC"));
+			return this;
+		}
 	}
 	
 	private void concursivelyCopyRecipe(Consumer<FinishedRecipe> consumer, String directoryName) {
@@ -104,207 +329,11 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		}
 	}
 	
-	private static enum GrinderRecipeGeneration{
+	private static HashMap<Character, Ingredient> getShapedKey(Ingredient... ingredients){
+		HashMap<Character, Ingredient> map = new HashMap<>();
 		
-		CHROMIUM(false, Blade.TITANIUM, true, 2, true, true), COAL(true, Blade.PUREGOLD, false, 4, false, false, Optional.of(Ingredient.of(Items.COAL))), COPPER(true, Blade.TITANIUM,
-				false, 2, true, true), DIAMOND(true, Blade.PUREGOLD, false, 2, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/diamond")))), GOLD(true, Blade.TITANIUM,
-				false, 2, true, true), IRON(true, Blade.TITANIUM, false, 2, true, true), LAPIS(true, Blade.TITANIUM, true, 8, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/lapis")))),
-		REDSTONE(true, Blade.TITANIUM, false, 10, false, false, null), FLEROVIUM(false, Blade.TITANIUM, true, 2, true, true), TITANIUM(true, Blade.TITANIUM, false, 2, true, true), 
-		EMERALD(true, Blade.PUREGOLD, false, 2, false, false, Optional.of(Ingredient.of(getNamed("forge", "gems/emerald")))),
-		
-		
-		//COMPAT
-		ALUMINUM, LEAD, SILVER, NICKEL, URANIUM, CONSTANTAN, ELECTRUM, TIN, ZINC, PLATINUM, TUNGSTEN, OSMIUM, COBALT, ARDITE, BRONZE, BRASS, INVAR, ROSE_GOLD, MANYULLYN;
-		
-		private final Consumer<Consumer<FinishedRecipe>> consumer;
-		
-		GrinderRecipeGeneration(boolean corruptOre, Blade bladeType, boolean machineRequired, int countFromOre, boolean hasRaw, boolean hasRawBlock){
-			this(corruptOre, bladeType, machineRequired, countFromOre, hasRaw, hasRawBlock, Optional.empty());
-		}
-		GrinderRecipeGeneration(boolean corruptOre, Blade bladeType, boolean machineRequired, int countFromOre, boolean hasRaw, boolean hasRawBlock, Optional<Ingredient> input){
-			this.consumer = (consumer) ->{
-				String name = this.toString().toLowerCase();
-				
-				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "block_ores/" + name), Ingredient.of(getNamed("forge", "ores/" + name)), getNamed("forge", "dusts/" + name), countFromOre, 10, 0f, machineRequired, bladeType));
-				if(hasRaw) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), Ingredient.of(getNamed("forge", "raw_materials/" + name)), getNamed("forge", "dusts/" + name), 1, 5, 0.25f, machineRequired, bladeType));
-				if(hasRawBlock) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), Ingredient.of(getNamed("forge", "storage_blocks/raw_" + name)), getNamed("forge", "dusts/" + name), 9, 10, 0.25f, machineRequired, bladeType));
-				if(input != null ) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "ingots/" + name), input.orElse(Ingredient.of(getNamed("forge", "ingots/" + this.toString().toLowerCase()))), 
-						getNamed("forge", "dusts/" + name), 1, 4, 0f, machineRequired, bladeType));
-				if(corruptOre) consumer.accept(new GrinderResult(getRecipeLoc("grinder", "corrupt_block_ores/" + name), Ingredient.of(getNamed("forge", "ores/corrupt_" + name)), getNamed("forge", "dusts/" + name),
-						Math.round((float) countFromOre * 1.5f), 15, 0f, true, bladeType));
-				
-			};
-		}
-		
-		GrinderRecipeGeneration(){
-			this.consumer = (consumer) ->{
-				String name = this.toString().toLowerCase();
-				
-				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "block_ores/" + name), getNamed("forge", "ores/" + name), getNamed("forge", "dusts/" + name), 2, 10, 0f));
-				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ores/" + name), getNamed("forge", "raw_materials/" + name), getNamed("forge", "dusts/" + name), 1, 5, 0.25f));
-				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "ingots/" + name), getNamed("forge", "ingots/" + name), getNamed("forge", "dusts/" + name), 1, 4, 0f));
-				consumer.accept(new GrinderResult(getRecipeLoc("grinder", "raw_ore_blocks/" + name), getNamed("forge", "storage_blocks/raw_" + name), getNamed("forge", "dusts/" + name), 9, 10, 0.25f));
-			};
-		}
-	}
-	
-	private static enum MetalRecipeGeneration {
-		
-		TITANIUM(true, true, true, true, Optional.empty(), Triple.of(false, false, 0)), STEEL(true, true, true, true, Optional.empty(), Triple.of(false, false, 0)), CHROMIUM(true, true, false, false, Optional.of(3), Triple.of(false, false, 0)),
-		ATTUNED_TITANIUM(true, false, false, false, Optional.of(3), Triple.of(false, false, 0)), PLASTIC(3), RUBBER(4),
-		MYSTIUM(true, false, true, false, Optional.of(2), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/steel")), FLEROVIUM(true, true, false, false, Optional.of(4), Triple.of(true, true, 1)), 
-		ENERGIZED_GOLD(true, false, false, false, Optional.of(4), Triple.of(false, false, 0)), RAW_CHROMIUM(() -> Ingredient.of(Registry.getItem("raw_chromium")), null, false),
-		NOVASTEEL(true, false, true, false, Optional.of(1), Triple.of(false, false, 0), getItemTagIngredient("forge", "rods/graphene")), 
-		CRANK(false, false, true, false, Optional.empty(), Triple.of(false, false, 0), getItemTagIngredient(AssemblyLineMachines.MODID, "precious_gears"), getItemTagIngredient("forge", "rods/steel")),
-		CRAFTING_TABLE(() -> Ingredient.of(Blocks.CRAFTING_TABLE), () -> Ingredient.of(Registry.getBlock("compressed_crafting_table")), false), RAW_TITANIUM(() -> Ingredient.of(Registry.getItem("raw_titanium")), null, false),
-		RAW_FLEROVIUM(() -> Ingredient.of(Registry.getItem("raw_flerovium")), null, false),
-		PURE_COPPER(Optional.of(3), Triple.of(true, false, 5)), PURE_IRON(Optional.of(3), Triple.of(true, false, 4)), PURE_GOLD(Optional.of(3), Triple.of(true, false, 1)), PURE_TITANIUM(Optional.of(5), Triple.of(true, false, 2)), 
-		PURE_STEEL(Optional.of(8), Triple.of(true, false, 3));
-		
-		private static final HashMap<String, List<String>> ARMOR_PATTERNS = new HashMap<>();
-		private static final HashMap<String, List<String>> TOOL_PATTERNS = new HashMap<>();
-		
-		private static final List<String> BLOCK_PATTERN = List.of("XXX", "XXX", "XXX");
-		private static final List<String> GEAR_PATTERN = List.of(" X ", "XYX", " X ");
-		
-		static {
-			ARMOR_PATTERNS.put("helmet", List.of("XXX", "X X"));
-			ARMOR_PATTERNS.put("chestplate", List.of("X X", "XXX", "XXX"));
-			ARMOR_PATTERNS.put("leggings", List.of("XXX", "X X", "X X"));
-			ARMOR_PATTERNS.put("boots", List.of("X X", "X X"));
-			
-			TOOL_PATTERNS.put("pickaxe", List.of("XXX", " Y ", " Y "));
-			TOOL_PATTERNS.put("axe", List.of("XX", "XY", " Y"));
-			TOOL_PATTERNS.put("sword", List.of("X", "X", "Y"));
-			TOOL_PATTERNS.put("shovel", List.of("X", "Y", "Y"));
-			TOOL_PATTERNS.put("hoe", List.of("XX", " Y", " Y"));
-			TOOL_PATTERNS.put("hammer", List.of(" X ", " YX", "Y  "));
-			
-		}
-		
-		private final boolean hasStorageBlock;
-		private final boolean hasNugget;
-		private final boolean hasTools;
-		private final boolean hasArmor;
-		private final Optional<Integer> hasPlate;
-		private final Triple<Boolean, Boolean, Integer> hasGear;
-		private final Supplier<Ingredient> toolMaterial;
-		private final Supplier<Ingredient> toolRod;
-		private final Supplier<Ingredient> specialStorageBlock;
-		private final boolean addIngot;
-		private final boolean isSheetInsteadOfPlate;
-		
-		MetalRecipeGeneration(Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear){
-			this(false, false, false, false, hasPlate, hasGear);
-		}
-		
-		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear){
-			this(hasStorageBlock, hasNugget, hasTools, hasArmor, hasPlate, hasGear, null, null);
-		}
-		
-		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear, Supplier<Ingredient> toolRod){
-			this(hasStorageBlock, hasNugget, hasTools, hasArmor, hasPlate, hasGear, null, toolRod);
-		}
-		
-		MetalRecipeGeneration(boolean hasStorageBlock, boolean hasNugget, boolean hasTools, boolean hasArmor, Optional<Integer> hasPlate, Triple<Boolean, Boolean, Integer> hasGear, Supplier<Ingredient> toolMaterial, Supplier<Ingredient> toolRod){
-			this.hasStorageBlock = hasStorageBlock;
-			this.hasNugget = hasNugget;
-			this.hasTools = hasTools;
-			this.hasArmor = hasArmor;
-			this.hasPlate = hasPlate;
-			this.hasGear = hasGear;
-			this.toolMaterial = toolMaterial != null ? toolMaterial : getItemTagIngredient("forge", "ingots/" + this.toString().toLowerCase());
-			this.toolRod = toolRod != null ? toolRod : getItemTagIngredient("forge", "rods/wooden");
-			this.specialStorageBlock = null;
-			this.addIngot = true;
-			this.isSheetInsteadOfPlate = false;
-		}
-		
-		MetalRecipeGeneration(Supplier<Ingredient> toolMaterial, Supplier<Ingredient> specialStorageBlock, boolean addIngot){
-			this.hasStorageBlock = true;
-			this.hasNugget = this.hasTools = this.hasArmor = this.isSheetInsteadOfPlate = false;
-			this.hasPlate = Optional.empty();
-			this.hasGear = Triple.of(false, false, 0);
-			this.toolMaterial = this.toolRod = toolMaterial;
-			this.specialStorageBlock = specialStorageBlock;
-			this.addIngot = addIngot;
-		}
-		
-		MetalRecipeGeneration(int plateCount){
-			this.hasStorageBlock = this.hasNugget = this.hasTools = this.hasArmor = false;
-			this.hasPlate = Optional.of(plateCount);
-			this.hasGear = Triple.of(false, false, 0);
-			this.toolMaterial = this.toolRod = () -> Ingredient.of(Registry.getItem(this.toString().toLowerCase() + "_ball"));
-			this.isSheetInsteadOfPlate = this.addIngot = true;
-			this.specialStorageBlock = null;
-		}
-		
-		public String generateRecipes(Consumer<FinishedRecipe> consumer) {
-			String typeName = this.toString().toLowerCase();
-			String logText = "";
-			
-			if(this.hasArmor) {
-				for(String piece : ARMOR_PATTERNS.keySet()) {
-					String pieceResultName = typeName + "_" + piece;
-					consumer.accept(new AdvancementlessResult(getRecipeLoc("tools/" + typeName + "/" + pieceResultName), Registry.getItem(pieceResultName), 1, ARMOR_PATTERNS.get(piece), getShapedKey(this.toolMaterial)));
-				}
-				logText = logText + "Armor, ";
-			}
-			if(this.hasTools) {
-				for(String piece : TOOL_PATTERNS.keySet()) {
-					String pieceResultName = typeName + "_" + piece;
-					consumer.accept(new AdvancementlessResult(getRecipeLoc("tools/" + typeName + "/" + pieceResultName), Registry.getItem(pieceResultName), 1, TOOL_PATTERNS.get(piece), getShapedKey(this.toolMaterial, this.toolRod)));
-				}
-				logText = logText + "Tools, ";
-			}
-			if(this.hasStorageBlock) {
-				Item resultBlock = specialStorageBlock == null ? Registry.getItem(typeName + "_block") : specialStorageBlock.get().getItems()[0].getItem();
-				Item resultIngot = specialStorageBlock == null ? addIngot ? Registry.getItem(typeName + "_ingot") : Registry.getItem(typeName) : toolMaterial.get().getItems()[0].getItem();
-				Ingredient inputBlock = specialStorageBlock == null ? getItemTagIngredient("forge", "storage_blocks/" + typeName).get() : specialStorageBlock.get();
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/ingot_to_block/" + typeName), resultBlock, 1, BLOCK_PATTERN, getShapedKey(this.toolMaterial)));
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/block_to_ingot/" + typeName), resultIngot, 9, List.of(inputBlock)));
-				logText = logText + "Storage Block, ";
-			}
-			if(this.hasNugget) {
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/nugget_to_ingot/" + typeName), Registry.getItem(typeName + "_ingot"), 1, BLOCK_PATTERN, getShapedKey(getItemTagIngredient("forge", "nuggets/" + typeName))));
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("conversion/ingot_to_nugget/" + typeName), Registry.getItem(typeName + "_nugget"), 9, List.of(this.toolMaterial.get())));
-				logText = logText + "Nugget, ";
-			}
-			if(this.hasPlate.isPresent()) {
-				String type = this.isSheetInsteadOfPlate ? "_sheet" : "_plate";
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("plates/" + typeName + type), Registry.getItem(typeName + type), this.hasPlate.get(), List.of(toolMaterial.get(), getItemTagIngredient(AssemblyLineMachines.MODID, "hammers").get())));
-				consumer.accept(new MetalShaperResult(getRecipeLoc("metalshaper", typeName + type), toolMaterial.get(), new ItemStack(Registry.getItem(typeName + type), this.hasPlate.get()), 6));
-				logText = logText + "Plate, ";
-			}
-			if(this.hasGear.getLeft()) {
-				Supplier<Ingredient> stickType = this.hasGear.getMiddle() ? getItemTagIngredient("forge", "rods/steel") : getItemTagIngredient("forge", "rods/wooden");
-				consumer.accept(new AdvancementlessResult(getRecipeLoc("gears/" + typeName + "_gear"), Registry.getItem(typeName + "_gear"), this.hasGear.getRight(), GEAR_PATTERN, getShapedKey(getItemTagIngredient("forge", "plates/" + typeName), stickType)));
-			}
-			
-			if(!logText.isEmpty()) {
-				return "[METAL RECIPES - INFO]: Generated " + typeName + " recipes: " + logText.substring(0, logText.length() - 2) + ".";
-			}
-			return "[METAL RECIPES - WARNING]: No recipes generated for " + typeName + ".";
-		}
-		
-		
-		
-		@SafeVarargs
-		private HashMap<Character, Ingredient> getShapedKey(Supplier<Ingredient>... ingredients){
-			HashMap<Character, Ingredient> map = new HashMap<>();
-			
-			if(ingredients.length > 0) {
-				map.put('X', ingredients[0].get());
-			}
-			if(ingredients.length > 1) {
-				map.put('Y', ingredients[1].get());
-			}
-			return map;
-		}
-		
-		private static Supplier<Ingredient> getItemTagIngredient(String modid, String path){
-			return () -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation(modid, path)));
-		}
+		for(int i = 0; i < ingredients.length; i++) map.put(FormattingHelper.getCharForNumber(i + 1), ingredients[i]);
+		return map;
 	}
 	
 	private static ResourceLocation getRecipeLoc(String fileName){
@@ -316,12 +345,17 @@ public class AutoRecipeGenerator extends RecipeProvider {
 	}
 	
 	private static TagKey<Item> getNamed(String modid, String path){
-		return Utils.getTagKey(Keys.ITEMS, new ResourceLocation(modid, path));
+		return TagKey.create(Keys.ITEMS, new ResourceLocation(modid, path));
+	}
+	
+	private static enum RecipeState{
+		TRUE, CONDITIONAL, IMC;
 	}
 	
 	public static class AdvancementlessResult implements FinishedRecipe{
 
 		private final FinishedRecipe recipe;
+		private ConfigCondition condition = null;
 		
 		public AdvancementlessResult(ResourceLocation rl, Ingredient input, Item result, float experience, int processingTime) {
 			this.recipe = new SimpleCookingRecipeBuilder.Result(rl, "", input, result, experience, processingTime, null, null, RecipeSerializer.SMELTING_RECIPE);
@@ -335,9 +369,19 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			this.recipe = new ShapelessRecipeBuilder.Result(rl, result, numberOfResult, "", ingredients, null, null);
 		}
 		
+		public AdvancementlessResult configCondition(String fieldName, boolean enableOn) {
+			this.condition = new ConfigCondition(fieldName, enableOn);
+			return this;
+		}
+		
 		@Override
 		public void serializeRecipeData(JsonObject json) {
 			recipe.serializeRecipeData(json);
+			if(condition != null) {
+				JsonArray conditions = new JsonArray();
+				conditions.add(CraftingHelper.serialize(condition));
+				json.add("conditions", conditions);
+			}
 		}
 
 		@Override
@@ -355,117 +399,6 @@ public class AutoRecipeGenerator extends RecipeProvider {
 			return null;
 		}
 
-		@Override
-		public ResourceLocation getAdvancementId() {
-			return null;
-		}
-		
-	}
-	
-	public static class MetalShaperResult implements FinishedRecipe{
-
-		private final ResourceLocation rl;
-		private final Ingredient input;
-		private final ItemStack result;
-		private final int time;
-		
-		public MetalShaperResult(ResourceLocation rl, Ingredient input, ItemStack result, int time) {
-			this.rl = rl;
-			this.input = input;
-			this.result = result;
-			this.time = time;
-		}
-		
-		@Override
-		public void serializeRecipeData(JsonObject json) {
-			
-			json.add("input", input.toJson());
-			
-			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("item", result.getItem().getRegistryName().toString());
-			if(result.getCount() > 1) {
-				outputJson.addProperty("count", result.getCount());
-			}
-			json.add("output", outputJson);
-			json.addProperty("time", time);
-		}
-
-		@Override
-		public ResourceLocation getId() {
-			return rl;
-		}
-
-		@Override
-		public RecipeSerializer<?> getType() {
-			return MetalCrafting.SERIALIZER;
-		}
-
-		@Override
-		public JsonObject serializeAdvancement() {
-			return null;
-		}
-
-		@Override
-		public ResourceLocation getAdvancementId() {
-			return null;
-		}
-		
-	}
-	
-	public static class GrinderResult implements FinishedRecipe{
-		private final ResourceLocation rl;
-		private final Ingredient input;
-		private final TagKey<Item> outputTag;
-		private final int outputCount;
-		private final int grinds;
-		private final float chanceToDouble;
-		private final boolean machineRequired;
-		private final Blade bladeType;
-		
-		public GrinderResult(ResourceLocation rl, TagKey<Item> inputTag, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble) {
-			this(rl, Ingredient.of(inputTag), outputTag, outputCount, grinds, chanceToDouble, false, Blade.TITANIUM);
-		}
-		
-		public GrinderResult(ResourceLocation rl, Ingredient input, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
-			this.rl = rl;
-			this.input = input;
-			this.outputTag = outputTag;
-			this.outputCount = outputCount;
-			this.grinds = grinds;
-			this.chanceToDouble = chanceToDouble;
-			this.machineRequired = machineRequired;
-			this.bladeType = bladeType;
-		}
-		
-		@Override
-		public void serializeRecipeData(JsonObject json) {
-			json.add("input", input.toJson());
-			if(chanceToDouble != 0f) json.addProperty("chanceToDouble", chanceToDouble);
-			json.addProperty("bladetype", bladeType.toString());
-			json.addProperty("grinds", grinds);
-			if(machineRequired) json.addProperty("machine_required", true);
-			
-			JsonObject outputJson = new JsonObject();
-			outputJson.addProperty("tag", outputTag.location().toString());
-			if(outputCount != 1) outputJson.addProperty("count", outputCount);
-			json.add("output", outputJson);
-		}
-		
-		@Override
-		public ResourceLocation getId() {
-			return rl;
-		}
-		
-		@Override
-		public RecipeSerializer<?> getType() {
-			return GrinderCrafting.SERIALIZER;
-		}
-		
-		@Override
-		public JsonObject serializeAdvancement() {
-			return null;
-		}
-		
 		@Override
 		public ResourceLocation getAdvancementId() {
 			return null;

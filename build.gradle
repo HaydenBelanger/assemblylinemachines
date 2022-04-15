@@ -127,7 +127,7 @@ jar{
 }
 
 dependencies {
-  	minecraft 'net.minecraftforge:forge:1.18.2-40.0.11'
+  	minecraft 'net.minecraftforge:forge:1.18.2-40.0.40'
 
 	//Compatibilities - 'implementation' because it needs to be during runtime and compilation.
  	implementation fg.deobf("mezz.jei:jei-1.18.2:9.4.1.116")

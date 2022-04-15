@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.registry.StateProperties;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;

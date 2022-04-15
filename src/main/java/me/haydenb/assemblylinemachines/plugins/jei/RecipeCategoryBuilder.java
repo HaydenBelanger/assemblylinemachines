@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -11,7 +12,7 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder.ICatalystProvider;
-import me.haydenb.assemblylinemachines.registry.Utils.CountIngredient;
+import me.haydenb.assemblylinemachines.registry.utils.CountIngredient;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;

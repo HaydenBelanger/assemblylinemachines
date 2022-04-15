@@ -12,16 +12,11 @@ import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
 
 public class PluginTOP {
-
-	private static boolean registered = false;
-	
 	
 	public static void register() {
-		if(!registered) {
-			registered = true;
-			if(ModList.get().isLoaded("theoneprobe")) {
-				InterModComms.sendTo("theoneprobe", "getTheOneProbe", PluginTOPRegistry::new);
-			}
+		if(ModList.get().isLoaded("theoneprobe")) {
+			InterModComms.sendTo("theoneprobe", "getTheOneProbe", PluginTOPRegistry::new);
+			AssemblyLineMachines.LOGGER.debug("The One Probe plugin connected to Assembly Line Machines.");
 		}
 	}
 	
@@ -29,7 +24,6 @@ public class PluginTOP {
 		
 		@Override
 		public Void apply(ITheOneProbe probe) {
-			AssemblyLineMachines.LOGGER.info("TOP plugin for Assembly Line Machines loaded.");
 			
 			probe.registerProvider(new IProbeInfoProvider() {
 				

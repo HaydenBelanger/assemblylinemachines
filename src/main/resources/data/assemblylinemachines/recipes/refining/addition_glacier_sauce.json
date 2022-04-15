@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:glacier_water",
+		"amount": 1000
+	},
+	"input_item":{
+		"item": "minecraft:carrot"
+	},
+	"proc_time": 12,
+	"output_item":{
+		"item": "assemblylinemachines:glacier_sauce"
+	}
+}

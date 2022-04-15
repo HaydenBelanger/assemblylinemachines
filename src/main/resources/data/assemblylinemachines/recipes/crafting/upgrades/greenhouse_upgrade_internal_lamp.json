@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sas",
+		"gdg",
+		"sas"
+	],
+	"key":{
+		"a":{
+			"item": "minecraft:sea_lantern"
+		},
+		"g":{
+			"item": "minecraft:glowstone"
+		},
+		"d":{
+			"tag": "forge:gems/emerald"
+		},
+		"s":{
+			"tag": "forge:plates/pure_steel"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:greenhouse_upgrade_internal_lamp"
+	}
+}

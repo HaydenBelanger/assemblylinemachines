@@ -16,7 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
+import me.haydenb.assemblylinemachines.registry.utils.ScreenMath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -73,6 +74,7 @@ public class TooltipBorderHandler {
 	public static Boolean frames = null;
 	
 	@SubscribeEvent
+	@OnlyIn(Dist.CLIENT)
 	public static void onTooltipColorEvent(RenderTooltipEvent.Color event) {
 		if(getColorsEnabled()) {
 			ISpecialTooltip special = get(event.getItemStack().getItem());
@@ -87,6 +89,7 @@ public class TooltipBorderHandler {
 	}
 	
 	//Method triggered from TooltipMixin.
+	@OnlyIn(Dist.CLIENT)
 	public static void onPostTooltipEvent(ItemStack itemStack, PoseStack matrix, int x, int y, Font tooltipFont, int width, int height, List<ClientTooltipComponent> components) {
 		if(getFramesEnabled()) {
 			ISpecialTooltip special = get(itemStack.getItem());
@@ -127,16 +130,18 @@ public class TooltipBorderHandler {
 		}
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	public static boolean getColorsEnabled() {
 		if(colors == null) {
-			colors = ConfigHolder.getCommonConfig().customTooltipColors.get();
+			colors = ConfigHolder.getClientConfig().customTooltipColors.get();
 		}
 		return colors;
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	public static boolean getFramesEnabled() {
 		if(frames == null) {
-			frames = getColorsEnabled() ? ConfigHolder.getCommonConfig().customTooltipFrames.get() : false;
+			frames = getColorsEnabled() ? ConfigHolder.getClientConfig().customTooltipFrames.get() : false;
 		}
 		return frames;
 	}
@@ -172,10 +177,10 @@ public class TooltipBorderHandler {
 		 */
 		default public int getBottomColor(){
 			try {
-				return BOTTOM_COLOR_CACHE.get(getTopColor(), () -> MathHelper.multiplyARGBColor(getTopColor(), 0.7f));
+				return BOTTOM_COLOR_CACHE.get(getTopColor(), () -> ScreenMath.multiplyARGBColor(getTopColor(), 0.7f));
 			}catch(ExecutionException e) {
 				e.printStackTrace();
-				return MathHelper.multiplyARGBColor(getTopColor(), 0.7f);
+				return ScreenMath.multiplyARGBColor(getTopColor(), 0.7f);
 			}
 			
 		}

@@ -4,11 +4,12 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class FluidOilProduct extends ALMFluid {
 	
@@ -33,13 +35,13 @@ public class FluidOilProduct extends ALMFluid {
 	@Override
 	protected void randomTick(Level world, BlockPos pos, FluidState state, Random random) {
 		
-		if(source && ConfigHolder.getCommonConfig().gasolineExplosions.get()) {
+		if(source && ConfigHolder.getServerConfig().gasolineExplosions.get()) {
 			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.offset(-3, -1, -3).north().west(), pos.offset(3, 1, 3)).iterator();
 			
 			while(iter.hasNext()) {
 				BlockPos cor = iter.next();
 				
-				if(Utils.isInTag(world.getBlockState(cor), new ResourceLocation("assemblylinemachines", "gas_flammable"))) {
+				if(world.getBlockState(cor).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "gas_flammable")))) {
 					if(world.getRandom().nextInt(3) == 0) {
 						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), breakAndBreakConnected(world, state, cor), true, BlockInteraction.BREAK);
 						

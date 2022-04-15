@@ -2,20 +2,24 @@ package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.CountIngredient;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -32,13 +36,13 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	public static final AlloyingSerializer SERIALIZER = new AlloyingSerializer();
 	
 	
-	private final Lazy<CountIngredient> parta;
-	private final Lazy<CountIngredient> partb;
+	private final CountIngredient parta;
+	private final CountIngredient partb;
 	private final Lazy<ItemStack> output;
 	private final int time;
 	private final ResourceLocation id;
 	
-	public AlloyingCrafting(ResourceLocation id, Lazy<CountIngredient> parta, Lazy<CountIngredient> partb, Lazy<ItemStack> output, int time) {
+	public AlloyingCrafting(ResourceLocation id, CountIngredient parta, CountIngredient partb, Lazy<ItemStack> output, int time) {
 		this.parta = parta;
 		this.partb = partb;
 		this.output = output;
@@ -48,8 +52,8 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(parta.get().isEmpty() || partb.get().isEmpty() || output.get().isEmpty()) return false;
-		return ((parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) || (partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2))));
+		if(!this.showInJEI()) return false;
+		return ((parta.test(inv.getItem(1)) && partb.test(inv.getItem(2))) || (partb.test(inv.getItem(1)) && parta.test(inv.getItem(2))));
 	}
 	
 	@Override
@@ -58,12 +62,12 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		if(inv instanceof IMachineDataBridge) {
 			int shra = 0;
 			int shrb = 0;
-			if(parta.get().test(inv.getItem(1)) && partb.get().test(inv.getItem(2))) {
-				shra = parta.get().getCount();
-				shrb = partb.get().getCount();
-			}else if(partb.get().test(inv.getItem(1)) && parta.get().test(inv.getItem(2))) {
-				shrb = parta.get().getCount();
-				shra = partb.get().getCount();
+			if(parta.test(inv.getItem(1)) && partb.test(inv.getItem(2))) {
+				shra = parta.getCount();
+				shrb = partb.getCount();
+			}else if(partb.test(inv.getItem(1)) && parta.test(inv.getItem(2))) {
+				shrb = parta.getCount();
+				shra = partb.getCount();
 			}else {
 				return ItemStack.EMPTY;
 			}
@@ -106,12 +110,12 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	
 	@Override
 	public boolean showInJEI() {
-		return !this.parta.get().isEmpty() && !this.partb.get().isEmpty() && !this.output.get().isEmpty();
+		return !this.parta.isEmpty() && !this.partb.isEmpty() && !this.output.get().isEmpty();
 	}
 	
 	@Override
 	public List<?> getJEIComponents() {
-		return List.of(parta.get(), partb.get(), output.get());
+		return List.of(parta, partb, output.get());
 	}
 	
 	@Override
@@ -124,15 +128,14 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		@Override
 		public AlloyingCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				Lazy<CountIngredient> ingredienta = Lazy.of(() -> CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a")));
-				Lazy<CountIngredient> ingredientb = Lazy.of(() -> CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b")));
-				Lazy<ItemStack> output = Utils.getTaggedOutputFromJson(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
+				CountIngredient ingredienta = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a"));
+				CountIngredient ingredientb = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b"));
+				Lazy<ItemStack> output = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
 				
 				int time = GsonHelper.getAsInt(json, "time");
 				
 				return new AlloyingCrafting(recipeId, ingredienta, ingredientb, output, time);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Alloying recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}
@@ -147,17 +150,77 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			ItemStack output = buffer.readItem();
 			int time = buffer.readInt();
 			
-			return new AlloyingCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), Lazy.of(() -> output), time);
+			return new AlloyingCrafting(recipeId, inputa, inputb, Lazy.of(() -> output), time);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, AlloyingCrafting recipe) {
-			recipe.parta.get().toNetwork(buffer);
-			recipe.partb.get().toNetwork(buffer);
+			recipe.parta.toNetwork(buffer);
+			recipe.partb.toNetwork(buffer);
 			buffer.writeItem(recipe.output.get());
 			buffer.writeInt(recipe.time);
 			
 		}
 		
+	}
+
+	public static class AlloyResult implements FinishedRecipe{
+		private final ResourceLocation rl;
+		private final CountIngredient inputa;
+		private final CountIngredient inputb;
+		private final Pair<TagKey<Item>, Integer> output;
+		private ConfigCondition condition = null;
+		
+		public AlloyResult(ResourceLocation rl, CountIngredient inputa, CountIngredient inputb, TagKey<Item> output, int outputcount) {
+			this.rl = rl;
+			this.inputa = inputa;
+			this.inputb = inputb;
+			this.output = Pair.of(output, outputcount);
+		}
+		
+		@Override
+		public void serializeRecipeData(JsonObject json) {
+			json.add("part_a", inputa.toJson());
+			json.add("part_b", inputb.toJson());
+			json.addProperty("time", 100);
+			
+			JsonObject outputJson = new JsonObject();
+			outputJson.addProperty("tag", output.getFirst().location().toString());
+			if(output.getSecond() > 1) outputJson.addProperty("count", output.getSecond());
+			json.add("output", outputJson);
+			
+			if(condition != null) {
+				JsonArray conditions = new JsonArray();
+				conditions.add(CraftingHelper.serialize(condition));
+				json.add("conditions", conditions);
+			}
+		}
+		
+		public AlloyResult addIMCIfTrue(boolean check) {
+			if(check) {
+				this.condition = new ConfigCondition("alloyIMC", true);
+			}
+			return this;
+		}
+		
+		@Override
+		public ResourceLocation getId() {
+			return rl;
+		}
+		
+		@Override
+		public RecipeSerializer<?> getType() {
+			return SERIALIZER;
+		}
+		
+		@Override
+		public JsonObject serializeAdvancement() {
+			return null;
+		}
+		
+		@Override
+		public ResourceLocation getAdvancementId() {
+			return null;
+		}
 	}
 }

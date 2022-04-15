@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:dead_fire_coral"
+	},
+	"output":{
+		"item": "minecraft:dead_fire_coral_fan",
+		"count": 2
+	},
+	"grinds": 7,
+	"bladetype": "TITANIUM"
+}

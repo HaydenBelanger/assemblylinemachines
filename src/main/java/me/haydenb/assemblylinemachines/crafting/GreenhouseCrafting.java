@@ -5,12 +5,11 @@ import java.util.Random;
 
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockGreenhouse;
 import me.haydenb.assemblylinemachines.block.machines.BlockGreenhouse.*;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.StateProperties;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -182,7 +181,6 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 				
 				return new GreenhouseCrafting(recipeId, input, output, baseWater, base, additional, max, scaling, time, sprout, soil);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Greenhouse Crafting Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

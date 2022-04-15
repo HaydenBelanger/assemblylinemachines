@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:bubble_coral"
+	},
+	"output":{
+		"item": "minecraft:bubble_coral_fan",
+		"count": 2
+	},
+	"grinds": 7,
+	"bladetype": "TITANIUM"
+}

@@ -20,9 +20,8 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -793,16 +792,16 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 
 					if(Screen.hasShiftDown()) {
 						ArrayList<String> str = new ArrayList<>();
-						str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.getCapacity()) + "FE");
+						str.add(FormattingHelper.GENERAL_FORMAT.format(machine.amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(machine.properties.getCapacity()) + "FE");
 						if(usesfept) {
 							
 							
-							str.add(Formatting.FEPT_FORMAT.format(machine.fept) + " FE/tick");
+							str.add(FormattingHelper.FEPT_FORMAT.format(machine.fept) + " FE/tick");
 						}
 						this.renderComponentTooltip(str,
 								mouseX - x, mouseY - y);
 					}else {
-						this.renderComponentTooltip(Formatting.formatToSuffix(machine.amount) + "/" + Formatting.formatToSuffix(machine.properties.getCapacity()) + "FE",
+						this.renderComponentTooltip(FormattingHelper.formatToSuffix(machine.amount) + "/" + FormattingHelper.formatToSuffix(machine.properties.getCapacity()) + "FE",
 								mouseX - x, mouseY - y);
 					}
 					
@@ -905,7 +904,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
-		pd.writeUtf("button", "setrecipe");
+		pd.writeString("button", "setrecipe");
 		pd.writeInteger("number", bNum);
 		
 		PacketHandler.INSTANCE.sendToServer(pd);
@@ -915,7 +914,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
-		pd.writeUtf("button", "lock");
+		pd.writeString("button", "lock");
 		
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
@@ -923,7 +922,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 	private static void sendOutputModeChangeRequest(BlockPos pos, int bNum, String button) {
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
-		pd.writeUtf("button", button);
+		pd.writeString("button", button);
 		pd.writeInteger("number", bNum);
 		
 		PacketHandler.INSTANCE.sendToServer(pd);

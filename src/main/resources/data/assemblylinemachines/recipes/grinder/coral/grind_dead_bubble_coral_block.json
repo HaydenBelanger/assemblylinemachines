@@ -1,0 +1,12 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "minecraft:dead_bubble_coral_block"
+	},
+	"output":{
+		"item": "minecraft:dead_bubble_coral",
+		"count": 4
+	},
+	"grinds": 15,
+	"bladetype": "TITANIUM"
+}

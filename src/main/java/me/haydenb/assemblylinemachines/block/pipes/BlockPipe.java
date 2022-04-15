@@ -7,7 +7,7 @@ import com.google.common.collect.ArrayListMultimap;
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
 import me.haydenb.assemblylinemachines.block.pipes.PipeProperties.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;

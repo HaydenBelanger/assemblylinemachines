@@ -1,10 +1,7 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.function.*;
-
-import com.mojang.datafixers.util.Pair;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.TEBatteryCell;
@@ -13,13 +10,10 @@ import me.haydenb.assemblylinemachines.block.machines.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockOmnivoid.TEOmnivoid;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.item.ItemSpores;
+import me.haydenb.assemblylinemachines.world.CapabilityBooks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkEvent.Context;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -41,6 +35,7 @@ public class PacketHandler {
 		PACKET_TARGETS.put("quantum_link_gui", (pd, world) -> BlockQuantumLink.receiveFromServer(pd, world));
 		PACKET_TARGETS.put("machine_builder_gui", (pd, world) -> ((IMachineDataBridge) world.getBlockEntity(pd.get("pos", BlockPos.class))).receiveButtonPacket(pd));
 		PACKET_TARGETS.put("omnivoid_gui", (pd, world) -> ((TEOmnivoid) world.getBlockEntity(pd.get("location", BlockPos.class))).toggleSettings(pd.get("settingtoggle", Integer.class)));
+		PACKET_TARGETS.put("request_book", (pd, world) -> CapabilityBooks.guideBookServerRequestHandler(pd.get("uuid", UUID.class)));
 		
 		//SERVER -> CLIENT
 		PACKET_TARGETS.put("vacuum_hopper_particles", (pd, world) -> BlockVacuumHopper.spawnTeleparticles(pd));
@@ -49,172 +44,100 @@ public class PacketHandler {
 	}
 	
 	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);
-	public static int ID = 0;
-	
-	
+	public static int simpleId = 0;
 	
 	public static class PacketData{
 		
-		private final HashMap<String, Pair<Integer, Object>> map;
+		private final Map<String, Object> map;
 		private final String title;
 		
 		public PacketData(String title) {
-			this.map = new HashMap<>();
+			this(title, new HashMap<>());
+		}
+		
+		private PacketData(String title, Map<String, Object> map) {
+			this.map = map;
 			this.title = title;
 		}
 		
-		public void writeUtf(String key, String value) {
-			map.put(key, new Pair<>(0, value));
+		public void writeString(String key, String value) {
+			map.put(key, value);
 		}
 		
 		public void writeInteger(String key, Integer value) {
-			map.put(key, new Pair<>(1, value));
+			map.put(key, value);
 		}
 		
 		public void writeBoolean(String key, Boolean value) {
-			map.put(key, new Pair<>(2, value));
-		}
-		
-		public void writeFloat(String key, Float value) {
-			map.put(key, new Pair<>(3, value));
+			map.put(key, value);
 		}
 		
 		public void writeBlockPos(String key, BlockPos value) {
-			map.put(key, new Pair<>(4, value));
-		}
-		
-		public void writeItemStack(String key, ItemStack value) {
-			map.put(key, new Pair<>(5, value));
-		}
-		
-		public void writeResourceLocation(String key, ResourceLocation value) {
-			map.put(key, new Pair<>(6, value));
+			map.put(key, value);
 		}
 		
 		public void writeDouble(String key, Double value) {
-			map.put(key, new Pair<>(7, value));
+			map.put(key, value);
 		}
 		
-		public Pair<Integer, Object> get(String key) {
-			return map.get(key);
+		public void writeUUID(String key, UUID value) {
+			map.put(key, value);
 		}
 		
 		public <T> T get(String key, Class<T> clazz) {
-			return clazz.cast(map.get(key).getSecond());
+			return clazz.cast(map.get(key));
 		}
 		
-		public int getMapSize() {
-			return map.size();
-		}
 		public String getCategory() {
-			return title;
+			return this.title;
 		}
-		
-		public Set<String> getKeySet() {
-			return map.keySet();
-		}
-	}
-	public static class DecoderConsumer implements Function<FriendlyByteBuf, PacketData>{
-
-		@Override
-		public PacketData apply(FriendlyByteBuf t) {
-			
-			PacketData pd = new PacketData(t.readUtf(32767));
-			
-			int max = t.readInt();
-			for(int i = 0; i < max; i++) {
-				
-				String key = t.readUtf(32767);
-				int id = t.readInt();
-				
-				if(id == 0) {
-					pd.writeUtf(key, t.readUtf(32767));
-				}else if(id == 1) {
-					pd.writeInteger(key, t.readInt());
-				}else if(id == 2) {
-					pd.writeBoolean(key, t.readBoolean());
-				}else if(id == 3) {
-					pd.writeFloat(key, t.readFloat());
-				}else if(id == 4) {
-					pd.writeBlockPos(key, t.readBlockPos());
-				}else if(id == 5) {
-					pd.writeItemStack(key, t.readItem());
-				}else if(id == 6) {
-					pd.writeResourceLocation(key, t.readResourceLocation());
-				}else if(id == 7) {
-					pd.writeDouble(key, t.readDouble());
-				}
-			}
-			return pd;
-		}
-		
-	}
-	public static class EncoderConsumer implements BiConsumer<PacketData, FriendlyByteBuf>{
-
-		@Override
-		public void accept(PacketData t, FriendlyByteBuf u) {
-			
-			u.writeUtf(t.getCategory());
-			u.writeInt(t.getMapSize());
-			
-			for(String k : t.getKeySet()) {
-				u.writeUtf(k);
-				Pair<Integer, Object> v = t.get(k);
-				Integer id = v.getFirst();
-				Object data = v.getSecond();
-				u.writeInt(id);
-				
-				if(id == 0) {
-					u.writeUtf((String) data);
-				}else if(id == 1) {
-					u.writeInt((Integer) data);
-				}else if(id == 2) {
-					u.writeBoolean((Boolean) data);
-				}else if(id == 3) {
-					u.writeFloat((Float) data);
-				}else if(id == 4) {
-					u.writeBlockPos((BlockPos) data);
-				}else if(id == 5) {
-					u.writeItem((ItemStack) data);
-				}else if(id == 6) {
-					u.writeResourceLocation((ResourceLocation) data);
-				}else if(id == 7) {
-					u.writeDouble((Double) data);
-				}
-				
-			}
-			
-		}
-		
 	}
 	
-	public static class MessageHandler implements BiConsumer<PacketData, Supplier<NetworkEvent.Context>>{
-
-		@Override
-		public void accept(PacketData t, Supplier<Context> u) {
-			u.get().enqueueWork(new Runnable() {
-				
-				@Override
-				public void run() {
-					
-					BiConsumer<PacketData, Level> x = PACKET_TARGETS.get(t.title);
-					if(x != null) {
-						if(u.get().getSender() != null) {
-							x.accept(t, u.get().getSender().getCommandSenderWorld());
-						}else {
-							x.accept(t, null);
-						}
-						
-					}else {
-						AssemblyLineMachines.LOGGER.warn("Received packet with no method target: " + t.title + ". Look out for injection possibilities.");
-					}
-					
-					
+	public static void register() {
+		INSTANCE.registerMessage(PacketHandler.simpleId++, PacketData.class, (t, u) -> {
+			//Encoder
+			u.writeUtf(t.title);
+			u.writeMap(t.map, (buf, key) -> buf.writeUtf(key), (buf, val) -> {
+				if(val instanceof String string) {
+					buf.writeUtf("String");
+					buf.writeUtf(string);
+				}else if(val instanceof Integer integer) {
+					buf.writeUtf("Integer");
+					buf.writeInt(integer);
+				}else if(val instanceof Boolean bool) {
+					buf.writeUtf("Boolean");
+					buf.writeBoolean(bool);
+				}else if(val instanceof BlockPos pos) {
+					buf.writeUtf("BlockPos");
+					buf.writeBlockPos(pos);
+				}else if(val instanceof Double d) {
+					buf.writeUtf("Double");
+					buf.writeDouble(d);
+				}else if(val instanceof UUID uuid) {
+					buf.writeUtf("UUID");
+					buf.writeUUID(uuid);
+				}else {
+					throw new IllegalArgumentException("Illegal member in PacketData.");
 				}
 			});
+		}, (t) -> {
+			//Decoder
+			return new PacketData(t.readUtf(), t.readMap((buf) -> buf.readUtf(), (buf) -> {
+				return switch(buf.readUtf()) {
+				case "String" -> buf.readUtf();
+				case "Integer" -> buf.readInt();
+				case "Boolean" -> buf.readBoolean();
+				case "BlockPos" -> buf.readBlockPos();
+				case "Double" -> buf.readDouble();
+				case "UUID" -> buf.readUUID();
+				default -> throw new IllegalArgumentException("Unexpected result from packet.");
+				};
+			}));
+		}, (t, u) -> u.get().enqueueWork(() -> {
+			//Handler
+			var cons = PACKET_TARGETS.get(t.title);
+			if(cons != null) cons.accept(t, u.get().getSender() != null ? u.get().getSender().getCommandSenderWorld() : null);
 			u.get().setPacketHandled(true);
-			
-		}
-		
+		}));
 	}
 }

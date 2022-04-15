@@ -44,28 +44,28 @@ public class VanillaDimensionOres {
 	public static void registerConfiguredFeatures() {
 		titaniumOreFeature = FeatureUtils.register(AssemblyLineMachines.MODID + ":ore_titanium", Feature.ORE, new OreConfiguration(List.of(OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, Registry.getBlock("titanium_ore").defaultBlockState()),
 				OreConfiguration.target(OreFeatures.DEEPSLATE_ORE_REPLACEABLES, Registry.getBlock("deepslate_titanium_ore").defaultBlockState()),
-				OreConfiguration.target(new BlockMatchTest(Registry.getBlock("corrupt_stone")), Registry.getBlock("corrupt_titanium_ore").defaultBlockState())), ConfigHolder.getCommonConfig().titaniumVeinSize.get()));
+				OreConfiguration.target(new BlockMatchTest(Registry.getBlock("corrupt_stone")), Registry.getBlock("corrupt_titanium_ore").defaultBlockState())), ConfigHolder.getServerConfig().titaniumVeinSize.get()));
 		
-		BlockState state = ConfigHolder.getCommonConfig().blackGraniteSpawnsWithNaturalTag.get() ? Registry.getBlock("black_granite").defaultBlockState().setValue(BlockBlackGranite.NATURAL_GRANITE, true) : Registry.getBlock("black_granite").defaultBlockState();
-		blackGraniteFeature = FeatureUtils.register(AssemblyLineMachines.MODID + ":ore_black_granite", Feature.ORE, new OreConfiguration(OreFeatures.NETHER_ORE_REPLACEABLES, state, ConfigHolder.getCommonConfig().blackGraniteVeinSize.get()));
+		BlockState state = ConfigHolder.getServerConfig().blackGraniteSpawnsWithNaturalTag.get() ? Registry.getBlock("black_granite").defaultBlockState().setValue(BlockBlackGranite.NATURAL_GRANITE, true) : Registry.getBlock("black_granite").defaultBlockState();
+		blackGraniteFeature = FeatureUtils.register(AssemblyLineMachines.MODID + ":ore_black_granite", Feature.ORE, new OreConfiguration(OreFeatures.NETHER_ORE_REPLACEABLES, state, ConfigHolder.getServerConfig().blackGraniteVeinSize.get()));
 	
-		chromiumOreFeature = FeatureUtils.register(AssemblyLineMachines.MODID + ":ore_chromium", Feature.ORE, new OreConfiguration(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState(), ConfigHolder.getCommonConfig().chromiumVeinSize.get()));
+		chromiumOreFeature = FeatureUtils.register(AssemblyLineMachines.MODID + ":ore_chromium", Feature.ORE, new OreConfiguration(new BlockMatchTest(Blocks.END_STONE), Registry.getBlock("chromium_ore").defaultBlockState(), ConfigHolder.getServerConfig().chromiumVeinSize.get()));
 	}
 	
 	public static void registerPlacedFeatures() {
 		
 		
 		
-		if(ConfigHolder.getCommonConfig().titaniumFrequency.get() != 0 && ConfigHolder.getCommonConfig().titaniumVeinSize.get() != 0) {
-			titaniumOrePlaced = PlacementUtils.register(AssemblyLineMachines.MODID + ":ore_titanium", titaniumOreFeature, OrePlacements.commonOrePlacement(ConfigHolder.getCommonConfig().titaniumFrequency.get(), ConfigHolder.getCommonConfig().titaniumOreGenStyle.get().apply(ConfigHolder.getCommonConfig().titaniumMinHeight.get(), ConfigHolder.getCommonConfig().titaniumMaxHeight.get())));
+		if(ConfigHolder.getServerConfig().titaniumFrequency.get() != 0 && ConfigHolder.getServerConfig().titaniumVeinSize.get() != 0) {
+			titaniumOrePlaced = PlacementUtils.register(AssemblyLineMachines.MODID + ":ore_titanium", titaniumOreFeature, OrePlacements.commonOrePlacement(ConfigHolder.getServerConfig().titaniumFrequency.get(), ConfigHolder.getServerConfig().titaniumOreGenStyle.get().apply(ConfigHolder.getServerConfig().titaniumMinHeight.get(), ConfigHolder.getServerConfig().titaniumMaxHeight.get())));
 		}
 		
-		if(ConfigHolder.getCommonConfig().blackGraniteFrequency.get() != 0 && ConfigHolder.getCommonConfig().blackGraniteVeinSize.get() != 0) {
-			blackGranitePlaced = PlacementUtils.register(AssemblyLineMachines.MODID + ":ore_black_granite", blackGraniteFeature, OrePlacements.commonOrePlacement(ConfigHolder.getCommonConfig().blackGraniteFrequency.get(), PlacementUtils.FULL_RANGE));
+		if(ConfigHolder.getServerConfig().blackGraniteFrequency.get() != 0 && ConfigHolder.getServerConfig().blackGraniteVeinSize.get() != 0) {
+			blackGranitePlaced = PlacementUtils.register(AssemblyLineMachines.MODID + ":ore_black_granite", blackGraniteFeature, OrePlacements.commonOrePlacement(ConfigHolder.getServerConfig().blackGraniteFrequency.get(), PlacementUtils.FULL_RANGE));
 		}
 		
-		if(ConfigHolder.getCommonConfig().chromiumFrequency.get() != 0 && ConfigHolder.getCommonConfig().chromiumVeinSize.get() != 0) {
-			chromiumOrePlaced = PlacementUtils.register(AssemblyLineMachines.MODID + ":ore_chromium", chromiumOreFeature, List.of(CountPlacement.of(ConfigHolder.getCommonConfig().chromiumFrequency.get()), InSquarePlacement.spread(), PlacementUtils.FULL_RANGE, ConfigHolder.getCommonConfig().chromiumOnDragonIsland.get() ? BiomeFilter.biome() : new BlacklistBiomeFilter(List.of(Biomes.THE_END.location()))));
+		if(ConfigHolder.getServerConfig().chromiumFrequency.get() != 0 && ConfigHolder.getServerConfig().chromiumVeinSize.get() != 0) {
+			chromiumOrePlaced = PlacementUtils.register(AssemblyLineMachines.MODID + ":ore_chromium", chromiumOreFeature, List.of(CountPlacement.of(ConfigHolder.getServerConfig().chromiumFrequency.get()), InSquarePlacement.spread(), PlacementUtils.FULL_RANGE, ConfigHolder.getServerConfig().chromiumOnDragonIsland.get() ? BiomeFilter.biome() : new BlacklistBiomeFilter(List.of(Biomes.THE_END.location()))));
 		}
 	}
 	

@@ -109,9 +109,9 @@ public class ItemWrenchOMatic extends Item {
 				return WRATH_MODE_ATTRIBUTE_CACHE.get(engineersFuryLevel, () -> {
 					Multimap<Attribute, AttributeModifier> attributes = ArrayListMultimap.create();
 					
-					attributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Damage", ConfigHolder.getCommonConfig().wrenchAttack.get(), Operation.ADDITION));
+					attributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Damage", ConfigHolder.getServerConfig().wrenchAttack.get(), Operation.ADDITION));
 					attributes.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Attack Speed", -0.8d, Operation.ADDITION));
-					attributes.put(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(KNOCKBACK_UUID, "Knockback", Math.min(5d, ConfigHolder.getCommonConfig().wrenchKnockback.get() + (engineersFuryLevel * ConfigHolder.getCommonConfig().engineersFuryKnockbackMultiplier.get())), Operation.ADDITION));
+					attributes.put(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(KNOCKBACK_UUID, "Knockback", Math.min(5d, ConfigHolder.getServerConfig().wrenchKnockback.get() + (engineersFuryLevel * ConfigHolder.getServerConfig().engineersFuryKnockbackMultiplier.get())), Operation.ADDITION));
 					return attributes;
 				});
 			}catch(ExecutionException e) {
@@ -141,7 +141,7 @@ public class ItemWrenchOMatic extends Item {
 		
 		@Override
 		public int getMaxLevel() {
-			return 30;
+			return 10;
 		}
 		
 		@Override

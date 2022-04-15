@@ -1,0 +1,12 @@
+{
+  "type": "assemblylinemachines:pneumatic",
+  "input": {
+    "tag": "forge:ingots/pure_steel",
+    "count": 2
+  },
+  "output": {
+    "item": "assemblylinemachines:plate_mold"
+  },
+  "moldItem": "assemblylinemachines:pure_steel_plate",
+  "time": 15
+}

@@ -1,0 +1,8 @@
+{
+	"parent": "assemblylinemachines:block/mkii_lumber_mill",
+	"textures": {
+		"0": "assemblylinemachines:block/mkii_metal_shaper/t2_lumbershaper_lights_active",
+		"2": "assemblylinemachines:block/mkii_lumber_mill/t2_lumber_mill_front_active",
+		"5": "assemblylinemachines:block/t2_electric_furnace_active"
+	}
+}

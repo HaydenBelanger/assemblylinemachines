@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.network.FriendlyByteBuf;
@@ -107,7 +106,6 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 				
 				return new EntropyReactorCrafting(recipeId, output, odds, max, varietyReqd);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Entropy Reactor Output from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

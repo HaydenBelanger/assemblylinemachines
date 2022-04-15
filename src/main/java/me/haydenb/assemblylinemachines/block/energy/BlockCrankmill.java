@@ -11,8 +11,8 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -114,7 +114,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 			if(fept == 0) {
 				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Idle").withStyle(ChatFormatting.RED)).text(new TextComponent("0 FE/t"));
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Generating...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t").withStyle(ChatFormatting.GREEN));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Generating...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + FormattingHelper.FEPT_FORMAT.format(fept) + " FE/t").withStyle(ChatFormatting.GREEN));
 			}
 			
 		}
@@ -214,7 +214,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 				this.drawCenteredString(this.font, "0/t", x+114, y+38, 0xffffff);
 			}else {
 				super.blit(x+74, y+33, 176, 52, 18, 18);
-				this.drawCenteredString(this.font, "+" + Formatting.FEPT_FORMAT.format(tsfm.fept) + "/t", x+114, y+38, 0x76f597);
+				this.drawCenteredString(this.font, "+" + FormattingHelper.FEPT_FORMAT.format(tsfm.fept) + "/t", x+114, y+38, 0x76f597);
 			}
 			
 

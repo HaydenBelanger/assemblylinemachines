@@ -1,0 +1,11 @@
+{
+  "type": "assemblylinemachines:pneumatic",
+  "input": {
+    "item": "minecraft:dead_horn_coral",
+    "count": 4
+  },
+  "output": {
+    "item": "minecraft:dead_horn_coral_block"
+  },
+  "time": 9
+}

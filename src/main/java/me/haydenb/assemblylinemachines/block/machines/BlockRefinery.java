@@ -20,9 +20,8 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -510,7 +509,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 				if (rc != null && rc instanceof RefiningCrafting) {
 					outputRecipe = (RefiningCrafting) rc;
 				} else {
-					AssemblyLineMachines.LOGGER.warn("Error loading active recipe from NBT for Refinery @ " + this.getBlockPos() + ". A recipe may have been lost.");
+					AssemblyLineMachines.LOGGER.debug("Error loading active recipe from NBT for Refinery @ " + this.getBlockPos() + ". A recipe may have been lost.");
 					progress = 0;
 					cycles = 0;
 
@@ -688,13 +687,13 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 					str.add(fs.getDisplayName().getString());
 					if (Screen.hasShiftDown()) {
 
-						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
+						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
 						if (cm == true) {
 							str.add("Click to send to output slot.");
 						}
 					} else {
-						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
 					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);

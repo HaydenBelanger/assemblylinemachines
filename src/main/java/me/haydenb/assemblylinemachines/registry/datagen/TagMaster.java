@@ -11,7 +11,6 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer.ItemDataProvider;
 import net.minecraft.data.tags.*;
 import net.minecraft.resources.ResourceLocation;
@@ -29,8 +28,8 @@ import net.minecraftforge.registries.ForgeRegistries.Keys;
 public class TagMaster {
 
 	//Below is all in reference to Mining Level and Tool Type, referenced by the block data generator.
-	public static final TagKey<Block> NEEDS_NETHERITE_TOOL = Utils.getTagKey(Keys.BLOCKS, new ResourceLocation("forge", "needs_netherite_tool"));
-	public static final TagKey<Block> NEEDS_MYSTIUM_TOOL = Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
+	public static final TagKey<Block> NEEDS_NETHERITE_TOOL = TagKey.create(Keys.BLOCKS, new ResourceLocation("forge", "needs_netherite_tool"));
+	public static final TagKey<Block> NEEDS_MYSTIUM_TOOL = TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_mystium_tool"));
 	
 	
 	private static final HashMap<Material, Optional<TagKey<Block>>> MATERIAL_TOOL = new HashMap<>();
@@ -99,15 +98,16 @@ public class TagMaster {
 		
 		//Additions to Forge tags.
 		ListMultimap<String, Pair<String, String>> forgeTags = ArrayListMultimap.create();
-		forgeTags.putAll("dusts", List.of(Pair.of("charcoal", "ground_charcoal"), Pair.of("coal", "ground_coal"), 
+		forgeTags.putAll("dusts", List.of(Pair.of("charcoal", "ground_charcoal"), Pair.of("coal", "ground_coal"), Pair.of("steel", "ground_steel"), Pair.of("amethyst", "ground_amethyst"),
 				Pair.of("copper", "ground_copper"), Pair.of("electrified_netherite", "electrified_netherite_blend"), 
 				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"), 
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
 				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"), Pair.of("emerald", "ground_emerald"),
 				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust"), Pair.of("chromium", "ground_chromium")));
 		forgeTags.putAll("gears", List.of(Pair.of("pure_copper", "pure_copper_gear"), Pair.of("pure_gold", "pure_gold_gear"), Pair.of("pure_iron", "pure_iron_gear"),
-				Pair.of("pure_steel", "pure_steel_gear"), Pair.of("pure_titanium", "pure_titanium_gear"), Pair.of("flerovium", "flerovium_gear")));
-		forgeTags.putAll("ingots", List.of(Pair.of("attuned_titanium", "attuned_titanium_ingot"), Pair.of("chromium", "chromium_ingot"),
+				Pair.of("pure_steel", "pure_steel_gear"), Pair.of("pure_titanium", "pure_titanium_gear"), Pair.of("flerovium", "flerovium_gear"),
+				Pair.of("mystium", "mystium_gear"), Pair.of("novasteel", "novasteel_gear"), Pair.of("graphene", "graphene_gear")));
+		forgeTags.putAll("ingots", List.of(Pair.of("attuned_titanium", "attuned_titanium_ingot"), Pair.of("chromium", "chromium_ingot"), Pair.of("graphene", "graphene_ingot"),
 				Pair.of("energized_gold", "energized_gold_ingot"), Pair.of("mystium", "mystium_ingot"), Pair.of("pure_copper", "pure_copper_ingot"), Pair.of("pure_gold", "pure_gold_ingot"),
 				Pair.of("pure_iron", "pure_iron_ingot"), Pair.of("pure_steel", "pure_steel_ingot"), Pair.of("pure_titanium", "pure_titanium_ingot"), Pair.of("steel", "steel_ingot"), 
 				Pair.of("titanium", "titanium_ingot"), Pair.of("flerovium", "flerovium_ingot"), Pair.of("raw_novasteel", "raw_novasteel_compound"), Pair.of("novasteel", "novasteel_ingot")));
@@ -115,15 +115,16 @@ public class TagMaster {
 		forgeTags.putAll("plates", List.of(Pair.of("attuned_titanium", "attuned_titanium_plate"), Pair.of("chromium", "chromium_plate"), Pair.of("pure_copper", "pure_copper_plate"), 
 				Pair.of("energized_gold", "energized_gold_plate"), Pair.of("pure_gold", "pure_gold_plate"), Pair.of("pure_iron", "pure_iron_plate"), Pair.of("mystium", "mystium_plate"),
 				Pair.of("stainless_steel", "stainless_steel_plate"), Pair.of("pure_steel", "pure_steel_plate"), Pair.of("pure_titanium", "pure_titanium_plate"), Pair.of("flerovium", "flerovium_plate"),
-				Pair.of("novasteel", "novasteel_plate")));
-		forgeTags.putAll("rods", List.of(Pair.of("steel", "steel_rod"), Pair.of("graphene", "graphene_rod")));
+				Pair.of("novasteel", "novasteel_plate"), Pair.of("graphene", "graphene_plate")));
+		forgeTags.putAll("rods", List.of(Pair.of("steel", "steel_rod"), Pair.of("graphene", "graphene_rod"), Pair.of("titanium", "titanium_rod"), Pair.of("novasteel", "novasteel_rod"),
+				Pair.of("mystium", "mystium_rod"), Pair.of("iron", "iron_rod"), Pair.of("gold", "gold_rod"), Pair.of("copper", "copper_rod"), Pair.of("chromium", "chromium_rod")));
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));
 		forgeTags.putAll("ores", List.of(Pair.of("chromium", "chromium_ore"), Pair.of("titanium", "titanium_ore;deepslate_titanium_ore"), Pair.of("flerovium", "flerovium_ore"),
 				Pair.of("corrupt_coal", "corrupt_coal_ore"), Pair.of("corrupt_copper", "corrupt_copper_ore"), Pair.of("corrupt_diamond", "corrupt_diamond_ore"), Pair.of("corrupt_gold", "corrupt_gold_ore"), Pair.of("corrupt_iron", "corrupt_iron_ore"),
 				Pair.of("corrupt_lapis", "corrupt_lapis_ore"), Pair.of("corrupt_redstone", "corrupt_redstone_ore"), Pair.of("corrupt_emerald", "corrupt_emerald_ore"), Pair.of("corrupt_titanium", "corrupt_titanium_ore")));
 		forgeTags.putAll("storage_blocks", List.of(Pair.of("chromium", "chromium_block"), Pair.of("titanium", "titanium_block"), Pair.of("mystium", "mystium_block"), Pair.of("steel", "steel_block"),
 				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block"), Pair.of("novasteel", "novasteel_block"), 
-				Pair.of("raw_chromium", "raw_chromium_block"), Pair.of("raw_titanium", "raw_titanium_block"), Pair.of("raw_flerovium", "raw_flerovium_block")));
+				Pair.of("raw_chromium", "raw_chromium_block"), Pair.of("raw_titanium", "raw_titanium_block"), Pair.of("raw_flerovium", "raw_flerovium_block"), Pair.of("crafting_table", "compressed_crafting_table")));
 		forgeTags.putAll("raw_materials", List.of(Pair.of("chromium", "raw_chromium"), Pair.of("titanium", "raw_titanium"), Pair.of("flerovium", "raw_flerovium")));
 		
 		//Blocks get special treatment since they need to have both a block and item tag
@@ -206,7 +207,7 @@ public class TagMaster {
 				throw new IllegalArgumentException("Cannot perform copy on a TagType.ITEM!");
 			}
 			copy = true;
-			namedItemCopy = Optional.of(Utils.getTagKey(Keys.ITEMS, named.location()));
+			namedItemCopy = Optional.of(TagKey.create(Keys.ITEMS, named.location()));
 			return this;
 		}
 		
@@ -303,7 +304,7 @@ public class TagMaster {
 				if(resource == null) throwException(block);
 				if(resource instanceof ResourceLocation) {
 
-					this.tag(block).addTag(Utils.getTagKey(Keys.BLOCKS, (ResourceLocation) resource));
+					this.tag(block).addTag(TagKey.create(Keys.BLOCKS, (ResourceLocation) resource));
 				}else if(resource instanceof Block) {
 					this.tag(block).add((Block) resource);
 				}else {
@@ -334,7 +335,7 @@ public class TagMaster {
 			public void passback(Object resource, TagKey<Item> item){
 				if(resource == null) throwException(item);
 				if(resource instanceof ResourceLocation) {
-					this.tag(item).addTag(Utils.getTagKey(Keys.ITEMS, (ResourceLocation) resource));
+					this.tag(item).addTag(TagKey.create(Keys.ITEMS, (ResourceLocation) resource));
 				}else if(resource instanceof Item) {
 					this.tag(item).add((Item) resource);
 				}else if(resource instanceof TagKey) {
@@ -363,7 +364,7 @@ public class TagMaster {
 				for(Fluid f : Registry.getAllFluids()) {
 					if(f.isSource(f.defaultFluidState()) && Registry.getBlock(f.getRegistryName().getPath() + "_block") != null) {
 						writer.println("[FLUID TAGGING - INFO]: Created tag for " + f.getRegistryName() + ".");
-						TagKey<Fluid> named = Utils.getTagKey(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, f.getRegistryName().getPath()));
+						TagKey<Fluid> named = TagKey.create(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, f.getRegistryName().getPath()));
 						this.tag(named).add(f);
 						Fluid flowing = Registry.getFluid(f.getRegistryName().getPath() + "_flowing");
 						if(flowing != null) this.tag(named).add(flowing);

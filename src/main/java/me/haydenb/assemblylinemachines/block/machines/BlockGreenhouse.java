@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.block.machines;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -21,9 +20,8 @@ import me.haydenb.assemblylinemachines.crafting.GreenhouseCrafting;
 import me.haydenb.assemblylinemachines.crafting.GreenhouseFertilizerCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -35,6 +33,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -61,40 +60,43 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
-
-	private static final HashMap<Item, Pair<Integer, Integer>> SAPLING_TINT_INDEXER = new HashMap<>();
-	static {
-		SAPLING_TINT_INDEXER.put(Items.ACACIA_SAPLING, Pair.of(0xa39f8c, 0x99b888));
-		SAPLING_TINT_INDEXER.put(Items.BIRCH_SAPLING, Pair.of(0xdedede, 0x5f7d4f));
-		SAPLING_TINT_INDEXER.put(Items.CRIMSON_FUNGUS, Pair.of(0x8f3c3c, 0xd42020));
-		SAPLING_TINT_INDEXER.put(Items.DARK_OAK_SAPLING, Pair.of(0x42221e, 0x0d7516));
-		SAPLING_TINT_INDEXER.put(Items.JUNGLE_SAPLING, Pair.of(0x2c4a2a, 0x35872f));
-		SAPLING_TINT_INDEXER.put(Items.OAK_SAPLING, Pair.of(0x66553f, 0x3a6e2b));
-		SAPLING_TINT_INDEXER.put(Items.SPRUCE_SAPLING, Pair.of(0x362c24, 0x28472b));
-		SAPLING_TINT_INDEXER.put(Items.WARPED_FUNGUS, Pair.of(0x215157, 0x2593a1));
-	}
 	
-	private static final HashMap<Item, Pair<Integer, Integer>> FLOWER_TINT_INDEXER = new HashMap<>();
+	private static final HashMap<Item, Pair<Integer, Integer>> SPROUT_TINT = new HashMap<>();
 	static {
-		FLOWER_TINT_INDEXER.put(Items.PEONY, Utils.leftOnlyPair(0xc8a0db));
-		FLOWER_TINT_INDEXER.put(Items.ROSE_BUSH, Utils.leftOnlyPair(0xc40000));
-		FLOWER_TINT_INDEXER.put(Items.LILAC, Utils.leftOnlyPair(0xde9bf2));
-		FLOWER_TINT_INDEXER.put(Items.SUNFLOWER, Utils.leftOnlyPair(0xffea00));
-		FLOWER_TINT_INDEXER.put(Items.WITHER_ROSE, Utils.leftOnlyPair(0x4d4d4d));
-		FLOWER_TINT_INDEXER.put(Items.LILY_OF_THE_VALLEY, Utils.leftOnlyPair(0xdbdbdb));
-		FLOWER_TINT_INDEXER.put(Items.CORNFLOWER, Utils.leftOnlyPair(0x8791ff));
-		FLOWER_TINT_INDEXER.put(Items.OXEYE_DAISY, Utils.leftOnlyPair(0xd9d9d9));
-		FLOWER_TINT_INDEXER.put(Items.ORANGE_TULIP, Utils.leftOnlyPair(0xdb742a));
-		FLOWER_TINT_INDEXER.put(Items.PINK_TULIP, Utils.leftOnlyPair(0xc7b09f));
-		FLOWER_TINT_INDEXER.put(Items.RED_TULIP, Utils.leftOnlyPair(0xf20a0a));
-		FLOWER_TINT_INDEXER.put(Items.WHITE_TULIP, Utils.leftOnlyPair(0xffffff));
-		FLOWER_TINT_INDEXER.put(Items.AZURE_BLUET, Utils.leftOnlyPair(0xd9d9d9));
-		FLOWER_TINT_INDEXER.put(Items.ALLIUM, Utils.leftOnlyPair(0xae91c7));
-		FLOWER_TINT_INDEXER.put(Items.BLUE_ORCHID, Utils.leftOnlyPair(0xbabbff));
-		FLOWER_TINT_INDEXER.put(Items.POPPY, Utils.leftOnlyPair(0xc20404));
-		FLOWER_TINT_INDEXER.put(Items.DANDELION, Utils.leftOnlyPair(0xffff00));
-		FLOWER_TINT_INDEXER.put(Registry.getItem("prism_rose"), Utils.leftOnlyPair(0xa2f0fa));
-		FLOWER_TINT_INDEXER.put(Registry.getItem("mandelbloom"), Utils.leftOnlyPair(0x000000));
+		SPROUT_TINT.put(Items.ACACIA_SAPLING, Pair.of(0xa39f8c, 0x99b888));
+		SPROUT_TINT.put(Items.BIRCH_SAPLING, Pair.of(0xdedede, 0x5f7d4f));
+		SPROUT_TINT.put(Items.CRIMSON_FUNGUS, Pair.of(0x8f3c3c, 0xd42020));
+		SPROUT_TINT.put(Items.DARK_OAK_SAPLING, Pair.of(0x42221e, 0x0d7516));
+		SPROUT_TINT.put(Items.JUNGLE_SAPLING, Pair.of(0x2c4a2a, 0x35872f));
+		SPROUT_TINT.put(Items.OAK_SAPLING, Pair.of(0x66553f, 0x3a6e2b));
+		SPROUT_TINT.put(Items.SPRUCE_SAPLING, Pair.of(0x362c24, 0x28472b));
+		SPROUT_TINT.put(Items.WARPED_FUNGUS, Pair.of(0x215157, 0x2593a1));
+		
+		SPROUT_TINT.put(Items.PEONY, Pair.of(0xc8a0db, 0));
+		SPROUT_TINT.put(Items.ROSE_BUSH, Pair.of(0xc40000, 0));
+		SPROUT_TINT.put(Items.LILAC, Pair.of(0xde9bf2, 0));
+		SPROUT_TINT.put(Items.SUNFLOWER, Pair.of(0xffea00, 0));
+		SPROUT_TINT.put(Items.WITHER_ROSE, Pair.of(0x4d4d4d, 0));
+		SPROUT_TINT.put(Items.LILY_OF_THE_VALLEY, Pair.of(0xdbdbdb, 0));
+		SPROUT_TINT.put(Items.CORNFLOWER, Pair.of(0x8791ff, 0));
+		SPROUT_TINT.put(Items.OXEYE_DAISY, Pair.of(0xd9d9d9, 0));
+		SPROUT_TINT.put(Items.ORANGE_TULIP, Pair.of(0xdb742a, 0));
+		SPROUT_TINT.put(Items.PINK_TULIP, Pair.of(0xc7b09f, 0));
+		SPROUT_TINT.put(Items.RED_TULIP, Pair.of(0xf20a0a, 0));
+		SPROUT_TINT.put(Items.WHITE_TULIP, Pair.of(0xffffff, 0));
+		SPROUT_TINT.put(Items.AZURE_BLUET, Pair.of(0xd9d9d9, 0));
+		SPROUT_TINT.put(Items.ALLIUM, Pair.of(0xae91c7, 0));
+		SPROUT_TINT.put(Items.BLUE_ORCHID, Pair.of(0xbabbff, 0));
+		SPROUT_TINT.put(Items.POPPY, Pair.of(0xc20404, 0));
+		SPROUT_TINT.put(Items.DANDELION, Pair.of(0xffff00, 0));
+		SPROUT_TINT.put(Registry.getItem("prism_rose"), Pair.of(0xa2f0fa, 0));
+		SPROUT_TINT.put(Registry.getItem("mandelbloom"), Pair.of(0x000000, 0));
+		
+		SPROUT_TINT.put(Items.TUBE_CORAL, Pair.of(0x7985d4, 0));
+		SPROUT_TINT.put(Items.BRAIN_CORAL, Pair.of(0xcc9b9b, 0));
+		SPROUT_TINT.put(Items.BUBBLE_CORAL, Pair.of(0x632678, 0));
+		SPROUT_TINT.put(Items.FIRE_CORAL, Pair.of(0xeb1010, 0));
+		SPROUT_TINT.put(Items.HORN_CORAL, Pair.of(0xd7f20a, 0));
 	}
 	
 	public static final EnumProperty<Sprout> SPROUT = EnumProperty.create("sprout", Sprout.class);
@@ -131,11 +133,12 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 	}
 	
 	public static enum Sprout implements StringRepresentable{
-		EMPTY, CACTUS((s) -> true), CORRUPT_SPROUT((s) -> false), NETHER_SPROUT((s) -> false), SAPLING((s) -> s != Soil.SOUL_SAND, Upgrades.GREENHOUSE_ARBORIST, (i) -> SAPLING_TINT_INDEXER.get(i)), 
+		EMPTY, CACTUS((s) -> true), CORRUPT_SPROUT((s) -> false), NETHER_SPROUT((s) -> false), SAPLING((s) -> s != Soil.SOUL_SAND, Upgrades.GREENHOUSE_ARBORIST, LazyOptional.of(() -> SPROUT_TINT.get(Items.OAK_SAPLING))), 
 		MUSHROOM((s) -> false), SPROUT((s) -> true), SUGAR_CANE((s) -> true), CHORUS((s) -> false), BRAIN_CACTUS((s) -> false), CHAOSBARK_SAPLING((s) -> false, Upgrades.GREENHOUSE_ARBORIST),
-		FLOWER((s) -> s != Soil.CORRUPT, Upgrades.GREENHOUSE_FLORIST, (i) -> FLOWER_TINT_INDEXER.get(i));
+		FLOWER((s) -> s != Soil.CORRUPT, Upgrades.GREENHOUSE_FLORIST, LazyOptional.of(() -> SPROUT_TINT.get(Items.DANDELION))),
+		CORAL((s) -> true, null, LazyOptional.of(() -> SPROUT_TINT.get(Items.TUBE_CORAL)));
 		
-		public final Function<Item, Pair<Integer, Integer>> tintIndexer;
+		public final LazyOptional<Pair<Integer, Integer>> tintDefault;
 		public final Predicate<Soil> sunlightReq;
 		public final Upgrades requiredSpecialization;
 		
@@ -148,11 +151,11 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 		}
 		
 		Sprout(Predicate<Soil> sunlightReq, Upgrades requiredSpecialization){
-			this(sunlightReq, requiredSpecialization, null);
+			this(sunlightReq, requiredSpecialization, LazyOptional.empty());
 		}
 		
-		Sprout(Predicate<Soil> sunlightReq, Upgrades requiredSpecialization, Function<Item, Pair<Integer, Integer>> tintIndexer){
-			this.tintIndexer = tintIndexer;
+		Sprout(Predicate<Soil> sunlightReq, Upgrades requiredSpecialization, LazyOptional<Pair<Integer, Integer>> tintDefault){
+			this.tintDefault = tintDefault;
 			this.sunlightReq = sunlightReq;
 			this.requiredSpecialization = requiredSpecialization;
 		}
@@ -162,12 +165,19 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 			return this.toString().toLowerCase();
 		}
 		
+		public int getTint(Item i, int tintIndex) {
+			Pair<Integer, Integer> mapped = tintDefault.map((def) -> {
+				return SPROUT_TINT.getOrDefault(i, def);
+			}).orElse(Pair.of(0, 0));
+			return tintIndex == 0 ? mapped.getFirst() : mapped.getSecond();
+		}
+		
 	}
 	
 	public static enum Soil implements StringRepresentable{
 		EMPTY(Lazy.of(() -> null)), DIRT(Lazy.of(() -> Ingredient.of(Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.COARSE_DIRT, Blocks.ROOTED_DIRT))), 
-		MYCELIUM(Lazy.of(() -> Ingredient.of(Blocks.MYCELIUM))), SAND(Lazy.of(() -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("minecraft", "sand"))))),
-		SOUL_SAND(Lazy.of(() -> Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("minecraft", "soul_fire_base_blocks")))), Upgrades.GREENHOUSE_INTERDIM), 
+		MYCELIUM(Lazy.of(() -> Ingredient.of(Blocks.MYCELIUM))), SAND(Lazy.of(() -> Ingredient.of(TagKey.create(Keys.ITEMS, new ResourceLocation("minecraft", "sand"))))),
+		SOUL_SAND(Lazy.of(() -> Ingredient.of(TagKey.create(Keys.ITEMS, new ResourceLocation("minecraft", "soul_fire_base_blocks")))), Upgrades.GREENHOUSE_INTERDIM), 
 		CORRUPT(Lazy.of(() -> Ingredient.of(Registry.getBlock("corrupt_dirt"), Registry.getBlock("corrupt_grass"))), Upgrades.GREENHOUSE_INTERDIM), END_STONE(Lazy.of(() -> Ingredient.of(Blocks.END_STONE)), Upgrades.GREENHOUSE_INTERDIM);
 		
 		public final Lazy<Ingredient> soil;
@@ -198,7 +208,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 		private ItemStack output = ItemStack.EMPTY;
 		public float progress = 0f;
 		public float cycles = 0f;
-		private LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> Utils.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Fluids.WATER), 4000, (oFs) -> {
+		private LazyOptional<IFluidHandler> handler = LazyOptional.of(() -> IFluidHandlerBypass.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Fluids.WATER), 4000, (oFs) -> {
 			if(oFs.isPresent()) tank = oFs.get();
 			return tank;
 		}, (v) -> this.sendUpdates(), false));
@@ -267,7 +277,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 					if(!output.isEmpty()) {
 						if(amount - baseCost >= 0) {
 							if(progress >= cycles) {
-								if(MathHelper.doFit(this.getItem(0), output, (is) -> this.setItem(0, is), (i) -> this.getItem(0).grow(i))) {
+								if(ScreenMath.doFit(this.getItem(0), output, (is) -> this.setItem(0, is), (i) -> this.getItem(0).grow(i))) {
 									output = ItemStack.EMPTY;
 									progress = cycles = 0;
 									sendUpdates = true;
@@ -379,11 +389,6 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 			
 			super.saveAdditional(compound);
 		}
-		
-		public int getTint(int index) {
-			Pair<Integer, Integer> pair = Optional.ofNullable(this.getBlockState().getValue(SPROUT).tintIndexer).map((f) -> f.apply(this.getItem(1).getItem())).orElse(Pair.of(0x40f029, 0x40f029));
-			return index == 0 ? pair.getFirst() : pair.getSecond();
-		}
 	}
 	
 	public static class ContainerGreenhouse extends ContainerALMBase<TEGreenhouse>{
@@ -484,14 +489,14 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 			
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
-			if(MathHelper.isMouseBetween(x, y, mouseX, mouseY, 41, 23, 48, 59)) {
+			if(ScreenMath.isMouseBetween(x, y, mouseX, mouseY, 41, 23, 48, 59)) {
 				List<String> tooltip;
 				if(!tsfm.tank.isEmpty()) {
 					String name = tsfm.tank.getDisplayName().getString();
 					if(Screen.hasShiftDown()) {
-						tooltip = List.of(name, Formatting.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
+						tooltip = List.of(name, FormattingHelper.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					}else {
-						tooltip = List.of(name, Formatting.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000d) + " B");
+						tooltip = List.of(name, FormattingHelper.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000d) + " B");
 					}
 				}else {
 					tooltip = List.of("Empty");
@@ -499,7 +504,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 				this.renderComponentTooltip(tooltip, mouseX - x, mouseY - y);
 			}
 			
-			if(MathHelper.isMouseBetween(x, y, mouseX, mouseY, 54, 28, 69, 30)) {
+			if(ScreenMath.isMouseBetween(x, y, mouseX, mouseY, 54, 28, 69, 30)) {
 				List<Component> fertilizer = getFertilizerInformation();
 				if(!fertilizer.isEmpty()) this.renderComponentTooltip(mx, fertilizer, mouseX - x, mouseY - y);
 			}

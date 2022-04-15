@@ -1,16 +1,17 @@
 package me.haydenb.assemblylinemachines.item.powertools;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTooltip {
 
@@ -43,9 +45,9 @@ public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTo
 		if(canUseSecondaryAbilities(stack)) {
 			BlockState bs = world.getBlockState(pos);
 
-			if(Utils.isInTag(bs, new ResourceLocation(AssemblyLineMachines.MODID, "mystium_axe_mineable"))) {
+			if(bs.is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "mystium_axe_mineable")))) {
 				int cmax = ptt == IToolWithCharge.PowerToolType.NOVASTEEL ? 50 : 10;
-				stack.hurtAndBreak(Utils.breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
+				stack.hurtAndBreak(breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 			}
 			return true;
 		}
@@ -114,5 +116,24 @@ public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTo
 	@Override
 	public IToolWithCharge.PowerToolType getPowerToolType() {
 		return ptt;
+	}
+	
+	private static int breakAndBreakConnected(Level world, BlockState origState, int ctx, int cmax, BlockPos posx, LivingEntity player) {
+		world.destroyBlock(posx, true, player);
+
+		int cost = 2;
+		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(posx.below().north().west(), posx.above().south().east()).iterator();
+
+		while(iter.hasNext()) {
+			BlockPos posq = iter.next();
+
+			BlockState bs = world.getBlockState(posq);
+			if(bs.getBlock() == origState.getBlock() && ctx <= cmax) {
+				ctx++;
+				cost = cost + breakAndBreakConnected(world, origState, ctx, cmax, posq, player);
+			}
+		}
+
+		return cost;
 	}
 }

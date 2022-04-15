@@ -10,9 +10,7 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ScreenALMBase;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.registry.Utils.MathHelper;
+import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -85,7 +83,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			
 			CompoundTag nbt = stack.getTag();
 			if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:storedprettyname")) {
-				tooltip.add(1, new TextComponent("This BSU has " + Formatting.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + nbt.getString("assemblylinemachines:storedprettyname") + " stored.").withStyle(ChatFormatting.GREEN));
+				tooltip.add(1, new TextComponent("This BSU has " + FormattingHelper.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + nbt.getString("assemblylinemachines:storedprettyname") + " stored.").withStyle(ChatFormatting.GREEN));
 			}
 			
 		}
@@ -360,12 +358,12 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 				}
 				float wsc = 110f / (float) this.font.width(n);
 				if(wsc > 3f) wsc = 3f;
-				MathHelper.renderScaledText(this.font, 52, 13, wsc, n, false, 0xd4d4d4);
+				ScreenMath.renderScaledText(this.font, 52, 13, wsc, n, false, 0xd4d4d4);
 				
-				n = Formatting.GENERAL_FORMAT.format(tsfm.internalStored);
+				n = FormattingHelper.GENERAL_FORMAT.format(tsfm.internalStored);
 				wsc = 110f / (float) this.font.width(n);
 				if(wsc > 2f) wsc = 2f;
-				MathHelper.renderScaledText(this.font, 52, 54, wsc, n, false, 0xd4d4d4);
+				ScreenMath.renderScaledText(this.font, 52, 54, wsc, n, false, 0xd4d4d4);
 			}
 
 		}
@@ -381,9 +379,9 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 				this.itemRenderer.renderGuiItem(tsfm.storedItem.getDefaultInstance(), (x + 17), (y + 60));
 				if (tsfm.internalStored < 10000) {
 					
-					MathHelper.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, Formatting.GENERAL_FORMAT.format(tsfm.internalStored));
+					ScreenMath.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, FormattingHelper.GENERAL_FORMAT.format(tsfm.internalStored));
 				} else {
-					MathHelper.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, Formatting.formatToSuffix(tsfm.internalStored));
+					ScreenMath.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, FormattingHelper.formatToSuffix(tsfm.internalStored));
 				}
 			}
 

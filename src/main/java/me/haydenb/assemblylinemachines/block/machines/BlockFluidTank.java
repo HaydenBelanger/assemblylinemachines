@@ -9,8 +9,8 @@ import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
+import me.haydenb.assemblylinemachines.registry.utils.IFluidHandlerBypass;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -102,7 +102,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 			if(nbt.contains("assemblylinemachines:fluidstack")) {
 				FluidStack fs = FluidStack.loadFluidStackFromNBT(nbt.getCompound("assemblylinemachines:fluidstack"));
 				if(!fs.isEmpty()) {
-					tooltip.add(1, new TextComponent("This Tank has " + Formatting.formatToSuffix(fs.getAmount()) + " mB of " + fs.getDisplayName().getString() + " stored.").withStyle(ChatFormatting.GREEN));
+					tooltip.add(1, new TextComponent("This Tank has " + FormattingHelper.formatToSuffix(fs.getAmount()) + " mB of " + fs.getDisplayName().getString() + " stored.").withStyle(ChatFormatting.GREEN));
 				}
 				
 			}
@@ -175,7 +175,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 		public TEFluidTank(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
 			block = (BlockFluidTank) state.getBlock();
-			fluids = Utils.getSimpleOneTankHandler((fs) -> {
+			fluids = IFluidHandlerBypass.getSimpleOneTankHandler((fs) -> {
 				if(fs.getFluid().getAttributes().getTemperature() >= 800 && block.temperatureResistance == TemperatureResistance.COLD) return false;
 				return true;
 			}, block.capacity, (oFs) -> {

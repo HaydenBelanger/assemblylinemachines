@@ -10,7 +10,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.TERefinery;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting.RefineryIO.RefineryIOType;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
@@ -293,7 +292,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 				
 				return new RefiningCrafting(recipeId, block, allIO, time);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Refining Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

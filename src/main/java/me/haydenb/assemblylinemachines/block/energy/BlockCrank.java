@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -80,7 +80,7 @@ public class BlockCrank extends Block {
 					if(crankable.perform()) {
 						world.playSound(null, pos, SoundEvents.WOOD_STEP, SoundSource.BLOCKS, 0.7f, 1f + getPitchNext(world.getRandom()));
 					}else {
-						int chance = ConfigHolder.getCommonConfig().crankSnapChance.get();
+						int chance = ConfigHolder.getServerConfig().crankSnapChance.get();
 						if(chance != -1 && world.getRandom().nextInt(chance) == 0) {
 							world.playSound(null, pos, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.BLOCKS, 1f, 1f);
 							world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

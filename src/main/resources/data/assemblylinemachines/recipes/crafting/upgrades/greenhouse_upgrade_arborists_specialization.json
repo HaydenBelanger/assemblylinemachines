@@ -1,0 +1,32 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"bso",
+		"sjs",
+		"asp"
+	],
+	"key":{
+		"b":{
+			"item": "minecraft:birch_sapling"
+		},
+		"o":{
+			"item": "minecraft:dark_oak_sapling"
+		},
+		"j":{
+			"item": "minecraft:jungle_sapling"
+		},
+		"a":{
+			"item": "minecraft:acacia_sapling"
+		},
+		"p":{
+			"item": "minecraft:spruce_sapling"
+		},
+		"s":{
+			"tag": "forge:plates/pure_steel"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:greenhouse_upgrade_arborists_specialization"
+	}
+}

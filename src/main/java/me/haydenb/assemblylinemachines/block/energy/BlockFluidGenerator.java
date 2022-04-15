@@ -19,9 +19,9 @@ import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.Generator
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
-import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -114,7 +114,6 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				
 				if(tank >= 2) return false;
 				Predicate<GeneratorFluidTypes> typePred = tank == 0 ? (type) -> TEFluidGenerator.this.type.get() == type.equivalentGenerator : (type) -> type == GeneratorFluidTypes.COOLANT;
 				return level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE).stream().anyMatch((recipe) -> typePred.test(recipe.fluidType) && recipe.fluid.equals(stack.getFluid()) && (recipe.powerPerUnit != 0 || recipe.coolantStrength != 0));
@@ -217,7 +216,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			if(fept == 0) {
 				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Idle").withStyle(ChatFormatting.RED)).text(new TextComponent("0 FE/t"));
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Generating...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + Formatting.FEPT_FORMAT.format(fept) + " FE/t").withStyle(ChatFormatting.GREEN));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Generating...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + FormattingHelper.FEPT_FORMAT.format(fept) + " FE/t").withStyle(ChatFormatting.GREEN));
 			}
 			
 		}
@@ -546,10 +545,10 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 					str.add(fs.getDisplayName().getString());
 					if (Screen.hasShiftDown()) {
 
-						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
+						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
 					} else {
-						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
 					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);

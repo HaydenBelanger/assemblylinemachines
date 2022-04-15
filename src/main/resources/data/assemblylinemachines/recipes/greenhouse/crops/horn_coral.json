@@ -1,0 +1,18 @@
+{
+	"type": "assemblylinemachines:greenhouse",
+	"input":{
+		"item": "minecraft:horn_coral"
+	},
+	"output":{
+		"item": "minecraft:horn_coral",
+		"count": 1
+	},
+	"waterPerUnit": 750,
+	"baseAdditionalChance": 0,
+	"upgradeAdditionalChance": 0.32,
+	"maxAdditional": 2,
+	"additionalScaling": "pure_random",
+	"time": 12,
+	"soil": "sand",
+	"sprout": "coral"
+}

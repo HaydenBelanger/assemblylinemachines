@@ -1,9 +1,11 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
@@ -11,29 +13,94 @@ import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ConfigHandler {
 
 	public static class ConfigHolder{
 		
-		private static final Pair<ALMCommonConfig, ForgeConfigSpec> COMMON = new ForgeConfigSpec.Builder().configure(ALMCommonConfig::new);
+		private static final HashMap<Type, Pair<Object, ForgeConfigSpec>> CONFIGS = new HashMap<>();
 		
-		public static ALMCommonConfig getCommonConfig() {
-			return COMMON.getLeft();
+		static {
+			CONFIGS.put(Type.SERVER, new ForgeConfigSpec.Builder().configure(ALMServerConfig::new));
+			CONFIGS.put(Type.CLIENT, new ForgeConfigSpec.Builder().configure(ALMClientConfig::new));
+			CONFIGS.put(Type.COMMON, new ForgeConfigSpec.Builder().configure(ALMCommonConfig::new));
 		}
 		
-		public static ForgeConfigSpec getCommonSpec() {
-			return COMMON.getRight();
+		public static ALMServerConfig getServerConfig() {
+			return (ALMServerConfig) CONFIGS.get(Type.SERVER).getKey();
+		}
+		
+		public static ALMCommonConfig getCommonConfig() {
+			return (ALMCommonConfig) CONFIGS.get(Type.COMMON).getKey();
+		}
+		
+		public static ALMClientConfig getClientConfig() {
+			return (ALMClientConfig) CONFIGS.get(Type.CLIENT).getKey();
+		}
+		
+		public static void registerSpecs(ModLoadingContext mlc) {
+			for(Entry<Type, Pair<Object, ForgeConfigSpec>> entry : CONFIGS.entrySet()) mlc.registerConfig(entry.getKey(), entry.getValue().getValue());
+		}
+	}
+	
+	public static class ALMClientConfig{
+		
+		public final BooleanValue customTooltipColors;
+		public final BooleanValue customTooltipFrames;
+		public final BooleanValue receiveGuideBook;
+		public final BooleanValue receiveUpdateMessages;
+		
+		public ALMClientConfig(ForgeConfigSpec.Builder builder) {
+			
+			builder.push("Client");
+			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
+			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
+			receiveGuideBook = builder.comment("Do you want to receive a copy of Assembly Lines & You when you first connect to a server and you have Patchouli installed?",
+					"If this is false, this will override the config of the server.", 
+					"If the server you connect to is configured as false, you will not receive a copy on that server.").define("receiveGuideBook", true);
+			receiveUpdateMessages = builder.comment("Do you want to receive mod update messages when the mod is out of date and you connect to a server?").define("receiveUpdateMessages", true);
+			builder.pop();
+			
 		}
 	}
 	
 	public static class ALMCommonConfig{
+		//Progression
+		public final BooleanValue lateGamePlatesRequireCompressor;
+		public final BooleanValue lateGameGearsRequireCompressor;
+		//IMC
+		public final BooleanValue grinderIMC;
+		public final BooleanValue alloyIMC;
+		public final BooleanValue compressorStorageBlockIMC;
+		public final BooleanValue compressorNuggetIMC;
+		public final BooleanValue compressorPlateIMC;
+		public final BooleanValue compressorGearIMC;
+		public final BooleanValue compressorRodIMC;
+		
+		public ALMCommonConfig(ForgeConfigSpec.Builder builder) {
+			builder.push("Progression Crafting");
+			lateGamePlatesRequireCompressor = builder.comment("Should late-game (Mystium and beyond) Plates & Sheets require the Pneumatic Compressor to create?").define("lateGamePlatesRequireCompressor", true);
+			lateGameGearsRequireCompressor = builder.comment("Should late game (Mystium and beyond) Gears require the Pneumatic Compressor to create?").define("lateGameGearsRequireCompressor", true);
+			builder.pop();
+			builder.push("Inter-Mod Compat Crafting");
+			grinderIMC = builder.comment("Should the Grinder support creation of other-mod Ground Ores with Ingots, Ore Blocks, and Raw Ores?").define("grinderIMC", true);
+			alloyIMC = builder.comment("Should the Alloy Smelter support creation of other-mod Alloys with various combinations of Ingots?").define("alloyIMC", true);
+			compressorStorageBlockIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Metal Blocks with Ingots?").define("compressorStorageBlockIMC", true);
+			compressorNuggetIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Ingots with Nuggets?").define("compressorNuggetIMC", true);
+			compressorPlateIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Plates with Ingots?").define("compressorPlateIMC", true);
+			compressorGearIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Gears with Plates?").define("compressorGearIMC", true);
+			compressorRodIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Rods with Ingots?").define("compressorRodIMC", true);
+			builder.pop();
+		}
+	}
+	
+	public static class ALMServerConfig{
 		
 		//MACHINE OPTIONS
-		public final BooleanValue interactorInteractMode;
 		public final BooleanValue reactorExplosions;
-		public final EnumValue<DebugOptions> interactorInteractDebug;
 		public final ConfigValue<Integer> crankSnapChance;
 		public final ConfigValue<Integer> toolChargerChargeRate;
 		public final ConfigValue<Integer> toolChargerMaxEnergyStorage;
@@ -45,11 +112,16 @@ public class ConfigHandler {
 		public final ConfigValue<Double> kineticGrinderCycleMultiplier;
 		public final ConfigValue<Double> kineticFluidMixerCycleMultiplier;
 		
+		//INTERACTOR
+		public final BooleanValue interactMode;
+		public final EnumValue<DebugOptions> interactExceptionReporting;
+		public final ConfigValue<String> interactExceptionReportLevel;
+		
 		//MISC/WORLD
-		public final BooleanValue updateChecker;
-		public final BooleanValue guideBook;
+		public final BooleanValue distributeGuideBook;
 		public final BooleanValue mystiumFarmlandDeath;
 		public final BooleanValue gasolineExplosions;
+		
 		public final ConfigValue<String> preferredModid;
 		
 		//GENERAL TOOLS
@@ -120,19 +192,9 @@ public class ConfigHandler {
 		public final ConfigValue<Integer> blackGraniteVeinSize;
 		public final ConfigValue<Integer> blackGraniteFrequency;
 		
-		//CLIENT
-		public final BooleanValue coolDudeMode;
-		public final BooleanValue customTooltipColors;
-		public final BooleanValue customTooltipFrames;
-		
-		public ALMCommonConfig(final ForgeConfigSpec.Builder builder) {
-			
+		public ALMServerConfig(ForgeConfigSpec.Builder builder) {
 			builder.push("Machines");
 			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").defineInRange("crankSnapChance", 100, -1, 1000);
-			interactorInteractMode = builder.comment("Interact Mode (in the Interactor block) can cause issues with intercompatability with some mods. Do you want this mode enabled?", "For example, attempting to \"interact with\" a block with a GUI will cause an exception.").define("interactorInteractMode", true);
-			interactorInteractDebug = builder.comment("Should Interact Mode (in the Interactor block) fail with an exception, what type of logging should be performed?",
-					"NONE - Interact Mode exceptions are completely silenced.", "BASIC - The first line of the exception, a simple description, is placed in the console. (If unsure, use this!)",
-					"COMPLETE - Full stack traces are placed in the console, useful for debugging.").defineEnum("interactorInteractDebug", DebugOptions.BASIC);
 			reactorExplosions = builder.comment("If the Entropy Reactor reaches higher than 98% Entropy, should it explode?").define("reactorExplosions", true);
 			toolChargerChargeRate = builder.comment("What is the maximum amount of FE the Tool Charger can place into an item per cycle?", "The Tool Charger runs one cycle every 2.5 seconds.").defineInRange("toolChargerChargeRate", 10000, 1, Integer.MAX_VALUE);
 			toolChargerMaxEnergyStorage = builder.comment("What should the FE capacity of the Tool Charger be?").defineInRange("toolChargerMaxEnergyStorage", 100000, 1, Integer.MAX_VALUE);
@@ -147,6 +209,14 @@ public class ConfigHandler {
 			kineticFluidMixerCycleMultiplier = builder.comment("What should the multiplier for the amount of stirs (uses of a Stirring Stick on Fluid Bath) to convert to minimum seconds in the Kinetic Fluid Mixer be?", "For example, a recipe with 10 stirs with a multiplier of 0.7 will take a minimum of 7 seconds to craft.").defineInRange("simpleFluidMixerCycleModifier", 1d, 0.01d, 100d);
 			builder.pop();
 			
+			builder.push("Interactor Settings");
+			interactMode = builder.comment("Interact Mode can cause issues with intercompatability with some mods. Do you want this mode enabled?", "For example, attempting to \"interact with\" a block with a GUI will cause an exception or other fatal issues.").define("interactMode", true);
+			interactExceptionReporting = builder.comment("Should Interact Mode fail with an exception, what type of logging should be performed?",
+					"NONE - Interact Mode exceptions are silenced.", "MESSAGE - A basic informative message to identify the error.",
+					"STACK_TRACE - A full stacktrace, for developers to identify source of error.").defineEnum("interactExceptionReporting", DebugOptions.MESSAGE);
+			interactExceptionReportLevel = builder.comment("If logging occurs based on the option selected in interactExceptionReporting, what Log4J level should the log be placed at?").define("interactExceptionReportLevel", "DEBUG", (s) -> Level.getLevel(Optional.ofNullable(s).orElse("").toString()) != null);
+			
+			builder.pop();
 			builder.push("Tools");
 			overclockEnchantmentMultiplier = builder.comment("What multiplier should each level of the Overclock enchantment give?", "For example, the default of \"0.2\" is a 20% increase per enchantment level.").defineInRange("overclockEnchantmentMultiplier", 0.2d, 0.001d, 1d);
 			engineersFuryKnockbackMultiplier = builder.comment("What additional multiplier should each level of the Engineer's Fury enchantment give to knockback?", "For example, \"0.1\" at Level X would be +1 knockback.").defineInRange("engineersFuryKnockbackMultiplier", 0.1d, 0d, 1d);
@@ -203,15 +273,16 @@ public class ConfigHandler {
 			wrenchAttack = builder.comment("In half-hearts, what is the amount of damage the Wrench-O-Matic in Wrath Mode should do?").defineInRange("wrenchAttack", 6d, 0d, Double.MAX_VALUE);
 			wrenchKnockback = builder.comment("How much base knockback should the Wrench-O-Matic do?", "Note that Engineer's Fury adds additional knockback.").defineInRange("wrenchKnockback", 0.5d, 0d, 5d);
 			builder.pop();
+			builder.pop();
 			
 			builder.push("World");
 			mystiumFarmlandDeath = builder.comment("Should Mystium Farmland get exhausted over time and stop performing grow operations?").define("mystiumFarmlandDeath", true);
-			updateChecker = builder.comment("Should the update check message be sent when a player joins a single-player world/the SMP server?").define("updateChecker", true);
 			gasolineExplosions = builder.comment("Should Gasoline and Diesel explode when placed next to a flammable block?").define("gasolineExplosions", true);
-			guideBook = builder.comment("When Patchouli is installed, should players be automatically given the Guidebook when they first connect?").define("guideBook", true);
+			distributeGuideBook = builder.comment("Should players receive a copy of Assembly Lines & You when they first connect to this server and Patchouli is installed?",
+					"If this is false, this server will override the config of all clients.",
+					"If clients are configured to false, that client will not receive a copy regardless of this option.").define("distributeGuideBook", true);
 			preferredModid = builder.comment("In recipe types which support inter-mod compatible output, which Mod ID should be preferred?", 
 					"If the selected Mod ID is invalid or does not provide an appropriate item for a tag, the first Mod ID alphabetically will be used.").define("preferredModid", "assemblylinemachines");
-			
 			builder.push("Titanium");
 			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumVeinSize", 5, 0, 1000);
 			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumFrequency", 7, 0, 1000);
@@ -235,18 +306,11 @@ public class ConfigHandler {
 			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?", "If false, Chromium Ore will only generate on the outer End islands accessed by the End Gateway.").define("chromiumOnDragonIsland", false);
 			builder.pop();
 			builder.pop();
-			
-			builder.push("Client");
-			coolDudeMode = builder.comment("Do you want to enable \"Cool Dude Mode\", enabling easter-egg/meme effects?", "There are no effects on gameplay, except some text, graphics, and names.").define("coolDudeMode", false);
-			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
-			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
-			builder.pop();
-			
 		}
 	}
 	
 	public static enum DebugOptions{
-		NONE, BASIC, COMPLETE;
+		NONE, MESSAGE, STACK_TRACE;
 	}
 	
 	public static enum OreGenOptions{

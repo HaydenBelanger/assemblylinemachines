@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -18,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -82,9 +82,14 @@ public class BlockExperienceSiphon extends BlockTileEntity {
 				if(timer++ == 10) {
 					timer = 0;
 					if(output == null) {
-						output = Utils.getCapabilityFromDirection(this, (lx) -> {
-							if(this != null) output = null;
-						}, Direction.DOWN, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().below());
+						if(te != null) {
+							LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.UP);
+							output = cap.orElse(null);
+							if(output != null) {
+								cap.addListener((h) -> output = null);
+							}
+						}
 					}else {
 						BlockPos bPos = this.getBlockPos();
 						AABB range = new AABB(bPos.getX(), bPos.getY(), bPos.getZ(), bPos.getX() + 1, bPos.getY() + 2, bPos.getZ() + 1);

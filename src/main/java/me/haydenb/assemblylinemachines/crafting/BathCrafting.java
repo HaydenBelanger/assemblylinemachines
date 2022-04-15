@@ -7,16 +7,16 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath;
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.IFluidHandlerBypass;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.IFluidHandlerBypass;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -43,7 +43,6 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	
 	public static final BathSerializer SERIALIZER = new BathSerializer();
 	
-	private static final Random RAND = new Random();
 	private static final Lazy<List<Item>> ILLEGAL_RECIPE_ITEMS = Lazy.of(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
 			Registry.getItem("steel_stirring_stick")).stream(), BlockFluidBath.VALID_FILL_ITEMS.stream()).collect(Collectors.toList()));
 	
@@ -145,7 +144,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			BiFunction<Integer, FluidAction, FluidStack> drain = handler instanceof IFluidHandlerBypass ? (i, a) -> ((IFluidHandlerBypass) handler).drainBypassRestrictions(i, a) : (i, a) -> handler.drain(i, a);
 			if(handler == null || handler.getFluidInTank(0).getFluid() != fluid.getAssocFluid() || drain.apply(percent.getMB(), FluidAction.SIMULATE).getAmount() != percent.getMB()) return ItemStack.EMPTY;
 
-			int rand = RAND.nextInt(9) * data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
+			int rand = Utils.RAND.nextInt(9) * data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
 			int cons = percent.getMB();
 			if(rand > 21) {
 				cons = 0;
@@ -161,11 +160,11 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			if(data.getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
 				inv.getItem(0).shrink(1);
 				inv.getItem(1).shrink(1);
-				data.setCycles((float) stirs * ConfigHolder.getCommonConfig().kineticFluidMixerCycleMultiplier.get().floatValue());
+				data.setCycles(Math.round((float) stirs * ConfigHolder.getServerConfig().kineticFluidMixerCycleMultiplier.get().floatValue()));
 			}else {
 				inv.getItem(1).shrink(1);
 				inv.getItem(2).shrink(1);
-				data.setCycles((float) stirs * 3.6f);
+				data.setCycles(Math.round((float) stirs * 3.6f));
 			}
 			
 			
@@ -256,7 +255,6 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 				
 				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, color, machineReqd, percent);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Bath Crafting Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

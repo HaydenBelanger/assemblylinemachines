@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "assemblylinemachines:item/assembly_lines_and_you"
+  }
+}

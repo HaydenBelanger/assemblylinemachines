@@ -12,9 +12,9 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.crafting.WorldCorruptionCrafting;
 import me.haydenb.assemblylinemachines.item.ItemCorruptedShard;
-import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -81,7 +81,7 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 		public FluidStack tank = FluidStack.EMPTY;
 		
 		
-		public IFluidHandler handler = Utils.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Registry.getFluid("condensed_void")), 4000, (oFs) -> {
+		public IFluidHandler handler = IFluidHandlerBypass.getSimpleOneTankHandler((fs) -> fs.getFluid().equals(Registry.getFluid("condensed_void")), 4000, (oFs) -> {
 			if(oFs.isPresent()) tank = oFs.get();
 			return tank;
 		}, (v) -> this.sendUpdates(), false);
@@ -290,9 +290,9 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 					str.add(fs.getDisplayName().getString());
 					if (Screen.hasShiftDown()) {
 
-						str.add(Formatting.FEPT_FORMAT.format(fs.getAmount()) + " mB");
+						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 					} else {
-						str.add(Formatting.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
 					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);

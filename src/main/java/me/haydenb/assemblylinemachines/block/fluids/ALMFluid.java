@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -101,7 +100,7 @@ public class ALMFluid extends ForgeFlowingFluid implements ILiquidFogColor{
 	}
 	
 	public static TagKey<Fluid> getTag(String name){
-		return Utils.getTagKey(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, name));
+		return TagKey.create(Keys.FLUIDS, new ResourceLocation(AssemblyLineMachines.MODID, name));
 	}
 
 

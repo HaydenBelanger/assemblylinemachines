@@ -1,14 +1,13 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
-import java.util.Random;
 
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -30,8 +29,6 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	};
 	
 	public static final LumberSerializer SERIALIZER = new LumberSerializer();
-	
-	private static final Random RAND = new Random();
 	
 	private final Lazy<Ingredient> input;
 	private final ItemStack outputa;
@@ -59,7 +56,7 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		if(inv instanceof IMachineDataBridge) {
 			inv.getItem(2).shrink(1);
 			if(!this.outputb.isEmpty()) {
-				if(RAND.nextFloat() < (opbchance * (1f + (0.5f * (float)((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
+				if(Utils.RAND.nextFloat() < (opbchance * (1f + (0.5f * (float)((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
 					((IMachineDataBridge) inv).setSecondaryOutput(this.outputb.copy());
 			}
 			((IMachineDataBridge) inv).setCycles(time);
@@ -119,7 +116,6 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 				
 				return new LumberCrafting(recipeId, input, output, outputb, opbchance, time);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Lumber Crafting Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

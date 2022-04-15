@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"sas",
+		"ada",
+		"sas"
+	],
+	"key":{
+		"a":{
+			"item": "minecraft:black_stained_glass"
+		},
+		"d":{
+			"tag": "forge:gems/diamond"
+		},
+		"s":{
+			"tag": "forge:plates/pure_steel"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:greenhouse_upgrade_blackout_glass"
+	}
+}

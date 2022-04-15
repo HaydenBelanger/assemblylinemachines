@@ -5,7 +5,6 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -178,7 +177,6 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 				FluidInGroundCriteria figc = FluidInGroundCriteria.valueOf(GsonHelper.getAsString(json, "criteria_set").toUpperCase());
 				return new FluidInGroundRecipe(recipeId, f, odds, min, max, figc);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Fluid-In-Ground Recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

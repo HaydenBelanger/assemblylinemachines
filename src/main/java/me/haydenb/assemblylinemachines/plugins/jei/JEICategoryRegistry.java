@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.plugins.jei;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.util.TriConsumer;
@@ -18,14 +19,13 @@ import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.Generator
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder.ICatalystProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
+import me.haydenb.assemblylinemachines.registry.utils.ScreenMath;
+import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
-import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.drawable.IDrawableAnimated;
+import mezz.jei.api.gui.drawable.*;
 import mezz.jei.api.gui.drawable.IDrawableAnimated.StartDirection;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -87,9 +87,20 @@ public class JEICategoryRegistry implements IModPlugin{
 				.background("gui_set_a", 0, 153, 90, 44).icon(Registry.getBlock("electric_purifier")).progressBar("gui_set_a", 90, 153, 43, 32, 200, StartDirection.LEFT, false, 20, 6)
 				.slots((i) -> i == 3 ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT, Pair.of(1, 1), Pair.of(1, 27), Pair.of(22, 14), Pair.of(69, 14)).catalysts(Registry.getBlock("electric_purifier"), Registry.getBlock("mkii_purifier")).build(PurifierCrafting.class));
 		
-		CATEGORY_REGISTRY.put(MetalCrafting.METAL_RECIPE, new RecipeCategoryBuilder(guiHelper, "metal_shaping", "Metal Shaper Crafting")
-				.background("gui_set_a", 168, 119, 69, 26).icon(Registry.getBlock("metal_shaper")).progressBar("gui_set_a", 218, 109, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
-				.slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(1, 5), Pair.of(48, 5)).catalysts(Registry.getBlock("metal_shaper"), Registry.getBlock("mkii_metal_shaper")).build(MetalCrafting.class));
+		CATEGORY_REGISTRY.put(PneumaticCrafting.PNEUMATIC_RECIPE, new RecipeCategoryBuilder(guiHelper, "pneumatic", "Pneumatic Compressor")
+				.background("gui_set_a", 87, 211, 87, 26).icon(Registry.getBlock("pneumatic_compressor")).progressBar("gui_set_a", 155, 201, 19, 10, 200, StartDirection.LEFT, false, 40, 8)
+				.slots((i) -> switch(i) {
+				default -> RecipeIngredientRole.CATALYST;
+				case 1 -> RecipeIngredientRole.INPUT;
+				case 2 -> RecipeIngredientRole.OUTPUT;
+				}, Pair.of(1, 5), Pair.of(21, 5), Pair.of(66, 5))
+				.draw(new TriConsumer<>() {
+					IDrawableStatic drawable = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), 139, 195, 16, 16).build();
+					@Override
+					public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
+						if(k instanceof PneumaticCrafting recipe && recipe.mold.equals(Items.AIR)) drawable.draw(v, 1, 5);
+					}
+				}).catalysts(Registry.getBlock("pneumatic_compressor"), Registry.getBlock("mkii_pneumatic_compressor")).build(PneumaticCrafting.class));
 		
 		CATEGORY_REGISTRY.put(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE, new RecipeCategoryBuilder(guiHelper, "world_corruption", "World Corruption")
 				.background("gui_set_a", 168, 119, 69, 26).icon(Registry.getBlock("corrupt_diamond_ore")).progressBar("gui_set_a", 218, 99, 19, 10, 200, StartDirection.LEFT, false, 21, 8)
@@ -113,9 +124,9 @@ public class JEICategoryRegistry implements IModPlugin{
 						if(k instanceof GeneratorFluidCrafting) {
 							GeneratorFluidCrafting recipe = (GeneratorFluidCrafting) k;
 							TextComponent l1 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent("Coolant") : new TextComponent("Fuel");
-							TextComponent l2 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.coolantStrength) + "x") : new TextComponent(Formatting.formatToSuffix(recipe.powerPerUnit) + " FE");
-							Utils.drawCenteredStringWithoutShadow(v, l1, 64, 6);
-							Utils.drawCenteredStringWithoutShadow(v, l2, 64, 15);
+							TextComponent l2 = recipe.fluidType == GeneratorFluidTypes.COOLANT ? new TextComponent(df.format(recipe.coolantStrength) + "x") : new TextComponent(FormattingHelper.formatToSuffix(recipe.powerPerUnit) + " FE");
+							ScreenMath.drawCenteredStringWithoutShadow(v, l1, 64, 6);
+							ScreenMath.drawCenteredStringWithoutShadow(v, l2, 64, 15);
 						}
 					}
 				}).build(GeneratorFluidCrafting.class));
@@ -224,14 +235,15 @@ public class JEICategoryRegistry implements IModPlugin{
 				.background("gui_set_a", 187, 0, 69, 26).icon(Items.BONE_MEAL).slots((i) -> RecipeIngredientRole.INPUT, Pair.of(1, 5)).draw((k, v, s) -> {
 					if(k instanceof GreenhouseFertilizerCrafting recipe) {
 						String uses = recipe.usesPerItem == 1 ? "Use" : "Uses";
-						Utils.drawCenteredStringWithoutShadow(v, new TextComponent(recipe.usesPerItem + " " + uses), 43, 6);
-						Utils.drawCenteredStringWithoutShadow(v, new TextComponent(recipe.multiplication + "x Yield"), 43, 15);
+						ScreenMath.drawCenteredStringWithoutShadow(v, new TextComponent(recipe.usesPerItem + " " + uses), 43, 6);
+						ScreenMath.drawCenteredStringWithoutShadow(v, new TextComponent(recipe.multiplication + "x Yield"), 43, 15);
 						
 					}
 				}).catalysts(Registry.getBlock("greenhouse")).build(GreenhouseFertilizerCrafting.class));
 		
 		registration.addRecipeCategories(CATEGORY_REGISTRY.values().toArray(new IRecipeCategory<?>[CATEGORY_REGISTRY.size()]));
-		AssemblyLineMachines.LOGGER.info("JEI plugin for Assembly Line Machines loaded.");
+		
+		AssemblyLineMachines.LOGGER.debug("Just Enough Items plugin connected to Assembly Line Machines.");
 	}
 	
 	@Override

@@ -46,6 +46,9 @@
 		{"when": {"sprout": "flower"},
 			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/flower"}
 		},
+		{"when": {"sprout": "coral"},
+			"apply": {"model": "assemblylinemachines:block/greenhouse/sprout/coral"}
+		},
 		
 		{"when": {"soil": "empty"},
 			"apply": {"model": "assemblylinemachines:block/greenhouse/soil/empty"}

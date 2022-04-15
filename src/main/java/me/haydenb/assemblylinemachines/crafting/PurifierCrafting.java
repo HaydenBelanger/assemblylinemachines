@@ -1,14 +1,13 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
-import java.util.Random;
 
 import com.google.gson.JsonObject;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -31,9 +30,6 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	};
 	
 	public static final PurifierSerializer SERIALIZER = new PurifierSerializer();
-	
-	private static final Random RAND = new Random();
-	
 	
 	private final Lazy<Ingredient> parta;
 	private final Lazy<Ingredient> partb;
@@ -68,8 +64,8 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			boolean requiresUpgrade = this.requiresUpgrade();
 			if(requiresUpgrade && data.getUpgradeAmount(Upgrades.PURIFIER_EXPANDED) == 0) return ItemStack.EMPTY;
 			int conservationCount = requiresUpgrade ? 0 : data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
-			if(RAND.nextInt(10) * conservationCount < 10) inv.getItem(1).shrink(1);
-			if(RAND.nextInt(10) * conservationCount < 10) inv.getItem(2).shrink(1);
+			if(Utils.RAND.nextInt(10) * conservationCount < 10) inv.getItem(1).shrink(1);
+			if(Utils.RAND.nextInt(10) * conservationCount < 10) inv.getItem(2).shrink(1);
 			data.setCycles(requiresUpgrade ? time / 8f : time / 10f);
 			
 			inv.getItem(3).shrink(1);
@@ -135,7 +131,6 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 				
 				return new PurifierCrafting(recipeId, ingredienta, ingredientb, tobepurified, output, time);
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("Error deserializing Purifier recipe from JSON: " + e.getMessage());
 				e.printStackTrace();
 				return null;
 			}

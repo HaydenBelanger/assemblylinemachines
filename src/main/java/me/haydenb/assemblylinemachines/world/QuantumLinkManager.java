@@ -49,12 +49,11 @@ public class QuantumLinkManager extends SavedData{
 
 				if(compound.contains("assemblylinemachines:handler")) {
 					QuantumLinkManager interimQlm = new QuantumLinkManager();
-					AssemblyLineMachines.LOGGER.info("Loading Quantum Link Network data from Level...");
+					AssemblyLineMachines.LOGGER.debug("Loading Quantum Link Network data from Level...");
 					try {
 						interimQlm.handler = GSON.fromJson(compound.getString("assemblylinemachines.handler"), QuantumLinkHandler.class);
 						return interimQlm;
 					}catch(Exception e) {
-						AssemblyLineMachines.LOGGER.error("A fatal exception was thrown deserializing the Quantum Link Manager: ");
 						e.printStackTrace();
 					}
 				}
@@ -79,13 +78,12 @@ public class QuantumLinkManager extends SavedData{
 	@Override
 	public CompoundTag save(CompoundTag compound) {
 		
-		AssemblyLineMachines.LOGGER.info("Saving Quantum Link Network data to Level...");
+		AssemblyLineMachines.LOGGER.debug("Saving Quantum Link Network data to Level...");
 		
 		if(handler != null) {
 			try {
 				compound.putString("assemblylinemachines:handler", GSON.toJson(handler));
 			}catch(Exception e) {
-				AssemblyLineMachines.LOGGER.error("A fatal exception was thrown serializing the Quantum Link Manager: ");
 				e.printStackTrace();
 			}
 			

@@ -13,9 +13,8 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.client.GUIHelper;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -417,16 +416,10 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			this.titleTextLoc = titleTextLoc;
 			this.invTextLoc = invTextLoc;
 			this.inventoryText = () -> this.playerInventoryTitle;
-			String a = "";
-			if (hasCool == true && ConfigHolder.getCommonConfig().coolDudeMode.get() == true) {
-				a = "cool/";
-				renderTitleText = false;
-				renderInventoryText = false;
-			} else {
-				renderTitleText = true;
-				renderInventoryText = true;
-			}
-			bg = new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/" + a + guipath + ".png");
+			this.renderTitleText = true;
+			this.renderInventoryText = true;
+			
+			bg = new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/" + guipath + ".png");
 		}
 
 		// render

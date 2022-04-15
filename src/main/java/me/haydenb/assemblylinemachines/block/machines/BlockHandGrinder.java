@@ -6,20 +6,18 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.crafting.GrinderCrafting;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
-import net.minecraft.ChatFormatting;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
@@ -54,24 +52,6 @@ public class BlockHandGrinder extends Block implements EntityBlock {
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		
 		builder.add(HorizontalDirectionalBlock.FACING).add(BLADE_PROPERTY);
-	}
-	
-	@Override
-	public String getDescriptionId() {
-		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
-			return super.getDescriptionId() + ".cool";
-		}
-		return super.getDescriptionId();
-	}
-	
-	@Override
-	public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
-		if(ConfigHolder.getCommonConfig().coolDudeMode.get()) {
-			tooltip.add(new TextComponent("XL+ Definitive Edition").withStyle(ChatFormatting.DARK_GRAY));
-			tooltip.add(new TextComponent("With Sonic & Knuckles").withStyle(ChatFormatting.DARK_GRAY));
-			tooltip.add(new TextComponent("Season Pass").withStyle(ChatFormatting.DARK_GRAY));
-		}
-		super.appendHoverText(stack, level, tooltip, flag);
 	}
 	
 	@Override

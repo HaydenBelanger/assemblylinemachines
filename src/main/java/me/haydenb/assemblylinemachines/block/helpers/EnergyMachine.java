@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.mojang.datafixers.util.Pair;
 
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
+import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -199,16 +199,16 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 
 					if(Screen.hasShiftDown()) {
 						ArrayList<String> str = new ArrayList<>();
-						str.add(Formatting.GENERAL_FORMAT.format(machine.amount) + "/" + Formatting.GENERAL_FORMAT.format(machine.properties.capacity) + "FE");
+						str.add(FormattingHelper.GENERAL_FORMAT.format(machine.amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(machine.properties.capacity) + "FE");
 						if(usesfept) {
 							
 							
-							str.add(Formatting.GENERAL_FORMAT.format(machine.fept) + " FE/tick");
+							str.add(FormattingHelper.GENERAL_FORMAT.format(machine.fept) + " FE/tick");
 						}
 						this.renderComponentTooltip(str,
 								mouseX - x, mouseY - y);
 					}else {
-						this.renderComponentTooltip(Formatting.formatToSuffix(machine.amount) + "/" + Formatting.formatToSuffix(machine.properties.capacity) + "FE",
+						this.renderComponentTooltip(FormattingHelper.formatToSuffix(machine.amount) + "/" + FormattingHelper.formatToSuffix(machine.properties.capacity) + "FE",
 								mouseX - x, mouseY - y);
 					}
 					

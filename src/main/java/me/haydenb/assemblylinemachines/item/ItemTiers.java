@@ -5,10 +5,9 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.PowerToolType;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ALMCommonConfig;
+import me.haydenb.assemblylinemachines.registry.ConfigHandler.ALMServerConfig;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -29,7 +28,7 @@ public enum ItemTiers {
 			cfg().steelArmorKnockbackResistance.get(), cfg().steelArmorDamageReduction.get(), "steel", cfg().steelArmorToughness.get(), List.of(Tiers.IRON), List.of(Tiers.DIAMOND), false, ()->{return Ingredient.of(Registry.getItem("steel_ingot"));}),
 	
 	CRANK(cfg().crankToolAttack.get(), cfg().crankToolDurability.get(), cfg().crankToolEnchantability.get(), cfg().crankToolDurability.get(), 0d, 0, null, 0d, List.of(Tiers.DIAMOND), List.of(Tiers.NETHERITE), false,
-			()->{return Ingredient.of(Utils.getTagKey(Keys.ITEMS, new ResourceLocation("assemblylinemachines", "precious_gears")));}),
+			()->{return Ingredient.of(TagKey.create(Keys.ITEMS, new ResourceLocation("assemblylinemachines", "precious_gears")));}),
 	
 	MYSTIUM(cfg().mystiumToolAttack.get(), cfg().mystiumToolHarvestSpeed.get(), cfg().mystiumEnchantability.get(), cfg().mystiumDurability.get(), cfg().mystiumArmorKnockbackResistance.get(), cfg().mystiumArmorDamageReduction.get(), "mystium", cfg().mystiumArmorToughness.get(),
 			List.of(Tiers.NETHERITE), List.of(), true, ()->{return Ingredient.of(Registry.getItem("mystium_ingot"));}),
@@ -49,7 +48,7 @@ public enum ItemTiers {
 			private final TagKey<Block> blockTag;
 			
 			public ItemTier() {
-				this.blockTag = hasTag ? Utils.getTagKey(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_" + ItemTiers.this.toString().toLowerCase() + "_tool")) : null;
+				this.blockTag = hasTag ? TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "needs_" + ItemTiers.this.toString().toLowerCase() + "_tool")) : null;
 				if(tiersAfter != null && tiersBefore != null) TierSortingRegistry.registerTier(this, new ResourceLocation(AssemblyLineMachines.MODID, ItemTiers.this.toString().toLowerCase()), tiersAfter, tiersBefore);
 			}
 			
@@ -152,8 +151,8 @@ public enum ItemTiers {
 		}catch(IllegalArgumentException e) {}
 	}
 	
-	private static ALMCommonConfig cfg() {
-		return ConfigHolder.getCommonConfig();
+	private static ALMServerConfig cfg() {
+		return ConfigHolder.getServerConfig();
 	}
 	
 	public Tier getItemTier() {

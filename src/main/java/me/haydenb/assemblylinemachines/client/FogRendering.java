@@ -29,6 +29,7 @@ public class FogRendering {
 		
 	}
 	
+	@SuppressWarnings({ "deprecation", "removal" })
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void applyFogDensity(EntityViewRenderEvent.FogDensity event) {

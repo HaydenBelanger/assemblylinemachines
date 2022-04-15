@@ -22,9 +22,10 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Utils.*;
-import me.haydenb.assemblylinemachines.registry.Utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.MenuScreens.ScreenConstructor;
 import net.minecraft.client.gui.screens.Screen;
@@ -210,6 +211,7 @@ public class MachineBuilder {
 		private Function<Integer, List<Integer>> mustBeFullBefore = null;
 		private List<List<Integer>> slotDuplicateCheckingGroups = null;
 		private TriPredicate<Integer, ItemStack, BlockEntity> slotValidator = null;
+		private Pair<Predicate<Integer>, BiFunction<Container, Integer, ItemStack>> getCapturer = null;
 		
 		private MachineBlockEntityBuilder() {}
 		
@@ -316,6 +318,11 @@ public class MachineBuilder {
 			return this;
 		}
 		
+		public MachineBlockEntityBuilder getCapturer(Predicate<Integer> operateOn, BiFunction<Container, Integer, ItemStack> stackProvider) {
+			this.getCapturer = Pair.of(operateOn, stackProvider);
+			return this;
+		}
+		
 		public MachineBlockEntityBuilder outputToRight() {
 			this.outputToRight = true;
 			this.primaryOutputSlot = -1;
@@ -346,6 +353,7 @@ public class MachineBuilder {
 				private FluidStack internalTank = FluidStack.EMPTY;
 				private boolean useInternalTank = true;
 				private boolean allowCranks = false;
+				private int mkiiPneumaticCompressorMold = 0;
 				
 				public MachineBlockEntity(BlockPos pos, BlockState state) {
 					super(Registry.getBlockEntity(blockName), totalSlots, new TranslatableComponent(Registry.getBlock(blockName).getDescriptionId())
@@ -547,6 +555,7 @@ public class MachineBuilder {
 					useInternalTank = compound.getBoolean("assemblylinemachines:useinternaltank");
 					cranks = compound.getInt("assemblylinemachines:cranks");
 					allowCranks = compound.getBoolean("assemblylinemachines:allowcranks");
+					mkiiPneumaticCompressorMold = compound.getInt("assemblylinemachines:mkiipneumaticmold");
 				}
 				
 				@Override
@@ -561,6 +570,7 @@ public class MachineBuilder {
 					if(useInternalTank) compound.putBoolean("assemblylinemachines:useinternaltank", useInternalTank);
 					if(cranks != 0) compound.putInt("assemblylinemachines:cranks", cranks);
 					if(allowCranks) compound.putBoolean("assemblylinemachines:allowcranks", allowCranks);
+					if(mkiiPneumaticCompressorMold != 0) compound.putInt("assemblylinemachines:mkiipneumaticmold", mkiiPneumaticCompressorMold);
 					
 					super.saveAdditional(compound);
 				}
@@ -606,7 +616,7 @@ public class MachineBuilder {
 					
 					if(useInternal && hasInternalTank) {
 						if(internalLazy == null) {
-							internalLazy = LazyOptional.of(() -> Utils.getSimpleOneTankHandler(null, capacity, (oFs) -> {
+							internalLazy = LazyOptional.of(() -> IFluidHandlerBypass.getSimpleOneTankHandler(null, capacity, (oFs) -> {
 								if(oFs.isPresent()) internalTank = oFs.get();
 								return internalTank;
 							}, (v) -> this.sendUpdates(), false));
@@ -636,6 +646,8 @@ public class MachineBuilder {
 					if(pd.get("function", String.class).equals("toggle_source_tank")) {
 						this.useInternalTank = !this.useInternalTank;
 						this.sendUpdates();
+					}else if(pd.get("function", String.class).equals("change_pneumatic_mold")) {
+						this.getOrSetMKIIPCSelMold(Optional.of(pd.get("mold", Integer.class)));
 					}
 				}
 				
@@ -650,6 +662,15 @@ public class MachineBuilder {
 					}
 
 					return ii;
+				}
+				
+				@Override
+				public int getOrSetMKIIPCSelMold(Optional<Integer> set) {
+					if(set.isPresent()) {
+						mkiiPneumaticCompressorMold = mkiiPneumaticCompressorMold == set.get() ? 0 : set.get();
+						this.sendUpdates();
+					}
+					return mkiiPneumaticCompressorMold;
 				}
 				
 				private IItemHandler getOrCreateRightOutput() {
@@ -696,6 +717,7 @@ public class MachineBuilder {
 
 					@Override
 					public ItemStack getItem(int intIn) {
+						if(getCapturer != null && getCapturer.getFirst().test(intIn)) return getCapturer.getSecond().apply(MachineBlockEntity.this, intIn);
 						return MachineBlockEntity.this.getItem(transformer.apply(intIn));
 					}
 
@@ -773,6 +795,11 @@ public class MachineBuilder {
 					public BlockState getBlockState() {
 						return MachineBlockEntity.this.getBlockState();
 					}
+					
+					@Override
+					public int getOrSetMKIIPCSelMold(Optional<Integer> set) {
+						return MachineBlockEntity.this.getOrSetMKIIPCSelMold(set);
+					}
 				}
 			}
 			
@@ -792,6 +819,7 @@ public class MachineBuilder {
 			public boolean getUsingInternalTank();
 			public void receiveButtonPacket(PacketData pd);
 			public BlockState getBlockState();
+			public int getOrSetMKIIPCSelMold(Optional<Integer> set);
 		}
 	}
 	
@@ -866,6 +894,9 @@ public class MachineBuilder {
 		private List<ProgressBar> progressBars = new ArrayList<>();
 		private int energyMeterStartX = 176;
 		private Function<BlockState, Pair<Integer, Integer>> uvModifier = null;
+		private ToIntBiFunction<Integer, Integer> pbSlotChecker = (blitx, blity) -> {
+			throw new IllegalArgumentException("Unexpected request: " + blitx + ", " + blity);
+		};
 		private boolean renderFluidBar = false;
 		private boolean hasCoolMode = false;
 		private int fluidBarTopLeftX = 0;
@@ -874,6 +905,7 @@ public class MachineBuilder {
 		private int fluidOverlayStartX = 0;
 		private int fluidOverlayStartY = 0;
 		private int[] tankButtonStats = null;
+		private boolean isMkiiPneumaticCompressor = false;
 		
 		@OnlyIn(Dist.CLIENT)
 		private MachineScreenBuilder() {}
@@ -901,6 +933,16 @@ public class MachineBuilder {
 		public MachineScreenBuilder energyBarLoc(int x, int y) {
 			this.energyBarLoc = Pair.of(x, y);
 			return this;
+		}
+		
+		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, int slotToCheck) {
+			ToIntBiFunction<Integer, Integer> previous = pbSlotChecker;
+			pbSlotChecker = (cbx, cby) -> {
+				if(cbx == blitx && cby == blity) return slotToCheck;
+				return previous.applyAsInt(cbx, cby);
+			};
+			return this.addBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, PBDirection.SLOT_EMPTY);
+			
 		}
 		
 		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction) {
@@ -953,6 +995,11 @@ public class MachineBuilder {
 			return this.inventorySize(190, 188).energyMeterStartX(190);
 		}
 		
+		public MachineScreenBuilder mkiiPneumaticCompressorButtons() {
+			this.isMkiiPneumaticCompressor = true;
+			return this;
+		}
+		
 		@SuppressWarnings("unchecked")
 		public void buildAndRegister(String blockName) {
 			
@@ -986,9 +1033,29 @@ public class MachineBuilder {
 							new TrueFalseButtonSupplier("Draw From Internal Tank", "Draw From External Tank", () -> data.getUsingInternalTank()), (b) -> {
 						PacketData packet = new PacketData("machine_builder_gui");
 						packet.writeBlockPos("pos", ((BlockEntity) data).getBlockPos());
-						packet.writeUtf("function", "toggle_source_tank");
+						packet.writeString("function", "toggle_source_tank");
 						PacketHandler.INSTANCE.sendToServer(packet);
 					}));
+					
+					if(isMkiiPneumaticCompressor) {
+						OnPress pcOp = (b) -> {
+							int bid = switch(((TrueFalseButton) b).blity) {
+							case 72 -> 1;
+							case 84 -> 2;
+							case 96 -> 3;
+							default -> 0;};
+							
+							PacketData packet = new PacketData("machine_builder_gui");
+							packet.writeBlockPos("pos", ((BlockEntity) data).getBlockPos());
+							packet.writeString("function", "change_pneumatic_mold");
+							packet.writeInteger("mold", bid);
+							PacketHandler.INSTANCE.sendToServer(packet);
+						};
+						
+						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+37, 190, 72, 12, 12, new TrueFalseButtonSupplier("Rod Mold (Selected)", "Rod Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 1), pcOp));
+						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+50, 190, 84, 12, 12, new TrueFalseButtonSupplier("Plate Mold (Selected)", "Plate Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 2), pcOp));
+						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+63, 190, 96, 12, 12, new TrueFalseButtonSupplier("Gear Mold (Selected)", "Gear Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 3), pcOp));
+					}
 				}
 				
 				@Override
@@ -1023,13 +1090,13 @@ public class MachineBuilder {
 					int x = (this.width - this.imageWidth) / 2;
 					int y = (this.height - this.imageHeight) / 2;
 					
-					if(MathHelper.isMouseBetween(x, y, mouseX, mouseY, fluidBarTopLeftX, fluidBarTopLeftY, fluidBarTopLeftX + 8, fluidBarTopLeftY + fluidBarHeight)) {
+					if(ScreenMath.isMouseBetween(x, y, mouseX, mouseY, fluidBarTopLeftX, fluidBarTopLeftY, fluidBarTopLeftX + 8, fluidBarTopLeftY + fluidBarHeight)) {
 						IFluidHandler handler = data.getCraftingFluidHandler(Optional.of(true));
 						if(renderFluidBar) {
 							if(handler != null && handler.getFluidInTank(0).getAmount() > 0) {
 								this.renderComponentTooltip(List.of(handler.getFluidInTank(0).getDisplayName().getString(),
-										Screen.hasShiftDown() ? Formatting.FEPT_FORMAT.format(handler.getFluidInTank(0).getAmount()) + " mB" : 
-											Formatting.FEPT_FORMAT.format((double)handler.getFluidInTank(0).getAmount() / 1000D) + " B"), mouseX - x, mouseY - y);
+										Screen.hasShiftDown() ? FormattingHelper.FEPT_FORMAT.format(handler.getFluidInTank(0).getAmount()) + " mB" : 
+											FormattingHelper.FEPT_FORMAT.format((double)handler.getFluidInTank(0).getAmount() / 1000D) + " B"), mouseX - x, mouseY - y);
 							}else {
 								this.renderComponentTooltip("Empty", mouseX - x, mouseY - y);
 							}
@@ -1079,13 +1146,10 @@ public class MachineBuilder {
 				float cycles = bridge.getCycles();
 				
 				if(progress != 0f && cycles != 0f) {
-					int piecex = pb.uvx;
-					int piecey = pb.uvy;
-					if(uvModifier != null) {
-						Pair<Integer, Integer> pieces = uvModifier.apply(screen.getMenu().tileEntity.getBlockState());
-						piecex = pieces.getFirst();
-						piecey = pieces.getSecond();
-					}
+					Pair<Integer, Integer> pieces = uvModifier == null ? Pair.of(pb.uvx, pb.uvy) : uvModifier.apply(screen.getMenu().tileEntity.getBlockState());
+					int piecex = pieces.getFirst();
+					int piecey = pieces.getSecond();
+					
 					switch(pb.direction) {
 					case LR -> {
 						int prog = Math.round((progress/cycles) * pb.defaultWidth);
@@ -1101,6 +1165,10 @@ public class MachineBuilder {
 					}
 					case STATIC -> {
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
+					}
+					case SLOT_EMPTY -> {
+						if(screen.getMenu().tileEntity.getItem(pbSlotChecker.applyAsInt(blitx, blity)).isEmpty())
+						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
 					}}
 					
 					if(renderDuplicates) for(Pair<Integer, Integer> pair : pb.duplicateAt) this.render(x, y, pair.getFirst(), pair.getSecond(), false);
@@ -1109,7 +1177,8 @@ public class MachineBuilder {
 		}
 		
 		public enum PBDirection{
-			LR, UD, DU, STATIC;
+			
+			LR,UD, DU, STATIC, SLOT_EMPTY;
 		}
 		
 		record ProgressBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {}

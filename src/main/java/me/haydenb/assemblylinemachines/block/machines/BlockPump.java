@@ -4,10 +4,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.Utils.Formatting;
-import me.haydenb.assemblylinemachines.world.FluidCapability;
-import me.haydenb.assemblylinemachines.world.FluidCapability.IChunkFluidCapability;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids;
+import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids.IChunkFluidCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -200,8 +200,16 @@ public class BlockPump extends BlockTileEntity {
 					timer = 0;
 
 					if(handler == null) {
-						handler = Utils.getCapabilityFromDirection(this, (lo) -> {if(this != null) handler = null;}, Direction.UP, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+						BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().above());
+						if(te != null) {
+							LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.DOWN);
+							handler = cap.orElse(null);
+							if(handler != null) {
+								cap.addListener((h) -> handler = null);
+							}
+						}
 					}
+					
 					if (this.getLevel().getBlockState(this.getBlockPos().below()).getBlock() != Registry.getBlock("pumpshaft")) {
 						prevStatusMessage = "Not connected to Pumpshaft.";
 						forceState(false);
@@ -211,7 +219,7 @@ public class BlockPump extends BlockTileEntity {
 							if (amount - 1800 >= 0) {
 								boolean success = false;
 								try {
-									LazyOptional<IChunkFluidCapability> lazy = FluidCapability.getChunkFluidCapability(this.getLevel().getChunkAt(this.getBlockPos()));
+									LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(this.getLevel().getChunkAt(this.getBlockPos()));
 									if(lazy.isPresent()) {
 										IChunkFluidCapability capability = lazy.orElseThrow(null);
 										FluidStack xfs = capability.drain(2000, false);
@@ -241,7 +249,7 @@ public class BlockPump extends BlockTileEntity {
 								if (handler.fill(extracted, FluidAction.SIMULATE) == extracted.getAmount()) {
 									handler.fill(extracted, FluidAction.EXECUTE);
 									extracted = FluidStack.EMPTY;
-									prevStatusMessage = "Working... (" + Formatting.GENERAL_FORMAT.format(amount) + "/30,000 FE)";
+									prevStatusMessage = "Working... (" + FormattingHelper.GENERAL_FORMAT.format(amount) + "/30,000 FE)";
 									forceState(true);
 								} else {
 									prevStatusMessage = "Fluid storage could not accept fluid.";

@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"ggg",
+		"bab",
+		"ihi"
+	],
+	"key":{
+		"g":{
+			"tag": "forge:glass_panes/colorless"
+		},
+		"b":{
+			"item": "minecraft:bucket"
+		},
+		"i":{
+			"tag": "forge:ingots/steel"
+		},
+		"h":{
+			"item": "minecraft:hopper"
+		},
+		"a":{
+			"item": "assemblylinemachines:conduction_component"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:greenhouse"
+	}
+}
