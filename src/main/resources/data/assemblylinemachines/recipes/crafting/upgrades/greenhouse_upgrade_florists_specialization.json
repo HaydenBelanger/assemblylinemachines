@@ -1,25 +1,13 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"bso",
-		"sjs",
-		"asp"
+		"bsb",
+		"sbs",
+		"bsb"
 	],
 	"key":{
 		"b":{
-			"item": "minecraft:blue_orchid"
-		},
-		"o":{
-			"item": "minecraft:allium"
-		},
-		"j":{
-			"item": "minecraft:wither_rose"
-		},
-		"a":{
-			"item": "minecraft:lily_of_the_valley"
-		},
-		"p":{
-			"item": "minecraft:oxeye_daisy"
+			"tag": "minecraft:small_flowers"
 		},
 		"s":{
 			"tag": "forge:plates/pure_steel"

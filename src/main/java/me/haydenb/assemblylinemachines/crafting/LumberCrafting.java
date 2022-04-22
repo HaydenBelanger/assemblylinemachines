@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -53,10 +54,11 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	
 	@Override
 	public ItemStack assemble(Container inv) {
-		if(inv instanceof IMachineDataBridge) {
+		if(inv instanceof IMachineDataBridge data) {
 			inv.getItem(2).shrink(1);
 			if(!this.outputb.isEmpty()) {
-				if(Utils.RAND.nextFloat() < (opbchance * (1f + (0.5f * (float)((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
+				float chance = data.blockState().is(Registry.getBlock("mkii_lumber_mill")) ? Utils.RAND.nextFloat(0.5f) : Utils.RAND.nextFloat();
+				if(chance <= (opbchance * (1f + (0.5f * (float)((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
 					((IMachineDataBridge) inv).setSecondaryOutput(this.outputb.copy());
 			}
 			((IMachineDataBridge) inv).setCycles(time);

@@ -6,10 +6,11 @@
 	],
 	"key":{
 		"x":{
-			"item": "assemblylinemachines:silt"
+			"item": "assemblylinemachines:smooth_silt"
 		}
 	},
 	"result":{
-		"item": "assemblylinemachines:silt_brick"
+		"item": "assemblylinemachines:silt_brick",
+		"count": 4
 	}
 }

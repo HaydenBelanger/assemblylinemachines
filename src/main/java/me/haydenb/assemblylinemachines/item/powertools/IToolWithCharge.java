@@ -61,7 +61,7 @@ public interface IToolWithCharge{
 	}
 	
 	default public int addCharge(ItemStack stack, int amount, boolean simulated) {
-		CompoundTag nbt = stack.hasTag() ? stack.getTag() : new CompoundTag();
+		CompoundTag nbt = stack.getOrCreateTag();
 		
 		IToolWithCharge.PowerToolType ptt = this.getPowerToolType();
 		int current = nbt.getInt(ptt.keyName);
@@ -111,7 +111,7 @@ public interface IToolWithCharge{
 	}
 	
 	default public ICapabilityProvider defaultInitCapabilities(ItemStack stack, CompoundTag nbt) {
-		if(this.getPowerToolType().hasSecondaryAbilities) {
+		if(this.getPowerToolType().hasEnergyCapability) {
 			return new ICapabilityProvider() {
 
 				protected IEnergyStorage energy = new IEnergyStorage() {

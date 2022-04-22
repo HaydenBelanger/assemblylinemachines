@@ -223,6 +223,9 @@
 	"item.assemblylinemachines.graphene_ingot": "Graphene Ingot",
 	"item.assemblylinemachines.graphene_plate": "Graphene Plate",
 	"item.assemblylinemachines.glacier_sauce": "Glacier Sauce",
+	"item.assemblylinemachines.quantum_fuel": "Quantum Fuel",
+	"item.assemblylinemachines.internal_water_generator": "Internal Water Generator",
+	"item.assemblylinemachines.creative_upgrade_kit": "Creative Upgrade Kit",
 	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",
@@ -374,6 +377,11 @@
 	"block.assemblylinemachines.cocoa_sapling": "Cocoa Sapling",
 	"block.assemblylinemachines.mkii_pneumatic_compressor": "MKII Pneumatic Compressor",
 	"block.assemblylinemachines.mkii_lumber_mill": "MKII Lumber Mill",
+	"block.assemblylinemachines.large_silt_brick": "Large Silt Brick",
+	"block.assemblylinemachines.painted_silt": "Painted Silt",
+	"block.assemblylinemachines.silt_tile": "Silt Tile",
+	"block.assemblylinemachines.smooth_silt": "Smooth Silt",
+	"block.assemblylinemachines.silt_pillar": "Silt Pillar",
 	
 	"fluid.assemblylinemachines.oil":"Oil",
 	"fluid.assemblylinemachines.condensed_void":"Condensed Void",
@@ -401,6 +409,18 @@
 	
 	"death.attack.interactor":"%1$s was killed by %2$s's Interactor",
 	"death.attack.interactor.item":"%1$s was killed by %2$s's Interactor using %3$s",
+	
+	"commands.assemblylinemachines.guide.missing_mod": "Patchouli is not installed.",
+	"commands.assemblylinemachines.guide.success": "Gave a copy of Assembly Lines & You to %1$s player(s).",
+	"commands.assemblylinemachines.chunkfluid.error": "An unexpected error occurred while interfacing with the chunk fluid.",
+	"commands.assemblylinemachines.chunkfluid.get.success": "There is %1$s mB of %2$s in the chunk at %3$s.",
+	"commands.assemblylinemachines.chunkfluid.get.success_empty": "The chunk at %1$s is empty.",
+	"commands.assemblylinemachines.chunkfluid.set.success": "Updated fluid in chunk at %1$s to %2$s mB of %3$s.",
+	"commands.assemblylinemachines.chunkfluid.remove.success": "Removed fluid from chunk at %1$s.",
+	"commands.assemblylinemachines.errors.missing_fluid": "Unknown fluid \"%1$s\"",
+	"commands.assemblylinemachines.errors.flowing_fluid": "The fluid given must be a source fluid.",
+	"commands.assemblylinemachines.makecreative.success": "Successfully made the %1$s at %2$s creative.",
+	"commands.assemblylinemachines.makecreative.error": "Block at %1$s is not a compatible block with this command.",
 	
 	"tileEntity.assemblylinemachines.entropy_reactor":"Entropy Reactor",
 	"tileEntity.assemblylinemachines.item_pipe":"Items",

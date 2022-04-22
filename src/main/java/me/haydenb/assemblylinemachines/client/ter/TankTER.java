@@ -40,7 +40,7 @@ public class TankTER implements BlockEntityRendererProvider<TEFluidTank> {
 					}else {
 						vec = new Vector4f(1f, 1f, 1f, 1f);
 					}
-					float endPoint = 0.0625f + (((float) tank.fluid.getAmount() / (float) tank.block.capacity) * 0.875f);
+					float endPoint = 0.0625f + (((float) Math.min(tank.fluid.getAmount(), tank.block.capacity) / (float) tank.block.capacity) * 0.875f);
 					
 					add(builder, matrixStack, vec, 0 + 0.0625f, 0 + 0.0625f, 1 - 0.0625f, sprite.getU0(), sprite.getV0());
 					add(builder, matrixStack, vec, 1 - 0.0625f, 0 + 0.0625f, 1 - 0.0625f, sprite.getU1(), sprite.getV0());

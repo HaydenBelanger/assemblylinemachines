@@ -65,12 +65,12 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			
 			CompoundTag nbt = stack.getTag();
 			
-			if(world.getBlockEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storedprettyname")) {
+			if(world.getBlockEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored")) {
 				
 				TEBottomlessStorageUnit te = (TEBottomlessStorageUnit) world.getBlockEntity(pos);
 				te.internalStored = nbt.getLong("assemblylinemachines:stored");
+				te.creative = nbt.getBoolean("assemblylinemachines:creative");
 				te.storedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(nbt.getString("assemblylinemachines:storeditem")));
-				te.storedItemPrettyName = nbt.getString("assemblylinemachines:storedprettyname");
 				te.sendUpdates();
 			}
 		}
@@ -82,8 +82,10 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		if(stack.hasTag()) {
 			
 			CompoundTag nbt = stack.getTag();
-			if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:storedprettyname")) {
-				tooltip.add(1, new TextComponent("This BSU has " + FormattingHelper.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + nbt.getString("assemblylinemachines:storedprettyname") + " stored.").withStyle(ChatFormatting.GREEN));
+			if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem")) {
+				String name = ForgeRegistries.ITEMS.getValue(new ResourceLocation(nbt.getString("assemblylinemachines:storeditem"))).getDescription().getString();
+				tooltip.add(1, new TextComponent("This BSU has " + FormattingHelper.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + name + " stored.").withStyle(ChatFormatting.GREEN));
+				if(nbt.getBoolean("assemblylinemachines:creative")) tooltip.add(1, new TextComponent("This BSU is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
 			}
 			
 		}
@@ -101,9 +103,9 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			this(Registry.getBlockEntity("bottomless_storage_unit"), pos, state);
 		}
 
-		private long internalStored = 0;
-		private Item storedItem = null;
-		private String storedItemPrettyName = null;
+		public long internalStored = 0;
+		public Item storedItem = null;
+		public boolean creative = false;
 
 		protected InternalStoredExtractHandler items = new InternalStoredExtractHandler(this);
 		protected LazyOptional<InternalStoredExtractHandler> itemHandler = LazyOptional.of(() -> items);
@@ -146,13 +148,10 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 						}
 						ItemStack itemstack = new ItemStack(storedItem, max);
 
-						if (simulate == false) {
+						if (simulate == false && !creative) {
 							internalStored -= max;
 
-							if (internalStored <= 0) {
-								storedItem = null;
-								storedItemPrettyName = null;
-							}
+							if (internalStored <= 0) storedItem = null;
 
 							sendUpdates();
 						}
@@ -207,22 +206,23 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 				if (internalStored == 0) {
 					storedItem = null;
-					storedItemPrettyName = null;
 					sendUpdates = true;
 				}
 
-				if (!contents.get(1).isEmpty()) {
+				if (internalStored != Long.MAX_VALUE && !contents.get(1).isEmpty()) {
+					
 					try {
 						internalStored = Math.addExact(internalStored, contents.get(1).getCount());
 						if (storedItem == null) {
 							storedItem = contents.get(1).getItem();
-							storedItemPrettyName = storedItem.getDefaultInstance().getHoverName().getString();
+						}
+						if(creative && storedItem != null && internalStored != Long.MAX_VALUE) {
+							internalStored = Long.MAX_VALUE;
 						}
 						contents.set(1, ItemStack.EMPTY);
 						sendUpdates = true;
-					} catch (ArithmeticException e) {
-					}
-					;
+					}catch(ArithmeticException e) {}
+					
 				}
 
 				if (sendUpdates) {
@@ -235,14 +235,14 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-			if (compound.contains("assemblylinemachines:storeditem") && compound.contains("assemblylinemachines:stored") && compound.contains("assemblylinemachines:storedprettyname")) {
+			if (compound.contains("assemblylinemachines:storeditem") && compound.contains("assemblylinemachines:stored")) {
 				storedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("assemblylinemachines:storeditem")));
 				internalStored = compound.getLong("assemblylinemachines:stored");
-				storedItemPrettyName = compound.getString("assemblylinemachines:storedprettyname");
 			} else {
 				storedItem = null;
 				internalStored = 0l;
 			}
+			creative = compound.getBoolean("assemblylinemachines:creative");
 
 			
 		}
@@ -250,12 +250,11 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		@Override
 		public void saveAdditional(CompoundTag compound) {
 
-			if (storedItem != null && internalStored != 0 && storedItemPrettyName != null) {
+			if (storedItem != null && internalStored != 0) {
 				compound.putString("assemblylinemachines:storeditem", storedItem.getRegistryName().toString());
 				compound.putLong("assemblylinemachines:stored", internalStored);
-				compound.putString("assemblylinemachines:storedprettyname", storedItemPrettyName);
 			}
-
+			compound.putBoolean("assemblylinemachines:creative", creative);
 			
 			super.saveAdditional(compound);
 		}
@@ -321,14 +320,13 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 		private void reduceInternal(int amt) {
 
-			tileEntity.internalStored -= amt;
+			if(!tileEntity.creative) {
+				tileEntity.internalStored -= amt;
 
-			if (tileEntity.internalStored <= 0) {
-				tileEntity.storedItem = null;
-				tileEntity.storedItemPrettyName = null;
+				if (tileEntity.internalStored <= 0) tileEntity.storedItem = null;
+
+				tileEntity.sendUpdates();
 			}
-
-			tileEntity.sendUpdates();
 		}
 
 	}

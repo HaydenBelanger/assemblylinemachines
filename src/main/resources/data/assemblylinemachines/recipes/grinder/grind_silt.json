@@ -1,0 +1,11 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"item": "assemblylinemachines:silt"
+	},
+	"output":{
+		"item": "minecraft:clay"
+	},
+	"grinds": 6,
+	"bladetype": "TITANIUM"
+}

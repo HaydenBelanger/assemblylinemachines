@@ -30,13 +30,13 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/silt_brick",
-			"recipe2": "assemblylinemachines:crafting/hand_grinder",
-			"title": "Grindstone"
+			"recipe": "assemblylinemachines:crafting/silt/smooth_silt",
+			"recipe2": "assemblylinemachines:crafting/silt/silt_brick"
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/titanium_blade_piece",
+			"recipe": "assemblylinemachines:crafting/hand_grinder",
+			"recipe2": "assemblylinemachines:crafting/titanium_blade_piece",
 			"text": "You will also need three $(item)Titanium Blade Pieces..."
 		},
 		{

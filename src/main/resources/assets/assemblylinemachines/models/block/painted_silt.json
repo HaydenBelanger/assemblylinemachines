@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_column",
+    "textures": {
+        "side": "assemblylinemachines:block/silt/painted_silt",
+        "end": "assemblylinemachines:block/silt/smooth_silt"
+    }
+}

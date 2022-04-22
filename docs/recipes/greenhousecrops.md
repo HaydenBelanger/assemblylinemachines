@@ -56,7 +56,7 @@ Recipe namespace: `assemblylinemachines:greenhouse`.
     *Note that `SOUL_SAND`, `CORRUPT`, and `END_STONE` requires the Interdimensional Specialization upgrade to perform operations!*
 
 ??? info "List of Sprouts"
-    There are a number of sprouts accepted in the Greenhouse, listed are the options and the requirements to plant them:  
+    There are a number of sprouts accepted in the Greenhouse. These change the visual effect of what happens within while an operation occurs. Listed are the options and the requirements to plant them:  
 
     `CACTUS`: Requires sunlight.  
     `CORRUPT_SPROUT`: Requires darkness.  
@@ -67,6 +67,7 @@ Recipe namespace: `assemblylinemachines:greenhouse`.
     `SUGAR_CANE`: Requires sunlight.  
     `CHORUS`: Requires darkness.  
     `BRAIN_CACTUS`: Requires darkness.  
+	`CORAL`: Requires sunlight.  
     `CHAOSBARK_SAPLING`: Requires darkness, requires Arborist's Specialization.  
     `FLOWER`: Requires sunlight unless has Corrupt soil, requires Florist's Specialization.
 

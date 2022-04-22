@@ -9,10 +9,15 @@
 		},
 		{
 			"type": "spotlight",
-			"item": "assemblylinemachines:graphene_rod",
-			"anchor": "graphenerod",
+			"item": "assemblylinemachines:graphene_ingot",
 			"link_recipe": true,
-			"text": "The $(item)Graphene Rod$() is used for some recipes, including as the handle for the Novasteel Tools.$(p)First, you will need to make Liquid Carbon. 1 Coal and $(9)1,000mB of Water$() in the Refinery will make 100mB Liquid Carbon. Then, you need $(b)Ground Diamond$() and 5,000mB Liquid Carbon with the Addition Attachment to make 1 Graphene Rod."
+			"text": "The $(item)Graphene Ingot$() is an alloy crucial in the creation of Novasteel Tools.$(p)First, you will need to make Liquid Carbon. 1 Coal and $(9)1,000mB of Water$() in the Refinery will make 100mB Liquid Carbon. Then, you need $(b)Ground Diamond$() and 4,000mB Liquid Carbon with the Addition Attachment to make 1 Graphene Ingot."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:graphene_rod",
+			"link_recipe": true,
+			"text": "Next up, you will need to convert the Graphene Ingots into $(item)Graphene Rods.$() These are created using the $(l:blocks/standard_machines#pneumaticcompressor)Pneumatic Compressor$() only. These act as the Tool Rod for Novasteel Tools."
 		},
 		{
 			"type": "crafting",

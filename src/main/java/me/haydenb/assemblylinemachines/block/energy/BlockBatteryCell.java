@@ -108,15 +108,14 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer,
 			ItemStack stack) {
-		if(stack.hasTag()) {
-			
-			CompoundTag nbt = stack.getTag();
-			
-			if(level.getBlockEntity(pos) instanceof TEBatteryCell && nbt.contains("assemblylinemachines:stored")) {
-				TEBatteryCell cell = (TEBatteryCell) level.getBlockEntity(pos);
-				cell.amount = nbt.getInt("assemblylinemachines:stored");
-				cell.sendUpdates();
-			}
+		CompoundTag nbt = stack.getOrCreateTag();
+		
+		if(level.getBlockEntity(pos) instanceof TEBatteryCell cell && !nbt.isEmpty()) {
+			cell.amount = nbt.getInt("assemblylinemachines:stored");
+			if(nbt.contains("assemblylinemachines:fptout")) cell.fept = nbt.getInt("assemblylinemachines:fptout");
+			cell.autoIn = nbt.getBoolean("assemblylinemachines:in");
+			cell.creative = nbt.getBoolean("assemblylinemachines:creative");
+			cell.sendUpdates();
 		}
 		super.setPlacedBy(level, pos, state, placer, stack);
 	}
@@ -126,9 +125,8 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			TooltipFlag flag) {
 		if(stack.hasTag()) {
 			CompoundTag nbt = stack.getTag();
-			if(nbt.contains("assemblylinemachines:stored")) {
-				tooltip.add(1, new TextComponent("This Cell has " + FormattingHelper.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
-			}
+			if(nbt.contains("assemblylinemachines:stored")) tooltip.add(1, new TextComponent("This Cell has " + FormattingHelper.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
+			if(nbt.contains("assemblylinemachines:creative")) tooltip.add(1, new TextComponent("This Cell is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
 		}
 		super.appendHoverText(stack, level, tooltip, flag);
 	}
@@ -154,6 +152,8 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		private boolean autoIn = true;
 		private int timer = 0;
 		private final int mx;
+		public boolean creative = false;
+		
 		public TEBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, 0, new TranslatableComponent(state.getBlock().getDescriptionId()), Registry.getContainerId("battery_cell"),
 					ContainerBatteryCell.class, new EnergyProperties(true, true, ((BlockBatteryCell) state.getBlock()).bcs.capacity), pos, state);
@@ -187,6 +187,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			if(compound.contains("assemblylinemachines:in")) {
 				autoIn = compound.getBoolean("assemblylinemachines:in");
 			}
+			creative = compound.getBoolean("assemblylinemachines:creative");
 		}
 		
 		@Override
@@ -194,6 +195,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			
 			compound.putInt("assemblylinemachines:fptout", fept);
 			compound.putBoolean("assemblylinemachines:in", autoIn);
+			if(creative) compound.putBoolean("assemblylinemachines:creative", creative);
 			super.saveAdditional(compound);
 		}
 		
@@ -255,6 +257,20 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			
 		}
 		
+		public void recalcBattery(){
+			
+			if(getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
+				double div = (double) amount / (double) properties.getCapacity();
+				if(div > 0.95d) div = 1d;
+				int fx = (int) Math.floor(div * 4d);
+				if(fx > 4) fx = 4;
+				if(fx < 0) fx = 0;
+				if(getBlockState().getValue(StateProperties.BATTERY_PERCENT_STATE) != fx) {
+					getLevel().setBlockAndUpdate(getBlockPos(), getBlockState().setValue(StateProperties.BATTERY_PERCENT_STATE, fx));
+				}
+			}
+		}
+
 		public static void updateDataFromPacket(PacketData pd, Level world) {
 			if (pd.getCategory().equals("battery_cell_gui")) {
 				BlockPos pos = pd.get("location", BlockPos.class);

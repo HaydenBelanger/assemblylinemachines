@@ -7,8 +7,10 @@ import java.util.function.BiFunction;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.context.CommandContext;
 
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -129,5 +131,15 @@ public class Utils {
 		}else {
 			return Optional.empty();
 		}
+	}
+	
+	public static boolean containsArgument(CommandContext<CommandSourceStack> context, String argument) {
+		try {
+			context.getArgument(argument, Object.class);
+			return true;
+		}catch(IllegalArgumentException e) {
+			return false;
+		}
+		
 	}
 }

@@ -394,7 +394,7 @@ public class MachineBuilder {
 										if(!result.isEmpty()) {
 											optRecipePair.getMiddle().accept(result);
 											if(executeOnRecipeCompletion != null) executeOnRecipeCompletion.accept(optRecipePair.getRight().get(), recipe);
-											if(specialStateModifier != null) this.getLevel().setBlockAndUpdate(this.getBlockPos(), specialStateModifier.apply(recipe, this.getBlockState()));
+											if(specialStateModifier != null) this.getLevel().setBlockAndUpdate(this.getBlockPos(), specialStateModifier.apply(recipe, this.blockState()));
 											sendUpdates = true;
 										}
 									}
@@ -456,10 +456,10 @@ public class MachineBuilder {
 								sendUpdates = true;
 							}
 							
-							if(getBlockState().hasProperty(StateProperties.MACHINE_ACTIVE)) {
-								boolean machineActive = getBlockState().getValue(StateProperties.MACHINE_ACTIVE);
+							if(blockState().hasProperty(StateProperties.MACHINE_ACTIVE)) {
+								boolean machineActive = blockState().getValue(StateProperties.MACHINE_ACTIVE);
 								if((machineActive == true && cycles == 0) || (machineActive == false && cycles != 0)) {
-									this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, !machineActive));
+									this.getLevel().setBlockAndUpdate(this.getBlockPos(), blockState().setValue(StateProperties.MACHINE_ACTIVE, !machineActive));
 									sendUpdates = true;
 								}
 							}
@@ -610,6 +610,11 @@ public class MachineBuilder {
 				}
 				
 				@Override
+				public BlockState blockState() {
+					return this.getBlockState();
+				}
+				
+				@Override
 				public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal) {
 					
 					boolean useInternal = preferInternal.isPresent() ? preferInternal.get() : getUsingInternalTank();
@@ -675,7 +680,7 @@ public class MachineBuilder {
 				
 				private IItemHandler getOrCreateRightOutput() {
 					if(rightOutput != null && rightOutput.isPresent()) return rightOutput.orElse(null);
-					Direction toRight = this.getBlockState().getValue(HorizontalDirectionalBlock.FACING).getCounterClockWise();
+					Direction toRight = this.blockState().getValue(HorizontalDirectionalBlock.FACING).getCounterClockWise();
 					BlockEntity be = this.getLevel().getBlockEntity(this.getBlockPos().relative(toRight));
 					if(be != null) {
 						LazyOptional<?> handler = be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, toRight.getOpposite());
@@ -792,8 +797,8 @@ public class MachineBuilder {
 					}
 					
 					@Override
-					public BlockState getBlockState() {
-						return MachineBlockEntity.this.getBlockState();
+					public BlockState blockState() {
+						return MachineBlockEntity.this.blockState();
 					}
 					
 					@Override
@@ -818,7 +823,7 @@ public class MachineBuilder {
 			public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal);
 			public boolean getUsingInternalTank();
 			public void receiveButtonPacket(PacketData pd);
-			public BlockState getBlockState();
+			public BlockState blockState();
 			public int getOrSetMKIIPCSelMold(Optional<Integer> set);
 		}
 	}
@@ -1152,15 +1157,15 @@ public class MachineBuilder {
 					
 					switch(pb.direction) {
 					case LR -> {
-						int prog = Math.round((progress/cycles) * pb.defaultWidth);
+						int prog = Math.min(Math.round((progress/cycles) * pb.defaultWidth), pb.defaultWidth);
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), prog, pb.defaultHeight);
 					}
 					case UD -> {
-						int prog = Math.round((progress/cycles) * pb.defaultHeight);
+						int prog = Math.min(Math.round((progress/cycles) * pb.defaultHeight), pb.defaultHeight);
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, prog);
 					}
 					case DU -> {
-						int prog = Math.round((progress/cycles) * pb.defaultHeight);
+						int prog = Math.min(Math.round((progress/cycles) * pb.defaultHeight), pb.defaultHeight);
 						screen.blit(x+blitx, y+blity + (pb.defaultHeight - prog), piecex, piecey + (pb.defaultHeight - prog) + (pb.defaultHeight * this.frame), pb.defaultWidth, prog);
 					}
 					case STATIC -> {

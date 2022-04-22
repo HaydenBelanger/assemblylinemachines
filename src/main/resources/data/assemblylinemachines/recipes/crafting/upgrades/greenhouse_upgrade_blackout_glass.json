@@ -10,7 +10,7 @@
 			"item": "minecraft:black_stained_glass"
 		},
 		"d":{
-			"tag": "forge:gems/diamond"
+			"item": "assemblylinemachines:upgrade_speed"
 		},
 		"s":{
 			"tag": "forge:plates/pure_steel"

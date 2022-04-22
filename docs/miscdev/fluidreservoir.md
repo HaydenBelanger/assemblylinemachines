@@ -7,7 +7,7 @@ As part of standard gameplay, the player has the opportunity to use the Mystium 
 
 ## Obtaining the Capability
 
-The capability can be obtained by calling `LevelChunk#getCapability`. The instance of the Capability can obtained by either accessing it via `CapabilityManager.get`, casting to `Capability<IChunkFluidCapability>`, or by accessing the stored singleton at `FluidCapability.CHUNK_FLUID_CAPABILITY`. Sides are not used, so the side within obtaining the capability can be `null`. Finally, cast the `LazyOptional<IChunkFluidCapability>` to `IChunkFluidCapability` using your preferred method, and you have successfully obtained an instance of the Fluid Reservoir capability!
+The capability can be obtained by calling `LevelChunk#getCapability`. The instance of the capability can be obtained by either accessing it via `CapabilityManager.get`, casting to `Capability<IChunkFluidCapability>`, or by accessing the stored singleton at `FluidCapability.CHUNK_FLUID_CAPABILITY`. Sides are not used, so the side within obtaining the capability can be `null`. Finally, cast the `LazyOptional<IChunkFluidCapability>` to `IChunkFluidCapability` using your preferred method, and you have successfully obtained an instance of the Fluid Reservoir capability!
 
 ## Methods
 

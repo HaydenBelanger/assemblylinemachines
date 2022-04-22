@@ -94,12 +94,12 @@ public class LootTableGenerator extends LootTableProvider {
 		private static final HashMap<String, List<String>> NBT_COPYING_KEYS = new HashMap<>();
 		static {
 			for(String str : new String[] {"novasteel", "attuned_titanium", "mystium", "steel", "wooden"}) {
-				NBT_COPYING_KEYS.put(str + "_fluid_tank", List.of("fluidstack"));
+				NBT_COPYING_KEYS.put(str + "_fluid_tank", List.of("fluidstack", "upgraded"));
 			}
 			for(String str : new String[] {"basic", "advanced", "ultimate"}) {
-				NBT_COPYING_KEYS.put(str + "_battery_cell", List.of("stored"));
+				NBT_COPYING_KEYS.put(str + "_battery_cell", List.of("stored", "fptout", "in", "creative"));
 			}
-			NBT_COPYING_KEYS.put("bottomless_storage_unit", List.of("stored", "storeditem", "storedprettyname"));
+			NBT_COPYING_KEYS.put("bottomless_storage_unit", List.of("stored", "storeditem", "creative"));
 			
 			NBT_COPYING_KEYS.replaceAll(new BiFunction<String, List<String>, List<String>>() {
 				@Override

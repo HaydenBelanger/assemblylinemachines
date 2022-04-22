@@ -9,26 +9,6 @@
 		},
 		{
 			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/experience_hopper",
-			"text": "This device will collect Experience Orbs, convert it to liquid, and place it into a Tank behind the Hopper!"
-		},
-		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/experience_mill",
-			"text": "This unique block allows processing of experience-related functions and items! It requires Liquid Experience as fuel, and does not need power."
-		},
-		{
-			"type": "text",
-			"text": "The options for this block are as follows:$(li)Enchantment Mode, which will apply a random enchantment to a tool or item,$(li)Anvil Mode, which can combine items to fill durability or combine enchantments,$(li)Book Mode, which will take a catalyst item and normal book and craft an Enchanted Book as a result!$(br)There is also a unique upgrade required to boost the power of the machine."
-		},
-		{
-			"type": "crafting",
-			"recipe": "assemblylinemachines:crafting/upgrades/experience_mill_upgrade_level",
-			"title": "Exp. Mill Level Upgrade",
-			"text": "This will boost the resulting enchantments in Enchantment Mode in the Experience Mill, as well as the max level resulting from Book Mode."
-		},
-		{
-			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/interactor",
 			"text": "The Interactor will perform one of four duties, extremely useful for automation."
 		},

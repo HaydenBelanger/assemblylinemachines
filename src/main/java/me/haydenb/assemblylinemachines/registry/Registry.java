@@ -53,7 +53,6 @@ import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.BlockRefineryAddon.RefineryAddon;
 import me.haydenb.assemblylinemachines.block.machines.BlockVacuumHopper.TEVacuumHopper;
 import me.haydenb.assemblylinemachines.block.misc.*;
-import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite.BlockBlackGranitePillar;
 import me.haydenb.assemblylinemachines.block.misc.CorruptBlock.*;
 import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.*;
 import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.ChaosbarkSaplingBlock.ChaosbarkTreeGrower;
@@ -346,8 +345,10 @@ public class Registry {
 		
 		createItem("chromium_rod", "copper_rod", "gold_rod", "iron_rod", "mystium_gear", "ground_steel", "mystium_rod", "novasteel_gear", "novasteel_rod", "titanium_rod", "ground_amethyst",
 				"graphene_gear", "graphene_ingot", "graphene_plate");
-		createItem("quantum_fuel", new ItemGearboxFuel(12800));
+		createItem("quantum_fuel", new ItemGearboxFuel(12800, Rarity.RARE));
 		createItem("glacier_sauce", new Item.Properties().rarity(Rarity.UNCOMMON).tab(Registry.CREATIVE_TAB).food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 3600), 1f).nutrition(1).fast().saturationMod(2.4f).alwaysEat().build()));
+		createItem("internal_water_generator", new ItemInternalWaterGenerator());
+		createItem("creative_upgrade_kit", new ItemCreativeUpgradeKit());
 		
 		MOD_ITEM_REGISTRY.values().forEach((i) -> event.getRegistry().register(i));
 	}
@@ -375,6 +376,11 @@ public class Registry {
 		
 		createBlock("silt", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
+		createBlock("large_silt_brick", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
+		createBlock("painted_silt", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
+		createBlock("silt_tile", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
+		createBlock("smooth_silt", Material.STONE, 4f, 12f, SoundType.STONE, false, true);
+		createBlock("silt_pillar", new BlockFancyPillar(Material.STONE, 4f, 12f), true);
 		createBlock("slab_silt_brick", new SlabBlock(Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
 		createBlock("stair_silt_brick", new StairBlock(() -> Registry.getBlock("silt_brick").defaultBlockState(), Block.Properties.of(Material.STONE).strength(4f, 12f).sound(SoundType.STONE)), true);
 		
@@ -389,7 +395,7 @@ public class Registry {
 		createBlock("tile_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("etched_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 		createBlock("large_brick_black_granite", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
-		createBlock("pillar_black_granite", new BlockBlackGranitePillar(), true);
+		createBlock("pillar_black_granite", new BlockFancyPillar(Material.STONE, 3f, 9f), true);
 		createBlock("slab_black_granite", new SlabBlock(Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		createBlock("stair_black_granite", new StairBlock(() -> Registry.getBlock("smooth_black_granite").defaultBlockState(), Block.Properties.of(Material.STONE).strength(3f, 9f).sound(SoundType.STONE)), true);
 		

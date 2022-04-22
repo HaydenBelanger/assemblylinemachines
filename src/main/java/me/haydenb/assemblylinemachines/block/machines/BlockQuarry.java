@@ -592,7 +592,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 					}
 					
 					max[1] = posA.getY();
-					min[1] = 1;
+					min[1] = world.getMinBuildHeight() + 1;
 					
 					if(posA.getZ() > posB.getZ()) {
 						max[2] = posA.getZ();

@@ -71,7 +71,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				return true;
 			}
 		}else if(inv instanceof IMachineDataBridge data){
-			if(data.getBlockState().is(Registry.getBlock("kinetic_grinder"))) {
+			if(data.blockState().is(Registry.getBlock("kinetic_grinder"))) {
 				Blade blade = Blade.getBladeFromItem(inv.getItem(0).getItem());
 				if(blade == null || blade.tier < tier.tier) return false;
 			}
@@ -85,9 +85,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	@Override
 	public ItemStack assemble(Container inv) {
 		
+		ItemStack stack = output.get().copy();
+		
 		if(inv instanceof IMachineDataBridge data) {
 			inv.getItem(1).shrink(1);
-			if(data.getBlockState().is(Registry.getBlock("kinetic_grinder"))){
+			if(data.blockState().is(Registry.getBlock("kinetic_grinder"))){
 				int i = Utils.RAND.nextInt(0, grinds + 1);
 				Blade b = Blade.getBladeFromItem(inv.getItem(0).getItem());
 				if(b == null || b.tier < this.tier.tier) return ItemStack.EMPTY;
@@ -97,9 +99,9 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			}else {
 				data.setCycles((float) grinds * 2.3f);
 			}
+			float chance = data.blockState().is(Registry.getBlock("mkii_grinder")) ? Utils.RAND.nextFloat(0.5f) : Utils.RAND.nextFloat();
+			if(chanceToDouble != 0f && chance <= chanceToDouble) stack.setCount(stack.getCount() * 2);
 		}
-		ItemStack stack = output.get().copy();
-		if(chanceToDouble != 0f && Utils.RAND.nextFloat() <= chanceToDouble) stack.setCount(stack.getCount() * 2);
 		return stack;
 	}
 

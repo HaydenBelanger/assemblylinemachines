@@ -13,7 +13,7 @@
 			"item": "minecraft:glowstone"
 		},
 		"d":{
-			"tag": "forge:gems/emerald"
+			"item": "assemblylinemachines:upgrade_speed"
 		},
 		"s":{
 			"tag": "forge:plates/pure_steel"

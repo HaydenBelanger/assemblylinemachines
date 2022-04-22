@@ -16,7 +16,8 @@ Recipe namespace: `assemblylinemachines:lumber`
 *The chance to produce the secondary output, between 0% and 100%. If `secondaryoutput` is set, this must be too.*
 
 !!! tip
-    The Lumber Mill is influenced by the Extra Output Machine Upgrade. Depending on the number of upgrades, the chance to generate will be multiplied by either 1.5x, 2x, or 2.5x.
+    The Lumber Mill is influenced by the Extra Output Machine Upgrade. Depending on the number of upgrades, the chance to generate will be multiplied by either 1.5x, 2x, or 2.5x.  
+	The chance is also doubled when the recipe is performed in the MKII Lumber Mill.
 
 - `time`: Positive Integer, required  
 *The time required to process the recipe. 1 is equal to 0.8 seconds of processing time. Every Speed Upgrade in the machine will cut this processing time in half.*

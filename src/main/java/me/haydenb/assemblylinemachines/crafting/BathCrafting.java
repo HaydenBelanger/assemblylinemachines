@@ -107,7 +107,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			}
 			int sla = 1;
 			int slb = 2;
-			if(data.getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
+			if(data.blockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
 				sla = 0;
 				slb = 1;
 			}
@@ -157,7 +157,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			}
 			
 			drain.apply(cons, FluidAction.EXECUTE);
-			if(data.getBlockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
+			if(data.blockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
 				inv.getItem(0).shrink(1);
 				inv.getItem(1).shrink(1);
 				data.setCycles(Math.round((float) stirs * ConfigHolder.getServerConfig().kineticFluidMixerCycleMultiplier.get().floatValue()));

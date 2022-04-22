@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:refining",
+	"attachment": "assemblylinemachines:refinery_attachment_addition",
+	"input_fluid":{
+		"fluid": "assemblylinemachines:liquid_carbon",
+		"amount": 4000
+	},
+	"input_item":{
+		"tag": "forge:dusts/diamond"
+	},
+	"proc_time": 10,
+	"output_item":{
+		"item": "assemblylinemachines:graphene_ingot"
+	}
+}

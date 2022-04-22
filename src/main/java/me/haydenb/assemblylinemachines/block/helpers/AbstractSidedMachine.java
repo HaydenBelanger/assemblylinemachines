@@ -1,10 +1,11 @@
 package me.haydenb.assemblylinemachines.block.helpers;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
+import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.TEBatteryCell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -127,13 +129,14 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 	
 	protected class SidedEnergyHandler implements IEnergyStorage{
 
+		private Lazy<Optional<TEBatteryCell>> battery = Lazy.of(() -> AbstractSidedMachine.this instanceof TEBatteryCell battery ? Optional.of(battery) : Optional.empty());
 		private Direction side = null;
 		
 		@Override
 		public int receiveEnergy(int maxReceive, boolean simulate) {
 			
 			if(!canReceive()) {
-				return 0;
+				return 0;	
 			}
 			
 			if(properties.getCapacity() < maxReceive + amount) {
@@ -142,7 +145,7 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 			
 			if(simulate == false) {
 				amount += maxReceive;
-				recalcBattery();
+				battery.get().ifPresent((b) -> b.recalcBattery());
 				sendUpdates();
 			}
 			
@@ -165,13 +168,22 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 			if(!canExtract()) {
 				return 0;
 			}
+			
+			if(battery.get().isPresent() && battery.get().get().creative) {
+				if(amount != properties.getCapacity()) {
+					amount = properties.getCapacity();
+					sendUpdates();
+				}
+				return maxExtract;
+			}
+			
 			if(maxExtract > amount) {
 				maxExtract = amount;
 			}
 			
 			if(simulate == false) {
 				amount -= maxExtract;
-				recalcBattery();
+				battery.get().ifPresent((b) -> b.recalcBattery());
 				sendUpdates();
 			}
 			
@@ -193,18 +205,5 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 			}
 			return false;
 		}
-		
-		private void recalcBattery(){
-			
-			if(getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
-				int fx = (int) Math.floor(((double) amount / (double) properties.getCapacity()) * 4d);
-				if(fx > 4) fx = 4;
-				if(fx < 0) fx = 0;
-				if(getBlockState().getValue(StateProperties.BATTERY_PERCENT_STATE) != fx) {
-					getLevel().setBlockAndUpdate(getBlockPos(), getBlockState().setValue(StateProperties.BATTERY_PERCENT_STATE, fx));
-				}
-			}
-		}
-		
 	}
 }

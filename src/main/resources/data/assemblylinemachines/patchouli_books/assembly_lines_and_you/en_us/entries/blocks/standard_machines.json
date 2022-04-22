@@ -35,7 +35,8 @@
 		{
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/pneumatic_compressor",
-			"text": "This will automatically press an Ingot, or a Plastic or Rubber ball, into the corresponding Plate."
+			"anchor": "pneumaticcompressor",
+			"text": "This machine will press a variety of things into a variety of other things, depending on what type of $(l:items/molds)Mold$() you have within. Required for making late-game Rods and Plates."
 		},
 		{
 			"type": "crafting",

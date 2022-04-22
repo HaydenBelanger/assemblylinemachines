@@ -3,7 +3,7 @@
 	"pattern":[
 		"bso",
 		"sjs",
-		"asp"
+		"osb"
 	],
 	"key":{
 		"b":{
@@ -13,13 +13,7 @@
 			"item": "minecraft:warped_fungus"
 		},
 		"j":{
-			"item": "minecraft:chorus_flower"
-		},
-		"a":{
-			"item": "assemblylinemachines:mandelbloom"
-		},
-		"p":{
-			"item": "assemblylinemachines:prism_rose"
+			"item": "minecraft:nether_wart"
 		},
 		"s":{
 			"tag": "forge:plates/pure_steel"

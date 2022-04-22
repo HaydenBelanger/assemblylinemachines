@@ -1,0 +1,32 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"cpc",
+		"rtr",
+		"ngn"
+	],
+	"key":{
+		"c":{
+			"tag": "forge:plates/pure_copper"
+		},
+		"p":{
+			"item": "assemblylinemachines:fluid_pipe"
+		},
+		"r":{
+			"tag": "forge:rods/copper"
+		},
+		"t":{
+			"item": "assemblylinemachines:steel_tank_component"
+		},
+		"n":{
+			"item": "assemblylinemachines:basic_pneumatic_device"
+		},
+		"g":{
+			"item": "assemblylinemachines:fluid_regulator"
+		}
+		
+	},
+	"result":{
+		"item": "assemblylinemachines:internal_water_generator"
+	}
+}

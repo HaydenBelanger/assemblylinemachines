@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xxx",
+		"xwx",
+		"xxx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:smooth_silt"
+		},
+		"w":{
+			"item": "minecraft:white_dye"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:painted_silt",
+		"count": 8
+	}
+}

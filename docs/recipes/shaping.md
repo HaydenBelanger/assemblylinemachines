@@ -2,6 +2,8 @@
 
 The Shaping recipes are for recipes you want to be performed in the Metal Shaper. Generally, this will process an Ingot of some kind and produce a Plate.
 
+!!! error "1.18.2- Feature"
+	This recipe type was removed in Assembly Line Machines 1.18.2-1.4, with the addition of the Pneumatic Compressor, [Compressing Recipes](../recipes/compressing.md), and the removal of the Metal Shaper.
 ## Recipe Specification
 
 Recipe namespace: `assemblylinemachines:metal`

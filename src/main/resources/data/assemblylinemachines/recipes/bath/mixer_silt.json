@@ -12,7 +12,7 @@
 	},
 	"stirs": 4,
 	"fluid": "water",
-	"mix_color": "#b8b4ab",
+	"mix_color": "0",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"
 }

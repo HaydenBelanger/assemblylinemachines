@@ -101,7 +101,6 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		//Builtin
 		new Builder(recipes, "raw_novasteel").alloy("flerovium", 1, "attuned_titanium", 1, 2);
 		new Builder(recipes, "energized_gold").alloy(Pair.of("dusts", "redstone"), 3, Pair.of("ingots", "pure_gold"), 1, 1).storageBlock(false).plate(4, RecipeState.CONDITIONAL);
-		new Builder(recipes, "novasteel").alloy(Pair.of("ingots", "raw_novasteel"), 1, Pair.of("dusts", "novasteel"), 1, 1).tools().storageBlock(false).plate(1, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
 		new Builder(recipes, "coal").alternateInput(Ingredient.of(Items.COAL)).grinder(true, false, false, Blade.PUREGOLD, 4).storageBlock(true);
 		new Builder(recipes, "diamond").alternateInput(Ingredient.of(getNamed("forge", "gems/diamond"))).grinder(true, false, false, Blade.PUREGOLD, 2).storageBlock(true);
 		new Builder(recipes, "lapis").alternateInput(Ingredient.of(getNamed("forge", "gems/lapis"))).grinder(true, true, false, Blade.TITANIUM, 8).storageBlock(true);
@@ -114,7 +113,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		new Builder(recipes, "gold").grinder(true, false).storageBlock(true).nugget(true).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
 		new Builder(recipes, "titanium").grinder(true, false).armor().tools().storageBlock(false).nugget(false).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
 		new Builder(recipes, "steel").grinder().armor().tools().storageBlock(false).nugget(false).plate(1, RecipeState.IMC).gear(1, RecipeState.IMC).rod();
-		new Builder(recipes, "attuned_titanium").plate(3, RecipeState.CONDITIONAL);
+		new Builder(recipes, "attuned_titanium").plate(3, RecipeState.CONDITIONAL).storageBlock(false);
 		new Builder(recipes, "amethyst").alternateInput(Ingredient.of(getNamed("forge", "gems/amethyst"))).grinder().storageBlock(true);
 		new Builder(recipes, "crank").alternateInput(Ingredient.of(getNamed(AssemblyLineMachines.MODID, "precious_gears"))).alternateToolRod(Ingredient.of(getNamed("forge", "rods/steel"))).tools();
 		new Builder(recipes, "crafting_table").storageBlockResult(Registry.getItem("compressed_crafting_table"), Items.CRAFTING_TABLE).storageBlock(false);
@@ -129,26 +128,28 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		new Builder(recipes, "graphene").plate(1, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
 		new Builder(recipes, "plastic").alternateInput(Ingredient.of(Registry.getItem("plastic_ball"))).plate(3, true, RecipeState.CONDITIONAL);
 		new Builder(recipes, "rubber").alternateInput(Ingredient.of(Registry.getItem("rubber_ball"))).plate(4, true, RecipeState.CONDITIONAL);
+		new Builder(recipes, "novasteel").alloy(Pair.of("ingots", "raw_novasteel"), 1, Pair.of("dusts", "novasteel"), 1, 1).alternateToolRod(Ingredient.of(getNamed("forge", "rods/graphene")))
+			.tools().storageBlock(false).plate(1, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
 		new Builder(recipes, "mystium").alloy(Pair.of("dusts", "mystium"), 1, Pair.of("dusts", "electrified_netherite"), 1, 1)
-		.armor(() -> {
-			LinkedHashMap<String, List<String>> patterns = new LinkedHashMap<>();
-			patterns.put("helmet", List.of("BCB", "A A"));
-			patterns.put("chestplate", List.of("B B", "BCB", "AAA"));
-			patterns.put("leggings", List.of("AAA", "B B", "B B"));
-			patterns.put("boots", List.of("A A", "B B"));
-			return patterns;
-		}, (s) -> {
-			Ingredient[] ingredients;
-			if(s.equals("helmet") || s.equals("chestplate")) {
-				ingredients = new Ingredient[3];
-				ingredients[2] = Ingredient.of(Registry.getItem("mystium_crystal"));
-			}else {
-				ingredients = new Ingredient[2];
-			}
-			ingredients[0] = Ingredient.of(getNamed("forge", "plates/pure_steel"));
-			ingredients[1] = Ingredient.of(Registry.getItem("mystium_armor_plating"));
-			return ingredients;
-		}).alternateToolRod(Ingredient.of(getNamed("forge", "rods/steel"))).tools().storageBlock(false).plate(2, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
+			.armor(() -> {
+				LinkedHashMap<String, List<String>> patterns = new LinkedHashMap<>();
+				patterns.put("helmet", List.of("BCB", "A A"));
+				patterns.put("chestplate", List.of("B B", "BCB", "AAA"));
+				patterns.put("leggings", List.of("AAA", "B B", "B B"));
+				patterns.put("boots", List.of("A A", "B B"));
+				return patterns;
+			}, (s) -> {
+				Ingredient[] ingredients;
+				if(s.equals("helmet") || s.equals("chestplate")) {
+					ingredients = new Ingredient[3];
+					ingredients[2] = Ingredient.of(Registry.getItem("mystium_crystal"));
+				}else {
+					ingredients = new Ingredient[2];
+				}
+				ingredients[0] = Ingredient.of(getNamed("forge", "plates/pure_steel"));
+				ingredients[1] = Ingredient.of(Registry.getItem("mystium_armor_plating"));
+				return ingredients;
+			}).alternateToolRod(Ingredient.of(getNamed("forge", "rods/steel"))).tools().storageBlock(false).plate(2, RecipeState.CONDITIONAL).gear(1, RecipeState.CONDITIONAL).rod();
 		
 		recipes.forEach((fr) -> consumer.accept(fr));
 		

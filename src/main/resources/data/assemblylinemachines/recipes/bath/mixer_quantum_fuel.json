@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:empowered_fuel"
+	},
+	"input_b":{
+		"item": "assemblylinemachines:semi_dense_neutron_matter"
+	},
+	"output":{
+		"item": "assemblylinemachines:quantum_fuel"
+	},
+	"stirs": 12,
+	"fluid": "condensed_void",
+	"mix_color": "0",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "QUARTER"
+}

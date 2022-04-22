@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "assemblylinemachines:smooth_silt"
+  },
+  "result": "assemblylinemachines:large_silt_brick",
+  "count": 1
+}

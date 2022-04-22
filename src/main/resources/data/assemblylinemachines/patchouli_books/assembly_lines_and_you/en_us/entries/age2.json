@@ -37,7 +37,7 @@
 		},
 		{
 			"type": "text",
-			"text": "Place a material in the machine, along with a blade, click and hold on the Crank, and the recipe will process; after a bit of time, the output will be placed in the Chest!$(br)Now, you can harness the power of your new machine. Grind a Steel Ingot and you will receive $(item)Steel Rods!$()$(p)$(c)If the machine is not processing, and the Crank is operated, there is a slim chance the Crank will snap and break into pieces!"
+			"text": "Place a material in the machine, along with a blade, click and hold on the Crank, and the recipe will process; after a bit of time, the output will be placed in the Chest!$(br)Now, you can harness the power of your new machine. Grind a Steel Block and you will receive $(item)Steel Rods!$()$(p)$(c)If the machine is not processing, and the Crank is operated, there is a slim chance the Crank will snap and break into pieces!"
 		},
 		{
 			"type": "crafting",
@@ -114,7 +114,7 @@
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/tools/crank/crank_pickaxe",
 			"title": "Crank-Powered Tools",
-			"text": "This is the recipe for the $(item)Crank-Powered Pickaxe.$()$(p) You can also make Crank-Powered Hoes, Hammers, Axes, Hoes, and Swords."
+			"text": "This is the recipe for the $(item)Crank-Powered Pickaxe.$()$(p) You can also make Crank-Powered Shovels, Hammers, Axes, Hoes, and Swords."
 		},
 		{
 			"type": "text",

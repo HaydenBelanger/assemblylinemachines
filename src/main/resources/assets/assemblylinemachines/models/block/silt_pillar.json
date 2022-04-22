@@ -1,0 +1,31 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"0": "assemblylinemachines:block/silt/silt_pillar",
+		"1": "assemblylinemachines:block/silt/smooth_silt",
+		"particle": "assemblylinemachines:block/silt/silt_pillar"
+	},
+	"elements": [
+		{
+			"name": "shaft",
+			"from": [2, 0, 2],
+			"to": [14, 16, 14],
+			"faces": {
+				"north": {"uv": [2, 0, 14, 16], "texture": "#0"},
+				"east": {"uv": [2, 0, 14, 16], "texture": "#0"},
+				"south": {"uv": [2, 0, 14, 16], "texture": "#0"},
+				"west": {"uv": [2, 0, 14, 16], "texture": "#0"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#1"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

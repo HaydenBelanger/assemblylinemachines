@@ -23,17 +23,20 @@ nav:
       - Fluid-In-Ground: recipes/fluidinground.md
       - Grinding: recipes/grinding.md
       - Milling: recipes/milling.md
-      - Shaping: recipes/shaping.md
+      - Compressing: recipes/compressing.md
       - Purifying: recipes/purifying.md
       - Refining: recipes/refining.md
       - World Corruption: recipes/worldcorruption.md
       - Generator Fluid: recipes/generatorfluid.md
       - Upgrading: recipes/upgrading.md
-      - Greenhouse:
-        - Crops: recipes/greenhousecrops.md
-        - Fertilizer: recipes/greenhousefertilizer.md
+      - Crops: recipes/greenhousecrops.md
+      - Fertilizer: recipes/greenhousefertilizer.md
+      - Removed Recipes:
+        - Shaping: recipes/shaping.md
     - Tags: miscdev/tags.md
     - Reservoir Capability: miscdev/fluidreservoir.md
+    - Guidebook Capability: miscdev/guidebook.md
+    - Commands: miscdev/commands.md
 
 
 theme:

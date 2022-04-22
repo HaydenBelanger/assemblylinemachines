@@ -131,7 +131,7 @@ dependencies {
 
 	//Compatibilities - 'implementation' because it needs to be during runtime and compilation.
  	implementation fg.deobf("mezz.jei:jei-1.18.2:9.4.1.116")
-    implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.2-66-SNAPSHOT")
+    implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.2-67")
     implementation fg.deobf("curse.maven:theoneprobe-245211:3671753")
     
     //Runtime - for testing purposes to make sure certain mechanics work.

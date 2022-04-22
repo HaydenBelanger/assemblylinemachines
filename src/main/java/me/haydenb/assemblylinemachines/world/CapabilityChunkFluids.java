@@ -99,6 +99,12 @@ public class CapabilityChunkFluids {
 		 * @return The display name of the stored fluid.
 		 */
 		public Component getDisplayName();
+		
+		/**
+		 * Sets the fluid in the chunk to the given fluid. Also overrides any existing fluid.
+		 * @param stack The fluid to place within the chunk.
+		 */
+		public void setFluid(FluidStack stack);
 	}
 	
 	private static String getCacheKey(ResourceKey<Level> dim, ChunkPos pos) {
@@ -138,12 +144,15 @@ public class CapabilityChunkFluids {
 
 		@Override
 		public Fluid getChunkFluid() {
-			if(!initialized) {
-				initialized = true;
-				storedFluid = FluidInGroundRecipe.assemble(chunk.getPos(), chunk.getLevel());
-				chunk.setUnsaved(true);
-			}
+			if(!initialized) setFluid(FluidInGroundRecipe.assemble(chunk.getPos(), chunk.getLevel()));
 			return storedFluid.getFluid();
+		}
+		
+		@Override
+		public void setFluid(FluidStack stack) {
+			if(!initialized) initialized = true;
+			storedFluid = stack;
+			chunk.setUnsaved(true);
 		}
 		
 		@Override
