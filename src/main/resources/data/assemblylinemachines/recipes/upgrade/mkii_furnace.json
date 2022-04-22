@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:upgrade_kit",
+	"input_block":{
+		"item": "assemblylinemachines:electric_furnace"
+	},
+	"upgrade_kit": "MKII",
+	"output_block": "assemblylinemachines:mkii_furnace",
+	"slot_copy":{
+		"0": 0,
+		"1": 2,
+		"2": 4,
+		"3": 5,
+		"4": 6
+	}
+}

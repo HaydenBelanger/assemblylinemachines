@@ -1150,7 +1150,7 @@ public class MachineBuilder {
 				float progress = bridge.getProgress();
 				float cycles = bridge.getCycles();
 				
-				if(progress != 0f && cycles != 0f) {
+				if((progress != 0f && cycles != 0f) || pb.direction == PBDirection.SLOT_EMPTY) {
 					Pair<Integer, Integer> pieces = uvModifier == null ? Pair.of(pb.uvx, pb.uvy) : uvModifier.apply(screen.getMenu().tileEntity.getBlockState());
 					int piecex = pieces.getFirst();
 					int piecey = pieces.getSecond();
@@ -1172,7 +1172,7 @@ public class MachineBuilder {
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
 					}
 					case SLOT_EMPTY -> {
-						if(screen.getMenu().tileEntity.getItem(pbSlotChecker.applyAsInt(blitx, blity)).isEmpty())
+						if(screen.getMenu().tileEntity.getItem(pbSlotChecker.applyAsInt(blitx, blity)).isEmpty()) 
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
 					}}
 					
