@@ -14,6 +14,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedInEvent;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
@@ -22,7 +24,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
+@EventBusSubscriber(modid = AssemblyLineMachines.MODID, value = {Dist.CLIENT})
 public class CapabilityBooks {
 
 	public static final Capability<IBookDistroCapability> BOOK_DISTRO_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
@@ -63,6 +65,7 @@ public class CapabilityBooks {
 	
 	//The Forge event to register a Client connection on the clientside only, and send a request to the server to give book.
 	@SubscribeEvent
+	@OnlyIn(Dist.CLIENT)
 	public static void clientSendGuideBookRequest(LoggedInEvent event) {
 		if(ConfigHolder.getClientConfig().receiveGuideBook.get()) {
 			AssemblyLineMachines.LOGGER.debug("Sending request for guide to server from player " + event.getPlayer().getDisplayName().getString() + ".");

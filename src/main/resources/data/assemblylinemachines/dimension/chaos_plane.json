@@ -1,0 +1,50 @@
+{
+	"type":"assemblylinemachines:chaos_plane",
+	"generator":{
+		"type":"assemblylinemachines:chaos_plane",
+		"seed": 0,
+		"settings":"assemblylinemachines:chaos_plane",
+		"biome_source":{
+			"type":"minecraft:multi_noise",
+			"biomes":[
+				{
+					"parameters":{
+						"temperature": 0.5,
+						"humidity": 0.2,
+						"continentalness": 1,
+						"erosion": 0.8,
+						"weirdness": 0.2,
+						"depth": 0,
+						"offset": 0
+					},
+					"biome":"assemblylinemachines:corrupt_desert"
+				},
+				{
+					"parameters":{
+						"temperature": 0.25,
+						"humidity": 0.3,
+						"continentalness": 1,
+						"erosion": 0.4,
+						"weirdness": 0.22,
+						"depth": 0,
+						"offset": 0
+					},
+					"biome":"assemblylinemachines:corrupt_forest"
+				},
+				{
+					"parameters":{
+						"temperature": 0.3,
+						"humidity": 0.25,
+						"continentalness": 1,
+						"erosion": 0.5,
+						"weirdness": 0.08,
+						"depth": 0,
+						"offset": 0
+					},
+					"biome":"assemblylinemachines:corrupt_plains"
+				}
+			]
+		}
+	},
+	"forge:use_server_seed": true
+}

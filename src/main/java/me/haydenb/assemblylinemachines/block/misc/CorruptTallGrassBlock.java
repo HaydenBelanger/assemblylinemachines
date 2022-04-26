@@ -41,10 +41,6 @@ import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class CorruptTallGrassBlock extends TallGrassBlock {
 
@@ -114,43 +110,35 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 			return CORRUPT_GRASS;
 		}
 
-		@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.MOD)
 		public static class ChaosbarkTreeGrower extends AbstractTreeGrower{
 
 			public static Holder<ConfiguredFeature<TreeConfiguration, ?>> chaosbarkTree;
 			public static Holder<ConfiguredFeature<TreeConfiguration, ?>> cocoaTree;
-			
-			@SubscribeEvent
-			public static void registerTreeGen(FMLCommonSetupEvent event) {
-				event.enqueueWork(() -> {
-					BlockStateProvider bspTrunk = BlockStateProvider.simple(Registry.getBlock("chaosbark_log").defaultBlockState());
-					TrunkPlacer trunkPlacer = new StraightTrunkPlacer(4, 2, 0);
-					BlockStateProvider bspLeaves = BlockStateProvider.simple(Registry.getBlock("chaosbark_leaves").defaultBlockState());
-
-					FoliagePlacer foliagePlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
-					FeatureSize size = new TwoLayersFeatureSize(1, 0, 1);
-					BlockStateProvider bspDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
-					
-					chaosbarkTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":chaosbark_tree", Feature.TREE, new TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).forceDirt().build());
-				});
-				
-				event.enqueueWork(() -> {
-					BlockStateProvider bspTrunk = BlockStateProvider.simple(Blocks.JUNGLE_LOG.defaultBlockState());
-					TrunkPlacer trunkPlacer = new StraightTrunkPlacer(4, 2, 0);
-					BlockStateProvider bspLeaves = BlockStateProvider.simple(Registry.getBlock("cocoa_leaves").defaultBlockState());
-
-					FoliagePlacer foliagePlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
-					FeatureSize size = new TwoLayersFeatureSize(1, 0, 1);
-					BlockStateProvider bspDirt = BlockStateProvider.simple(Blocks.DIRT.defaultBlockState());
-					
-					cocoaTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":cocoa_tree", Feature.TREE, new TreeConfigurationBuilder(bspTrunk, trunkPlacer, bspLeaves, foliagePlacer, size).dirt(bspDirt).build());
-				});
-			}
 
 			@Override
 			protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random p_204307_,
 					boolean p_204308_) {
 				return chaosbarkTree;
+			}
+			
+			public static void registerTrees() {
+				//Chaosbark Tree feature
+				BlockStateProvider chaosTrunk = BlockStateProvider.simple(Registry.getBlock("chaosbark_log").defaultBlockState());
+				TrunkPlacer chaosTPlacer = new StraightTrunkPlacer(4, 2, 0);
+				BlockStateProvider chaosLeaves = BlockStateProvider.simple(Registry.getBlock("chaosbark_leaves").defaultBlockState());
+				FoliagePlacer chaosFPlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
+				FeatureSize chaosSize = new TwoLayersFeatureSize(1, 0, 1);
+				BlockStateProvider chaosDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
+				chaosbarkTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":chaosbark_tree", Feature.TREE, new TreeConfigurationBuilder(chaosTrunk, chaosTPlacer, chaosLeaves, chaosFPlacer, chaosSize).dirt(chaosDirt).forceDirt().build());
+			
+				//Cocoa Tree feature
+				BlockStateProvider cocoaTrunk = BlockStateProvider.simple(Blocks.JUNGLE_LOG.defaultBlockState());
+				TrunkPlacer cocoaTPlacer = new StraightTrunkPlacer(4, 2, 0);
+				BlockStateProvider cocoaLeaves = BlockStateProvider.simple(Registry.getBlock("cocoa_leaves").defaultBlockState());
+				FoliagePlacer cocoaFPlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
+				FeatureSize cocoaSize = new TwoLayersFeatureSize(1, 0, 1);
+				BlockStateProvider cocoaDirt = BlockStateProvider.simple(Blocks.DIRT.defaultBlockState());
+				cocoaTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":cocoa_tree", Feature.TREE, new TreeConfigurationBuilder(cocoaTrunk, cocoaTPlacer, cocoaLeaves, cocoaFPlacer, cocoaSize).dirt(cocoaDirt).build());
 			}
 		}
 	}

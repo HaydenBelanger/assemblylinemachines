@@ -76,6 +76,9 @@ import me.haydenb.assemblylinemachines.registry.utils.ConfigCondition.ConfigCond
 import me.haydenb.assemblylinemachines.registry.utils.PhasedMap;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
+import me.haydenb.assemblylinemachines.world.Ores;
+import me.haydenb.assemblylinemachines.world.chaosplane.ChaosPlaneCarver;
+import me.haydenb.assemblylinemachines.world.chaosplane.ChaosPlaneChunkGenerator;
 import me.haydenb.assemblylinemachines.world.effects.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.color.block.BlockColor;
@@ -116,6 +119,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
@@ -688,7 +692,25 @@ public class Registry {
 	}
 	
 	@SubscribeEvent
-	public static void registerRecipeConditions(FMLCommonSetupEvent event) {
+	public static void registerCarvers(RegistryEvent.Register<WorldCarver<?>> event) {
+		event.getRegistry().register(new ChaosPlaneCarver().setRegistryName("chaos_plane_carver"));
+	}
+	
+	@SubscribeEvent
+	public static void common(FMLCommonSetupEvent event) {
+		event.enqueueWork(() -> {
+			ChaosbarkTreeGrower.registerTrees();
+			Ores.registerOres();
+			registerCraftingConditions();
+			
+			//Registers the Chaos Plane Chunk Generator, used to generate the Chaos Plane.
+			net.minecraft.core.Registry.register(net.minecraft.core.Registry.CHUNK_GENERATOR, 
+					new ResourceLocation(AssemblyLineMachines.MODID, "chaos_plane"), ChaosPlaneChunkGenerator.CODEC);
+		});
+	}
+	
+	private static void registerCraftingConditions() {
+		//Config Condition registration
 		CraftingHelper.register(ConfigConditionSerializer.INSTANCE);
 	}
 	
@@ -857,7 +879,7 @@ public class Registry {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) throws Exception {
 		
-		registerRecipeConditions(null);
+		registerCraftingConditions();
 		
 		PrintWriter pw = new PrintWriter("logs/almdatagen.log", "UTF-8");
 		pw.println("[DATAGEN SYSTEM - INFO]: Commencing ALM data generation...");

@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
-import me.haydenb.assemblylinemachines.world.VanillaDimensionOres;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
@@ -26,10 +25,9 @@ public final class AssemblyLineMachines{
 		//Registers PacketHandler.
 		PacketHandler.register();
 		
-		//Registers VanillaDimensionOres events manually as multi-bus events.
-		VanillaDimensionOres.generationBusRegistration();
-		
 		//The One Probe plugin registration.
 		PluginTOP.register();
+		
+		
 	}
 }
