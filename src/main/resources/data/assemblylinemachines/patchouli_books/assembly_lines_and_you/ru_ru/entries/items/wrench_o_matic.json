@@ -1,0 +1,16 @@
+{
+	"name": "Wrench-O-Matic",
+	"category": "assemblylinemachines:items",
+	"icon": "assemblylinemachines:wrench_o_matic",
+	"pages": [
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/wrench_o_matic",
+			"text": "$(8)Wrench-O-Matic - полезное устройство, которое упрощает настройку механизмов."
+		},
+		{
+			"type": "text",
+			"text": "Всего существует 3 режима работы, которые переключаются нажатием Shift+ПКМ.$(li)$(9)Режим взаимодействия,$() который поворачивает механизмы на 90°.$(li)$(2)Режим ключа,$() редактирующий расположение Разъёмов для труб.$(li)$(4)Режим гнева,$() повышающий урон и откидывание Ключа.$(br)Также, на инструмент можно наложить зачарование $(l:items/enchantments#engineersfury)Ярость инженера$()."
+		}
+	]
+}

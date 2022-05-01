@@ -1,0 +1,158 @@
+{
+	"name": "Электрическая эра",
+	"category": "assemblylinemachines:walkthrough",
+	"icon": "assemblylinemachines:item_pipe",
+	"pages": [
+		{
+			"type": "text",
+			"text": "Вы добыли Чёрный гранит и теперь можете создавать $(item)Простые энергетические трубы,$() $(item)Кривошипо-шатунный механизм,$() и $(item)Электрический очиститель$(). Кривошипо-шатунный механизм генерирует электричество из кинетической энергии от Коробки передач.$()$(p)$(l:blocks/pipes)Нажмите сюда, чтобы узнать больше о трубах.$(/l)"
+		},
+		{
+			"type": "crafting",
+			"recipe": "ill",
+			"recipe2": "assemblylinemachines:crafting/electric_purifier"
+		},
+		{
+			"type": "text",
+			"text": "Правильно соберите схему и запитайте Электрический очиститель! Великолепно!$(p)Очиститель упрощает процесс получения Чистых слитков металлов. Положите Песок, Гравий и Слиток в машину и получите Чистый слиток.$(p)Данный механизм необходим для получения $(item)Чистой стали."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/conduction_component",
+			"recipe2": "assemblylinemachines:crafting/temperature_regulator",
+			"title": "Компоненты"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/alloy_smelter",
+			"text": "Теперь, когда у вас есть Стальные панели, можно приступить к созданию более сложных машин, например, $(item)Литейного завода.$(p)$() Для получения большей информации, ознакомтесь с разделом \"Блоки\"."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/empowered_conduction_component",
+			"title": "Компоненты",
+			"text": "Объединив Красную пыль и Золотую панель в Литейном заводе, вы получите $(item)Заряженный золотой слиток$(). Заряженные панели делаются как и обычные."
+		},
+		{
+			"type": "text",
+			"text": "Литейный завод позволяет создавать Сталь без использования Лавы. А ещё, $(5)$(l)Мистиевые слитки.$() Вам понадобится:$(li)Лазуритовый порошок, Красная пыль, Лава, смешайте их в Мешалке и получите $(5)Мистиевый порошок.$()$(li)Засуньте Незеритовый порошок и Заряженное золото в Литейный завод и получите Заряженный незеритовый порошок.$(li)Положите оба полученных порошка в Литейный завод и получите $(item)Мистиевый слиток."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/mystium_dowsing_rod",
+			"text": "Теперь, когда у вас есть мистий, можно создать полезный инструмент - $(item)Прут для лозоходства.$()$(p)С его помощью, вы сможете находить $(l)Нефть$(). Так же, вам понадобится Хромовая руда, которую можно найти в Энде."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/pneumatic_device",
+			"recipe2": "assemblylinemachines:crafting/steel_tank_component",
+			"title": "Компоненты"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/fluid_regulator",
+			"recipe2": "assemblylinemachines:crafting/pumpshaft"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/pump",
+			"text": "$(o)$(7)Мистиевые и Хромовые панели делаются как и все остальные.$()$(p)Сделав их, вы сможете создать Помпу и Трубы для неё."
+		},
+		{
+			"type": "text",
+			"text": "Использовав полученный прут, вы узнаете, есть ли под вами озеро какой-либо жидкости. Например, Воды, Лавы, Нефти и... некоторых других!$(p)Нефть редко встречается в Обычном мире. Обнаружив залежь, установите Помпу, как показано на рисунке справа, подведите электричество и наблюдайте.$(p)$(7)$(o)Подсказка: Резервуары можно забирать, жидкость не пропадёт!"
+		},
+		{
+			"type": "multiblock",
+			"multiblock": {
+				"mapping": {
+					"t": "assemblylinemachines:steel_fluid_tank",
+					"0": "assemblylinemachines:pump",
+					"s": "assemblylinemachines:pumpshaft"
+				},
+				"pattern": [
+					[
+						"t"
+					],
+					[
+						"0"
+					],
+					[
+						"s"
+					],
+					[
+						" "
+					]
+				]
+			},
+			"name": "Помпа",
+			"enable_visualize": false,
+			"text": "$(7)$(o)Опробуйте прут и в Аду с Эндом!"
+		},
+		{
+			"type": "text",
+			"text": "После получения нефти возникает проблема - а как её использовать? Вам поможет специальный $(item)Завод.$() Это многоблочная конструкция, которая принимает Предметы и Жидкости в зависимости от установленных модулей. $(p)Рекомендую вам ознакомиться с Генераторами в специальном разделе.$(p)Вам может понадобится $(item)Панель из нержавеющей стали.$() Для её получения, просто сплавьте Хромовую и Стальную панели."
+		},
+		{
+			"type": "crafting",
+			"title": "Компоненты",
+			"recipe": "assemblylinemachines:crafting/stainless_steel_tank_component",
+			"recipe2": "assemblylinemachines:crafting/refinery"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/upgrades/machine_upgrade_gas",
+			"title": "Использование газа",
+			"text": "Это улучшение НЕОБХОДИМО для всех рецептов, где используется Газ. Но оно необязательно для тех, где газ выделяется."
+		},
+		{
+			"type": "text",
+			"text": "Для наиболее эффективного производства Пластика и Резины, вам понадобятся следующие модули:$(li)5 Перерабатывающих заводов.$(li)1 Галогеновый реактор.$(li)2 Дробильные камеры.$(li)2 Объединителя.$(li)4 Улучшения: Использование газа.$(li)1 Жидкостной маршрутизартор.$(li)Много труб.$(li)Много электричества."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/coal_generator",
+			"recipe2": "assemblylinemachines:crafting/fluid_router",
+			"title": "Разные рецепты"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/refinery_attachment_halogen",
+			"recipe2": "assemblylinemachines:crafting/refinery_attachment_cracking",
+			"title": "Модули"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/refinery_attachment_separation",
+			"recipe2": "assemblylinemachines:crafting/refinery_attachment_addition",
+			"title": "Модули"
+		},
+		{
+			"type": "text",
+			"text": "Великолепно! Правда. Завод принимает ингредиенты и энергию и отдаёт результат в любую из своих сторон. Модули необходимы для работы. Следующие страницы расскажут о том, как получать Пластик и Резину."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:rubber_ball",
+			"link_recipe": true,
+			"text": "Один из продуктов Нефти.$(li)Переработайте Нефть в $(item)Пропан$() в Галогеновом реакторе.$(li)Пропан переработайте в $(item)Пропилен$() в Дробильной камере.$(li)Объедините Пропилен с Древесноугольным порошком в соотвествующем модуле Завода."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:plastic_ball",
+			"link_recipe": true,
+			"text": "Один из продуктов нефти.$(li)Переработайте Нефть в $(item)Этан$() в Галогеновом реакторе.$(li)Этан превратите в $(item)Этилен$() в Дробильной камере.$(li)Объедините Этилен с Древесноугольным порошком в соответствющем модуле Завода."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/pneumatic_compressor",
+			"text": "Пластиковые и Резиновые шарики можно раскатать в соответствующие $(item)Листы$(), используя Пневматический пресс.$(p)Но можно обойтись и обычным молотом."
+		},
+		{
+			"type": "text",
+			"text": "После получения Пластика и Резины заканчивается Электрическая эра. Пора переходить к $(l:age4)Синтетике."
+		}
+	],
+	"sortnum": 3,
+	"read_by_default": true
+}

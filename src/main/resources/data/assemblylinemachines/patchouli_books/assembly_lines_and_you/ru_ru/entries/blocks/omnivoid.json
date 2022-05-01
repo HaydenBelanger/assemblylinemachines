@@ -1,0 +1,15 @@
+{
+	"name": "Всеядный",
+	"category": "assemblylinemachines:blocks",
+	"icon": "assemblylinemachines:omnivoid",
+	"pages": [
+		{
+			"type": "text",
+			"text": "Всеядный - простой блок, который $(4)поглощает$() любые предметы, жидкости и энергию, попадающие внутрь.$(p)С помощью интерфейса можно настраивать Всеядного."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/omnivoid"
+		}
+	]
+}

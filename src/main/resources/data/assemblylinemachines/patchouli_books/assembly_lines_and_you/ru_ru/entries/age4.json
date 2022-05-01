@@ -1,0 +1,74 @@
+{
+	"name": "Синтетичекая эра",
+	"category": "assemblylinemachines:walkthrough",
+	"icon": "assemblylinemachines:plastic_sheet",
+	"sortnum": 4,
+	"read_by_default": true,
+	"pages": [
+		{
+			"type": "text",
+			"text": "Теперь, когда у вас есть $(thing)Пластик,$() вам придётся сделать $(item)Сверхчистый титан.$()$(p)Его можно получить в $(thing)Улучшенном электрическом очистителе.$() Для получения большей информации, ознакомтесь с разделом $(l:items/upgrades#purifierfiltering)Улучшение: Усиленная фильтрация$(/l)."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:attuned_titanium_ingot",
+			"link_recipe": true,
+			"text": "В качестве фильтра используйте $(thing)Жемчуг эндера и Мистиевый порошок$(). Пропустите через машину $(item)Слиток чистого титана$() и получите $(9)Слиток сверхчистого титана.$()"
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:silt_mystium",
+			"link_recipe": true,
+			"text": "Используя скрытое влияние $(l:blocks/entropy_reactor)Энтропийного реактора,$(/l) вы сможете получить $(item)Флеровиевую руду.$()$(p)Для этого вам необходимо поддерживать высокий уровень $(c)Энтропии$(), что приведёт к искажению блоков вокруг."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:flerovium_ore",
+			"link_recipe": true,
+			"text": "Создайте $(thing)Мистиевый ил,$() объединив Ил и Мистиевый порошок в Мешалке, затем разместите полученный блок неподалёку от Энтропийного реактора. Через некоторое время Мистиевый ил превратится в $(item)Флеровиевую руду.$()$(p)$(4)Учитывайте, добыть её можно только Мистиевой киркой или лучше."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:prismatic_dust",
+			"link_recipe": true,
+			"text": "Также вы можете искажать мир Энтропийным реактором ради $(3)Призматических роз.$() Просто разметите небольшой цветок, типа Мака или Одуванчика, неподалёку от Реактора.$(p)С помощью Дробилки из Призматической розы можно получить $(item)Призматическую пыль.$()"
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:raw_novasteel_compound",
+			"link_recipe": true,
+			"text": "Теперь можно приступать к созданию лучшего сплава - $(9)Звёздной стали.$()$(p)Объедините Флеровиевый слиток и Слиток сверхчистого титана в Литейном заводе. На выходе получится 2 единицы Необработанной звёздной стали."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:nova_blend",
+			"link_recipe": true,
+			"text": "Соедините Мистиевый порошок с Призматической пылью и Конденсированной пустотой в Мешалке. На выходе получится 2 Звёздных порошка."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:novasteel_ingot",
+			"anchor": "novasteel",
+			"link_recipe": true,
+			"text": "И наконец, объедините Необработанную звёздную сталь и Звёздный порошок в Литейном заводе, чтобы получить $(9)Слиток звёздной стали.$()$(p)Возникают проблемы с массовым производством Флеровия? Попробуйте $(l:blocks/entropy_reactor#entropicharnesser)Улучшение: Энтропийный производитель.$(/l)"
+		},
+		{
+			"type": "text",
+			"text": "Получив $(thing)Слитки звёздной стали$(), вы достигли конца Синтетической эры и этого руководства. Однако, мод на этом не заканчивается, существует ещё множество других механизмов.$(p)$(l)Спасибо за игру с Assembly Line Machines!"
+		},
+		{
+			"type": "relations",
+			"entries": [
+				"assemblylinemachines:blocks/generators",
+				"assemblylinemachines:blocks/mob_farming",
+				"assemblylinemachines:blocks/quantum_link",
+				"assemblylinemachines:blocks/quarry",
+				"assemblylinemachines:blocks/pipes",
+				"assemblylinemachines:items/novasteel_tools",
+				"assemblylinemachines:blocks/corrupting_basin"
+			],
+			"title": "Что почитать?",
+			"text": "Хотите ещё? Ознакомтесь с заметками о других вещах. Хорошее времяпрепровождение гарантировано."
+		}
+	]
+}
