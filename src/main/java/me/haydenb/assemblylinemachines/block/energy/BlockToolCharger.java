@@ -3,9 +3,9 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -120,8 +120,8 @@ public class BlockToolCharger extends BlockTileEntity{
 		
 		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
-			this.configMaxChargeRate = ConfigHolder.getServerConfig().toolChargerChargeRate.get();
-			this.configMaxCapacity = ConfigHolder.getServerConfig().toolChargerMaxEnergyStorage.get();
+			this.configMaxChargeRate = Config.getServerConfig().toolChargerChargeRate.get();
+			this.configMaxCapacity = Config.getServerConfig().toolChargerMaxEnergyStorage.get();
 		}
 
 		public TEToolCharger(BlockPos pos, BlockState state) {

@@ -1,7 +1,7 @@
 {
 	"type":"assemblylinemachines:chaos_plane",
 	"generator":{
-		"type":"assemblylinemachines:chaos_plane",
+		"type":"minecraft:noise",
 		"seed": 0,
 		"settings":"assemblylinemachines:chaos_plane",
 		"biome_source":{
@@ -9,10 +9,10 @@
 			"biomes":[
 				{
 					"parameters":{
-						"temperature": 0.5,
+						"temperature": 0.3,
 						"humidity": 0.2,
 						"continentalness": 1,
-						"erosion": 0.8,
+						"erosion": 0.6,
 						"weirdness": 0.2,
 						"depth": 0,
 						"offset": 0
@@ -33,7 +33,7 @@
 				},
 				{
 					"parameters":{
-						"temperature": 0.3,
+						"temperature": 0.275,
 						"humidity": 0.25,
 						"continentalness": 1,
 						"erosion": 0.5,

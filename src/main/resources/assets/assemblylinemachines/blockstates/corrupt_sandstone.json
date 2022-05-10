@@ -1,0 +1,14 @@
+{
+	"variants":{
+		"": [{
+			"model": "assemblylinemachines:block/corrupt_sandstone"
+		},
+		{
+			"model": "assemblylinemachines:block/corrupt_sandstone_1"
+		},
+		{
+			"model": "assemblylinemachines:block/corrupt_sandstone_2"
+		}]
+	}
+	
+}

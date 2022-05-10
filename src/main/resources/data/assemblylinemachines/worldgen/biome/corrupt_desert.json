@@ -18,6 +18,9 @@
   },
   "features": [
     [],
+    [
+    	"assemblylinemachines:lake_dark_energy"
+    ],
     [],
     [],
     [],
@@ -25,7 +28,9 @@
     [],
     [],
     [],
-    [],
+    [
+    	"assemblylinemachines:patch_brain_cactus"
+    ],
     []
   ],
   "starts": [],

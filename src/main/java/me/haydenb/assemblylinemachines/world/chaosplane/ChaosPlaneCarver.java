@@ -23,7 +23,8 @@ public class ChaosPlaneCarver extends CaveWorldCarver {
 
 	public ChaosPlaneCarver() {
 		super(CaveCarverConfiguration.CODEC);
-		replaceableBlocks = ImmutableSet.of(Registry.getBlock("corrupt_stone"), Registry.getBlock("corrupt_dirt"), Registry.getBlock("corrupt_sand"), Registry.getBlock("corrupt_grass"), Registry.getBlock("dark_energy_block"));
+		replaceableBlocks = ImmutableSet.of(Registry.getBlock("corrupt_stone"), Registry.getBlock("corrupt_basalt"), Registry.getBlock("corrupt_sandstone"), Registry.getBlock("corrupt_dirt"),
+				Registry.getBlock("corrupt_sand"), Registry.getBlock("corrupt_grass"), Registry.getBlock("dark_energy_block"));
 	}
 
 	@Override

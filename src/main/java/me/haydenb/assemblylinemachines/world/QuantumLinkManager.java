@@ -2,11 +2,11 @@ package me.haydenb.assemblylinemachines.world;
 
 import java.util.*;
 
-import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.machines.BlockQuantumLink.TEQuantumLink;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -23,8 +23,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 public class QuantumLinkManager extends SavedData{
-
-	private static final Gson GSON = new Gson();
 	
 	private QuantumLinkHandler handler = null;
 	
@@ -51,7 +49,7 @@ public class QuantumLinkManager extends SavedData{
 					QuantumLinkManager interimQlm = new QuantumLinkManager();
 					AssemblyLineMachines.LOGGER.debug("Loading Quantum Link Network data from Level...");
 					try {
-						interimQlm.handler = GSON.fromJson(compound.getString("assemblylinemachines.handler"), QuantumLinkHandler.class);
+						interimQlm.handler = Utils.GSON.fromJson(compound.getString("assemblylinemachines.handler"), QuantumLinkHandler.class);
 						return interimQlm;
 					}catch(Exception e) {
 						e.printStackTrace();
@@ -82,7 +80,7 @@ public class QuantumLinkManager extends SavedData{
 		
 		if(handler != null) {
 			try {
-				compound.putString("assemblylinemachines:handler", GSON.toJson(handler));
+				compound.putString("assemblylinemachines:handler", Utils.GSON.toJson(handler));
 			}catch(Exception e) {
 				e.printStackTrace();
 			}

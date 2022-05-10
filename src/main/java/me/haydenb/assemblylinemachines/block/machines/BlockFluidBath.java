@@ -10,10 +10,10 @@ import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -44,7 +44,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class BlockFluidBath extends Block implements EntityBlock {
 	
 	public static final List<Item> VALID_FILL_ITEMS = List.of(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.POTION);
-	public static final Lazy<List<Item>> DISALLOWED_ITEMS = Lazy.of(() -> Lists.transform(ConfigHolder.getServerConfig().disallowedFluidBathItems.get(), (o) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(o.toString()))));
+	public static final Lazy<List<Item>> DISALLOWED_ITEMS = Lazy.of(() -> Lists.transform(Config.getServerConfig().disallowedFluidBathItems.get(), (o) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(o.toString()))));
 	
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
@@ -196,7 +196,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 											
 											
 										}else {
-											if(!ConfigHolder.getServerConfig().invalidBathReturnsSludge.get()) {
+											if(!Config.getServerConfig().invalidBathReturnsSludge.get()) {
 												entity.inputIngredientReturn = Pair.of(entity.inputa, entity.inputb);
 											}
 											entity.sendUpdates();

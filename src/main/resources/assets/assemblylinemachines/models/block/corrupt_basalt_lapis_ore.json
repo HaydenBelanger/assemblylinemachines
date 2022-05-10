@@ -1,0 +1,7 @@
+{
+	"parent": "block/cube_column",
+	"textures": {
+		"side": "assemblylinemachines:block/corrupt/ores/corrupt_basalt_lapis",
+		"end": "assemblylinemachines:block/corrupt/ores/corrupt_basalt_lapis_top"
+	}
+}

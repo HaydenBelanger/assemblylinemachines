@@ -18,6 +18,9 @@
   },
   "features": [
     [],
+    [
+    	"assemblylinemachines:lake_dark_energy"
+    ],
     [],
     [],
     [],
@@ -25,7 +28,11 @@
     [],
     [],
     [],
-    [],
+    [
+    	"assemblylinemachines:flower_chaos_plane",
+    	"assemblylinemachines:patch_grass_chaos_plane_sparse",
+    	"assemblylinemachines:chaosbark/chaosbark_random"
+    ],
     []
   ],
   "starts": [],

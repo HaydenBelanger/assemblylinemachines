@@ -5,13 +5,11 @@ import java.util.stream.Stream;
 
 import com.mojang.authlib.GameProfile;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.energy.BlockEntropyReactor.ISpecialEntropyPlacement;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.core.*;
-import net.minecraft.data.worldgen.features.FeatureUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -20,21 +18,9 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration.TreeConfigurationBuilder;
-import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
-import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
-import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
-import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
-import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
-import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraft.world.ticks.ScheduledTick;
@@ -99,50 +85,6 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 
 	}
 
-	public static class ChaosbarkSaplingBlock extends SaplingBlock{
-
-		public ChaosbarkSaplingBlock() {
-			super(new ChaosbarkTreeGrower(), Block.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.GRASS));
-		}
-
-		@Override
-		public PlantType getPlantType(BlockGetter world, BlockPos pos) {
-			return CORRUPT_GRASS;
-		}
-
-		public static class ChaosbarkTreeGrower extends AbstractTreeGrower{
-
-			public static Holder<ConfiguredFeature<TreeConfiguration, ?>> chaosbarkTree;
-			public static Holder<ConfiguredFeature<TreeConfiguration, ?>> cocoaTree;
-
-			@Override
-			protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random p_204307_,
-					boolean p_204308_) {
-				return chaosbarkTree;
-			}
-			
-			public static void registerTrees() {
-				//Chaosbark Tree feature
-				BlockStateProvider chaosTrunk = BlockStateProvider.simple(Registry.getBlock("chaosbark_log").defaultBlockState());
-				TrunkPlacer chaosTPlacer = new StraightTrunkPlacer(4, 2, 0);
-				BlockStateProvider chaosLeaves = BlockStateProvider.simple(Registry.getBlock("chaosbark_leaves").defaultBlockState());
-				FoliagePlacer chaosFPlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
-				FeatureSize chaosSize = new TwoLayersFeatureSize(1, 0, 1);
-				BlockStateProvider chaosDirt = BlockStateProvider.simple(Registry.getBlock("corrupt_dirt").defaultBlockState());
-				chaosbarkTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":chaosbark_tree", Feature.TREE, new TreeConfigurationBuilder(chaosTrunk, chaosTPlacer, chaosLeaves, chaosFPlacer, chaosSize).dirt(chaosDirt).forceDirt().build());
-			
-				//Cocoa Tree feature
-				BlockStateProvider cocoaTrunk = BlockStateProvider.simple(Blocks.JUNGLE_LOG.defaultBlockState());
-				TrunkPlacer cocoaTPlacer = new StraightTrunkPlacer(4, 2, 0);
-				BlockStateProvider cocoaLeaves = BlockStateProvider.simple(Registry.getBlock("cocoa_leaves").defaultBlockState());
-				FoliagePlacer cocoaFPlacer = new BlobFoliagePlacer(UniformInt.of(2, 2), UniformInt.of(0, 0), 3);
-				FeatureSize cocoaSize = new TwoLayersFeatureSize(1, 0, 1);
-				BlockStateProvider cocoaDirt = BlockStateProvider.simple(Blocks.DIRT.defaultBlockState());
-				cocoaTree = FeatureUtils.register(AssemblyLineMachines.MODID + ":cocoa_tree", Feature.TREE, new TreeConfigurationBuilder(cocoaTrunk, cocoaTPlacer, cocoaLeaves, cocoaFPlacer, cocoaSize).dirt(cocoaDirt).build());
-			}
-		}
-	}
-
 	public static class BrainCactusBlock extends CactusBlock {
 
 		public static final BooleanProperty CAP = BooleanProperty.create("cap");
@@ -157,8 +99,8 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 				Block.box(4, 14, 4, 12, 15, 12)
 				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
 
-		public BrainCactusBlock() {
-			super(Block.Properties.of(Material.CACTUS).randomTicks().strength(3f, 9f).sound(SoundType.WOOL));
+		public BrainCactusBlock(Properties properties) {
+			super(properties);
 			this.registerDefaultState(this.stateDefinition.any().setValue(CactusBlock.AGE, Integer.valueOf(0)).setValue(CAP, false));
 		}
 

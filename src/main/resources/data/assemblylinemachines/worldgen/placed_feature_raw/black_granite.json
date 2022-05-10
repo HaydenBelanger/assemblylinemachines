@@ -1,0 +1,72 @@
+{
+	"feature": {
+		"config": {
+			"targets": [
+				{
+					"target": {
+						"config_option": ["blackGranite", "blackGraniteNaturalTag"],
+						"rule_test":{
+							"tag": "minecraft:base_stone_nether",
+							"predicate_type": "minecraft:tag_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:black_granite",
+						"Properties":{
+							"natural": "true"
+						}
+					}
+				},
+				{
+					"target": {
+						"config_option": "blackGranite",
+						"rule_test":{
+							"config_option": "blackGraniteNaturalTag",
+							"enabled_on": false,
+							"rule_test":{
+								"tag": "minecraft:base_stone_nether",
+								"predicate_type": "minecraft:tag_match"
+							},
+							"predicate_type": "assemblylinemachines:config"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:black_granite",
+						"Properties":{
+							"natural": "false"
+						}
+					}
+				}
+			],
+			"size": 37,
+			"discard_chance_on_air_exposure": 0
+		},
+		"type": "minecraft:ore"
+	},
+	"placement": [
+		{
+			"count": 7,
+			"type": "minecraft:count"
+		},
+		{
+			"type": "minecraft:in_square"
+		},
+		{
+			"height": {
+				"min_inclusive": {
+					"above_bottom": 0
+				},
+				"max_inclusive": {
+					"below_top": 0
+				},
+				"type": "minecraft:uniform"
+			},
+			"type": "minecraft:height_range"
+		},
+		{
+			"type": "minecraft:biome"
+		}
+	]
+}

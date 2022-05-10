@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
@@ -18,8 +17,9 @@ import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.machines.BlockAutocraftingTable.TEAutocraftingTable.SerializableRecipe;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.gui.screens.Screen;
@@ -376,9 +376,8 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			
 			if(!serializedRecipes.isEmpty()) {
-				Gson gson = new Gson();
 				
-				compound.putString("assemblylinemachines:recipes", gson.toJson(serializedRecipes, GSON_TYPE_TOKEN));
+				compound.putString("assemblylinemachines:recipes", Utils.GSON.toJson(serializedRecipes, GSON_TYPE_TOKEN));
 			}
 			
 			
@@ -395,8 +394,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			nTimer = compound.getInt("assemblylinemachines:ntimer");
 			
 			if(compound.contains("assemblylinemachines:recipes")) {
-				Gson gson = new Gson();
-				serializedRecipes = gson.fromJson(compound.getString("assemblylinemachines:recipes"), GSON_TYPE_TOKEN);
+				serializedRecipes = Utils.GSON.fromJson(compound.getString("assemblylinemachines:recipes"), GSON_TYPE_TOKEN);
 			}else {
 				serializedRecipes = new HashMap<>();
 			}

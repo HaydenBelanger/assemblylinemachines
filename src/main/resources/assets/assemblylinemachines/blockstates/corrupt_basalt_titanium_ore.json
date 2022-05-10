@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "axis=y":  [
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore" },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore_1" },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore_2" }
+        ],
+        "axis=z":[
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore", "x": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore_1", "x": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore_2", "x": 90 }
+        ],
+        "axis=x":[
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore", "x": 90, "y": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore_1", "x": 90, "y": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_titanium_ore_2", "x": 90, "y": 90 }
+        ]   
+    }
+}

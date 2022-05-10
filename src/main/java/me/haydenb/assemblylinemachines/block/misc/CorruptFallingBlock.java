@@ -25,7 +25,7 @@ public class CorruptFallingBlock extends FallingBlock implements TagMaster.IMini
 	private final TagKey<Block> toolLevelTag;
 	
 	public CorruptFallingBlock(int dustColor, Properties properties, TagKey<Block> toolLevelTag) {
-		super(properties.strength(3f, 9f));
+		super(properties);
 		this.dustColor = dustColor;
 		this.toolLevelTag = toolLevelTag;
 	}

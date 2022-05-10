@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
-import com.google.gson.Gson;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
@@ -17,8 +16,8 @@ import me.haydenb.assemblylinemachines.crafting.WorldCorruptionCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.Config;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import net.minecraft.ChatFormatting;
@@ -557,8 +556,6 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 	public static class TEEntropyReactor extends EnergyMachine<ContainerEntropyReactor> implements ALMTicker<TEEntropyReactor>, TOPProvider{
 
-		private static final Gson GSON = new Gson();
-
 		private int operationTimer = 0;
 		private int burnTimer = 0;
 		private int nBurnTimer = 300;
@@ -622,7 +619,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 			nBurnTimer = compound.getInt("assemblylinemachines:nburntimer");
 			if(compound.contains("assemblylinemachines:shardmap")) {
-				shardMap = GSON.fromJson(compound.getString("assemblylinemachines:shardmap"), HashMap.class);
+				shardMap = Utils.GSON.fromJson(compound.getString("assemblylinemachines:shardmap"), HashMap.class);
 			}
 
 			varietyRating = compound.getFloat("assemblylinemachines:variety");
@@ -641,7 +638,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 			compound.putInt("assemblylinemachines:nburntimer", nBurnTimer);
 
-			compound.putString("assemblylinemachines:shardmap", GSON.toJson(shardMap));
+			compound.putString("assemblylinemachines:shardmap", Utils.GSON.toJson(shardMap));
 
 			compound.putFloat("assemblylinemachines:variety", varietyRating);
 			compound.putFloat("assemblylinemachines:total", total);
@@ -1009,7 +1006,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				}
 			}
 			
-			if(!hasUpgrade && entropy > 0.98f && ConfigHolder.getServerConfig().reactorExplosions.get()) {
+			if(!hasUpgrade && entropy > 0.98f && Config.getServerConfig().reactorExplosions.get()) {
 				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
 				entropy = 0f;
 			}

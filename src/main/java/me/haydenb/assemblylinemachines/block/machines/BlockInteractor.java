@@ -14,9 +14,9 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.*;
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.SimpleMachine;
 import me.haydenb.assemblylinemachines.registry.*;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.DebugOptions;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.Config.DebugOptions;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
@@ -217,16 +217,16 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 							if(mode == 1) {
 								
 								if(checkInteractMode == null) {
-									checkInteractMode = ConfigHolder.getServerConfig().interactMode.get();
+									checkInteractMode = Config.getServerConfig().interactMode.get();
 								}
 								if(checkInteractMode) {
 									try {
 										fp.gameMode.useItemOn(fp, this.getLevel(), stack, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(0.5d, 0.5d, 0.5d), getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite(), offsetPos, false));
 									}catch(Exception e) {
 										
-										DebugOptions db = ConfigHolder.getServerConfig().interactExceptionReporting.get();
+										DebugOptions db = Config.getServerConfig().interactExceptionReporting.get();
 										if(db != DebugOptions.NONE) {
-											var level = org.apache.logging.log4j.Level.getLevel(ConfigHolder.getServerConfig().interactExceptionReportLevel.get());
+											var level = org.apache.logging.log4j.Level.getLevel(Config.getServerConfig().interactExceptionReportLevel.get());
 											AssemblyLineMachines.LOGGER.log(level, switch(db) {
 											case STACK_TRACE -> "Interactor @ " + this.getBlockPos().toString() + " triggered exception:\n" + ExceptionUtils.getStackTrace(e);
 											default -> "Interactor @ " + this.getBlockPos().toString() + " triggered exception:\n" + e.getMessage();
@@ -451,7 +451,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 					if (te.mode == 3) {
 						te.mode = 0;
 					} else if(te.mode == 0) {
-						if(ConfigHolder.getServerConfig().interactMode.get() == true) {
+						if(Config.getServerConfig().interactMode.get() == true) {
 							te.mode++;
 						}else {
 							te.mode = 2;

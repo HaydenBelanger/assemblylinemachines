@@ -17,6 +17,7 @@ import me.haydenb.assemblylinemachines.crafting.GrinderCrafting.GrinderResult;
 import me.haydenb.assemblylinemachines.crafting.PneumaticCrafting.Mold;
 import me.haydenb.assemblylinemachines.crafting.PneumaticCrafting.PneumaticResult;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.ConfigCondition;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;

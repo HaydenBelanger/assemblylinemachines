@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.registry.utils;
+package me.haydenb.assemblylinemachines.registry.config;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -6,8 +6,7 @@ import java.util.Optional;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ALMCommonConfig;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.config.Config.Common;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
@@ -20,7 +19,6 @@ public class ConfigCondition implements ICondition {
 
 	private static final ResourceLocation ID = new ResourceLocation(AssemblyLineMachines.MODID, "config");
 	
-	
 	private final String configOption;
 	private final boolean enableOn;
 	private final Lazy<Optional<Boolean>> fieldResult;
@@ -30,8 +28,8 @@ public class ConfigCondition implements ICondition {
 		this.enableOn = enableOn;
 		this.fieldResult = Lazy.of(() -> {
 			try {
-				Field field = ObfuscationReflectionHelper.findField(ALMCommonConfig.class, configOption);
-				Object obj = field.get(ConfigHolder.getCommonConfig());
+				Field field = ObfuscationReflectionHelper.findField(Common.class, configOption);
+				Object obj = field.get(Config.getCommonConfig());
 				return Optional.of(((BooleanValue) obj).get());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -56,14 +54,14 @@ public class ConfigCondition implements ICondition {
 		
 		@Override
 		public void write(JsonObject json, ConfigCondition value) {
-			json.addProperty("configOption", value.configOption);
-			if(!value.enableOn) json.addProperty("enableOn", value.enableOn);
+			json.addProperty("config_option", value.configOption);
+			if(!value.enableOn) json.addProperty("enabled_on", value.enableOn);
 		}
 
 		@Override
 		public ConfigCondition read(JsonObject json) {
-			boolean enableOn = GsonHelper.getAsBoolean(json, "enableOn", true);
-			return new ConfigCondition(GsonHelper.getAsString(json, "configOption"), enableOn);
+			boolean enableOn = GsonHelper.getAsBoolean(json, "enabled_on", true);
+			return new ConfigCondition(GsonHelper.getAsString(json, "config_option"), enableOn);
 		}
 
 		@Override

@@ -1,0 +1,82 @@
+{
+	"config": {
+		"tries": 25,
+		"xz_spread": 15,
+		"y_spread": 5,
+		"feature": {
+			"feature": {
+				"config": {
+					"layers": [
+						{
+							"height": {
+								"type": "minecraft:biased_to_bottom",
+								"value": {
+									"min_inclusive": 0,
+									"max_inclusive": 4
+								}
+							},
+							"provider": {
+								"state": {
+									"Properties": {
+										"age": "0",
+										"cap": "false"
+									},
+									"Name": "assemblylinemachines:brain_cactus"
+								},
+								"type": "minecraft:simple_state_provider"
+							}
+						},
+						{
+							"height": {
+								"type": "minecraft:constant",
+								"value": 1
+							},
+							"provider":{
+								"state":{
+									"Properties":{
+										"age": 0,
+										"cap": "true"
+									},
+									"Name": "assemblylinemachines:brain_cactus"
+								},
+								"type": "minecraft:simple_state_provider"
+							}
+						}
+					],
+					"direction": "up",
+					"allowed_placement": {
+						"blocks": "minecraft:air",
+						"type": "minecraft:matching_blocks"
+					},
+					"prioritize_tip": true
+				},
+				"type": "minecraft:block_column"
+			},
+			"placement": [
+				{
+					"predicate": {
+						"predicates": [
+							{
+								"blocks": "minecraft:air",
+								"type": "minecraft:matching_blocks"
+							},
+							{
+								"state": {
+									"Properties": {
+										"age": "0",
+										"cap": "false"
+									},
+									"Name": "assemblylinemachines:brain_cactus"
+								},
+								"type": "minecraft:would_survive"
+							}
+						],
+						"type": "minecraft:all_of"
+					},
+					"type": "minecraft:block_predicate_filter"
+				}
+			]
+		}
+	},
+	"type": "minecraft:random_patch"
+}

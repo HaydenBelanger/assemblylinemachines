@@ -329,6 +329,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 						return true;
 					}
 				}
+				return false;
 			}
 			return super.isAllowedInSlot(slot, stack);
 		}

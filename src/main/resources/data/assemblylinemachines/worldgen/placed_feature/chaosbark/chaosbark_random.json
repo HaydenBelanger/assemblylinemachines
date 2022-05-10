@@ -1,0 +1,43 @@
+{
+  "feature": "assemblylinemachines:chaosbark/chaosbark_random",
+  "placement": [
+    {
+      "count": {
+        "distribution": [
+          {
+            "data": 8,
+            "weight": 3
+          },
+          {
+            "data": 11,
+            "weight": 2
+          },
+          {
+          	"data": 14,
+          	"weight": 4
+          },
+          {
+          	"data": 17,
+          	"weight": 15
+          }
+        ],
+        "type": "minecraft:weighted_list"
+      },
+      "type": "minecraft:count"
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "max_water_depth": 0,
+      "type": "minecraft:surface_water_depth_filter"
+    },
+    {
+      "heightmap": "OCEAN_FLOOR",
+      "type": "minecraft:heightmap"
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

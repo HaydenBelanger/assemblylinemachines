@@ -1,0 +1,25 @@
+{
+    "variants": {
+        "axis=y":  [
+        	{ "model": "assemblylinemachines:block/corrupt_basalt" },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_1" },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_2" },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_3" },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_4" }
+        ],
+        "axis=z":[
+        	{ "model": "assemblylinemachines:block/corrupt_basalt", "x": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_1", "x": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_2", "x": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_3", "x": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_4", "x": 90 }
+        ],
+        "axis=x":[
+        	{ "model": "assemblylinemachines:block/corrupt_basalt", "x": 90, "y": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_1", "x": 90, "y": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_2", "x": 90, "y": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_3", "x": 90, "y": 90 },
+        	{ "model": "assemblylinemachines:block/corrupt_basalt_4", "x": 90, "y": 90 }
+        ]   
+    }
+}

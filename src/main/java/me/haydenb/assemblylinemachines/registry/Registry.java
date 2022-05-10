@@ -55,7 +55,6 @@ import me.haydenb.assemblylinemachines.block.machines.BlockVacuumHopper.TEVacuum
 import me.haydenb.assemblylinemachines.block.misc.*;
 import me.haydenb.assemblylinemachines.block.misc.CorruptBlock.*;
 import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.*;
-import me.haydenb.assemblylinemachines.block.misc.CorruptTallGrassBlock.ChaosbarkSaplingBlock.ChaosbarkTreeGrower;
 import me.haydenb.assemblylinemachines.block.pipes.BlockPipe;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity.PipeConnectorContainer;
@@ -70,15 +69,16 @@ import me.haydenb.assemblylinemachines.item.ItemWrenchOMatic.EnchantmentEngineer
 import me.haydenb.assemblylinemachines.item.powertools.*;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.EnchantmentOverclock;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.PowerToolType;
+import me.haydenb.assemblylinemachines.registry.config.ConfigCondition.ConfigConditionSerializer;
 import me.haydenb.assemblylinemachines.registry.datagen.*;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer;
-import me.haydenb.assemblylinemachines.registry.utils.ConfigCondition.ConfigConditionSerializer;
 import me.haydenb.assemblylinemachines.registry.utils.PhasedMap;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
-import me.haydenb.assemblylinemachines.world.Ores;
+import me.haydenb.assemblylinemachines.world.ModCommand.FluidArgument;
+import me.haydenb.assemblylinemachines.world.OreManager;
+import me.haydenb.assemblylinemachines.world.OreManager.CorruptOres;
 import me.haydenb.assemblylinemachines.world.chaosplane.ChaosPlaneCarver;
-import me.haydenb.assemblylinemachines.world.chaosplane.ChaosPlaneChunkGenerator;
 import me.haydenb.assemblylinemachines.world.effects.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.color.block.BlockColor;
@@ -91,8 +91,9 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -116,11 +117,10 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.grower.AbstractTreeGrower;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.carver.WorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
@@ -128,6 +128,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.common.PlantType;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegistryEvent;
@@ -164,7 +165,7 @@ public class Registry {
 	private static final ConcurrentHashMap<String, SoundEvent> MOD_SOUND_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, ForgeFlowingFluid> MOD_FLUID_REGISTRY = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Enchantment> MOD_ENCHANTMENT_REGISTRY = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<String, Pair<RecipeType<?>, ForgeRegistryEntry<RecipeSerializer<?>>>> MOD_CRAFTING_REGISTRY = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, ForgeRegistryEntry<RecipeSerializer<?>>> MOD_CRAFTING_REGISTRY = new ConcurrentHashMap<>();
 	
 	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
 	
@@ -361,6 +362,7 @@ public class Registry {
 	public static void registerBlocks(RegistryEvent.Register<Block> event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
 		TransmissionType.getPipeRegistryValues().forEach((pipeData) -> createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true));
+		CorruptOres.createCorruptOres();
 		
 		createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 		createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
@@ -466,23 +468,30 @@ public class Registry {
 		createBlock("entropy_reactor_core", new BlockEntropyReactorCore(), true);
 		createBlock("corrupting_basin", new BlockCorruptingBasin(), true);
 		
-		createBlock("corrupt_dirt", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_grass", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL, true, true), true);
-		createBlock("corrupt_sand", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.SAND)), true);
-		createBlock("corrupt_stone", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_gravel", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL)), true);
-		createBlock("chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
-		createBlock("stripped_chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
-		createBlock("chaosbark_sapling", new CorruptTallGrassBlock.ChaosbarkSaplingBlock(), true);
-		createBlock("chaosbark_leaves", new CorruptLeavesBlock(), true);
-		createBlock("chaosbark_planks", Material.WOOD, 3f, 9f, SoundType.WOOD, false, BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
-		createBlock("chaosbark_stairs", new StairBlock(() -> Registry.getBlock("chaosbark_planks").defaultBlockState(), Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD)), true);
-		createBlock("chaosbark_slab", new SlabBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD)), true);
-		createBlock("chaosbark_door", new DoorBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion()), true);
-		createBlock("chaosbark_trapdoor", new TrapDoorBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion()), true);
-		createBlock("chaosbark_fence", new ChaosbarkFenceBlock(), true);
-		createBlock("chaosbark_fence_gate", new FenceGateBlock(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion()), true);
+		createBlock("corrupt_dirt", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL).strength(3f, 9f), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_grass", new CorruptBlock(Block.Properties.of(Material.DIRT).sound(SoundType.GRAVEL).strength(3f, 9f), BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.NEEDS_DIAMOND_TOOL, true, true), true);
+		createBlock("corrupt_sand", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).strength(3f, 9f).sound(SoundType.SAND)), true);
+		createBlock("corrupt_stone", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(3f, 9f), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_gravel", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL).strength(3f, 9f)), true);
+		createBlock("corrupt_bedrock", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(-1f, 3600000f).noDrops().isValidSpawn(Blocks::never), null, null), true);
+		createBlock("corrupt_sandstone", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(3f, 9f), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
+		createBlock("corrupt_basalt", new CorruptBlockWithAxis(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(5f, 15f), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, false, true), true);
+		createBlock("flerovium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(3f, 9f).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_MYSTIUM_TOOL), true);
+		createBlock("corrupt_basalt_empowered_coal_ore", new CorruptBlockWithAxis(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(5f, 15f).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, false, true), true);
 		
+		createBlock("chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).strength(3f, 9f), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
+		createBlock("stripped_chaosbark_log", new CorruptBlockWithAxis(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).strength(3f, 9f), BlockTags.MINEABLE_WITH_AXE, BlockTags.NEEDS_DIAMOND_TOOL, false, false), true);
+		createBlock("chaosbark_leaves", new CorruptLeavesBlock(Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never).strength(3f, 9f)), true);
+		
+		createBlock("chaosbark_planks", Material.WOOD, 2f, 6f, SoundType.WOOD, false, true);
+		createBlock("chaosbark_stairs", new StairBlock(() -> Registry.getBlock("chaosbark_planks").defaultBlockState(), Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD)), true);
+		createBlock("chaosbark_slab", new SlabBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD)), true);
+		createBlock("chaosbark_door", new DoorBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion()), true);
+		createBlock("chaosbark_trapdoor", new TrapDoorBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion()), true);
+		createBlock("chaosbark_fence", new ChaosbarkFenceBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).noOcclusion().strength(2f, 6f)), true);
+		createBlock("chaosbark_fence_gate", new FenceGateBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion()), true);
+		
+		createBlock("chaosbark_sapling", new BlockModdedSapling(new ResourceLocation(AssemblyLineMachines.MODID, "chaosbark/chaosbark_random"), CorruptTallGrassBlock.CORRUPT_GRASS), true);
 		createBlock("chaosweed", new CorruptTallGrassBlock(), true);
 		createBlock("blooming_chaosweed", new CorruptTallGrassBlock(), true);
 		createBlock("tall_chaosweed", new CorruptDoubleTallGrassBlock(), true);
@@ -490,18 +499,7 @@ public class Registry {
 		createBlock("mandelbloom", new CorruptFlowerBlock(MobEffects.CONFUSION, 15, 0), true);
 		createBlock("prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 30, 7), true);
 		createBlock("bright_prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 240, 15), true);
-		createBlock("brain_cactus", new BrainCactusBlock(), true);
-		
-		createBlock("corrupt_coal_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_copper_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_diamond_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_emerald_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_gold_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_iron_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_lapis_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_redstone_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("corrupt_titanium_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
-		createBlock("flerovium_ore", new CorruptFallingBlock(0x4287f5, Block.Properties.of(Material.SAND).sound(SoundType.GRAVEL).requiresCorrectToolForDrops(), TagMaster.NEEDS_MYSTIUM_TOOL), true);
+		createBlock("brain_cactus", new BrainCactusBlock(Block.Properties.of(Material.CACTUS).strength(3f, 9f).randomTicks().sound(SoundType.WOOL)), true);
 		
 		createBlock("flerovium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
 		createBlock("energized_gold_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
@@ -526,14 +524,10 @@ public class Registry {
 		createBlock("omnivoid", new BlockOmnivoid(), true);
 		createBlock("greenhouse", new BlockGreenhouse(), true);
 		
-		createBlock("cocoa_sapling", new SaplingBlock(new AbstractTreeGrower() {
-			@Override
-			protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random p_204307_, boolean p_204308_) {
-				return ChaosbarkTreeGrower.cocoaTree;
-			}
-		}, Block.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.GRASS)), true);
+		createBlock("cocoa_sapling", new BlockModdedSapling(new ResourceLocation(AssemblyLineMachines.MODID, "cocoa_tree"), PlantType.PLAINS), true);
 		createBlock("cocoa_leaves", new LeavesBlock(Block.Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never)), true);
 		
+		//FLUIDS
 		createFluid("oil", new FluidOil(true), new FluidOil(false), new FluidOilBlock(() -> Registry.getFluid("oil")), true);
 		createFluid("condensed_void", new FluidCondensedVoid(true), new FluidCondensedVoid(false), new FluidCondensedVoidBlock(() -> Registry.getFluid("condensed_void")), true);
 		createFluid("naphtha", new FluidNaphtha(true), new FluidNaphtha(false), new FluidNaphthaBlock(() -> Registry.getFluid("naphtha")), true);
@@ -674,10 +668,7 @@ public class Registry {
 		createRecipe(GreenhouseCrafting.GREENHOUSE_RECIPE, GreenhouseCrafting.SERIALIZER);
 		createRecipe(GreenhouseFertilizerCrafting.FERTILIZER_RECIPE, GreenhouseFertilizerCrafting.SERIALIZER);
 		
-		MOD_CRAFTING_REGISTRY.entrySet().forEach((e) -> {
-			net.minecraft.core.Registry.register(net.minecraft.core.Registry.RECIPE_TYPE, new ResourceLocation(e.getValue().getFirst().toString()), e.getValue().getFirst());
-			event.getRegistry().register(e.getValue().getSecond().setRegistryName(e.getKey()));
-		});
+		MOD_CRAFTING_REGISTRY.entrySet().forEach((e) -> event.getRegistry().register(e.getValue().setRegistryName(e.getKey())));
 	}
 	
 	@SubscribeEvent
@@ -699,18 +690,15 @@ public class Registry {
 	@SubscribeEvent
 	public static void common(FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> {
-			ChaosbarkTreeGrower.registerTrees();
-			Ores.registerOres();
+			OreManager.registerOres();
 			registerCraftingConditions();
 			
-			//Registers the Chaos Plane Chunk Generator, used to generate the Chaos Plane.
-			net.minecraft.core.Registry.register(net.minecraft.core.Registry.CHUNK_GENERATOR, 
-					new ResourceLocation(AssemblyLineMachines.MODID, "chaos_plane"), ChaosPlaneChunkGenerator.CODEC);
+			//Registers the Fluid argument type for the client.
+			ArgumentTypes.register(AssemblyLineMachines.MODID + ":fluid", FluidArgument.class, new EmptyArgumentSerializer<>(() -> new FluidArgument()));
 		});
 	}
 	
 	private static void registerCraftingConditions() {
-		//Config Condition registration
 		CraftingHelper.register(ConfigConditionSerializer.INSTANCE);
 	}
 	
@@ -1165,6 +1153,6 @@ public class Registry {
 	
 	//CRAFTING
 	public static void createRecipe(RecipeType<?> type, ForgeRegistryEntry<RecipeSerializer<?>> serializer) {
-		MOD_CRAFTING_REGISTRY.put(type.toString().split(":")[1], Pair.of(type, serializer));
+		MOD_CRAFTING_REGISTRY.put(type.toString().split(":")[1], serializer);
 	}
 }

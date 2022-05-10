@@ -1,4 +1,4 @@
-package me.haydenb.assemblylinemachines.registry;
+package me.haydenb.assemblylinemachines.registry.config;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -17,87 +17,72 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ConfigHandler {
+public class Config {
 
-	public static class ConfigHolder{
+	private static final HashMap<Type, Pair<Object, ForgeConfigSpec>> CONFIGS = new HashMap<>();
+	
+	static {
+		CONFIGS.put(Type.SERVER, new ForgeConfigSpec.Builder().configure(Server::new));
+		CONFIGS.put(Type.CLIENT, new ForgeConfigSpec.Builder().configure(Client::new));
+		CONFIGS.put(Type.COMMON, new ForgeConfigSpec.Builder().configure(Common::new));
+	}
+	
+	public static Server getServerConfig() {
+		return (Server) CONFIGS.get(Type.SERVER).getKey();
+	}
+
+	public static Common getCommonConfig() {
+		return (Common) CONFIGS.get(Type.COMMON).getKey();
+	}
+
+	public static Client getClientConfig() {
+		return (Client) CONFIGS.get(Type.CLIENT).getKey();
+	}
+
+	public static void registerSpecs(ModLoadingContext mlc) {
+		for(Entry<Type, Pair<Object, ForgeConfigSpec>> entry : CONFIGS.entrySet()) mlc.registerConfig(entry.getKey(), entry.getValue().getValue());
+	}
+	
+	public static final record Client(BooleanValue customTooltipColors, BooleanValue customTooltipFrames, BooleanValue receiveGuideBook, BooleanValue receiveUpdateMessages) {
 		
-		private static final HashMap<Type, Pair<Object, ForgeConfigSpec>> CONFIGS = new HashMap<>();
-		
-		static {
-			CONFIGS.put(Type.SERVER, new ForgeConfigSpec.Builder().configure(ALMServerConfig::new));
-			CONFIGS.put(Type.CLIENT, new ForgeConfigSpec.Builder().configure(ALMClientConfig::new));
-			CONFIGS.put(Type.COMMON, new ForgeConfigSpec.Builder().configure(ALMCommonConfig::new));
-		}
-		
-		public static ALMServerConfig getServerConfig() {
-			return (ALMServerConfig) CONFIGS.get(Type.SERVER).getKey();
-		}
-		
-		public static ALMCommonConfig getCommonConfig() {
-			return (ALMCommonConfig) CONFIGS.get(Type.COMMON).getKey();
-		}
-		
-		public static ALMClientConfig getClientConfig() {
-			return (ALMClientConfig) CONFIGS.get(Type.CLIENT).getKey();
-		}
-		
-		public static void registerSpecs(ModLoadingContext mlc) {
-			for(Entry<Type, Pair<Object, ForgeConfigSpec>> entry : CONFIGS.entrySet()) mlc.registerConfig(entry.getKey(), entry.getValue().getValue());
+		public Client(Builder builder) {
+			this(
+				builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true),
+				builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true),
+				builder.comment("Do you want to receive a copy of Assembly Lines & You when you first connect to a server and you have Patchouli installed?", "This may be overridden by the server.").define("receiveGuideBook", true),
+				builder.comment("Do you want to receive mod update messages when the mod is out of date and you connect to a server?").define("receiveUpdateMessages", true)
+			);
 		}
 	}
 	
-	public static class ALMClientConfig{
+	public static final record Common(BooleanValue lateGamePlatesRequireCompressor, BooleanValue lateGameGearsRequireCompressor, BooleanValue grinderIMC, BooleanValue alloyIMC, BooleanValue compressorStorageBlockIMC,
+			BooleanValue compressorNuggetIMC, BooleanValue compressorPlateIMC, BooleanValue compressorGearIMC, BooleanValue compressorRodIMC, BooleanValue titaniumOre, BooleanValue blackGranite, BooleanValue blackGraniteNaturalTag,
+			BooleanValue chromiumOre, BooleanValue chromiumOreOnDragonIsland, BooleanValue corruptOres, BooleanValue fleroviumOre, BooleanValue empoweredCoalOre) {
 		
-		public final BooleanValue customTooltipColors;
-		public final BooleanValue customTooltipFrames;
-		public final BooleanValue receiveGuideBook;
-		public final BooleanValue receiveUpdateMessages;
-		
-		public ALMClientConfig(ForgeConfigSpec.Builder builder) {
-			
-			builder.push("Client");
-			customTooltipColors = builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true);
-			customTooltipFrames = builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true);
-			receiveGuideBook = builder.comment("Do you want to receive a copy of Assembly Lines & You when you first connect to a server and you have Patchouli installed?",
-					"If this is false, this will override the config of the server.", 
-					"If the server you connect to is configured as false, you will not receive a copy on that server.").define("receiveGuideBook", true);
-			receiveUpdateMessages = builder.comment("Do you want to receive mod update messages when the mod is out of date and you connect to a server?").define("receiveUpdateMessages", true);
-			builder.pop();
-			
+		public Common(Builder builder) {
+			this(
+				builder.push("Progression Crafting").comment("Should late-game (Mystium and beyond) Plates & Sheets require the Pneumatic Compressor to create?").define("lateGamePlatesRequireCompressor", true),
+				builder.comment("Should late game (Mystium and beyond) Gears require the Pneumatic Compressor to create?").define("lateGameGearsRequireCompressor", true),
+				builder.pop().push("IMC Crafting").comment("Should the Grinder support creation of other-mod Ground Ores with Ingots, Ore Blocks, and Raw Ores?").define("grinderIMC", true),
+				builder.comment("Should the Alloy Smelter support creation of other-mod Alloys with various combinations of Ingots?").define("alloyIMC", true),
+				builder.comment("Should the Pneumatic Compressor support creation of other-mod Metal Blocks with Ingots?").define("compressorStorageBlockIMC", true),
+				builder.comment("Should the Pneumatic Compressor support creation of other-mod Ingots with Nuggets?").define("compressorNuggetIMC", true),
+				builder.comment("Should the Pneumatic Compressor support creation of other-mod Plates with Ingots?").define("compressorPlateIMC", true),
+				builder.comment("Should the Pneumatic Compressor support creation of other-mod Gears with Plates?").define("compressorGearIMC", true),
+				builder.comment("Should the Pneumatic Compressor support creation of other-mod Rods with Ingots?").define("compressorRodIMC", true),
+				builder.pop().push("Ores").comment("Should Titanium and Deepslate Titanium Ore generate in the overworld?").define("titaniumOre", true),
+				builder.comment("Should Black Granite generate in the Nether?").define("blackGranite", true),
+				builder.comment("Should Black Granite spawn with its natural property, preventing it from being collected with non-electric Pickaxes?").define("blackGraniteNaturalTag", true),
+				builder.comment("Should Chromium Ore generate in The End?").define("chromiumOre", true),
+				builder.comment("Should Chromium Ore generate on the Dragon Island?").define("chromiumOreOnDragonIsland", false),
+				builder.comment("Should all vanilla-counterpart Corrupt Ores generate in the Chaos Plane?").define("corruptOres", true),
+				builder.comment("Should Flerovium Ore spawn in the Chaos Plane?").define("fleroviumOre", true),
+				builder.comment("Should 20% of Corrupt Basalt Coal Ore be replaced with Corrupt Basalt Empowered Coal Ore?").define("empoweredCoalOre", true)
+			);
 		}
 	}
-	
-	public static class ALMCommonConfig{
-		//Progression
-		public final BooleanValue lateGamePlatesRequireCompressor;
-		public final BooleanValue lateGameGearsRequireCompressor;
-		//IMC
-		public final BooleanValue grinderIMC;
-		public final BooleanValue alloyIMC;
-		public final BooleanValue compressorStorageBlockIMC;
-		public final BooleanValue compressorNuggetIMC;
-		public final BooleanValue compressorPlateIMC;
-		public final BooleanValue compressorGearIMC;
-		public final BooleanValue compressorRodIMC;
-		
-		public ALMCommonConfig(ForgeConfigSpec.Builder builder) {
-			builder.push("Progression Crafting");
-			lateGamePlatesRequireCompressor = builder.comment("Should late-game (Mystium and beyond) Plates & Sheets require the Pneumatic Compressor to create?").define("lateGamePlatesRequireCompressor", true);
-			lateGameGearsRequireCompressor = builder.comment("Should late game (Mystium and beyond) Gears require the Pneumatic Compressor to create?").define("lateGameGearsRequireCompressor", true);
-			builder.pop();
-			builder.push("Inter-Mod Compat Crafting");
-			grinderIMC = builder.comment("Should the Grinder support creation of other-mod Ground Ores with Ingots, Ore Blocks, and Raw Ores?").define("grinderIMC", true);
-			alloyIMC = builder.comment("Should the Alloy Smelter support creation of other-mod Alloys with various combinations of Ingots?").define("alloyIMC", true);
-			compressorStorageBlockIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Metal Blocks with Ingots?").define("compressorStorageBlockIMC", true);
-			compressorNuggetIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Ingots with Nuggets?").define("compressorNuggetIMC", true);
-			compressorPlateIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Plates with Ingots?").define("compressorPlateIMC", true);
-			compressorGearIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Gears with Plates?").define("compressorGearIMC", true);
-			compressorRodIMC = builder.comment("Should the Pneumatic Compressor support creation of other-mod Rods with Ingots?").define("compressorRodIMC", true);
-			builder.pop();
-		}
-	}
-	
-	public static class ALMServerConfig{
+
+	public static class Server{
 		
 		//MACHINE OPTIONS
 		public final BooleanValue reactorExplosions;
@@ -175,24 +160,7 @@ public class ConfigHandler {
 		public final ConfigValue<Double> wrenchAttack;
 		public final ConfigValue<Double> wrenchKnockback;
 		
-		//TITANIUM
-		public final ConfigValue<Integer> titaniumVeinSize;
-		public final ConfigValue<Integer> titaniumFrequency;
-		public final ConfigValue<Integer> titaniumMinHeight;
-		public final ConfigValue<Integer> titaniumMaxHeight;
-		public final EnumValue<OreGenOptions> titaniumOreGenStyle;
-		
-		//CHROMIUM
-		public final ConfigValue<Integer> chromiumVeinSize;
-		public final ConfigValue<Integer> chromiumFrequency;
-		public final BooleanValue chromiumOnDragonIsland;
-		
-		//BLACK GRANITE
-		public final BooleanValue blackGraniteSpawnsWithNaturalTag;
-		public final ConfigValue<Integer> blackGraniteVeinSize;
-		public final ConfigValue<Integer> blackGraniteFrequency;
-		
-		public ALMServerConfig(ForgeConfigSpec.Builder builder) {
+		public Server(ForgeConfigSpec.Builder builder) {
 			builder.push("Machines");
 			crankSnapChance = builder.comment("If using the Crank without meaning, what chould be the chance it snaps?", "Value is 1 in X chance to snap, where X is the value in the config.", "Set to -1 to disable snapping completely.").defineInRange("crankSnapChance", 100, -1, 1000);
 			reactorExplosions = builder.comment("If the Entropy Reactor reaches higher than 98% Entropy, should it explode?").define("reactorExplosions", true);
@@ -209,7 +177,7 @@ public class ConfigHandler {
 			kineticFluidMixerCycleMultiplier = builder.comment("What should the multiplier for the amount of stirs (uses of a Stirring Stick on Fluid Bath) to convert to minimum seconds in the Kinetic Fluid Mixer be?", "For example, a recipe with 10 stirs with a multiplier of 0.7 will take a minimum of 7 seconds to craft.").defineInRange("simpleFluidMixerCycleModifier", 1d, 0.01d, 100d);
 			builder.pop();
 			
-			builder.push("Interactor Settings");
+			builder.push("Interactor-Settings");
 			interactMode = builder.comment("Interact Mode can cause issues with intercompatability with some mods. Do you want this mode enabled?", "For example, attempting to \"interact with\" a block with a GUI will cause an exception or other fatal issues.").define("interactMode", true);
 			interactExceptionReporting = builder.comment("Should Interact Mode fail with an exception, what type of logging should be performed?",
 					"NONE - Interact Mode exceptions are silenced.", "MESSAGE - A basic informative message to identify the error.",
@@ -283,28 +251,8 @@ public class ConfigHandler {
 					"If clients are configured to false, that client will not receive a copy regardless of this option.").define("distributeGuideBook", true);
 			preferredModid = builder.comment("In recipe types which support inter-mod compatible output, which Mod ID should be preferred?", 
 					"If the selected Mod ID is invalid or does not provide an appropriate item for a tag, the first Mod ID alphabetically will be used.").define("preferredModid", "assemblylinemachines");
-			builder.push("Titanium");
-			titaniumVeinSize = builder.comment("What should the maximum size per vein of Titanium Ore be?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumVeinSize", 5, 0, 1000);
-			titaniumFrequency = builder.comment("How many veins of Titanium Ore should generate per chunk?", "Set to 0 to disable Titanium Ore generation.").defineInRange("titaniumFrequency", 7, 0, 1000);
-			titaniumMinHeight = builder.comment("What is the minimum Y value Titanium Ore should spawn at in the overworld?", 
-					"This can (and by default, does) go below the minimum world limit to change the TRIANGLE-style weighting of generation.").define("titaniumMinHeight", -112);
-			titaniumMaxHeight = builder.comment("What is the maximum Y value Titanium Ore should spawn at in the overworld?").define("titaniumMaxHeight", -16);
-			titaniumOreGenStyle = builder.comment("What style of ore generation should Titanium Ore use?", "TRIANGLE - Most generation occurs in center of min-max range - Akin to Coal Ore at most altitudes.", 
-					"UNIFORM - All generation is equal between min-max range - Akin to Redstone Ore at most altitudes.").defineEnum("titaniumOreGenStyle", OreGenOptions.TRIANGLE);
-			builder.pop();
 			
-			builder.push("Black-Granite");
-			blackGraniteSpawnsWithNaturalTag = builder.comment("Should generated Black Granite have the \"natural\" tag?", "This tag, if present, will only allow Black Granite to be dropped if mined with a Crank-Powered Pickaxe.", 
-					"This is the intended progression, but can be disabled in order to make all Pickaxes mine it.").define("blackGraniteSpawnsWithNaturalTag", true);
-			blackGraniteVeinSize = builder.comment("What should the maximum size per vein of Black Granite be?", "Set to 0 to disable Black Granite generation.").define("blackGraniteVeinSize", 37);
-			blackGraniteFrequency = builder.comment("How many veins of Black Granite should generate per chunk?", "Set to 0 to disable Black Granite generation.").define("blackGraniteFrequency", 7);
-			builder.pop();
-			
-			builder.push("Chromium");
-			chromiumVeinSize = builder.comment("What should the maximum size per vein of Chromium Ore be?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumVeinSize", 10, 0, 1000);
-			chromiumFrequency = builder.comment("How many veins of Chromium Ore should generate per chunk?", "Set to 0 to disable Chromium Ore generation.").defineInRange("chromiumFrequency", 4, 0, 1000);
-			chromiumOnDragonIsland = builder.comment("Should Chromium Ore generate on the Dragon Island in The End?", "If false, Chromium Ore will only generate on the outer End islands accessed by the End Gateway.").define("chromiumOnDragonIsland", false);
-			builder.pop();
+			//corruptOreCountMod = builder.comment("How much should the placement of Corrupt Ores be multiplied from their overworld counterparts?", "Higher means more ore per chunk.").define("corruptOreCountMod", 5);
 			builder.pop();
 		}
 	}

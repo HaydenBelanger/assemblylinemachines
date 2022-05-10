@@ -1,0 +1,64 @@
+{
+	"feature": {
+		"config": {
+			"targets": [
+				{
+					"target":{
+						"config_option": "corruptOres",
+						"rule_test":{
+							"block": "assemblylinemachines:corrupt_stone",
+							"predicate_type": "minecraft:block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:corrupt_gold_ore"
+					}
+				},
+				{
+					"target":{
+						"config_option": "corruptOres",
+						"rule_test":{
+							"block": "assemblylinemachines:corrupt_basalt",
+							"predicate_type": "minecraft:block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:corrupt_basalt_gold_ore",
+						"Properties":{
+							"axis": "y"
+						}
+					}
+				}
+			],
+			"size": 9,
+			"discard_chance_on_air_exposure": 0
+		},
+		"type": "minecraft:ore"
+	},
+	"placement": [
+		{
+			"count": 20,
+			"type": "minecraft:count"
+		},
+		{
+			"type": "minecraft:in_square"
+		},
+		{
+			"height": {
+				"min_inclusive": {
+					"above_bottom": 0
+				},
+				"max_inclusive": {
+					"absolute": 32
+				},
+				"type": "minecraft:biased_to_bottom"
+			},
+			"type": "minecraft:height_range"
+		},
+		{
+			"type": "minecraft:biome"
+		}
+	]
+}

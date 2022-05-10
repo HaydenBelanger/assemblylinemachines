@@ -10,6 +10,7 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.ConfigCondition;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;

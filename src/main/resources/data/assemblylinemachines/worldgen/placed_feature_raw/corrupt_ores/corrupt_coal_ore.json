@@ -1,0 +1,81 @@
+{
+	"feature": {
+		"config": {
+			"targets": [
+				{
+					"target":{
+						"config_option": "corruptOres",
+						"rule_test":{
+							"block": "assemblylinemachines:corrupt_stone",
+							"predicate_type": "minecraft:block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:corrupt_coal_ore"
+					}
+				},
+				{
+					"target":{
+						"config_option": ["corruptOres", "empoweredCoalOre"],
+						"rule_test":{
+							"block": "assemblylinemachines:corrupt_basalt",
+							"probability": 0.2,
+							"predicate_type": "minecraft:random_block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state":{
+						"Name": "assemblylinemachines:corrupt_basalt_empowered_coal_ore",
+						"Properties":{
+							"axis": "y"
+						}
+					}
+				},
+				{
+					"target":{
+						"config_option": "corruptOres",
+						"rule_test":{
+							"block": "assemblylinemachines:corrupt_basalt",
+							"predicate_type": "minecraft:block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:corrupt_basalt_coal_ore",
+						"Properties":{
+							"axis": "y"
+						}
+					}
+				}
+			],
+			"size": 17,
+			"discard_chance_on_air_exposure": 0
+		},
+		"type": "minecraft:ore"
+	},
+	"placement": [
+		{
+			"count": 90,
+			"type": "minecraft:count"
+		},
+		{
+			"type": "minecraft:in_square"
+		},
+		{
+			"height": {
+				"min_inclusive": {
+					"above_bottom": 0
+				},
+				"max_inclusive": {
+					"absolute": 192
+				},
+				"type": "minecraft:biased_to_bottom"
+			},
+			"type": "minecraft:height_range"
+		},
+		{
+			"type": "minecraft:biome"
+		}
+	]
+}

@@ -1,0 +1,48 @@
+{
+	"feature": {
+		"config": {
+			"targets": [
+				{
+					"target": {
+						"config_option": "fleroviumOre",
+						"rule_test":{
+							"block": "assemblylinemachines:corrupt_stone",
+							"predicate_type": "minecraft:block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:flerovium_ore"
+					}
+				}
+			],
+			"size": 3,
+			"discard_chance_on_air_exposure": 0.5
+		},
+		"type": "minecraft:ore"
+	},
+	"placement": [
+		{
+			"count": 7,
+			"type": "minecraft:count"
+		},
+		{
+			"type": "minecraft:in_square"
+		},
+		{
+			"height": {
+				"min_inclusive": {
+					"absolute": -152
+				},
+				"max_inclusive": {
+					"absolute": -122
+				},
+				"type": "minecraft:uniform"
+			},
+			"type": "minecraft:height_range"
+		},
+		{
+			"type": "minecraft:biome"
+		}
+	]
+}

@@ -5,9 +5,9 @@ import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge.PowerToolType;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ALMServerConfig;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.Config.Server;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -151,8 +151,8 @@ public enum ItemTiers {
 		}catch(IllegalArgumentException e) {}
 	}
 	
-	private static ALMServerConfig cfg() {
-		return ConfigHolder.getServerConfig();
+	private static Server cfg() {
+		return Config.getServerConfig();
 	}
 	
 	public Tier getItemTier() {

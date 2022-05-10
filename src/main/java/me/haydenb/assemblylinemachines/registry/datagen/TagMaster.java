@@ -120,8 +120,9 @@ public class TagMaster {
 				Pair.of("mystium", "mystium_rod"), Pair.of("iron", "iron_rod"), Pair.of("gold", "gold_rod"), Pair.of("copper", "copper_rod"), Pair.of("chromium", "chromium_rod")));
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));
 		forgeTags.putAll("ores", List.of(Pair.of("chromium", "chromium_ore"), Pair.of("titanium", "titanium_ore;deepslate_titanium_ore"), Pair.of("flerovium", "flerovium_ore"),
-				Pair.of("corrupt_coal", "corrupt_coal_ore"), Pair.of("corrupt_copper", "corrupt_copper_ore"), Pair.of("corrupt_diamond", "corrupt_diamond_ore"), Pair.of("corrupt_gold", "corrupt_gold_ore"), Pair.of("corrupt_iron", "corrupt_iron_ore"),
-				Pair.of("corrupt_lapis", "corrupt_lapis_ore"), Pair.of("corrupt_redstone", "corrupt_redstone_ore"), Pair.of("corrupt_emerald", "corrupt_emerald_ore"), Pair.of("corrupt_titanium", "corrupt_titanium_ore")));
+				Pair.of("corrupt_coal", "corrupt_coal_ore;corrupt_basalt_coal_ore"), Pair.of("corrupt_copper", "corrupt_copper_ore;corrupt_basalt_copper_ore"), Pair.of("corrupt_diamond", "corrupt_diamond_ore;corrupt_basalt_diamond_ore"), 
+				Pair.of("corrupt_gold", "corrupt_gold_ore;corrupt_basalt_gold_ore"), Pair.of("corrupt_iron", "corrupt_iron_ore;corrupt_basalt_iron_ore"),
+				Pair.of("corrupt_lapis", "corrupt_lapis_ore;corrupt_basalt_lapis_ore"), Pair.of("corrupt_redstone", "corrupt_redstone_ore;corrupt_basalt_redstone_ore"), Pair.of("corrupt_emerald", "corrupt_emerald_ore;corrupt_basalt_emerald_ore"), Pair.of("corrupt_titanium", "corrupt_titanium_ore;corrupt_basalt_titanium_ore")));
 		forgeTags.putAll("storage_blocks", List.of(Pair.of("chromium", "chromium_block"), Pair.of("titanium", "titanium_block"), Pair.of("mystium", "mystium_block"), Pair.of("steel", "steel_block"),
 				Pair.of("flerovium", "flerovium_block"), Pair.of("attuned_titanium", "attuned_titanium_block"), Pair.of("energized_gold", "energized_gold_block"), Pair.of("novasteel", "novasteel_block"), 
 				Pair.of("raw_chromium", "raw_chromium_block"), Pair.of("raw_titanium", "raw_titanium_block"), Pair.of("raw_flerovium", "raw_flerovium_block"), Pair.of("crafting_table", "compressed_crafting_table")));

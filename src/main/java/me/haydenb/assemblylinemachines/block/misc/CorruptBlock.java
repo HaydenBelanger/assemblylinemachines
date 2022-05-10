@@ -1,6 +1,7 @@
 package me.haydenb.assemblylinemachines.block.misc;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -35,17 +35,8 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 	private final boolean isGrass;
 	private final boolean shouldBePoisonous;
 	
-	public static final HashMap<Block, String> CORRUPT_VARIANTS = new HashMap<>();
-	static{
-		CORRUPT_VARIANTS.put(Blocks.DIRT, "corrupt_dirt");
-		CORRUPT_VARIANTS.put(Blocks.GRASS, "corrupt_grass");
-		CORRUPT_VARIANTS.put(Blocks.SAND, "corrupt_sand");
-		CORRUPT_VARIANTS.put(Blocks.STONE, "corrupt_stone");
-		CORRUPT_VARIANTS.put(Blocks.GRAVEL, "corrupt_gravel");
-	}
-	
 	public CorruptBlock(BlockBehaviour.Properties properties, TagKey<Block> type, TagKey<Block> level, boolean isGrass, boolean shouldBePoisonous) {
-		super(properties.strength(3f, 9f));
+		super(properties);
 		this.type = type;
 		this.level = level;
 		this.isGrass = isGrass;
@@ -53,11 +44,7 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 	}
 	
 	public CorruptBlock(BlockBehaviour.Properties properties, TagKey<Block> type, TagKey<Block> level) {
-		super(properties.strength(3f, 9f));
-		this.type = type;
-		this.level = level;
-		this.isGrass = false;
-		this.shouldBePoisonous = true;
+		this(properties, type, level, false, true);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -175,13 +162,13 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 	
 	public static class CorruptLeavesBlock extends LeavesBlock implements IMiningLevelDataGenProvider{
 
-		public CorruptLeavesBlock() {
-			super(Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never));
+		public CorruptLeavesBlock(Properties properties) {
+			super(properties);
 		}
 
 		@Override
 		public TagKey<Block> getToolType() {
-			return BlockTags.MINEABLE_WITH_PICKAXE;
+			return BlockTags.MINEABLE_WITH_HOE;
 		}
 
 		@Override
@@ -194,8 +181,8 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 	}
 	
 	public static class ChaosbarkFenceBlock extends FenceBlock {
-		public ChaosbarkFenceBlock() {
-			super(Block.Properties.of(Material.WOOD).strength(3f, 9f).sound(SoundType.WOOD).noOcclusion());
+		public ChaosbarkFenceBlock(Properties properties) {
+			super(properties);
 		}
 		
 		@Override

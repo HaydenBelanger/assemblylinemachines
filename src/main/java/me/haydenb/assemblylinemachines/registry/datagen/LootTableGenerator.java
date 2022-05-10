@@ -15,6 +15,7 @@ import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.world.OreManager.CorruptOres;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -61,26 +62,14 @@ public class LootTableGenerator extends LootTableProvider {
 	private class GeneratedBlockLoot extends BlockLoot{
 		
 		private static final List<String> BLOCK_ONLY_EXCEPTIONS = List.of("mystium_farmland", "nova_farmland");
-		private static final List<String> KNOWN_ERRORS = List.of("naphtha_fire");
 		
 		private final List<String> existingLootTables = getExistingLootTables();
 		
 		private static final HashMap<String, Triple<Supplier<Item>, Float, Float>> ORE_DROPS = new HashMap<>();
 		static {
-			ORE_DROPS.put("corrupt_coal_ore", Triple.of(() -> Items.COAL, 2f, 2f));
-			ORE_DROPS.put("corrupt_copper_ore", Triple.of(() -> Items.RAW_COPPER, 4f, 6f));
-			ORE_DROPS.put("corrupt_diamond_ore", Triple.of(() -> Items.DIAMOND, 2f, 2f));
-			ORE_DROPS.put("corrupt_emerald_ore", Triple.of(() -> Items.EMERALD, 2f, 2f));
-			ORE_DROPS.put("corrupt_gold_ore", Triple.of(() -> Items.RAW_GOLD, 2f, 2f));
-			ORE_DROPS.put("corrupt_iron_ore", Triple.of(() -> Items.RAW_IRON, 2f, 2f));
-			ORE_DROPS.put("corrupt_lapis_ore", Triple.of(() -> Items.LAPIS_LAZULI, 8f, 18f));
-			ORE_DROPS.put("corrupt_redstone_ore", Triple.of(() -> Items.REDSTONE, 8f, 10f));
-
-			//Assigns titaniumTriple to all types of Titanium - But the 2x result is only actually used in the below case for corrupt_titanium_ore.
-			Triple<Supplier<Item>, Float, Float> titaniumTriple = Triple.of(() -> Registry.getItem("raw_titanium"), 2f, 2f);
-			ORE_DROPS.put("corrupt_titanium_ore", titaniumTriple);
-			ORE_DROPS.put("deepslate_titanium_ore", titaniumTriple);
-			ORE_DROPS.put("titanium_ore", titaniumTriple);
+			CorruptOres.oreDropMap(ORE_DROPS);
+			ORE_DROPS.put("deepslate_titanium_ore", Triple.of(() -> Registry.getItem("raw_titanium"), -1f, -1f));
+			ORE_DROPS.put("titanium_ore", Triple.of(() -> Registry.getItem("raw_titanium"), -1f, -1f));
 			ORE_DROPS.put("chromium_ore", Triple.of(() -> Registry.getItem("raw_chromium"), -1f, -1f));
 			ORE_DROPS.put("flerovium_ore", Triple.of(() -> Registry.getItem("raw_flerovium"), -1f, -1f));
 		}
@@ -132,90 +121,66 @@ public class LootTableGenerator extends LootTableProvider {
 				Block b = knownBlocks.next();
 				switch(b.getRegistryName().getPath()) {
 				
-				case("titanium_ore"):
-				case("deepslate_titanium_ore"):
-				case("chromium_ore"):
-				case("flerovium_ore"):
+				case "titanium_ore", "deepslate_titanium_ore",
+						"chromium_ore", "flerovium_ore" -> 
 					//Ore loot tables - drops Raw Ore.
 					this.add(b, (bl) -> createOreDrop(bl, ORE_DROPS.get(bl.getRegistryName().getPath()).getLeft().get()));
-					break;
 				
-				case("mystium_farmland"):
-				case("nova_farmland"):
+				case "mystium_farmland", "nova_farmland" -> 
 					//Farmland loot tables - drops Dirt.
 					this.dropOther(b, Blocks.DIRT);
-					break;
 					
-				case("novasteel_fluid_tank"):
-				case("attuned_titanium_fluid_tank"):
-				case("mystium_fluid_tank"):
-				case("steel_fluid_tank"):
-				case("wooden_fluid_tank"):
-				case("basic_battery_cell"):
-				case("advanced_battery_cell"):
-				case("ultimate_battery_cell"):
-				case("bottomless_storage_unit"):
+				case "novasteel_fluid_tank", "attuned_titanium_fluid_tank", "mystium_fluid_tank",
+				"steel_fluid_tank", "wooden_fluid_tank", "basic_battery_cell", "advanced_battery_cell",
+				"ultimate_battery_cell", "bottomless_storage_unit" -> {
 					//NBT-copying loot tables - copys required NBT data from BlockEntity to Item.
 					CopyNbtFunction.Builder nbtFunction = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY);
 					for(String key : NBT_COPYING_KEYS.get(b.getRegistryName().getPath())) {
 						nbtFunction = nbtFunction.copy(key, key);
 					}
 					this.add(b, createSingleItemTable(b).apply(nbtFunction));
-					break;
+				}
 					
-				case("corrupt_coal_ore"):
-				case("corrupt_copper_ore"):
-				case("corrupt_diamond_ore"):
-				case("corrupt_emerald_ore"):
-				case("corrupt_gold_ore"):
-				case("corrupt_iron_ore"):
-				case("corrupt_lapis_ore"):
-				case("corrupt_redstone_ore"):
-				case("corrupt_titanium_ore"):
-					//Corrupt Ore loot tables - drops 2x standard drops.
+				case "corrupt_coal_ore", "corrupt_copper_ore", "corrupt_diamond_ore",
+				"corrupt_emerald_ore", "corrupt_gold_ore", "corrupt_iron_ore", "corrupt_lapis_ore",
+				"corrupt_redstone_ore", "corrupt_titanium_ore", "corrupt_basalt_coal_ore",
+				"corrupt_basalt_copper_ore", "corrupt_basalt_diamond_ore", "corrupt_basalt_emerald_ore",
+				"corrupt_basalt_gold_ore", "corrupt_basalt_iron_ore", "corrupt_basalt_lapis_ore",
+				"corrupt_basalt_redstone_ore", "corrupt_basalt_titanium_ore" -> {
 					Triple<Supplier<Item>, Float, Float> stats = ORE_DROPS.get(b.getRegistryName().getPath());
 					this.add(b, createDynamicOreDrops(b, stats.getLeft().get(), stats.getMiddle(), stats.getRight()));
-					break;
+				}
 				
-				case("prism_glass"):
+				case "prism_glass" ->
 					//Silk Touch loot tables - only drops when Silk Touch is used.
 					this.dropWhenSilkTouch(b);
-					break;
 					
-				case("chaosweed"):
-				case("blooming_chaosweed"):
+				case "chaosweed", "blooming_chaosweed" ->
 					//Short plant loot tables - drops when shears are used.
 					this.add(b, BlockLoot::createShearsOnlyDrop);
-					break;
 				
-				case("tall_chaosweed"):
-				case("tall_blooming_chaosweed"):
+				case "tall_chaosweed", "tall_blooming_chaosweed" -> 
 					//Tall plant loot tables - drops 2x when shears are used from one part of plant.
 					this.add(b, BlockLoot::createDoublePlantShearsDrop);
-					break;
 				
-				case("chaosbark_door"):
+				case "chaosbark_door" ->
 					//Door loot tables - only drops from one segment of door.
 					this.add(b, BlockLoot::createDoorTable);
-					break;
 				
-				case("slab_black_granite"):
-				case("slab_silt_brick"):
-				case("chaosbark_slab"):
+				case "slab_black_granite", "slab_silt_brick", "chaosbark_slab" ->
 					//Slab loot tables - if double slab, drops 2.
 					this.add(b, BlockLoot::createSlabItemTable);
-					break;
 				
-				case("chaosbark_leaves"):
-				case("cocoa_leaves"):
+				case "chaosbark_leaves", "cocoa_leaves" ->
 					//Leaves loot tables - occasionally drops Saplings, and leaves if shears are used.
 					this.add(b, (bl) -> createLeavesDrops(bl, LEAVES_SAPLINGS.get(b.getRegistryName().getPath()), new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F}));
-					break;
 					
-				default:
+				default -> {
 					if(!b.asItem().equals(Items.AIR)) {
 						this.dropSelf(b);
 					}
+				}
+					
 				}
 				i++;
 			}
@@ -225,26 +190,26 @@ public class LootTableGenerator extends LootTableProvider {
 			List<Block> skippedBlks = excludedBlocks();
 			if(!skippedBlks.isEmpty()) {
 				int fluidSkips = 0;
-				int knownSkips = 0;
+				int emptySkips = 0;
 				List<Block> otherSkips = new ArrayList<>();
 				for(Block b : skippedBlks) {
 					if(b instanceof LiquidBlock) {
 						fluidSkips++;
-					}else if(KNOWN_ERRORS.contains(b.getRegistryName().getPath())) {
-						knownSkips++;
+					}else if(b.getLootTable().equals(BuiltInLootTables.EMPTY)) {
+						emptySkips++;
 					}else {
 						otherSkips.add(b);
 					}
 				}
 				if(fluidSkips != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + fluidSkips + " block(s) which are LiquidBlocks and expected to be skipped as a result.");
-				if(knownSkips != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + knownSkips + " block(s) which are flagged as a \"known error\", meaning they intentionally don't have an associated sequence.");
+				if(emptySkips != 0) pw.println("[LOOT TABLES - INFO]: Skipped " + emptySkips + " block(s) which are set as noDrops in their Block.Properties.");
 				if(!otherSkips.isEmpty()) {
 					String blocks = "";
 					for(Block b : otherSkips) {
 						blocks = blocks + b.getRegistryName().toString() + ", ";
 					}
 					blocks = blocks.substring(0, blocks.length() - 2);
-					pw.println("[LOOT TABLES - WARNING]: There were blocks skipped which were skipped for not having an associated BlockItem, not given an alternative drop, or marked as a \"known error\": " + blocks);
+					pw.println("[LOOT TABLES - WARNING]: There were blocks skipped which were skipped for not having an associated BlockItem, and not marked as having noDrops or given an alternate drop: " + blocks);
 				}
 			}
 		}
@@ -254,12 +219,13 @@ public class LootTableGenerator extends LootTableProvider {
 			List<Block> recipesToApply = Registry.getAllBlocksModifiable();
 			recipesToApply.removeIf((b) -> b.asItem().equals(Items.AIR) && !BLOCK_ONLY_EXCEPTIONS.contains(b.getRegistryName().getPath()));
 			recipesToApply.removeIf((b) -> existingLootTables.contains(b.getRegistryName().getPath()));
+			recipesToApply.removeIf((b) -> b.getLootTable().equals(BuiltInLootTables.EMPTY));
 			
 			return recipesToApply;
 		}
 		
 		private List<Block> excludedBlocks(){
-			return Registry.getAllBlocksUnmodifiable().stream().filter((b) -> b.asItem().equals(Items.AIR) && !BLOCK_ONLY_EXCEPTIONS.contains(b.getRegistryName().getPath())).toList();
+			return Registry.getAllBlocksUnmodifiable().stream().filter((b) -> (b.asItem().equals(Items.AIR) && !BLOCK_ONLY_EXCEPTIONS.contains(b.getRegistryName().getPath())) || b.getLootTable().equals(BuiltInLootTables.EMPTY)).toList();
 		}
 		
 		private List<String> getExistingLootTables(){

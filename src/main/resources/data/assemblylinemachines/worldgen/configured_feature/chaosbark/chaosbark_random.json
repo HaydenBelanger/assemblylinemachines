@@ -1,0 +1,12 @@
+{
+  "config": {
+    "features": [
+      {
+        "feature": "assemblylinemachines:chaosbark/chaosbark_fancy",
+        "chance": 0.15
+      }
+    ],
+    "default": "assemblylinemachines:chaosbark/chaosbark_regular"
+  },
+  "type": "minecraft:random_selector"
+}

@@ -5,8 +5,8 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
 import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -35,7 +35,7 @@ public class FluidOilProduct extends ALMFluid {
 	@Override
 	protected void randomTick(Level world, BlockPos pos, FluidState state, Random random) {
 		
-		if(source && ConfigHolder.getServerConfig().gasolineExplosions.get()) {
+		if(source && Config.getServerConfig().gasolineExplosions.get()) {
 			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.offset(-3, -1, -3).north().west(), pos.offset(3, 1, 3)).iterator();
 			
 			while(iter.hasNext()) {

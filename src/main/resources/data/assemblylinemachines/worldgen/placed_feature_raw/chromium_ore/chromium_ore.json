@@ -1,0 +1,50 @@
+{
+	"feature": {
+		"config": {
+			"targets": [
+				{
+					"target": {
+						"config_option": "chromiumOre",
+						"rule_test":{
+							"block": "minecraft:end_stone",
+							"predicate_type": "minecraft:block_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:chromium_ore"
+					}
+				}
+			],
+			"size": 10,
+			"discard_chance_on_air_exposure": 0
+		},
+		"type": "minecraft:ore"
+	},
+	"placement": [
+		{
+			"count": 4,
+			"type": "minecraft:count"
+		},
+		{
+			"type": "minecraft:in_square"
+		},
+		{
+			"height": {
+				"min_inclusive": {
+					"above_bottom": 0
+				},
+				"max_inclusive": {
+					"below_top": 0
+				},
+				"type": "minecraft:uniform"
+			},
+			"type": "minecraft:height_range"
+		},
+		{
+			"type": "assemblylinemachines:whitelist_biome",
+			"biome_id": "minecraft:the_end",
+			"whitelist": false
+		}
+	]
+}

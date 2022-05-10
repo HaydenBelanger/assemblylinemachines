@@ -1,0 +1,8 @@
+{
+	"variants":{
+		"axis=x": {"model": "assemblylinemachines:block/corrupt_basalt_emerald_ore", "x": 90, "y": 90},
+		"axis=y": {"model": "assemblylinemachines:block/corrupt_basalt_emerald_ore"},
+		"axis=z": {"model": "assemblylinemachines:block/corrupt_basalt_emerald_ore", "x": 90}
+	}
+	
+}

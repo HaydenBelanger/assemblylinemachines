@@ -1,7 +1,7 @@
 package me.haydenb.assemblylinemachines.client;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.ClickEvent.Action;
@@ -20,7 +20,7 @@ public class VersionCheck {
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public static void join(LoggedInEvent event) {
-		if(ConfigHolder.getClientConfig().receiveUpdateMessages.get()) {
+		if(Config.getClientConfig().receiveUpdateMessages().get()) {
 			CheckResult result = VersionChecker.getResult(AssemblyLineMachines.MOD_CONTAINER.get().getModInfo());
 			if(result.status() == Status.BETA_OUTDATED || result.status() == Status.OUTDATED) {
 				MutableComponent tc = new TextComponent("[AssemblyLineMachines] Update available, version " + result.target().getCanonical() + ". ").append(new TextComponent("Click to Update!").withStyle(ChatFormatting.DARK_GREEN));

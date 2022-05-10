@@ -1,0 +1,17 @@
+{
+  "feature": "assemblylinemachines:chaosbark/chaosbark_regular",
+  "placement": [
+    {
+      "predicate": {
+        "state": {
+          "Properties": {
+            "stage": "0"
+          },
+          "Name": "assemblylinemachines:chaosbark_sapling"
+        },
+        "type": "minecraft:would_survive"
+      },
+      "type": "minecraft:block_predicate_filter"
+    }
+  ]
+}

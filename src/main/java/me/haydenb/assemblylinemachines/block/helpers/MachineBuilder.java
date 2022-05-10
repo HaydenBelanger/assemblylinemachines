@@ -20,8 +20,9 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.client.Minecraft;

@@ -4,11 +4,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import me.haydenb.assemblylinemachines.plugins.PluginTOP;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ConfigMatchTest;
+import me.haydenb.assemblylinemachines.registry.utils.WhitelistBiomeFilter;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
+import me.haydenb.assemblylinemachines.world.CapabilityBooks;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(AssemblyLineMachines.MODID)
 public final class AssemblyLineMachines{
@@ -20,7 +24,7 @@ public final class AssemblyLineMachines{
 	public AssemblyLineMachines() {
 		
 		//Registers all sided-config files.
-		ConfigHolder.registerSpecs(ModLoadingContext.get());
+		Config.registerSpecs(ModLoadingContext.get());
 		
 		//Registers PacketHandler.
 		PacketHandler.register();
@@ -28,6 +32,11 @@ public final class AssemblyLineMachines{
 		//The One Probe plugin registration.
 		PluginTOP.register();
 		
+		//Registers Book Capability events using listeners.
+		CapabilityBooks.registerAllEvents();
 		
+		//Deferred vanilla-type registries.
+		ConfigMatchTest.RULE_TEST_REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
+		WhitelistBiomeFilter.PLACEMENT_MODIFIER_REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 }

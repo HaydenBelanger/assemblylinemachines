@@ -9,7 +9,8 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ConfigCondition;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -95,7 +96,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				if(b == null || b.tier < this.tier.tier) return ItemStack.EMPTY;
 				inv.getItem(0).setDamageValue(inv.getItem(0).getDamageValue() + i);
 				if(inv.getItem(0).getDamageValue() >= inv.getItem(0).getMaxDamage()) inv.getItem(0).shrink(1);
-				data.setCycles((float) grinds * ConfigHolder.getServerConfig().kineticGrinderCycleMultiplier.get().floatValue());
+				data.setCycles((float) grinds * Config.getServerConfig().kineticGrinderCycleMultiplier.get().floatValue());
 			}else {
 				data.setCycles((float) grinds * 2.3f);
 			}

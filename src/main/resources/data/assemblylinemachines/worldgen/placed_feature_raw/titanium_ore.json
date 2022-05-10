@@ -1,0 +1,61 @@
+{
+	"feature": {
+		"config": {
+			"targets": [
+				{
+					"target": {
+						"config_option": "titaniumOre",
+						"rule_test":{
+							"tag": "minecraft:stone_ore_replaceables",
+							"predicate_type": "minecraft:tag_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:titanium_ore"
+					}
+				},
+				{
+					"target": {
+						"config_option": "titaniumOre",
+						"rule_test":{
+							"tag": "minecraft:deepslate_ore_replaceables",
+							"predicate_type": "minecraft:tag_match"
+						},
+						"predicate_type": "assemblylinemachines:config"
+					},
+					"state": {
+						"Name": "assemblylinemachines:deepslate_titanium_ore"
+					}
+				}
+			],
+			"size": 5,
+			"discard_chance_on_air_exposure": 0
+		},
+		"type": "minecraft:ore"
+	},
+	"placement": [
+		{
+			"count": 7,
+			"type": "minecraft:count"
+		},
+		{
+			"type": "minecraft:in_square"
+		},
+		{
+			"height": {
+				"min_inclusive": {
+					"above_bottom": 0
+				},
+				"max_inclusive": {
+					"absolute": -16
+				},
+				"type": "minecraft:biased_to_bottom"
+			},
+			"type": "minecraft:height_range"
+		},
+		{
+			"type": "minecraft:biome"
+		}
+	]
+}

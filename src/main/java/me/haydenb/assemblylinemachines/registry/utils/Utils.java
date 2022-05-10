@@ -6,10 +6,11 @@ import java.util.function.BiFunction;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
 
-import me.haydenb.assemblylinemachines.registry.ConfigHandler.ConfigHolder;
+import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.*;
 import net.minecraft.network.FriendlyByteBuf;
@@ -34,6 +35,8 @@ import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class Utils {
 
+	public static final Gson GSON = new Gson();
+	
 	public static final Direction[] CARDINAL_DIRS = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 	
 	public static final Random RAND = new Random();
@@ -109,7 +112,7 @@ public class Utils {
 					Optional<Item> preferredResult = CACHED_SORTED_TAGS.get(tag.location().toString(), () ->{
 						List<Item> values = new ArrayList<>();
 						Registry.ITEM.getTagOrEmpty(tag).forEach((holder) -> values.add(holder.value()));
-						String preferredModid = ConfigHolder.getServerConfig().preferredModid.get();
+						String preferredModid = Config.getServerConfig().preferredModid.get();
 						if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
 							Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
 							if(optionalItem.isPresent()) return optionalItem;

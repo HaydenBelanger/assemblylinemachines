@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_column",
+    "textures": {
+        "end": "assemblylinemachines:block/corrupt/corrupt_basalt_top",
+        "side": "assemblylinemachines:block/corrupt/corrupt_basalt_side_1"
+    }
+}
