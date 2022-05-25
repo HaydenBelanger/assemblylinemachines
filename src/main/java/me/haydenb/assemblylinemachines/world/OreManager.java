@@ -5,10 +5,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.function.Supplier;
-
-import org.apache.commons.lang3.tuple.Triple;
 
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
@@ -43,7 +40,7 @@ public class OreManager {
 	
 	public static void registerOres() {
 		try {
-			Files.find(Paths.get(ClassLoader.getSystemResource("data/assemblylinemachines/worldgen/placed_feature_raw").toURI()), Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile()).forEach((p) -> {
+			Files.find(Paths.get(Thread.currentThread().getContextClassLoader().getResource("data/assemblylinemachines/worldgen/placed_feature_raw").toURI()), Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile()).forEach((p) -> {
 				try {
 					PlacedFeature.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(new InputStreamReader(new BufferedInputStream(Files.newInputStream(p)))))
 						.resultOrPartial((s) -> AssemblyLineMachines.LOGGER.fatal("In relation to " + p.getFileName().toString() + ": " + s)).ifPresent((cf) -> PLACED_FEATURES.add(cf));
@@ -63,14 +60,14 @@ public class OreManager {
 		LAPIS(() -> Items.LAPIS_LAZULI, 8, 18), REDSTONE(() -> Items.REDSTONE, 8, 10), 
 		TITANIUM(() -> Registry.getItem("raw_titanium"), 2, 2);
 		
-		private final Supplier<Item> itemDrop;
-		private final Supplier<Float> minDrop;
-		private final Supplier<Float> maxDrop;
+		public final Supplier<Item> itemDrop;
+		public final float minDrop;
+		public final float maxDrop;
 		
 		CorruptOres(Supplier<Item> drop, float minDrop, float maxDrop){
 			this.itemDrop = drop;
-			this.minDrop = () -> minDrop;
-			this.maxDrop = () -> maxDrop;
+			this.minDrop = minDrop;
+			this.maxDrop = maxDrop;
 		}
 		
 		public static void createCorruptOres(){
@@ -78,14 +75,6 @@ public class OreManager {
 				String ore = ores.toString().toLowerCase();
 				Registry.createBlock("corrupt_" + ore + "_ore", new CorruptBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(3f, 9f).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL), true);
 				Registry.createBlock("corrupt_basalt_" + ore + "_ore", new CorruptBlockWithAxis(Block.Properties.of(Material.STONE).sound(SoundType.STONE).strength(5f, 15f).requiresCorrectToolForDrops(), BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, false, true), true);
-			}
-		}
-		
-		public static void oreDropMap(HashMap<String, Triple<Supplier<Item>, Float, Float>> map){
-			for(CorruptOres ore : CorruptOres.values()) {
-				var triple = Triple.of(ore.itemDrop, ore.minDrop.get(), ore.maxDrop.get());
-				map.put("corrupt_" + ore.toString().toLowerCase() + "_ore", triple);
-				map.put("corrupt_basalt_" + ore.toString().toLowerCase() + "_ore", triple);
 			}
 		}
 	}

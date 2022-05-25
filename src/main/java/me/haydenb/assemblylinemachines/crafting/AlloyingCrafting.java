@@ -21,7 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.common.crafting.conditions.NotCondition;
+import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
@@ -39,11 +40,11 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	
 	private final CountIngredient parta;
 	private final CountIngredient partb;
-	private final Lazy<ItemStack> output;
+	private final PredicateLazy<ItemStack> output;
 	private final int time;
 	private final ResourceLocation id;
 	
-	public AlloyingCrafting(ResourceLocation id, CountIngredient parta, CountIngredient partb, Lazy<ItemStack> output, int time) {
+	public AlloyingCrafting(ResourceLocation id, CountIngredient parta, CountIngredient partb, PredicateLazy<ItemStack> output, int time) {
 		this.parta = parta;
 		this.partb = partb;
 		this.output = output;
@@ -53,7 +54,6 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(!this.showInJEI()) return false;
 		return ((parta.test(inv.getItem(1)) && partb.test(inv.getItem(2))) || (partb.test(inv.getItem(1)) && parta.test(inv.getItem(2))));
 	}
 	
@@ -110,11 +110,6 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 	
 	@Override
-	public boolean showInJEI() {
-		return !this.parta.isEmpty() && !this.partb.isEmpty() && !this.output.get().isEmpty();
-	}
-	
-	@Override
 	public List<?> getJEIComponents() {
 		return List.of(parta, partb, output.get());
 	}
@@ -131,7 +126,7 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			try {
 				CountIngredient ingredienta = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a"));
 				CountIngredient ingredientb = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b"));
-				Lazy<ItemStack> output = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
+				PredicateLazy<ItemStack> output = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output"));
 				
 				int time = GsonHelper.getAsInt(json, "time");
 				
@@ -151,7 +146,7 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			ItemStack output = buffer.readItem();
 			int time = buffer.readInt();
 			
-			return new AlloyingCrafting(recipeId, inputa, inputb, Lazy.of(() -> output), time);
+			return new AlloyingCrafting(recipeId, inputa, inputb, PredicateLazy.of(() -> output), time);
 		}
 
 		@Override
@@ -190,11 +185,12 @@ public class AlloyingCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			if(output.getSecond() > 1) outputJson.addProperty("count", output.getSecond());
 			json.add("output", outputJson);
 			
-			if(condition != null) {
-				JsonArray conditions = new JsonArray();
-				conditions.add(CraftingHelper.serialize(condition));
-				json.add("conditions", conditions);
-			}
+			JsonArray conditions = new JsonArray();
+			if(condition != null) conditions.add(CraftingHelper.serialize(condition));
+			if(json.getAsJsonObject("part_a").has("tag")) conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(json.getAsJsonObject("part_a").get("tag").getAsString()))));
+			if(json.getAsJsonObject("part_b").has("tag")) conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(json.getAsJsonObject("part_b").get("tag").getAsString()))));
+			conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(output.getFirst().location()))));
+			json.add("conditions", conditions);
 		}
 		
 		public AlloyResult addIMCIfTrue(boolean check) {

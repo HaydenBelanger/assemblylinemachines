@@ -58,7 +58,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 			BlockPos currentPos, BlockPos facingPos) {
 		if (!worldIn.isClientSide()) {
 			if (facing == stateIn.getValue(HorizontalDirectionalBlock.FACING)) {
-				if (worldIn.getBlockState(currentPos.relative(facing)).getBlock() == Blocks.AIR) {
+				if (worldIn.getBlockState(currentPos.relative(facing)).isAir()) {
 					return Blocks.AIR.defaultBlockState();
 				}
 			}

@@ -6,7 +6,7 @@ import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.plugins.PluginPatchouli;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -62,7 +62,7 @@ public class CapabilityBooks {
 		});
 		
 		if(FMLLoader.getDist() == Dist.CLIENT) bus.addListener((LoggedInEvent event) -> {
-			if(Config.getClientConfig().receiveGuideBook().get()) {
+			if(ALMConfig.getClientConfig().receiveGuideBook().get()) {
 				AssemblyLineMachines.LOGGER.debug("Sending request for guide to server from player " + event.getPlayer().getDisplayName().getString() + ".");
 				PacketData pd = new PacketData("request_book");
 				pd.writeUUID("uuid", event.getPlayer().getUUID());
@@ -74,7 +74,7 @@ public class CapabilityBooks {
 	
 	//Receives packet request from server to give book to player by UUID.
 	public static void guideBookServerRequestHandler(UUID uuid) {
-		if(Config.getServerConfig().distributeGuideBook.get()) {
+		if(ALMConfig.getServerConfig().distributeGuideBook().get()) {
 			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
 			if(player == null) throw new NullPointerException("UUID-based player lookup failed.");
 			AssemblyLineMachines.LOGGER.debug("Received request to dispense book for player " + player.getDisplayName().getString() + ".");

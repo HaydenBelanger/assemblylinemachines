@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.config.Config.Common;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig.Common;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
@@ -29,7 +29,7 @@ public class ConfigCondition implements ICondition {
 		this.fieldResult = Lazy.of(() -> {
 			try {
 				Field field = ObfuscationReflectionHelper.findField(Common.class, configOption);
-				Object obj = field.get(Config.getCommonConfig());
+				Object obj = field.get(ALMConfig.getCommonConfig());
 				return Optional.of(((BooleanValue) obj).get());
 			} catch (Exception e) {
 				e.printStackTrace();

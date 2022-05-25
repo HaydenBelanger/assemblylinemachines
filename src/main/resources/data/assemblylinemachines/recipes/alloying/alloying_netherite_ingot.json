@@ -1,0 +1,15 @@
+{
+	"type": "assemblylinemachines:alloying",
+	"part_a":{
+		"tag": "forge:ores/netherite_scrap",
+		"count": 2
+	},
+	"part_b":{
+		"tag": "forge:dusts/gold",
+		"count": 4
+	},
+	"output":{
+		"item": "minecraft:netherite_ingot"
+	},
+	"time": 350
+}

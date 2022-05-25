@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:bedrock"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_bedrock"
+	}
+}

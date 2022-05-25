@@ -513,7 +513,6 @@ public class Registry {
 		createBlock("attuned_titanium_fluid_tank", new BlockFluidTank(5000000, TemperatureResistance.HOT, 0xffe69ee6), true);
 		
 		createBlock("novasteel_fluid_tank", new BlockFluidTank(50000000, TemperatureResistance.HOT, 0xff111d63), true);
-		createBlock("silt_mystium", Material.CLAY, 1f, 2f, SoundType.GRAVEL, false, true);
 		createBlock("prism_glass", new Block(Block.Properties.of(Material.GLASS).sound(SoundType.GLASS).lightLevel((state) -> 15).noOcclusion()), true);
 		
 		createBlock("raw_chromium_block", Material.STONE, 5f, 6f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, TagMaster.NEEDS_NETHERITE_TOOL, true);
@@ -538,10 +537,10 @@ public class Registry {
 		createFluid("dark_energy", new FluidDarkEnergy(true), new FluidDarkEnergy(false), new FluidDarkEnergyBlock(() -> Registry.getFluid("dark_energy")), true);
 		createFluid("glacier_water", new FluidGlacierWater(true), new FluidGlacierWater(false), new FluidGlacierWaterBlock(() -> Registry.getFluid("glacier_water")), true);
 		
-		createFluid("ethane", 0, true, false, false, 0, 0, 0);
-		createFluid("ethylene", 0, true, false, false, 0, 0, 0);
-		createFluid("propane", 0, true, false, false, 0, 0, 0);
-		createFluid("propylene", 0, true, false, false, 0, 0, 0);
+		createFluid("ethane", 0, true, false, false, 19, 95, 15);
+		createFluid("ethylene", 0, true, false, false, 179, 170, 195);
+		createFluid("propane", 0, true, false, false, 95, 15, 28);
+		createFluid("propylene", 0, true, false, false, 40, 13, 85);
 		
 		MOD_BLOCK_REGISTRY.add().values().forEach((b) -> event.getRegistry().register(b));
 	}
@@ -985,17 +984,17 @@ public class Registry {
 		return MOD_BLOCK_REGISTRY.get(name);
 	}
 	
-	public static Collection<Block> getAllBlocksUnmodifiable(){
+	public static Collection<Block> getAllBlocks(){
 		return Collections.unmodifiableCollection(MOD_BLOCK_REGISTRY.values());
-	}
-	
-	public static List<Block> getAllBlocksModifiable(){
-		return new ArrayList<>(MOD_BLOCK_REGISTRY.values());
 	}
 	
 	//FLUIDS
 	public static ForgeFlowingFluid getFluid(String name) {
 		return MOD_FLUID_REGISTRY.get(name);
+	}
+	
+	public static Collection<ForgeFlowingFluid> getAllFluids() {
+		return Collections.unmodifiableCollection(MOD_FLUID_REGISTRY.values());
 	}
 	
 	public static ForgeFlowingFluid.Properties createFluidProperties(String name, int temperature, boolean gaseous, boolean block, boolean bucket){
@@ -1057,10 +1056,6 @@ public class Registry {
 			MOD_FLUID_REGISTRY.put(name, still);
 		}
 		
-	}
-	
-	public static Collection<ForgeFlowingFluid> getAllFluids() {
-		return MOD_FLUID_REGISTRY.values();
 	}
 	
 	//TILE ENTITIES

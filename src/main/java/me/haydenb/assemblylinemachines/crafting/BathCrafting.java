@@ -13,7 +13,7 @@ import me.haydenb.assemblylinemachines.block.machines.BlockFluidBath.TEFluidBath
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import me.haydenb.assemblylinemachines.registry.utils.IFluidHandlerBypass;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
@@ -160,7 +160,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			if(data.blockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
 				inv.getItem(0).shrink(1);
 				inv.getItem(1).shrink(1);
-				data.setCycles(Math.round((float) stirs * Config.getServerConfig().kineticFluidMixerCycleMultiplier.get().floatValue()));
+				data.setCycles(Math.round((float) stirs * ALMConfig.getServerConfig().kineticMachineCycleModifier().get().floatValue()));
 			}else {
 				inv.getItem(1).shrink(1);
 				inv.getItem(2).shrink(1);

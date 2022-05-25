@@ -3,9 +3,8 @@ package me.haydenb.assemblylinemachines.block.energy;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
-import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -115,13 +114,8 @@ public class BlockToolCharger extends BlockTileEntity{
 		private String prevStatusMessage = "";
 		private int timer = 0;
 		
-		private final int configMaxChargeRate;
-		private final int configMaxCapacity;
-		
 		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
-			this.configMaxChargeRate = Config.getServerConfig().toolChargerChargeRate.get();
-			this.configMaxCapacity = Config.getServerConfig().toolChargerMaxEnergyStorage.get();
 		}
 
 		public TEToolCharger(BlockPos pos, BlockState state) {
@@ -134,8 +128,8 @@ public class BlockToolCharger extends BlockTileEntity{
 			@Override
 			public int receiveEnergy(int maxReceive, boolean simulate) {
 
-				if (configMaxCapacity < maxReceive + amount) {
-					maxReceive = configMaxCapacity - amount;
+				if (100000 < maxReceive + amount) {
+					maxReceive = 100000 - amount;
 				}
 
 				if (simulate == false) {
@@ -245,8 +239,8 @@ public class BlockToolCharger extends BlockTileEntity{
 								
 								int max;
 								
-								if(amount >= this.configMaxChargeRate) {
-									max = this.configMaxChargeRate;
+								if(amount >= 10000) {
+									max = 10000;
 								}else {
 									max = amount;
 								}
@@ -275,7 +269,7 @@ public class BlockToolCharger extends BlockTileEntity{
 							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 						}
 					}
-					prevStatusMessage = prevStatusMessage + " (" + FormattingHelper.GENERAL_FORMAT.format(amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(configMaxCapacity) + " FE)";
+					prevStatusMessage = prevStatusMessage + " (" + FormattingHelper.GENERAL_FORMAT.format(amount) + "/100,000 FE)";
 					sendUpdates();
 				}
 			}

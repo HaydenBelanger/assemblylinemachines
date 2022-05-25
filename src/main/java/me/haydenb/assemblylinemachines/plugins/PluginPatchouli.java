@@ -12,9 +12,7 @@ public class PluginPatchouli {
 	public static final Lazy<PatchouliInterface> INTERFACE = Lazy.of(() -> {
 		if(ModList.get().isLoaded("patchouli")) {
 			try {
-				PatchouliInterface pInt = Class.forName("me.haydenb.assemblylinemachines.plugins.PluginPatchouli$PatchouliPresent").asSubclass(PatchouliInterface.class).getDeclaredConstructor().newInstance();
-				AssemblyLineMachines.LOGGER.debug("Patchouli plugin connected to Assembly Line Machines.");
-				return pInt;
+				return Class.forName("me.haydenb.assemblylinemachines.plugins.PluginPatchouli$PatchouliPresent").asSubclass(PatchouliInterface.class).getDeclaredConstructor().newInstance();
 			}catch(Exception e) {
 				e.printStackTrace();
 			}

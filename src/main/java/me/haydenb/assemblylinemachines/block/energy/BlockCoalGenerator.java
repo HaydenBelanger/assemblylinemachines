@@ -13,7 +13,6 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
 import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.ChatFormatting;
@@ -148,8 +147,6 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 		private int genper = 0;
 		private int timeremaining = 0;
 		private int timer = 0;
-		private Integer multiplier = null;
-		private Integer naphthaTimeIncrease = null;
 		private boolean naphthaActive = false;
 		
 		public TECoalGenerator(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
@@ -214,13 +211,11 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 							}else {
 								naphthaActive = false;
 							}
-							if(multiplier == null) multiplier = Config.getServerConfig().coalGeneratorMultiplier.get();
-							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0), RecipeType.SMELTING) * multiplier);
+							int burnTime = Math.round((float) ForgeHooks.getBurnTime(contents.get(0), RecipeType.SMELTING) * 2);
 							if(burnTime != 0) {
 								contents.get(0).shrink(1);
 								genper = Math.round((float)(burnTime * 3f) / 90f);
 								if(naphthaActive) {
-									if(naphthaTimeIncrease == null) naphthaTimeIncrease = Config.getServerConfig().naphthaTurbineMultiplier.get();
 									timeremaining = 60 * 4;
 								}else {
 									timeremaining = 60;
@@ -290,12 +285,10 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 			int y = (this.height - this.imageHeight) / 2;
 			if(mouseX >= x+74 && mouseY >= y+33 && mouseX <= x+91 && mouseY <= y+50) {
 				List<Component> tt = getTooltipFromItem(stack);
-				if(tsfm.multiplier == null) tsfm.multiplier = Config.getServerConfig().coalGeneratorMultiplier.get();
-				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) * tsfm.multiplier);
+				int burnTime = Math.round((float) ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) * 2);
 				float mul;
 				if(tsfm.naphthaActive) {
-					if(tsfm.naphthaTimeIncrease == null) tsfm.naphthaTimeIncrease = Config.getServerConfig().naphthaTurbineMultiplier.get();
-					mul = 60f * tsfm.naphthaTimeIncrease;
+					mul = 60f * 4;
 				}else {
 					mul = 60f;
 				}
@@ -316,8 +309,7 @@ public class BlockCoalGenerator extends BlockScreenBlockEntity<BlockCoalGenerato
 			if(tsfm.timeremaining != 0) {
 				int prog2;
 				if(tsfm.naphthaActive) {
-					if(tsfm.naphthaTimeIncrease == null) tsfm.naphthaTimeIncrease = Config.getServerConfig().naphthaTurbineMultiplier.get();
-					prog2 = Math.round(((float) tsfm.timeremaining / (60f * tsfm.naphthaTimeIncrease)) * 12F);
+					prog2 = Math.round(((float) tsfm.timeremaining / (60f * 4)) * 12F);
 					super.blit(x+77, y+19 + (12 - prog2), 189, 52 + (12 - prog2), 13, prog2);
 				}else {
 					prog2 = Math.round(((float) tsfm.timeremaining / 60f) * 12F);

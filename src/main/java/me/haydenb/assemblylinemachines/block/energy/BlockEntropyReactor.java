@@ -17,7 +17,7 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import net.minecraft.ChatFormatting;
@@ -1006,7 +1006,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 				}
 			}
 			
-			if(!hasUpgrade && entropy > 0.98f && Config.getServerConfig().reactorExplosions.get()) {
+			if(!hasUpgrade && entropy > 0.98f && ALMConfig.getServerConfig().reactorExplosions().get()) {
 				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
 				entropy = 0f;
 			}

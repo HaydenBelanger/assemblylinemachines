@@ -4,7 +4,7 @@
 			"targets": [
 				{
 					"target": {
-						"config_option": "chromiumOre",
+						"config_option": ["chromiumOre"],
 						"rule_test":{
 							"block": "minecraft:end_stone",
 							"predicate_type": "minecraft:block_match"
@@ -43,7 +43,7 @@
 		},
 		{
 			"type": "assemblylinemachines:whitelist_biome",
-			"biome_id": "minecraft:the_end",
+			"biome_id": ["minecraft:the_end"],
 			"whitelist": false
 		}
 	]

@@ -4,7 +4,7 @@
 			"targets": [
 				{
 					"target": {
-						"config_option": "titaniumOre",
+						"config_option": ["titaniumOre"],
 						"rule_test":{
 							"tag": "minecraft:stone_ore_replaceables",
 							"predicate_type": "minecraft:tag_match"
@@ -17,7 +17,7 @@
 				},
 				{
 					"target": {
-						"config_option": "titaniumOre",
+						"config_option": ["titaniumOre"],
 						"rule_test":{
 							"tag": "minecraft:deepslate_ore_replaceables",
 							"predicate_type": "minecraft:tag_match"

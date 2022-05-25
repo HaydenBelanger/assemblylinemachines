@@ -10,6 +10,7 @@ import me.haydenb.assemblylinemachines.block.machines.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockOmnivoid.TEOmnivoid;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.item.ItemSpores;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig.PreInit;
 import me.haydenb.assemblylinemachines.world.CapabilityBooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -20,9 +21,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 public class PacketHandler {
 
 	public static final HashMap<String, BiConsumer<PacketData, Level>> PACKET_TARGETS = new HashMap<>();
-	
 	static {
-		
 		//CLIENT -> SERVER
 		PACKET_TARGETS.put("item_pipe_gui", (pd, world) -> PipeConnectorTileEntity.updateDataFromPacket(pd, world));
 		PACKET_TARGETS.put("battery_cell_gui", (pd, world) -> TEBatteryCell.updateDataFromPacket(pd, world));
@@ -41,6 +40,7 @@ public class PacketHandler {
 		PACKET_TARGETS.put("vacuum_hopper_particles", (pd, world) -> BlockVacuumHopper.spawnTeleparticles(pd));
 		PACKET_TARGETS.put("experience_hopper_particles", (pd, world) -> BlockExperienceHopper.spawnTeleparticles(pd));
 		PACKET_TARGETS.put("spores_growth", (pd, world) -> ItemSpores.spawnGrowParticles(pd));
+		PACKET_TARGETS.put("experimental_verify", (pd, world) -> PreInit.connectReceiveValidateRequest(pd));
 	}
 	
 	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);
@@ -84,6 +84,10 @@ public class PacketHandler {
 			map.put(key, value);
 		}
 		
+		public void writeByteArray(String key, byte[] value) {
+			map.put(key, value);
+		}
+		
 		public <T> T get(String key, Class<T> clazz) {
 			return clazz.cast(map.get(key));
 		}
@@ -116,9 +120,10 @@ public class PacketHandler {
 				}else if(val instanceof UUID uuid) {
 					buf.writeUtf("UUID");
 					buf.writeUUID(uuid);
-				}else {
-					throw new IllegalArgumentException("Illegal member in PacketData.");
-				}
+				}else if(val instanceof byte[] byteArray){
+					buf.writeUtf("ByteArray");
+					buf.writeByteArray(byteArray);
+				}else throw new IllegalArgumentException("Illegal member in PacketData.");
 			});
 		}, (t) -> {
 			//Decoder
@@ -130,6 +135,7 @@ public class PacketHandler {
 				case "BlockPos" -> buf.readBlockPos();
 				case "Double" -> buf.readDouble();
 				case "UUID" -> buf.readUUID();
+				case "ByteArray" -> buf.readByteArray();
 				default -> throw new IllegalArgumentException("Unexpected result from packet.");
 				};
 			}));

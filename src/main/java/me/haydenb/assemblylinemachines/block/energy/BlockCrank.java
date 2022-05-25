@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -80,8 +80,7 @@ public class BlockCrank extends Block {
 					if(crankable.perform()) {
 						world.playSound(null, pos, SoundEvents.WOOD_STEP, SoundSource.BLOCKS, 0.7f, 1f + getPitchNext(world.getRandom()));
 					}else {
-						int chance = Config.getServerConfig().crankSnapChance.get();
-						if(chance != -1 && world.getRandom().nextInt(chance) == 0) {
+						if(world.getRandom().nextDouble() < ALMConfig.getServerConfig().crankSnapChance().get()) {
 							world.playSound(null, pos, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.BLOCKS, 1f, 1f);
 							world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 							Utils.spawnItem(new ItemStack(Items.STICK, 5), pos, world);
@@ -107,7 +106,7 @@ public class BlockCrank extends Block {
 			BlockPos currentPos, BlockPos facingPos) {
 		if (!worldIn.isClientSide()) {
 			if (facing == stateIn.getValue(HorizontalDirectionalBlock.FACING).getOpposite()) {
-				if (worldIn.getBlockState(currentPos.relative(facing)).getBlock() == Blocks.AIR) {
+				if (worldIn.getBlockState(currentPos.relative(facing)).isAir()) {
 					return Blocks.AIR.defaultBlockState();
 				}
 			}

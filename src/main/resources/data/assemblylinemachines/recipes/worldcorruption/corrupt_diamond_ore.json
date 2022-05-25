@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:world_corruption",
 	"input":{
-		"tag": "forge:ores/diamond"
+		"item": "minecraft:diamond_ore"
 	},
 	"output":{
 		"item": "assemblylinemachines:corrupt_diamond_ore"

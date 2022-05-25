@@ -11,7 +11,7 @@ import com.google.common.collect.Multimap;
 
 import me.haydenb.assemblylinemachines.block.pipes.BlockPipe;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -109,9 +109,9 @@ public class ItemWrenchOMatic extends Item {
 				return WRATH_MODE_ATTRIBUTE_CACHE.get(engineersFuryLevel, () -> {
 					Multimap<Attribute, AttributeModifier> attributes = ArrayListMultimap.create();
 					
-					attributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Damage", Config.getServerConfig().wrenchAttack.get(), Operation.ADDITION));
+					attributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Damage", ALMConfig.getServerConfig().engineersFuryMultiplier().get(), Operation.ADDITION));
 					attributes.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Attack Speed", -0.8d, Operation.ADDITION));
-					attributes.put(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(KNOCKBACK_UUID, "Knockback", Math.min(5d, Config.getServerConfig().wrenchKnockback.get() + (engineersFuryLevel * Config.getServerConfig().engineersFuryKnockbackMultiplier.get())), Operation.ADDITION));
+					attributes.put(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(KNOCKBACK_UUID, "Knockback", Math.min(5d, 0.5d + (engineersFuryLevel * ALMConfig.getServerConfig().engineersFuryMultiplier().get())), Operation.ADDITION));
 					return attributes;
 				});
 			}catch(ExecutionException e) {

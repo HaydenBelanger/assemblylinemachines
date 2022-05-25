@@ -3,24 +3,22 @@ package me.haydenb.assemblylinemachines.block.machines;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.BasicTileEntity;
 import me.haydenb.assemblylinemachines.crafting.BathCrafting;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick;
 import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResistance;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.*;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
@@ -37,14 +35,11 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
-import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class BlockFluidBath extends Block implements EntityBlock {
 	
 	public static final List<Item> VALID_FILL_ITEMS = List.of(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.POTION);
-	public static final Lazy<List<Item>> DISALLOWED_ITEMS = Lazy.of(() -> Lists.transform(Config.getServerConfig().disallowedFluidBathItems.get(), (o) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(o.toString()))));
 	
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
@@ -168,7 +163,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 							}else {
 								if (entity.inputa == null) {
 									Item i = held.getItem();
-									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && !DISALLOWED_ITEMS.get().contains(i) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
 										entity.inputa = new ItemStack(held.getItem());
 										held.shrink(1);
 										entity.sendUpdates();
@@ -178,7 +173,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 								} else if (entity.inputb == null) {
 									Item i = held.getItem();
-									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && !DISALLOWED_ITEMS.get().contains(i) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
+									if (!held.isEmpty() && !(i instanceof ItemStirringStick) && i != Registry.getItem("sludge") && i != Items.BUCKET && i != Items.LAVA_BUCKET && i != Items.WATER_BUCKET) {
 										world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS,
 												1f, 1f);
 										entity.inputb = new ItemStack(held.getItem());
@@ -196,7 +191,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 											
 											
 										}else {
-											if(!Config.getServerConfig().invalidBathReturnsSludge.get()) {
+											if(!ALMConfig.getServerConfig().invalidBathReturnsSludge().get()) {
 												entity.inputIngredientReturn = Pair.of(entity.inputa, entity.inputb);
 											}
 											entity.sendUpdates();

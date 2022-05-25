@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:world_corruption",
 	"input":{
-		"tag": "forge:ores/gold"
+		"item": "minecraft:gold_ore"
 	},
 	"output":{
 		"item": "assemblylinemachines:corrupt_gold_ore"

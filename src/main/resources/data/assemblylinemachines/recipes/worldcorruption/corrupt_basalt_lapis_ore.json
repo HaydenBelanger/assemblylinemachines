@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:deepslate_lapis_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_basalt_lapis_ore"
+	}
+}

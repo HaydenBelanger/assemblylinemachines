@@ -15,7 +15,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import me.haydenb.assemblylinemachines.registry.utils.ScreenMath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -133,7 +133,7 @@ public class TooltipBorderHandler {
 	@OnlyIn(Dist.CLIENT)
 	public static boolean getColorsEnabled() {
 		if(colors == null) {
-			colors = Config.getClientConfig().customTooltipColors().get();
+			colors = ALMConfig.getClientConfig().customTooltipColors().get();
 		}
 		return colors;
 	}
@@ -141,7 +141,7 @@ public class TooltipBorderHandler {
 	@OnlyIn(Dist.CLIENT)
 	public static boolean getFramesEnabled() {
 		if(frames == null) {
-			frames = getColorsEnabled() ? Config.getClientConfig().customTooltipFrames().get() : false;
+			frames = getColorsEnabled() ? ALMConfig.getClientConfig().customTooltipFrames().get() : false;
 		}
 		return frames;
 	}

@@ -7,7 +7,9 @@ import java.util.Optional;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.ItemAEFG;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig.Stats;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig.ToolDefaults;
 import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
@@ -23,6 +25,7 @@ import net.minecraft.world.item.enchantment.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -180,11 +183,11 @@ public interface IToolWithCharge{
 	}
 	
 	public static enum PowerToolType{
-		CRANK("assemblylinemachines:cranks", 1, 30, false, new TextComponent("Cranks").withStyle(ChatFormatting.GOLD), false, null, 0.0f, Config.getServerConfig().crankToolMaxCranks.get(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
-		MYSTIUM("assemblylinemachines:fe", 150, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_PURPLE), true, "mystium_farmland", 0.1f, Config.getServerConfig().mystiumMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
-		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_AQUA), true, "nova_farmland", 0.25f, Config.getServerConfig().novasteelToolMaxFE.get(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
+		CRANK("assemblylinemachines:cranks", 1, 30, false, new TextComponent("Cranks").withStyle(ChatFormatting.GOLD), false, null, 0.0f, ToolDefaults.CRANK.get(Stats.SP_ENERGY).intValue(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_PURPLE), true, "mystium_farmland", 0.1f, ToolDefaults.MYSTIUM.get(Stats.SP_ENERGY).intValue(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_AQUA), true, "nova_farmland", 0.25f, ToolDefaults.NOVASTEEL.get(Stats.SP_ENERGY).intValue(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
 		AEFG("assemblylinemachines:fe", 1, 1, false, new TextComponent("FE").withStyle(ChatFormatting.BLUE), true, null, 0.0f, 10000000, 0x0, null),
-		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, MYSTIUM.friendlyNameOfUnit, true, null, 0.0f, Config.getServerConfig().enhancedMystiumChestplateMaxFE.get(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png"));
+		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, MYSTIUM.friendlyNameOfUnit, true, null, 0.0f, ToolDefaults.MYSTIUM.get(Stats.SP_ENH_ENERGY).intValue(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png"));
 		
 		public final String keyName;
 		public final int costMultiplier;
@@ -227,11 +230,11 @@ public interface IToolWithCharge{
 	public static class EnchantmentOverclock extends Enchantment{
 	
 		public static final EnchantmentCategory POWER_TOOLS = EnchantmentCategory.create("POWER_TOOLS", (item) -> item instanceof IToolWithCharge);
-		private final float multiplier;
+		private final Lazy<Float> multiplier;
 		
 		public EnchantmentOverclock() {
 			super(Rarity.RARE, POWER_TOOLS, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
-			this.multiplier = Config.getServerConfig().overclockEnchantmentMultiplier.get().floatValue();
+			this.multiplier = Lazy.of(() -> ALMConfig.getServerConfig().overclockMultiplier().get().floatValue());
 		}
 		
 		@Override
@@ -250,7 +253,7 @@ public interface IToolWithCharge{
 		}
 		
 		public float getMultiplier() {
-			return this.multiplier;
+			return this.multiplier.get();
 		}
 		
 	}

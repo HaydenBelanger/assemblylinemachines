@@ -2,12 +2,11 @@ package me.haydenb.assemblylinemachines.registry.config;
 
 import java.util.*;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.config.Config.Common;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig.Common;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
@@ -23,7 +22,7 @@ public class ConfigMatchTest extends RuleTest {
 	public static final Codec<ConfigMatchTest> CODEC = RecordCodecBuilder.<ConfigMatchTest>create((instance) -> {
 		return instance.group(
 		Codec.BOOL.optionalFieldOf("enabled_on", true).forGetter((value) -> value.enableOn),
-		Codec.either(Codec.STRING, Codec.list(Codec.STRING)).fieldOf("config_option").forGetter((value) -> Either.right(value.configOptions)),
+		Codec.list(Codec.STRING).fieldOf("config_option").forGetter((value) -> value.configOptions),
 		RuleTest.CODEC.fieldOf("rule_test").forGetter((value) -> value.ruleTest))
 		.apply(instance, ConfigMatchTest::new);
 	});
@@ -36,14 +35,14 @@ public class ConfigMatchTest extends RuleTest {
 	private final List<String> configOptions;
 	private final Lazy<Optional<Boolean>> passedAllOptions;
 
-	public ConfigMatchTest(boolean enableOn, Either<String, List<String>> configOptions, RuleTest ruleTest) {
+	public ConfigMatchTest(boolean enableOn, List<String> configOptions, RuleTest ruleTest) {
 		this.enableOn = enableOn;
 		this.ruleTest = ruleTest;
-		this.configOptions = configOptions.right().orElse(List.of(configOptions.left().get()));
+		this.configOptions = configOptions;
 		this.passedAllOptions = Lazy.of(() -> {
 			for(String configOption : this.configOptions) {
 				try {
-					boolean result = ((BooleanValue) ObfuscationReflectionHelper.findField(Common.class, configOption).get(Config.getCommonConfig())).get();
+					boolean result = ((BooleanValue) ObfuscationReflectionHelper.findField(Common.class, configOption).get(ALMConfig.getCommonConfig())).get();
 					if(result != enableOn) return Optional.of(false);
 				}catch(Exception e) {
 					e.printStackTrace();

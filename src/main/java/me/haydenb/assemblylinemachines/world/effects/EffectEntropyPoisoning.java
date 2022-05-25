@@ -9,7 +9,6 @@ import net.minecraft.world.effect.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 
 public class EffectEntropyPoisoning extends MobEffect {
 
@@ -51,7 +50,7 @@ public class EffectEntropyPoisoning extends MobEffect {
 						BlockPos rand2 = pos.relative(Direction.UP);
 						
 						
-						if(world.getBlockState(rand).getBlock() == Blocks.AIR && world.getBlockState(rand2).getBlock() == Blocks.AIR) {
+						if(world.getBlockState(rand).isAir() && world.getBlockState(rand2).isAir()) {
 							livingEntity.moveTo(rand.getX() + 0.5, rand.getY() + 0.5, rand.getZ() + 0.5, (r.nextFloat() * 360f) - 180f, (r.nextFloat() * 180f) - 90f);
 						}
 					}

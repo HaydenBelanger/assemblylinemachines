@@ -15,17 +15,11 @@
 			"link_recipe": true,
 			"text": "Place $(thing)1 Ender Pearl and 1 Mystium Blend$() as the filter items, and $(item)1 Pure Titanium Ingot$() in the main spot, to get $(9)1 Attuned Titanium Ingot.$()"
 		},
-		{ 
-			"type": "spotlight",
-			"item": "assemblylinemachines:silt_mystium",
-			"link_recipe": true,
-			"text": "Using the latent power of the $(l:blocks/entropy_reactor)Entropy Reactor,$(/l) you will be able to create your next resource: $(item)Flerovium Ore.$()$(p)This is obtained by intentionally inducing a high level of $(c)Entropy$() and allowing the device to corrupt blocks in a surrounding area."
-		},
 		{
 			"type": "spotlight",
-			"item": "assemblylinemachines:flerovium_ore",
+			"item": "assemblylinemachines:flerovium_ingot",
 			"link_recipe": true,
-			"text": "Create $(thing)Mystium Silt$() by combining Silt and Mystium Blend in a Fluid Mixer, and place in the world near the Entropy Reactor. With time, the Mystium Silt will be replaced with $(item)Flerovium Ore.$()$(p)$(4)Note that Flerovium Ore is tough, and requires a Mystium tool or better to be harvested."
+			"text": "Create $(thing)Flerovium Ingots$() by placing a Mystium Block near an Entropy Reactor that is above at least 50% $(4)Entropy$(), and with time, the Mystium Block will become a $(thing)Flerovium Block."
 		},
 		{
 			"type": "spotlight",

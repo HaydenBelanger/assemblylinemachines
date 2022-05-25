@@ -20,9 +20,9 @@
 				},
 				{
 					"target": {
-						"config_option": "blackGranite",
+						"config_option": ["blackGranite"],
 						"rule_test":{
-							"config_option": "blackGraniteNaturalTag",
+							"config_option": ["blackGraniteNaturalTag"],
 							"enabled_on": false,
 							"rule_test":{
 								"tag": "minecraft:base_stone_nether",

@@ -9,10 +9,11 @@ import com.google.gson.JsonObject;
 import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
-import me.haydenb.assemblylinemachines.registry.config.Config;
-import me.haydenb.assemblylinemachines.registry.config.ConfigCondition;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.utils.*;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
+import me.haydenb.assemblylinemachines.registry.config.ConfigCondition;
+import me.haydenb.assemblylinemachines.registry.utils.PredicateLazy;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.NotCondition;
+import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -41,7 +44,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	public static final GrinderSerializer SERIALIZER = new GrinderSerializer();
 	
 	private final Lazy<Ingredient> input;
-	private final Lazy<ItemStack> output;
+	private final PredicateLazy<ItemStack> output;
 
 	public final int grinds;
 	public final Blade tier;
@@ -49,7 +52,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	private final boolean machineReqd;
 	public final float chanceToDouble;
 	
-	public GrinderCrafting(ResourceLocation id, Lazy<Ingredient> input, Lazy<ItemStack> output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
+	public GrinderCrafting(ResourceLocation id, Lazy<Ingredient> input, PredicateLazy<ItemStack> output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
 		this.input = input;
 		this.output = output;
 		this.grinds = grinds;
@@ -61,7 +64,6 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(!this.showInJEI()) return false;
 		
 		if(inv instanceof Inventory) {
 			if(machineReqd == true) {
@@ -96,7 +98,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				if(b == null || b.tier < this.tier.tier) return ItemStack.EMPTY;
 				inv.getItem(0).setDamageValue(inv.getItem(0).getDamageValue() + i);
 				if(inv.getItem(0).getDamageValue() >= inv.getItem(0).getMaxDamage()) inv.getItem(0).shrink(1);
-				data.setCycles((float) grinds * Config.getServerConfig().kineticGrinderCycleMultiplier.get().floatValue());
+				data.setCycles((float) grinds * ALMConfig.getServerConfig().kineticMachineCycleModifier().get().floatValue());
 			}else {
 				data.setCycles((float) grinds * 2.3f);
 			}
@@ -119,11 +121,6 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	@Override
 	public boolean isSpecial() {
 		return true;
-	}
-	
-	@Override
-	public boolean showInJEI() {
-		return !this.input.get().isEmpty() && !this.output.get().isEmpty();
 	}
 	
 	@Override
@@ -157,8 +154,8 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		@Override
 		public GrinderCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
-				Lazy<Ingredient> input = CountIngredient.getValidatedIngredient(GsonHelper.getAsJsonObject(json, "input"));
-				Lazy<ItemStack> supplier = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
+				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
+				PredicateLazy<ItemStack> supplier = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output"));
 				
 				int grinds = GsonHelper.getAsInt(json, "grinds");
 				Blade tier = Blade.valueOf(Blade.class, GsonHelper.getAsString(json, "bladetype"));
@@ -193,7 +190,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			boolean machineReqd = buffer.readBoolean();
 			float chanceToDouble = buffer.readFloat();
 			
-			return new GrinderCrafting(recipeId, Lazy.of(() -> input), Lazy.of(() -> stack), grinds, tier, machineReqd, chanceToDouble);
+			return new GrinderCrafting(recipeId, Lazy.of(() -> input), PredicateLazy.of(() -> stack), grinds, tier, machineReqd, chanceToDouble);
 		}
 
 		@Override
@@ -248,11 +245,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			if(outputCount != 1) outputJson.addProperty("count", outputCount);
 			json.add("output", outputJson);
 			
-			if(condition != null) {
-				JsonArray conditions = new JsonArray();
-				conditions.add(CraftingHelper.serialize(condition));
-				json.add("conditions", conditions);
-			}
+			JsonArray conditions = new JsonArray();
+			if(condition != null) conditions.add(CraftingHelper.serialize(condition));
+			if(json.getAsJsonObject("input").has("tag")) conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(json.getAsJsonObject("input").get("tag").getAsString()))));
+			conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(outputTag.location()))));
+			json.add("conditions", conditions);
 		}
 		
 		public GrinderResult addIMCIfTrue(boolean check) {

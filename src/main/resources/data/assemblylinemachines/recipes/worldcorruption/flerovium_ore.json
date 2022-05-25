@@ -1,9 +1,0 @@
-{
-	"type": "assemblylinemachines:world_corruption",
-	"input":{
-		"item": "assemblylinemachines:silt_mystium"
-	},
-	"output":{
-		"item": "assemblylinemachines:flerovium_ore"
-	}
-}

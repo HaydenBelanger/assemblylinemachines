@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.registry.utils;
 import java.util.List;
 import java.util.Random;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -19,7 +18,7 @@ public class WhitelistBiomeFilter extends BiomeFilter{
 
 	public static final Codec<WhitelistBiomeFilter> CODEC = RecordCodecBuilder.create((instance) -> {
 		return instance.group(
-		Codec.either(ResourceLocation.CODEC, Codec.list(ResourceLocation.CODEC)).fieldOf("biome_id").forGetter((value) -> Either.right(value.biomes)),
+		Codec.list(ResourceLocation.CODEC).fieldOf("biome_id").forGetter((value) -> value.biomes),
 		Codec.BOOL.optionalFieldOf("whitelist", true).forGetter((value) -> value.whitelist))
 		.apply(instance, WhitelistBiomeFilter::new);
 	});
@@ -30,8 +29,8 @@ public class WhitelistBiomeFilter extends BiomeFilter{
 	private final List<ResourceLocation> biomes;
 	private final boolean whitelist;
 	
-	public WhitelistBiomeFilter(Either<ResourceLocation, List<ResourceLocation>> biomes, boolean whitelist) {
-		this.biomes = biomes.right().orElse(List.of(biomes.left().get()));
+	public WhitelistBiomeFilter(List<ResourceLocation> biomes, boolean whitelist) {
+		this.biomes = biomes;
 		this.whitelist = whitelist;
 	}
 	

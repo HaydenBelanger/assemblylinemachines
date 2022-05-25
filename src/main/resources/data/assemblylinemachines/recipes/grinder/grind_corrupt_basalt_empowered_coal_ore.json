@@ -1,0 +1,13 @@
+{
+	"type": "assemblylinemachines:grinder",
+	"input":{
+		"tag": "assemblylinemachines:corrupt_basalt_empowered_coal_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:empowered_coal",
+		"count": 2
+	},
+	"grinds": 11,
+	"bladetype": "PUREGOLD",
+	"machine_required": true
+}

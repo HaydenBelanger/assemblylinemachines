@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "minecraft:deepslate_iron_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_basalt_iron_ore"
+	}
+}

@@ -1,18 +1,16 @@
 package me.haydenb.assemblylinemachines.registry.utils;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
 
-import me.haydenb.assemblylinemachines.registry.config.Config;
+import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -28,10 +26,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
+import net.minecraftforge.registries.tags.ITag;
 
 public class Utils {
 
@@ -98,42 +97,26 @@ public class Utils {
 		};
 	}
 	
-	private static final Cache<String, Optional<Item>> CACHED_SORTED_TAGS = CacheBuilder.newBuilder().build();
-	
-	@SuppressWarnings("deprecation")
-	public static Optional<Lazy<ItemStack>> getItemStackWithTag(JsonObject json){
-		if(GsonHelper.isValidNode(json, "item")) {
-			return Optional.of(Lazy.of(() -> ShapedRecipe.itemStackFromJson(json)));
-		}else if(GsonHelper.isValidNode(json, "tag")) {
-			TagKey<Item> tag = TagKey.create(Keys.ITEMS, new ResourceLocation(GsonHelper.getAsString(json, "tag")));
-			int count = GsonHelper.isValidNode(json, "count") ? GsonHelper.getAsInt(json, "count") : 1;
-			return Optional.of(Lazy.of(() -> {
-				try {
-					Optional<Item> preferredResult = CACHED_SORTED_TAGS.get(tag.location().toString(), () ->{
-						List<Item> values = new ArrayList<>();
-						Registry.ITEM.getTagOrEmpty(tag).forEach((holder) -> values.add(holder.value()));
-						String preferredModid = Config.getServerConfig().preferredModid.get();
-						if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
-							Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
-							if(optionalItem.isPresent()) return optionalItem;
-						}
-						
-						Collections.sort(values, (a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString()));
-						
-						if(values.isEmpty()) return Optional.empty();
-						return Optional.of(values.get(0));
-					});
-					
-					if(preferredResult.isEmpty()) return ItemStack.EMPTY;
-					return new ItemStack(preferredResult.get(), count);
-				}catch(ExecutionException e) {
-					e.printStackTrace();
-					return null;
+	public static PredicateLazy<ItemStack> getItemStackWithTag(JsonObject json){
+		return PredicateLazy.of(() -> {
+			if(GsonHelper.isValidNode(json, "item")) {
+				return ShapedRecipe.itemStackFromJson(json);
+			}else if(GsonHelper.isValidNode(json, "tag")) {
+				ITag<Item> tag = ForgeRegistries.ITEMS.tags().getTag(TagKey.create(Keys.ITEMS, new ResourceLocation(GsonHelper.getAsString(json, "tag"))));
+				int count = GsonHelper.isValidNode(json, "count") ? GsonHelper.getAsInt(json, "count") : 1;
+				if(tag.isEmpty()) return ItemStack.EMPTY;
+				List<Item> values = new ArrayList<>(tag.stream().toList());
+				String preferredModid = ALMConfig.getCommonConfig().preferredModid().get();
+				if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
+					Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
+					if(optionalItem.isPresent()) values = new ArrayList<>(List.of(optionalItem.get()));
 				}
-			}));
-		}else {
-			return Optional.empty();
-		}
+				
+				Collections.sort(values, (a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString()));
+				return new ItemStack(values.get(0), count);
+			}
+			throw new IllegalArgumentException("Unknown field in ItemStack Tag.");
+		}, (is) -> !is.isEmpty());
 	}
 	
 	public static boolean containsArgument(CommandContext<CommandSourceStack> context, String argument) {

@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:world_corruption",
 	"input":{
-		"tag": "forge:ores/lapis"
+		"item": "minecraft:lapis_ore"
 	},
 	"output":{
 		"item": "assemblylinemachines:corrupt_lapis_ore"

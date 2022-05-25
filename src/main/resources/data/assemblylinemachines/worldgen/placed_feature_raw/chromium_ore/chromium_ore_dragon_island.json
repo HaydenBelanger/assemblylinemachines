@@ -43,7 +43,7 @@
 		},
 		{
 			"type": "assemblylinemachines:whitelist_biome",
-			"biome_id": "minecraft:the_end"
+			"biome_id": ["minecraft:the_end"]
 		}
 	]
 }

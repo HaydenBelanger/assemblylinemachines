@@ -22,7 +22,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.common.crafting.conditions.NotCondition;
+import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -39,12 +40,12 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 	public static final PneumaticSerializer SERIALIZER = new PneumaticSerializer();
 	
 	private final CountIngredient input;
-	private final Lazy<ItemStack> output;
+	private final PredicateLazy<ItemStack> output;
 	public final int time;
 	private final ResourceLocation id;
 	public final Item mold;
 	
-	public PneumaticCrafting(ResourceLocation id, CountIngredient input, Lazy<ItemStack> outputa, int time, Item mold) {
+	public PneumaticCrafting(ResourceLocation id, CountIngredient input, PredicateLazy<ItemStack> outputa, int time, Item mold) {
 		this.id = id;
 		this.input = input;
 		this.output = outputa;
@@ -54,7 +55,6 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-		if(!this.showInJEI()) return false;
 		if(input.test(inv.getItem(1))) {
 			return !mold.equals(Items.AIR) ? mold.equals(inv.getItem(2).getItem()) : inv.getItem(2).isEmpty();
 		}
@@ -86,11 +86,6 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 	}
 	
 	@Override
-	public boolean showInJEI() {
-		return !this.input.isEmpty() && !this.output.get().isEmpty();
-	}
-	
-	@Override
 	public List<?> getJEIComponents() {
 		return List.of(!mold.equals(Items.AIR) ? mold.getDefaultInstance() : ItemStack.EMPTY, input, output.get());
 	}
@@ -116,7 +111,7 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 		public PneumaticCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
 				CountIngredient input = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-				Lazy<ItemStack> output = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output")).orElseThrow();
+				PredicateLazy<ItemStack> output = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output"));
 				
 				int time = GsonHelper.getAsInt(json, "time");
 				Mold mold = GsonHelper.isValidNode(json, "mold") ? Mold.valueOf(GsonHelper.getAsString(json, "mold").toUpperCase()) : Mold.NONE;
@@ -138,7 +133,7 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 			int time = buffer.readInt();
 			Item mold = ForgeRegistries.ITEMS.getValue(buffer.readResourceLocation());
 			
-			return new PneumaticCrafting(recipeId, input, Lazy.of(() -> output), time, mold);
+			return new PneumaticCrafting(recipeId, input, PredicateLazy.of(() -> output), time, mold);
 		}
 
 		@Override
@@ -191,11 +186,11 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 			json.addProperty("time", time);
 			if(mold != Mold.NONE) json.addProperty("mold", mold.toString().toLowerCase());
 			
-			if(condition != null) {
-				JsonArray conditions = new JsonArray();
-				conditions.add(CraftingHelper.serialize(condition));
-				json.add("conditions", conditions);
-			}
+			JsonArray conditions = new JsonArray();
+			if(condition != null) conditions.add(CraftingHelper.serialize(condition));
+			if(json.getAsJsonObject("input").has("tag")) conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(json.getAsJsonObject("input").get("tag").getAsString()))));
+			conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(output.getFirst().location()))));
+			json.add("conditions", conditions);
 		}
 		
 		public PneumaticResult addIMCIfTrue(boolean check, String varName) {

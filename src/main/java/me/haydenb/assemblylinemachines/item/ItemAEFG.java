@@ -72,7 +72,7 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 
 	@Override
 	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
-		return getCurrentCharge(stack) > 0 && (entity.hasEffect(Registry.getEffect("entropy_poisoning")) || entity.hasEffect(Registry.getEffect("dark_expulsion"))) ? 1f : 0f;
+		return getCurrentCharge(stack) > 0 && entity != null && (entity.hasEffect(Registry.getEffect("entropy_poisoning")) || entity.hasEffect(Registry.getEffect("dark_expulsion"))) ? 1f : 0f;
 	}
 	
 	@Override

@@ -37,6 +37,7 @@ nav:
     - Reservoir Capability: miscdev/fluidreservoir.md
     - Guidebook Capability: miscdev/guidebook.md
     - Commands: miscdev/commands.md
+    - Tool Configuration: miscdev/toolconfig.md
 
 
 theme:

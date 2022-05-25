@@ -1,22 +1,17 @@
 package me.haydenb.assemblylinemachines.registry.utils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 /**
  * The CountIngredient is a special kind of ingredient which supports addition of a count field.
@@ -73,7 +68,7 @@ public class CountIngredient {
 	}
 	
 	public static CountIngredient fromJson(JsonObject json) {
-		Lazy<Ingredient> ingredient = getValidatedIngredient(json);
+		Lazy<Ingredient> ingredient = Lazy.of(() -> Ingredient.fromJson(json));
 		int count = GsonHelper.isValidNode(json, "count") ? GsonHelper.getAsInt(json, "count") : 1;
 		return new CountIngredient(ingredient, count);
 	}
@@ -92,18 +87,5 @@ public class CountIngredient {
 	
 	public static CountIngredient of(Ingredient ingredient, int count) {
 		return new CountIngredient(Lazy.of(() -> ingredient), count);
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static Lazy<Ingredient> getValidatedIngredient(JsonObject json){
-		return Lazy.of(() -> {
-				if(GsonHelper.isValidNode(json, "tag")) {
-					TagKey<Item> tag = TagKey.create(Keys.ITEMS, new ResourceLocation(GsonHelper.getAsString(json, "tag")));
-					List<Holder<Item>> values = new ArrayList<>();
-					Registry.ITEM.getTagOrEmpty(tag).forEach(values::add);
-					if(values.isEmpty()) return Ingredient.EMPTY;
-				}
-				return Ingredient.fromJson(json);
-		});
 	}
 }

@@ -270,7 +270,7 @@ public class TagMaster {
 				TagMaster.tagAllInMaster(container, TagType.BLOCK);
 				
 				writer.println("[BLOCK TAGGING - INFO]: Starting Mining Level and Tool Type tagging...");
-				for(Block b : Registry.getAllBlocksUnmodifiable()) {
+				for(Block b : Registry.getAllBlocks()) {
 					Optional<Pair<Optional<TagKey<Block>>, Optional<TagKey<Block>>>> result = getTagsForMiningLevel(b);
 					if(result == null) {
 						writer.println("[BLOCK TAGGING - WARNING]: For " + b.getRegistryName() + ", a default tool was not exposed.");

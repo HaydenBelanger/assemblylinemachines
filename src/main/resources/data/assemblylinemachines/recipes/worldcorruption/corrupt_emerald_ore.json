@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:world_corruption",
 	"input":{
-		"tag": "forge:ores/emerald"
+		"item": "minecraft:emerald_ore"
 	},
 	"output":{
 		"item": "assemblylinemachines:corrupt_emerald_ore"

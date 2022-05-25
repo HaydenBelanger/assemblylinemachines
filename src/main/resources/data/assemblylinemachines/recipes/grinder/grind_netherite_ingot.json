@@ -4,8 +4,7 @@
 		"tag": "forge:ingots/netherite"
 	},
 	"output":{
-		"item": "assemblylinemachines:ground_netherite",
-		"count": 4
+		"item": "assemblylinemachines:ground_netherite"
 	},
 	"grinds": 7,
 	"bladetype": "PUREGOLD",

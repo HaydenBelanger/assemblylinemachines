@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"item": "assemblylinemachines:deepslate_titanium_ore"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_basalt_titanium_ore"
+	}
+}

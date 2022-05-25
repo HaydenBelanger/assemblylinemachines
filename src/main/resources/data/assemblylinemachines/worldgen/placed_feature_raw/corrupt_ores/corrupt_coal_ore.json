@@ -4,7 +4,7 @@
 			"targets": [
 				{
 					"target":{
-						"config_option": "corruptOres",
+						"config_option": ["corruptOres"],
 						"rule_test":{
 							"block": "assemblylinemachines:corrupt_stone",
 							"predicate_type": "minecraft:block_match"
@@ -34,7 +34,7 @@
 				},
 				{
 					"target":{
-						"config_option": "corruptOres",
+						"config_option": ["corruptOres"],
 						"rule_test":{
 							"block": "assemblylinemachines:corrupt_basalt",
 							"predicate_type": "minecraft:block_match"

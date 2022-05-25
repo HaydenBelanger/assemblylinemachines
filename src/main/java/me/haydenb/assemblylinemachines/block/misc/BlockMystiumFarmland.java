@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.block.misc;
 
 import java.util.Random;
 
-import me.haydenb.assemblylinemachines.registry.config.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -50,12 +49,7 @@ public class BlockMystiumFarmland extends FarmBlock {
 							grbs.performBonemeal(world, random, pos.above(), bs);
 							world.levelEvent(2005, pos.above(), 0);
 							if(canGetExhausted && random.nextInt(2) == 0) {
-								
-								if(Config.getServerConfig().mystiumFarmlandDeath.get()) {
-									world.setBlockAndUpdate(pos, state.setValue(AGE, age + 1));
-								}
-								
-								
+								world.setBlockAndUpdate(pos, state.setValue(AGE, age + 1));
 							}
 						}
 					}

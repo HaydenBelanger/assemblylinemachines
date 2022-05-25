@@ -1,0 +1,9 @@
+{
+	"type": "assemblylinemachines:world_corruption",
+	"input":{
+		"tag": "forge:ore_bearing_ground/deepslate"
+	},
+	"output":{
+		"item": "assemblylinemachines:corrupt_basalt"
+	}
+}

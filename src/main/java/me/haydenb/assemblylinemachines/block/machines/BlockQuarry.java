@@ -10,8 +10,9 @@ import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine.ContainerAL
 import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreenBlockEntity;
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
-import me.haydenb.assemblylinemachines.registry.*;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.core.BlockPos;
@@ -241,7 +242,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 										BlockState bsx = this.getLevel().getBlockState(new BlockPos(current[0], current[1], current[2]));
 										
 										if(voidup != 0 || bsx.getBlock() != Blocks.DIRT) {
-											if(bsx.getBlock() != Blocks.AIR && bsx.getDestroySpeed(this.getLevel(), mpos) < 51 && bsx.getDestroySpeed(this.getLevel(), mpos) != -1) {
+											if(!bsx.isAir() && bsx.getDestroySpeed(this.getLevel(), mpos) < 51 && bsx.getDestroySpeed(this.getLevel(), mpos) != -1) {
 												bs = bsx;
 											}
 										}

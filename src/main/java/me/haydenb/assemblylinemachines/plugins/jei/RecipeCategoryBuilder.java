@@ -11,9 +11,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder.ICatalystProvider;
 import me.haydenb.assemblylinemachines.registry.utils.CountIngredient;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -24,12 +24,13 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -62,7 +63,7 @@ public class RecipeCategoryBuilder {
 	}
 	
 	RecipeCategoryBuilder icon(ItemLike b) {
-		this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM, b.asItem().getDefaultInstance());
+		this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, b.asItem().getDefaultInstance());
 		return this;
 	}
 	
@@ -102,7 +103,7 @@ public class RecipeCategoryBuilder {
 	//Build
 	<R extends Recipe<?> & IRecipeCategoryBuilder> IRecipeCategory<R> build(Class<R> clazz){
 		
-		class ALMRecipeCategory implements IRecipeCategory<R>, ICatalystProvider{
+		class ALMRecipeCategory implements IRecipeCategory<R>, IInfoProvider{
 
 			@Override
 			public ResourceLocation getUid() {
@@ -157,7 +158,7 @@ public class RecipeCategoryBuilder {
 						}else if(obj instanceof Ingredient ing) {
 							sb.addIngredients(ing);
 						}else if(obj instanceof FluidStack fs) {
-							sb.addIngredient(VanillaTypes.FLUID, fs);
+							sb.addIngredient(ForgeTypes.FLUID_STACK, fs);
 						}else if(obj instanceof ItemStack is) {
 							sb.addItemStack(is);
 						}else if(obj instanceof List<?> isl) {
@@ -174,7 +175,12 @@ public class RecipeCategoryBuilder {
 			public List<ItemStack> getCatalysts() {
 				return catalysts;
 			}
-			
+
+			@Override
+			public void registerRecipes(IRecipeRegistration registration) {
+				Minecraft mc = Minecraft.getInstance();
+				registration.addRecipes(this.getRecipeType(), mc.level.getRecipeManager().getRecipes().stream().filter((r) -> clazz.isInstance(r)).map((r) -> clazz.cast(r)).toList());
+			}
 		}
 		
 		return new ALMRecipeCategory();
@@ -194,14 +200,13 @@ public class RecipeCategoryBuilder {
 		 */
 		public List<?> getJEIComponents();
 		
-		public default boolean showInJEI() {
-			return true;
-		}
+	}
+	
+	public static interface IInfoProvider{
 		
-		public static interface ICatalystProvider{
-			
-			public List<ItemStack> getCatalysts();
-		}
+		public List<ItemStack> getCatalysts();
+		
+		public void registerRecipes(IRecipeRegistration registration);
 	}
 
 }
