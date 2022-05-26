@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:grinder",
 	"input":{
-		"tag": "assemblylinemachines:corrupt_basalt_empowered_coal_ore"
+		"item": "assemblylinemachines:corrupt_basalt_empowered_coal_ore"
 	},
 	"output":{
 		"item": "assemblylinemachines:empowered_coal",
