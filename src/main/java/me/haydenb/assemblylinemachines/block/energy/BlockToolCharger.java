@@ -8,7 +8,7 @@ import me.haydenb.assemblylinemachines.registry.utils.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -44,36 +44,36 @@ public class BlockToolCharger extends BlockTileEntity{
 	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	
+
 	public BlockToolCharger() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "tool_charger");
-		
+
 		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
 	}
-	
-	
-	
+
+
+
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
-	
+
 	@Override
 	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
 		if (world.getBlockEntity(pos) instanceof TEToolCharger) {
 			TEToolCharger pump = (TEToolCharger) world.getBlockEntity(pos);
-			player.displayClientMessage(new TextComponent(pump.prevStatusMessage), true);
+			player.displayClientMessage(Component.literal(pump.prevStatusMessage), true);
 		}
-		
+
 		return InteractionResult.PASS;
 	}
-	
+
 	@Override
 	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
-		
+
 		return InteractionResult.PASS;
 	}
-	
+
 	@Override
 	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
 		return bteDefaultReturnBlockEntity(pPos, pState);
@@ -83,7 +83,7 @@ public class BlockToolCharger extends BlockTileEntity{
 	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
 		return bteDefaultReturnTicker(level, state, blockEntityType);
 	}
-	
+
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
@@ -98,22 +98,22 @@ public class BlockToolCharger extends BlockTileEntity{
 			return SHAPE_N;
 		}
 	}
-	
+
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
 		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.MACHINE_ACTIVE);
 	}
-	
-	
+
+
 	public static class TEToolCharger extends BasicTileEntity implements ALMTicker<TEToolCharger>{
 
-		
+
 		private IItemHandler handler = null;
 		private String prevStatusMessage = "";
 		private int timer = 0;
-		
+
 		public TEToolCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
 		}
@@ -121,7 +121,7 @@ public class BlockToolCharger extends BlockTileEntity{
 		public TEToolCharger(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("tool_charger"), pos, state);
 		}
-		
+
 		private int amount;
 		protected IEnergyStorage energy = new IEnergyStorage() {
 
@@ -132,7 +132,7 @@ public class BlockToolCharger extends BlockTileEntity{
 					maxReceive = 100000 - amount;
 				}
 
-				if (simulate == false) {
+				if (!simulate) {
 					amount += maxReceive;
 					sendUpdates();
 				}
@@ -166,26 +166,26 @@ public class BlockToolCharger extends BlockTileEntity{
 			}
 		};
 		protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
-		
+
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
 				return energyHandler.cast();
 			}
-			
+
 			return super.getCapability(cap, side);
 		}
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			
+
 			return super.getCapability(cap);
 		}
-		
+
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-			
+
 			amount = compound.getInt("assemblylinemachines:amount");
 		}
 
@@ -195,7 +195,7 @@ public class BlockToolCharger extends BlockTileEntity{
 			compound.putInt("assemblylinemachines:amount", amount);
 			super.saveAdditional(compound);
 		}
-		
+
 		private boolean getCapability() {
 			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
@@ -218,7 +218,7 @@ public class BlockToolCharger extends BlockTileEntity{
 					return true;
 				}
 			}
-			
+
 			return false;
 		}
 
@@ -227,24 +227,24 @@ public class BlockToolCharger extends BlockTileEntity{
 			if(!level.isClientSide) {
 				if(timer++ == 8) {
 					timer = 0;
-					
+
 					boolean didSomething = false;
 					if(handler != null || getCapability()) {
 						for(int i = 0; i < handler.getSlots(); i++) {
 							ItemStack stack = handler.getStackInSlot(i);
 							LazyOptional<IEnergyStorage> opt = stack.getCapability(CapabilityEnergy.ENERGY);
 							IEnergyStorage storage = opt.orElse(null);
-							
+
 							if(storage != null) {
-								
+
 								int max;
-								
+
 								if(amount >= 10000) {
 									max = 10000;
 								}else {
 									max = amount;
 								}
-								
+
 								int ext = storage.receiveEnergy(max, false);
 								if(ext != 0) {
 									amount = amount - ext;
@@ -252,15 +252,15 @@ public class BlockToolCharger extends BlockTileEntity{
 									didSomething = true;
 									break;
 								}
-								
+
 							}
-							
+
 						}
 					}
-					
+
 					if(didSomething) {
 						prevStatusMessage = "Charging " + prevStatusMessage + "...";
-						if(getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
+						if(!getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
 							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 						}
 					}else {
@@ -273,11 +273,11 @@ public class BlockToolCharger extends BlockTileEntity{
 					sendUpdates();
 				}
 			}
-			
+
 		}
-		
-		
-		
+
+
+
 	}
 
 }

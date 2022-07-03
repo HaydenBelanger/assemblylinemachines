@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpecialTooltip {
 
 	private final IToolWithCharge.PowerToolType ptt;
-	
+
 	public ItemPowerHammer(ItemTiers ptt, Properties properties) {
 		super(ptt.getItemTier(), 8, -3.2f, properties);
 		this.ptt = ptt.getPowerToolType();
@@ -34,7 +34,7 @@ public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpe
 		ItemStack resStack = damageItem(stack, amount);
 		return resStack == null ? super.damageItem(stack, amount, entity, onBroken) : super.damageItem(resStack, 0, entity, onBroken);
 	}
-	
+
 	@Override
 	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		if (canUseSecondaryAbilities(stack)) {
@@ -43,24 +43,24 @@ public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpe
 		}
 		return super.hurtEnemy(stack, target, attacker);
 	}
-	
+
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
 		return this.defaultInitCapabilities(stack, nbt);
 	}
-	
+
 	@Override
 	public void appendHoverText(ItemStack p_41421_, Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 		super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
 		this.addEnergyInfoToHoverText(p_41421_, p_41423_);
 	}
-	
+
 	@Override
 	public boolean isBarVisible(ItemStack stack) {
 		if(!stack.hasTag() || stack.getTag().getInt(ptt.keyName) == 0) return super.isBarVisible(stack);
 		return stack.getTag().getInt(ptt.keyName) != this.getMaxPower(stack);
 	}
-	
+
 	@Override
 	public int getBarColor(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
@@ -71,16 +71,16 @@ public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpe
 			float v = (float) dmg / (float) getMaxPower(stack);
 			return ARGB32.color(255, Math.round(v * 255f), Math.round(v * 255f), 255);
 		}
-		
+
 	}
-	
+
 	@Override
 	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
-	
+
 	@Override
 	public ResourceLocation getTexture() {
 		return ptt.borderTexturePath;
@@ -90,7 +90,7 @@ public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpe
 	public int getTopColor() {
 		return ptt.argbBorderColor;
 	}
-	
+
 	@Override
 	public int getBottomColor() {
 		return ptt.getBottomARGBBorderColor().orElse(ISpecialTooltip.super.getBottomColor());

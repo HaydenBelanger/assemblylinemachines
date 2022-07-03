@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" x ",
+		"xmx",
+		" x "
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:smooth_corrupt_stone"
+		},
+		"m":{
+			"item": "assemblylinemachines:corrupt_stone_tile"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_stone_panel",
+		"count": 5
+	}
+}

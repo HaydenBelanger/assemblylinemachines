@@ -8,8 +8,8 @@ import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -20,18 +20,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class ItemCreativeUpgradeKit extends Item {
 
 	public static final Rarity CREATIVE_RARITY = Rarity.create("CREATIVE", ChatFormatting.DARK_PURPLE);
-	
+
 	public ItemCreativeUpgradeKit() {
 		super(new Item.Properties().tab(Registry.CREATIVE_TAB).rarity(CREATIVE_RARITY));
 	}
-	
+
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		if(!context.getLevel().isClientSide()) {
 			Optional<MutableComponent> result = makeCreative(context.getLevel(), context.getClickedPos());
 			if(result.isPresent()) {
 				context.getItemInHand().shrink(1);
-				context.getPlayer().displayClientMessage(new TextComponent("Upgraded " + result.get().getString() + " to creative."), true);
+				context.getPlayer().displayClientMessage(Component.literal("Upgraded " + result.get().getString() + " to creative."), true);
 			}
 		}
 		return InteractionResult.CONSUME;

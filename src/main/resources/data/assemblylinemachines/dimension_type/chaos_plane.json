@@ -14,5 +14,13 @@
 	"min_y": -256,
 	"height": 512,
 	"infiniburn": "#minecraft:infiniburn_overworld",
-	"effects": "minecraft:the_nether"
+	"effects": "minecraft:the_nether",
+	"monster_spawn_block_light_limit": 11,
+	"monster_spawn_light_level": {
+		"type": "minecraft:uniform",
+		"value": {
+			"max_inclusive": 11,
+			"min_inclusive": 0
+		}
+	}
 }

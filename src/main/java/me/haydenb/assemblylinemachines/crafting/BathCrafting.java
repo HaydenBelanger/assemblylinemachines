@@ -29,23 +29,22 @@ import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-	
-	public static final RecipeType<BathCrafting> BATH_RECIPE = new RecipeType<BathCrafting>() {
+
+	public static final RecipeType<BathCrafting> BATH_RECIPE = new RecipeType<>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:bath";
 		}
 	};
-	
+
 	public static final BathSerializer SERIALIZER = new BathSerializer();
-	
+
 	private static final Lazy<List<Item>> ILLEGAL_RECIPE_ITEMS = Lazy.of(() -> Stream.concat(List.of(Registry.getItem("wooden_stirring_stick"), Registry.getItem("pure_iron_stirring_stick"),
 			Registry.getItem("steel_stirring_stick")).stream(), BlockFluidBath.VALID_FILL_ITEMS.stream()).collect(Collectors.toList()));
-	
+
 	private final Lazy<Ingredient> inputa;
 	private final Lazy<Ingredient> inputb;
 	private final ItemStack output;
@@ -55,7 +54,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	private final int color;
 	private final BathOption type;
 	private final BathPercentage percent;
-	
+
 	public BathCrafting(ResourceLocation id, Lazy<Ingredient> inputa, Lazy<Ingredient> inputb, ItemStack output, int stirs, BathCraftingFluids fluid, int color, BathOption type, BathPercentage percent) {
 		this.inputa = inputa;
 		this.inputb = inputb;
@@ -67,12 +66,12 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		this.type = type;
 		this.percent = percent;
 	}
-	
+
 	@Override
 	public boolean canCraftInDimensions(int pWidth, int pHeight) {
 		return false;
 	}
-	
+
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
@@ -81,7 +80,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	public RecipeType<?> getType() {
 		return BATH_RECIPE;
 	}
-	
+
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		if(inv instanceof TEFluidBath) {
@@ -89,13 +88,13 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 				return false;
 			}
 			TEFluidBath finv = (TEFluidBath) inv;
-			
+
 			if(inputa.get().test(finv.getItem(1))) {
 				if(inputb.get().test(finv.getItem(2))) {
 					return true;
 				}
 			}
-			
+
 			if(inputa.get().test(finv.getItem(2))) {
 				if(inputb.get().test(finv.getItem(1))) {
 					return true;
@@ -116,7 +115,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 					return true;
 				}
 			}
-			
+
 			if(inputa.get().test(inv.getItem(slb))) {
 				if(inputb.get().test(inv.getItem(sla))) {
 					return true;
@@ -124,18 +123,18 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			}
 		}
 		return false;
-		
+
 	}
 
 	public BathOption getMachineMode() {
 		return type;
 	}
-	
+
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-	
+
 	@Override
 	public ItemStack assemble(Container inv) {
 		if(inv instanceof IMachineDataBridge) {
@@ -149,26 +148,26 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			if(rand > 21) {
 				cons = 0;
 			}else if(rand > 15) {
-				cons = (int) Math.round((double) cons * 0.25d);
+				cons = (int) Math.round(cons * 0.25d);
 			}else if(rand > 10) {
-				cons = (int) Math.round((double) cons * 0.5d);
+				cons = (int) Math.round(cons * 0.5d);
 			}else if(rand > 5) {
-				cons = (int) Math.round((double) cons * 0.75d);
+				cons = (int) Math.round(cons * 0.75d);
 			}
-			
+
 			drain.apply(cons, FluidAction.EXECUTE);
 			if(data.blockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
 				inv.getItem(0).shrink(1);
 				inv.getItem(1).shrink(1);
-				data.setCycles(Math.round((float) stirs * ALMConfig.getServerConfig().kineticMachineCycleModifier().get().floatValue()));
+				data.setCycles(Math.round(stirs * ALMConfig.getServerConfig().kineticMachineCycleModifier().get().floatValue()));
 			}else {
 				inv.getItem(1).shrink(1);
 				inv.getItem(2).shrink(1);
-				data.setCycles(Math.round((float) stirs * 3.6f));
+				data.setCycles(Math.round(stirs * 3.6f));
 			}
-			
-			
-			
+
+
+
 		}
 		return this.output.copy();
 	}
@@ -182,7 +181,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	public ResourceLocation getId() {
 		return id;
 	}
-	
+
 	@Override
 	public List<?> getJEIComponents() {
 		ArrayList<Item> items = new ArrayList<>();
@@ -193,27 +192,27 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		case BASIN_ONLY:
 			items.add(Registry.getItem("fluid_bath"));
 		}
-		
+
 		return List.of(inputa.get(), inputb.get(), Ingredient.of(items.toArray(new Item[items.size()])), new FluidStack(fluid.getAssocFluid(), percent.getMB()), output);
 	}
-	
+
 	public BathCraftingFluids getFluid() {
 		return fluid;
 	}
-	
+
 	public int getStirs() {
 		return stirs;
 	}
-	
+
 	public int getColor() {
 		return color;
 	}
-	
+
 	public BathPercentage getPercentage() {
 		return percent;
 	}
-	
-	public static class BathSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<BathCrafting>{
+
+	public static class BathSerializer /*extends ForgeRegistryEntry<RecipeSerializer<?>>*/ implements RecipeSerializer<BathCrafting>{
 
 		@Override
 		public BathCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -223,20 +222,20 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 					if(!Collections.disjoint(List.of(i.getItems()), ILLEGAL_RECIPE_ITEMS.get())) throw new IllegalArgumentException(recipeId + " used an illegal item as input_a.");
 					return i;
 				});
-				
+
 				Lazy<Ingredient> ingredientb = Lazy.of(() -> {
 					Ingredient i = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_b"));
 					if(!Collections.disjoint(List.of(i.getItems()), ILLEGAL_RECIPE_ITEMS.get())) throw new IllegalArgumentException(recipeId + " used an illegal item as input_b.");
 					return i;
 				});
-				
+
 				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				int stirs = GsonHelper.getAsInt(json, "stirs");
 				BathCraftingFluids fluid = BathCraftingFluids.valueOf(GsonHelper.getAsString(json, "fluid").toUpperCase());
 				if(fluid == BathCraftingFluids.NONE) {
 					throw new IllegalArgumentException("Fluid cannot be 'NONE'.");
 				}
-				
+
 				int color = Integer.parseInt(GsonHelper.getAsString(json, "mix_color").replace("#", ""), 16);
 				BathOption machineReqd;
 				if(GsonHelper.isValidNode(json, "mixer_type")) {
@@ -244,22 +243,22 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 				}else {
 					machineReqd = BathOption.ALL;
 				}
-				
+
 				BathPercentage percent;
-				
+
 				if(GsonHelper.isValidNode(json, "drain_percent")) {
 					percent = BathPercentage.valueOf(GsonHelper.getAsString(json, "drain_percent").toUpperCase());
 				}else {
 					percent = BathPercentage.FULL;
 				}
-				
+
 				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, color, machineReqd, percent);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-			
-			
+
+
 		}
 
 		@Override
@@ -272,7 +271,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			int color = buffer.readInt();
 			BathOption machineReqd = buffer.readEnum(BathOption.class);
 			BathPercentage percent = buffer.readEnum(BathPercentage.class);
-			
+
 			return new BathCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, stirs, fluid, color, machineReqd, percent);
 		}
 
@@ -286,29 +285,29 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			buffer.writeInt(recipe.color);
 			buffer.writeEnum(recipe.type);
 			buffer.writeEnum(recipe.percent);
-			
+
 		}
-		
+
 	}
 
 	public static enum BathOption{
 		ALL, BASIN_ONLY, MIXER_ONLY;
 	}
-	
+
 	public static enum BathPercentage{
 		FULL(4, 1000), HALF(2, 500), QUARTER(1, 250);
-		
+
 		final int drop;
 		final int crankmixeruse;
 		BathPercentage(int drop, int use){
 			this.drop = drop;
 			this.crankmixeruse = use;
 		}
-		
+
 		public int getDrop() {
 			return drop;
 		}
-		
+
 		public int getMB() {
 			return crankmixeruse;
 		}

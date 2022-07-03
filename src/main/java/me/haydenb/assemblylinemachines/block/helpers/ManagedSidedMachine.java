@@ -5,7 +5,7 @@ import java.util.HashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -18,7 +18,7 @@ public class ManagedSidedMachine<A extends AbstractContainerMenu> extends Abstra
 
 
 
-	public ManagedSidedMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, TranslatableComponent name,
+	public ManagedSidedMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, MutableComponent name,
 			int containerId, Class<A> clazz, EnergyProperties properties, BlockPos pos, BlockState state) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz, properties, pos, state);
 	}
@@ -103,7 +103,7 @@ public class ManagedSidedMachine<A extends AbstractContainerMenu> extends Abstra
 		ManagedDirection(Direction rel){
 			this.rel = rel;
 		}
-		
+
 		public Direction getDirection(Direction facing) {
 			switch(this){
 			case FRONT:

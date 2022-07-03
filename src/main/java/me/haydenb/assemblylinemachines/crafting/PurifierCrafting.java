@@ -17,34 +17,33 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-	
-	public static final RecipeType<PurifierCrafting> PURIFIER_RECIPE = new RecipeType<PurifierCrafting>() {
+
+	public static final RecipeType<PurifierCrafting> PURIFIER_RECIPE = new RecipeType<>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:purifier";
 		}
 	};
-	
+
 	public static final PurifierSerializer SERIALIZER = new PurifierSerializer();
-	
+
 	private final Lazy<Ingredient> parta;
 	private final Lazy<Ingredient> partb;
 	public final Lazy<Ingredient> tobepurified;
 	private final ItemStack output;
 	private final int time;
 	private final ResourceLocation id;
-	
+
 	public PurifierCrafting(ResourceLocation id, Lazy<Ingredient> parta, Lazy<Ingredient> partb, Lazy<Ingredient> tobepurified, ItemStack output, int time) {
 		this.parta = parta;
 		this.partb = partb;
 		this.tobepurified = tobepurified;
 		this.output = output;
 		this.time = time;
-		
+
 		this.id = id;
 	}
 	@Override
@@ -56,7 +55,7 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		}
 		return false;
 	}
-	
+
 	@Override
 	public ItemStack assemble(Container inv) {
 		if(inv instanceof IMachineDataBridge) {
@@ -67,7 +66,7 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			if(Utils.RAND.nextInt(10) * conservationCount < 10) inv.getItem(1).shrink(1);
 			if(Utils.RAND.nextInt(10) * conservationCount < 10) inv.getItem(2).shrink(1);
 			data.setCycles(requiresUpgrade ? time / 8f : time / 10f);
-			
+
 			inv.getItem(3).shrink(1);
 		}
 		return this.output.copy();
@@ -83,15 +82,15 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		return output;
 	}
 
-	
+
 	public boolean requiresUpgrade() {
 		if((parta.get().test(new ItemStack(Items.SAND)) && partb.get().test(new ItemStack(Items.GRAVEL))) || (parta.get().test(new ItemStack(Items.GRAVEL)) && partb.get().test(new ItemStack(Items.SAND)))) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public ResourceLocation getId() {
 		return id;
@@ -106,18 +105,18 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	public RecipeType<?> getType() {
 		return PURIFIER_RECIPE;
 	}
-	
+
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-	
+
 	@Override
 	public List<?> getJEIComponents() {
 		return List.of(parta.get(), partb.get(), tobepurified.get(), output);
 	}
-	
-	public static class PurifierSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<PurifierCrafting>{
+
+	public static class PurifierSerializer implements RecipeSerializer<PurifierCrafting>{
 
 		@Override
 		public PurifierCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -125,17 +124,17 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 				Lazy<Ingredient> ingredienta = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_a")));
 				Lazy<Ingredient> ingredientb = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "part_b")));
 				Lazy<Ingredient> tobepurified = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "tobepurified")));
-				
+
 				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				int time = GsonHelper.getAsInt(json, "time");
-				
+
 				return new PurifierCrafting(recipeId, ingredienta, ingredientb, tobepurified, output, time);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-			
-			
+
+
 		}
 
 		@Override
@@ -145,7 +144,7 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			Ingredient inputc = Ingredient.fromNetwork(buffer);
 			ItemStack output = buffer.readItem();
 			int time = buffer.readInt();
-			
+
 			return new PurifierCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), Lazy.of(() -> inputc), output, time);
 		}
 
@@ -156,8 +155,8 @@ public class PurifierCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			recipe.tobepurified.get().toNetwork(buffer);
 			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.time);
-			
+
 		}
-		
+
 	}
 }

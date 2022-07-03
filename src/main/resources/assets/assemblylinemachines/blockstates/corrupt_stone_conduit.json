@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "axis=y":  { "model": "assemblylinemachines:block/corrupt_stone_conduit" },
+        "axis=z":   { "model": "assemblylinemachines:block/corrupt_stone_conduit", "x": 90 },
+        "axis=x":   { "model": "assemblylinemachines:block/corrupt_stone_conduit", "x": 90, "y": 90 }
+    }
+}

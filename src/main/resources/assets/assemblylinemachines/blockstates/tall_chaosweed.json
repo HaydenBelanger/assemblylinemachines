@@ -1,10 +1,16 @@
 {
   "variants": {
-    "half=lower": {
-      "model": "assemblylinemachines:block/tall_chaosweed_lower"
-    },
-    "half=upper": {
-      "model": "assemblylinemachines:block/tall_chaosweed"
-    }
+    "half=lower": [
+    	{"model": "assemblylinemachines:block/tall_chaosweed_lower"},
+    	{"model": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_lower_1"},
+    	{"model": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_lower_2"},
+    	{"model": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_lower_3"}
+    ],
+    "half=upper": [
+    	{"model": "assemblylinemachines:block/tall_chaosweed"},
+    	{"model": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_1"},
+    	{"model": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_2"},
+    	{"model": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_3"}
+    ]
   }
 }

@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		" x ",
+		"xmx",
+		" x "
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:smooth_corrupt_stone"
+		},
+		"m":{
+			"tag": "forge:ingots/energized_gold"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_stone_conduit",
+		"count": 12
+	}
+}

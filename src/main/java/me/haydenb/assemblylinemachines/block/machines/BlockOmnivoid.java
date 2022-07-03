@@ -21,7 +21,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -52,68 +51,68 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 			Block.box(9, 14, 7, 10, 16, 9),
 			Block.box(7, 15, 7, 9, 16, 9)
 			).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
-	
+
 	public BlockOmnivoid() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL).lightLevel((state) -> 10), "omnivoid", SHAPE_N, true, Direction.NORTH, TEOmnivoid.class);
 		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
-	
+
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> p_49915_) {
 		p_49915_.add(HorizontalDirectionalBlock.FACING);
 	}
-	
+
 	public static class TEOmnivoid extends SimpleMachine<ContainerOmnivoid> implements ALMTicker<TEOmnivoid>{
-		
+
 		//ITEM, FLUID, ENERGY
 		private int[] settings = new int[] {1, 1, 1};
 		private LazyOptional<VoidingHandler> handler = LazyOptional.of(() -> new VoidingHandler());
-	
+
 		public TEOmnivoid(BlockEntityType<?> tileEntityType, BlockPos pos, BlockState state) {
-			super(tileEntityType, 1, new TranslatableComponent(Registry.getBlock("omnivoid").getDescriptionId()), Registry.getContainerId("omnivoid"), ContainerOmnivoid.class, pos, state);
+			super(tileEntityType, 1, Component.translatable(Registry.getBlock("omnivoid").getDescriptionId()), Registry.getContainerId("omnivoid"), ContainerOmnivoid.class, pos, state);
 		}
-		
+
 		public TEOmnivoid(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("omnivoid"), pos, state);
 		}
-		
+
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-			
+
 			if(compound.contains("assemblylinemachines:settings")) settings = compound.getIntArray("assemblylinemachines:settings");
 		}
-		
+
 		@Override
 		protected void saveAdditional(CompoundTag compound) {
-			
+
 			compound.putIntArray("assemblylinemachines:settings", settings);
 			super.saveAdditional(compound);
 		}
 
 		@Override
 		public void tick() {
-			
+
 			if(!level.isClientSide) {
 				if(!this.getItem(0).isEmpty()) {
 					this.setItem(0, ItemStack.EMPTY);
 					this.sendUpdates();
 				}
 			}
-			
+
 		}
 
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			return settings[0] == 1;
 		}
-		
+
 		@Override
 		public void setRemoved() {
 			super.setRemoved();
 			if(handler != null) handler.invalidate();
 		}
-		
+
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
 			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || cap == CapabilityEnergy.ENERGY) {
@@ -121,7 +120,7 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 			}
 			return super.getCapability(cap);
 		}
-		
+
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || cap == CapabilityEnergy.ENERGY) {
@@ -129,15 +128,15 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 			}
 			return super.getCapability(cap, side);
 		}
-		
+
 		public void toggleSettings(int settingNum) {
 			settings[settingNum] = settings[settingNum] == 0 ? 1 : 0;
 		}
-		
+
 		public class VoidingHandler implements IItemHandler, IFluidHandler, IEnergyStorage{
 
 			//ENERGY
-			
+
 			@Override
 			public int receiveEnergy(int maxReceive, boolean simulate) {
 				return settings[2] == 1 ? maxReceive : 0;
@@ -169,12 +168,12 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 			}
 
 			//FLUID
-			
+
 			@Override
 			public int fill(FluidStack resource, FluidAction action) {
 				return settings[1] == 1 ? resource.getAmount() : 0;
 			}
-			
+
 			@Override
 			public int getTanks() {
 				return 1;
@@ -206,12 +205,12 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 			}
 
 			//ITEM
-			
+
 			@Override
 			public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 				return settings[0] == 1 ? ItemStack.EMPTY : stack;
 			}
-			
+
 			@Override
 			public int getSlots() {
 				return 1;
@@ -236,47 +235,47 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 			public boolean isItemValid(int slot, ItemStack stack) {
 				return true;
 			}
-			
+
 		}
 	}
-	
+
 	public static class ContainerOmnivoid extends ContainerALMBase<TEOmnivoid>{
-		
+
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
-		
+
 		public ContainerOmnivoid(int windowId, Inventory playerInventory, TEOmnivoid tileEntity) {
 			super(Registry.getContainerType("omnivoid"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0, 0);
-			
+
 			this.addSlot(new Slot(this.tileEntity, 0, 80, 44));
 		}
-		
+
 		public ContainerOmnivoid(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
 			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEOmnivoid.class));
 		}
-		
-		
+
+
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static class ScreenOmnivoid extends ScreenALMBase<ContainerOmnivoid>{
-		
+
 		TEOmnivoid tsfm;
-		
+
 		public ScreenOmnivoid(ContainerOmnivoid container, Inventory inv, Component title) {
 			super(container, inv, title, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "omnivoid", false);
 			this.tsfm = container.tileEntity;
 		}
-		
+
 		@Override
 		protected void init() {
 			super.init();
-			
+
 			this.addRenderableWidget(new TrueFalseButton(leftPos+53, topPos+20, 176, 36, 18, 18, new TrueFalseButtonSupplier("Items Enabled", "Items Disabled", () -> tsfm.settings[0] == 1), (b) -> sendButtonToggle(tsfm.getBlockPos(), 0)));
 			this.addRenderableWidget(new TrueFalseButton(leftPos+79, topPos+20, 176, 18, 18, 18, new TrueFalseButtonSupplier("Fluids Enabled", "Fluids Disabled", () -> tsfm.settings[1] == 1), (b) -> sendButtonToggle(tsfm.getBlockPos(), 1)));
 			this.addRenderableWidget(new TrueFalseButton(leftPos+105, topPos+20, 176, 0, 18, 18, new TrueFalseButtonSupplier("Energy Enabled", "Energy Disabled", () -> tsfm.settings[2] == 1), (b) -> sendButtonToggle(tsfm.getBlockPos(), 2)));
 		}
-		
+
 		private static void sendButtonToggle(BlockPos pos, int settingNum) {
 			PacketData pd = new PacketData("omnivoid_gui");
 			pd.writeBlockPos("location", pos);

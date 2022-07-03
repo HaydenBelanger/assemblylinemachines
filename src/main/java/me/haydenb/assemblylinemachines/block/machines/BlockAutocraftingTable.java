@@ -28,7 +28,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
@@ -67,29 +66,29 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			Block.box(4, 12, 1, 5, 16, 2),Block.box(11, 12, 1, 12, 16, 2),
 			Block.box(11, 12, 14, 12, 16, 15),Block.box(4, 12, 14, 5, 16, 15)
 			).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
-	
+
 	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
 	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
-	
-	
+
+
 	public BlockAutocraftingTable() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).noOcclusion().dynamicShape().sound(SoundType.METAL), "autocrafting_table", BlockAutocraftingTable.TEAutocraftingTable.class);
 		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
-	
-	
-	
+
+
+
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(StateProperties.MACHINE_ACTIVE).add(HorizontalDirectionalBlock.FACING);
 	}
-	
+
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
-	
+
 	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if(state.getBlock() != newState.getBlock()) {
@@ -104,7 +103,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			}
 		}
 	}
-	
+
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		Direction d = state.getValue(HorizontalDirectionalBlock.FACING);
@@ -117,21 +116,21 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		} else {
 			return SHAPE_N;
 		}
-		
+
 	}
-	
+
 	public static class TEAutocraftingTable extends ManagedSidedMachine<ContainerAutocraftingTable> implements ALMTicker<TEAutocraftingTable>{
-		
+
 		private static final Type GSON_TYPE_TOKEN = new TypeToken<HashMap<Integer, SerializableRecipe>>() {
 			private static final long serialVersionUID = -5336168241880605825L;}.getType();
-		
+
 		private static final Integer[] grnSlots = {17, 18, 26, 27};
 		private static final Integer[] magSlots = {19, 20, 28, 29};
 		private static final Integer[] orgSlots = {21, 22, 30, 31};
 		private static final Integer[] allSlots = Stream.of(grnSlots, magSlots, orgSlots).flatMap(Stream::of).toArray(Integer[]::new);
-		
+
 		private HashMap<Integer, SerializableRecipe> serializedRecipes = new HashMap<>();
-		
+
 		private byte[] outputMode = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		private byte[] slotTargets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		private CraftingRecipe prevEnteredRecipe;
@@ -139,12 +138,12 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		private int timer = 0;
 		private int nTimer = 16;
 		private int changeModelTimer = 0;
-		
-		
+
+
 		public TEAutocraftingTable(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 32, new TranslatableComponent(Blocks.CRAFTING_TABLE.getDescriptionId()), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000), pos, state);
+			super(tileEntityTypeIn, 32, Component.translatable(Blocks.CRAFTING_TABLE.getDescriptionId()), Registry.getContainerId("autocrafting_table"), ContainerAutocraftingTable.class, new EnergyProperties(true, false, 50000), pos, state);
 		}
-		
+
 		public TEAutocraftingTable(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("autocrafting_table"), pos, state);
 		}
@@ -153,18 +152,18 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 		public boolean canInsertToSide(boolean isEnergy, int slot, Direction direction) {
 			return (slot == -1) || (slot > 13 && slot < 17) || (slot > 22 && slot < 26);
 		}
-		
+
 		@Override
 		public void tick() {
 			if(!level.isClientSide) {
 				if(timer++ == nTimer) {
 					timer = 0;
-					
+
 					int availRecip = getUpgradeAmount(Upgrades.AC_RECIPES);
-					
+
 					int mul;
-					
-					
+
+
 					boolean devicePerformed = false;
 					if(getUpgradeAmount(Upgrades.AC_SUSTAINED) > 0) {
 						mul = 0;
@@ -188,11 +187,11 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 							nTimer = 16;
 						}
 					}
-					
-					
+
+
 					int cost = 0;
 					for(Integer nX : serializedRecipes.keySet()) {
-						
+
 						if((nX > 1 && availRecip < 1) || (nX > 3 && availRecip < 2) || (nX > 5) && availRecip < 3) {
 							serializedRecipes.remove(nX);
 							break;
@@ -200,7 +199,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						CraftingRecipe recipe = serializedRecipes.get(nX).getRecipe(level);
 						int tCost = 0;
 						boolean validRecipe = true;
-						
+
 						ArrayList<Integer> containerItemSlots = new ArrayList<>();
 						HashMap<ItemStack, Integer> shrinkStacks = new HashMap<>();
 						for(Ingredient ing : recipe.getIngredients()) {
@@ -210,9 +209,9 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 								for(int i = 14; i < 32; i++) {
 									ItemStack st = this.getItem(i);
 									if(ing.test(st)) {
-										
+
 										if(st.hasContainerItem()) {
-											
+
 											if(!containerItemSlots.contains(i)) {
 												containerItemSlots.add(i);
 												foundMatch = true;
@@ -220,7 +219,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 											}
 										}else {
 											if(shrinkStacks.containsKey(st)) {
-												
+
 												if(shrinkStacks.get(st) < st.getCount()) {
 													shrinkStacks.put(st, shrinkStacks.get(st) + 1);
 													foundMatch = true;
@@ -230,40 +229,40 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 												shrinkStacks.put(st, 1);
 												foundMatch = true;
 												break;
-												
+
 											}
 										}
-										
-										
+
+
 									}
 								}
-								
+
 								if(!foundMatch) {
 									validRecipe = false;
 									break;
 								}
 							}
-							
-							
-							
+
+
+
 						}
-						
+
 						if(validRecipe) {
-							
+
 							if(amount - cost - tCost < 0) {
 								break;
 							}
 							ItemStack output = recipe.getResultItem().copy();
-							
-							
-							
+
+
+
 							if(outputMode[nX] == 1) {
 								if(getItem(0).isEmpty()) {
 									for(ItemStack i : shrinkStacks.keySet()) {
 										i.shrink(shrinkStacks.get(i));
 									}
 									for(Integer i : containerItemSlots) {
-										
+
 										setItem(i, getItem(i).getContainerItem());
 									}
 									cost += tCost;
@@ -274,7 +273,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 										i.shrink(shrinkStacks.get(i));
 									}
 									for(Integer i : containerItemSlots) {
-										
+
 										setItem(i, getItem(i).getContainerItem());
 									}
 									cost += tCost;
@@ -282,7 +281,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 									getItem(0).grow(output.getCount());
 								}
 							}else {
-								
+
 								Integer[] vals;
 								switch(slotTargets[nX]){
 								case 3:
@@ -300,12 +299,12 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 								for(int x : vals) {
 									if(getItem(x).isEmpty()) {
 										for(ItemStack i : shrinkStacks.keySet()) {
-												
+
 											i.shrink(shrinkStacks.get(i));
-											
+
 										}
 										for(Integer i : containerItemSlots) {
-											
+
 											setItem(i, getItem(i).getContainerItem());
 										}
 										cost += tCost;
@@ -317,7 +316,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 											i.shrink(shrinkStacks.get(i));
 										}
 										for(Integer i : containerItemSlots) {
-											
+
 											setItem(i, getItem(i).getContainerItem());
 										}
 										cost += tCost;
@@ -326,25 +325,25 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 										break;
 									}
 								}
-								
+
 							}
-							
-							
-							
-							
-							
-							
+
+
+
+
+
+
 						}
-						
+
 					}
-					
-					
-					
-					if(devicePerformed == true) {
+
+
+
+					if(devicePerformed) {
 						amount -= cost;
-						
+
 						fept = (float) cost / (float) nTimer;
-						
+
 						if(changeModelTimer == 0 && !getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
 							this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 						}
@@ -357,48 +356,48 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 								sendUpdates();
 							}
-							
+
 						}else {
 							changeModelTimer--;
 						}
 					}
-					
+
 				}else if(timer > 24) {
 					timer = 0;
 				}
 			}
 		}
-		
+
 		@Override
 		public void saveAdditional(CompoundTag compound) {
-			
+
 			compound.putInt("assemblylinemachines:selected", selectedRecipe);
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
-			
+
 			if(!serializedRecipes.isEmpty()) {
-				
+
 				compound.putString("assemblylinemachines:recipes", Utils.GSON.toJson(serializedRecipes, GSON_TYPE_TOKEN));
 			}
-			
-			
+
+
 			compound.putByteArray("assemblylinemachines:outputmodes", outputMode);
 			compound.putByteArray("assemblylinemachines:slottargets", slotTargets);
 			super.saveAdditional(compound);
 		}
-		
+
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-			
+
 			selectedRecipe = compound.getInt("assemblylinemachines:selected");
 			nTimer = compound.getInt("assemblylinemachines:ntimer");
-			
+
 			if(compound.contains("assemblylinemachines:recipes")) {
 				serializedRecipes = Utils.GSON.fromJson(compound.getString("assemblylinemachines:recipes"), GSON_TYPE_TOKEN);
 			}else {
 				serializedRecipes = new HashMap<>();
 			}
-			
+
 			if(compound.contains("assemblylinemachines:outputmodes")) {
 				outputMode = compound.getByteArray("assemblylinemachines:outputmodes");
 			}
@@ -406,17 +405,17 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				slotTargets = compound.getByteArray("assemblylinemachines:slottargets");
 			}
 		}
-		
+
 		static class SerializableRecipe {
-			
+
 			private transient CraftingRecipe internalRecipe = null;
 			private final ResourceLocation rl;
-			
+
 			public SerializableRecipe(CraftingRecipe recipe) {
 				this.rl = recipe.getId();
 				this.internalRecipe = recipe;
 			}
-			
+
 			public CraftingRecipe getRecipe(Level level) {
 				if(internalRecipe != null) {
 					return internalRecipe;
@@ -428,14 +427,14 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 					}
 					return null;
 				}
-				
+
 			}
 		}
-		
+
 		private SerializableRecipe build(CraftingRecipe recipe) {
 			return new SerializableRecipe(recipe);
 		}
-		
+
 		@Override
 		public ItemStack removeItem(int pIndex, int pCount) {
 			if(pIndex > 0 && pIndex < 11) {
@@ -443,7 +442,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			}
 			return super.removeItem(pIndex, pCount);
 		}
-		
+
 		@Override
 		public ItemStack removeItemNoUpdate(int pIndex) {
 			if(pIndex > 0 && pIndex < 11) {
@@ -451,10 +450,10 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			}
 			return super.removeItemNoUpdate(pIndex);
 		}
-		
+
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
-			
+
 			if(slot > 10 && slot <= 13) {
 				if(stack.getItem() instanceof ItemUpgrade) {
 					return true;
@@ -463,10 +462,10 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			}else {
 				return (slot > 13 && slot < 17) || (slot > 22 && slot < 26);
 			}
-			
+
 		}
-		
-		
+
+
 		public int getUpgradeAmount(Upgrades upgrade) {
 			int ii = 0;
 			for (int i = 11; i < 14; i++) {
@@ -477,22 +476,22 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 
 			return ii;
 		}
-		
+
 	}
-	
+
 	public static class ContainerAutocraftingTable extends ContainerALMBase<TEAutocraftingTable> {
-		
+
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(62, 120);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(62, 178);
-		
+
 		private final AutocrafterInvWrapper wrapper = new AutocrafterInvWrapper(this, tileEntity);
-		
+
 		public ContainerAutocraftingTable(final int windowId, final Inventory playerInventory, final TEAutocraftingTable tileEntity) {
 			super(Registry.getContainerType("autocrafting_table"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 14);
-			
+
 			//Output slot
 			this.addSlot(new SlotWithRestrictions(tileEntity, 0, 158, 30, tileEntity, true));
-			
+
 			//3x3 grid slots
 			for (int row = 0; row < 3; ++row) {
 				for (int col = 0; col < 3; ++col) {
@@ -500,13 +499,13 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 							12 + (18 * row), tileEntity));
 				}
 			}
-			
+
 			//Recipe view, upgrades slots
 			this.addSlot(new SlotWithRestrictions(tileEntity, 10, 77, 48, tileEntity));
 			this.addSlot(new SlotWithRestrictions(tileEntity, 11, 203, 12, tileEntity));
 			this.addSlot(new SlotWithRestrictions(tileEntity, 12, 203, 30, tileEntity));
 			this.addSlot(new SlotWithRestrictions(tileEntity, 13, 203, 48, tileEntity));
-			
+
 			//Fill input slots
 			for (int row = 0; row < 2; ++row) {
 				for (int col = 0; col < 3; ++col) {
@@ -514,50 +513,50 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 							69 + (18 * row), tileEntity));
 				}
 			}
-			
-			//Fill inter. slots, row one 
+
+			//Fill inter. slots, row one
 			for (int col = 0; col < 6; ++col) {
 				this.addSlot(new SlotWithRestrictions(tileEntity, 17 + col, 116 + (18 * col),
 						69, tileEntity));
 			}
-			
+
 			//Fill inter. slots, row two
 			for (int col = 0; col < 6; ++col) {
 				this.addSlot(new SlotWithRestrictions(tileEntity, 26 + col, 116 + (18 * col),
 						87, tileEntity));
 			}
-			
-			if(tileEntity.serializedRecipes.containsKey(tileEntity.selectedRecipe) == false) {
+
+			if(!tileEntity.serializedRecipes.containsKey(tileEntity.selectedRecipe)) {
 				checkRecipe();
 			}
-			
+
 		}
-		
+
 		public ContainerAutocraftingTable(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
 			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEAutocraftingTable.class));
 		}
-		
+
 		@Override
 		public void clicked(int slot, int dragType, ClickType clickTypeIn, Player player) {
 			if(slot > 36 && slot < 46) {
-				if(tileEntity.serializedRecipes.containsKey(tileEntity.selectedRecipe) == false) {
+				if(!tileEntity.serializedRecipes.containsKey(tileEntity.selectedRecipe)) {
 					ItemStack is = this.getCarried();
 					if(!is.isEmpty()) {
 						tileEntity.setItem(slot - 36, new ItemStack(is.getItem(), 1));
 					}else {
 						tileEntity.setItem(slot - 36, ItemStack.EMPTY);
 					}
-					
+
 					checkRecipe();
 				}
-				
+
 				return;
 			}else if(slot == 46) {
 				return;
 			}else if(slot > 46 && slot < 50){
-				
+
 				super.clicked(slot, dragType, clickTypeIn, player);
-				
+
 				int availRecip = tileEntity.getUpgradeAmount(Upgrades.AC_RECIPES);
 				int nX = tileEntity.selectedRecipe;
 				if((nX > 1 && availRecip < 1) || (nX > 3 && availRecip < 2) || (nX > 5) && availRecip < 3) {
@@ -567,7 +566,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						tileEntity.setItem(i, ItemStack.EMPTY);
 					}
 					tileEntity.setItem(10, ItemStack.EMPTY);
-					
+
 					if(tileEntity.serializedRecipes.containsKey(tileEntity.selectedRecipe)) {
 						tileEntity.serializedRecipes.remove(tileEntity.selectedRecipe);
 					}else {
@@ -585,7 +584,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 											break;
 										}
 									}
-									
+
 								}
 							}
 							tileEntity.setItem(10, tileEntity.prevEnteredRecipe.getResultItem());
@@ -597,14 +596,14 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				super.clicked(slot, dragType, clickTypeIn, player);
 			}
 		}
-		
+
 		private void checkRecipe() {
 			Optional<CraftingRecipe> rOpt = tileEntity.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, wrapper, tileEntity.getLevel());
-			
+
 			CraftingRecipe recipe = rOpt.orElse(null);
-			
+
 			if(recipe != null) {
-				
+
 				tileEntity.setItem(10, recipe.getResultItem());
 				tileEntity.prevEnteredRecipe = recipe;
 			}else {
@@ -612,7 +611,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				tileEntity.prevEnteredRecipe = null;
 			}
 		}
-		
+
 		public static class AutocrafterInvWrapper extends CraftingContainer{
 
 			private final Container inv;
@@ -620,84 +619,84 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				super(eventHandlerIn, 3, 3);
 				this.inv = inv;
 			}
-			
+
 			@Override
 			public void clearContent() {
 				inv.clearContent();
 			}
-			
+
 			@Override
 			public int getContainerSize() {
 				return 9;
 			}
-			
+
 			@Override
 			public ItemStack getItem(int index) {
 				if(index < 9) {
 					return inv.getItem(index + 1);
 				}
-				
+
 				return ItemStack.EMPTY;
-				
+
 			}
-			
+
 			@Override
 			public ItemStack removeItem(int pIndex, int pCount) {
 				return ItemStack.EMPTY;
 			}
-			
+
 			@Override
 			public ItemStack removeItemNoUpdate(int pIndex) {
 				return ItemStack.EMPTY;
 			}
 			@Override
 			public void setItem(int index, ItemStack stack) {
-				
-				
+
+
 			}
-			
+
 			@Override
 			public void setChanged() {
 				inv.setChanged();
 			}
-			
+
 			@Override
 			public boolean stillValid(Player pPlayer) {
 				return inv.stillValid(pPlayer);
 			}
-			
+
 			@Override
 			public void fillStackedContents(StackedContents helper) {
 				for(int i = 1; i < 10; i++) {
 					helper.accountSimpleStack(inv.getItem(i));
 				}
 			}
-			
-			
+
+
 		}
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static class ScreenAutocraftingTable extends ScreenALMEnergyBased<ContainerAutocraftingTable>{
-		
+
 		TEAutocraftingTable tsfm;
-		
+
 		private TrueFalseButton bSwitch;
-		
+
 		public ScreenAutocraftingTable(ContainerAutocraftingTable screenContainer, Inventory inv,
 				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(230, 202), new Pair<>(11, 6), new Pair<>(62, 109), "autocrafting_table", false, new Pair<>(14, 17), screenContainer.tileEntity, 230, true);
 			tsfm = screenContainer.tileEntity;
 		}
-		
+
 		@Override
 		protected void init() {
 			super.init();
-			
+
 			int x = this.leftPos;
 			int y = this.topPos;
-			
-			
+
+
 			for (int row = 0; row < 5; ++row) {
 				for (int col = 0; col < 2; ++col) {
 					int bnum = (row * 2) + col;
@@ -708,14 +707,14 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 					this.addRenderableWidget(new AutocraftingSlotButton(bx, by, blitx, blity, 8, 8, new TrueFalseButtonSupplier("Recipe " + bnum, "Recipe " + bnum, () -> bnum == tsfm.selectedRecipe), (b) -> sendACChangeRecipePacket(tsfm.getBlockPos(), bnum), tsfm, bnum));
 				}
 			}
-			
+
 			this.addRenderableWidget(new TrueFalseButton(x+83, y+14, 244, 203, 11, 11, new TrueFalseButtonSupplier("Clear Recipe", "Save Recipe", () -> tsfm.serializedRecipes.containsKey(tsfm.selectedRecipe)), (b) -> tryLockInRecipe(tsfm.getBlockPos())));
-			this.addRenderableWidget(new TrueFalseButton(x+154, y+14, 231, 203, 11, 11, 
+			this.addRenderableWidget(new TrueFalseButton(x+154, y+14, 231, 203, 11, 11,
 					new TrueFalseButtonSupplier("Output to Output Slot", "Output to Internal Inventory", () -> tsfm.outputMode[tsfm.selectedRecipe] != 0), (b) -> sendOutputModeChangeRequest(tsfm.getBlockPos(), tsfm.selectedRecipe, "setoutputmode")));
 			bSwitch = this.addRenderableWidget(new TrueFalseButton(x+154, y+51, 11, 11, null, (b) -> sendOutputModeChangeRequest(tsfm.getBlockPos(), tsfm.selectedRecipe, "settargetslots")));
-			
+
 		}
-		
+
 		private static class AutocraftingSlotButton extends TrueFalseButton{
 
 			private final TEAutocraftingTable te;
@@ -725,12 +724,12 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				this.te = te;
 				this.number = number;
 			}
-			
+
 			@Override
 			protected boolean isValidClickButton(int p_230987_1_) {
 				return isEnabledSlot();
 			}
-			
+
 			@Override
 			public int[] getBlitData() {
 				if(!isEnabledSlot()) {
@@ -738,28 +737,28 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				}
 				return super.getBlitData();
 			}
-			
+
 			@Override
 			public boolean getSupplierOutput() {
 				if(!isEnabledSlot()) {
 					return true;
 				}
-				
+
 				return super.getSupplierOutput();
 			}
-			
+
 			@Override
 			public void renderToolTip(PoseStack mx, int mouseX, int mouseY) {
 				if(isEnabledSlot()) {
 					super.renderToolTip(mx, mouseX, mouseY);
 				}
 			}
-			
+
 			private boolean isEnabledSlot(){
 				if(number < 2) {
 					return true;
 				}else {
-					
+
 					int rcps = te.getUpgradeAmount(Upgrades.AC_RECIPES);
 					if(te.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
 						if(number < 4) {
@@ -774,16 +773,16 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 					}
 				}
 			}
-			
-				
+
+
 		}
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			
+
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
-			
-			
+
+
 			//Render energy TT if sustained upgrade is not installed.
 			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) == 0) {
 				if (mouseX >= x + energyMeterLoc.getFirst() && mouseY >= y + energyMeterLoc.getSecond() && mouseX <= x + energyMeterLoc.getFirst() + 15 && mouseY <= y + energyMeterLoc.getSecond() + 51) {
@@ -792,8 +791,8 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						ArrayList<String> str = new ArrayList<>();
 						str.add(FormattingHelper.GENERAL_FORMAT.format(machine.amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(machine.properties.getCapacity()) + "FE");
 						if(usesfept) {
-							
-							
+
+
 							str.add(FormattingHelper.FEPT_FORMAT.format(machine.fept) + " FE/tick");
 						}
 						this.renderComponentTooltip(str,
@@ -802,10 +801,10 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						this.renderComponentTooltip(FormattingHelper.formatToSuffix(machine.amount) + "/" + FormattingHelper.formatToSuffix(machine.properties.getCapacity()) + "FE",
 								mouseX - x, mouseY - y);
 					}
-					
+
 				}
 			}
-			
+
 			//Render special filter slot button TT.
 			if(bSwitch.isHoveredOrFocused()) {
 				switch(tsfm.slotTargets[tsfm.selectedRecipe]) {
@@ -823,23 +822,23 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 					break;
 				}
 			}
-			
-			
-			
+
+
+
 		}
-		
+
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
 			if(tsfm.getUpgradeAmount(Upgrades.AC_SUSTAINED) != 0) {
-				
+
 				//Blit over the energy bar if sustained upgrade is installed.
 				super.blit(x+13, y+16, 178, 10, 18, 54);
 			}
-			
-			
+
+
 			//Blit over the button depending on which mode is selected.
 			switch(tsfm.slotTargets[tsfm.selectedRecipe]) {
 			case 3:
@@ -852,82 +851,82 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				super.blit(x+154, y+51, 231, 116, 11, 11);
 				break;
 			}
-			
+
 			if (bSwitch.isHoveredOrFocused()) {
-				
-				
+
+
 				//blit overlay for the color slots on the internal inventory.
 				//blit lime
 				for (int row = 0; row < 2; ++row) {
 					for (int col = 0; col < 2; ++col) {
-						
+
 						super.blit(x+116+(col * 18), y+69+(row*18), 230, 154, 16, 16);
-						
+
 					}
 				}
-				
+
 				//blit magenta
 				for (int row = 0; row < 2; ++row) {
 					for (int col = 0; col < 2; ++col) {
-						
+
 						super.blit(x+152+(col * 18), y+69+(row*18), 230, 170, 16, 16);
-						
+
 					}
 				}
-				
+
 				//blit orange
 				for (int row = 0; row < 2; ++row) {
 					for (int col = 0; col < 2; ++col) {
-						
+
 						super.blit(x+188+(col * 18), y+69+(row*18), 230, 186, 16, 16);
-						
+
 					}
 				}
-				
+
 				//blit input-only slots.
 				for (int row = 0; row < 2; ++row) {
 					for (int col = 0; col < 3; ++col) {
-						
+
 						super.blit(x+61+(col * 18), y+69+(row*18), 214, 202, 16, 16);
-						
+
 					}
 				}
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	private static void sendACChangeRecipePacket(BlockPos pos, int bNum) {
-		
+
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
 		pd.writeString("button", "setrecipe");
 		pd.writeInteger("number", bNum);
-		
+
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
-	
+
 	private static void tryLockInRecipe(BlockPos pos) {
-		
+
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
 		pd.writeString("button", "lock");
-		
+
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
-	
+
 	private static void sendOutputModeChangeRequest(BlockPos pos, int bNum, String button) {
 		PacketData pd = new PacketData("autocrafting_gui");
 		pd.writeBlockPos("location", pos);
 		pd.writeString("button", button);
 		pd.writeInteger("number", bNum);
-		
+
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
-	
+
 	public static void updateDataFromPacket(PacketData pd, Level world) {
-		
+
 		if(pd.getCategory().equals("autocrafting_gui")) {
 			BlockPos pos = pd.get("location", BlockPos.class);
 			BlockEntity tex = world.getBlockEntity(pos);
@@ -940,7 +939,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						te.setItem(i, ItemStack.EMPTY);
 					}
 					te.setItem(10, ItemStack.EMPTY);
-					
+
 					SerializableRecipe recipA = te.serializedRecipes.get(te.selectedRecipe);
 					CraftingRecipe recipe;
 					if(recipA != null && (recipe = recipA.getRecipe(te.getLevel())) != null) {
@@ -956,19 +955,19 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 										break;
 									}
 								}
-								
+
 							}
 						}
-						
+
 						te.setItem(10, recipe.getResultItem());
 					}
 				}else if(b.equals("lock")) {
-					
+
 					for(int i = 1; i < 10; i++) {
 						te.setItem(i, ItemStack.EMPTY);
 					}
 					te.setItem(10, ItemStack.EMPTY);
-					
+
 					if(te.serializedRecipes.containsKey(te.selectedRecipe)) {
 						te.serializedRecipes.remove(te.selectedRecipe);
 					}else {
@@ -986,14 +985,14 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 											break;
 										}
 									}
-									
+
 								}
 							}
 							te.setItem(10, te.prevEnteredRecipe.getResultItem());
 							te.prevEnteredRecipe = null;
 						}
 					}
-					
+
 				}else if(b.equals("setoutputmode")) {
 					int i = pd.get("number", Integer.class);
 					if(te.outputMode[i] == 0) {
@@ -1009,8 +1008,8 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 						te.slotTargets[i]++;
 					}
 				}
-				
-				
+
+
 				te.sendUpdates();
 			}
 		}

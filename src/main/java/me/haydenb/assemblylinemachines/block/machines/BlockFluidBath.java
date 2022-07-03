@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.*;
 import net.minecraft.world.*;
@@ -36,11 +36,12 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class BlockFluidBath extends Block implements EntityBlock {
-	
+
 	public static final List<Item> VALID_FILL_ITEMS = List.of(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.POTION);
-	
+
 	private static final VoxelShape SHAPE = Stream.of(Block.box(1, 0, 1, 15, 16, 2),
 			Block.box(1, 0, 14, 15, 16, 15), Block.box(1, 0, 2, 2, 16, 14),
 			Block.box(14, 0, 2, 15, 16, 14), Block.box(2, 0, 2, 14, 1, 14)).reduce((v1, v2) -> {
@@ -56,7 +57,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		
+
 		builder.add(StateProperties.FLUID).add(STATUS);
 	}
 
@@ -64,7 +65,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 	public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
 		return SHAPE;
 	}
-	
+
 	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if(state.getBlock() != newState.getBlock()) {
@@ -73,7 +74,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 			}
 		}
 	}
-	
+
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
 		return Registry.getBlockEntity("fluid_bath").create(pPos, pState);
@@ -92,7 +93,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 					if (player.isShiftKeyDown()) {
 
 						if (entity.fluid == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE) {
-							player.displayClientMessage(new TextComponent("The basin is empty."), true);
+							player.displayClientMessage(Component.literal("The basin is empty."), true);
 						} else {
 							int maxSludge = 2;
 							if(entity.inputa != null) {
@@ -108,10 +109,10 @@ public class BlockFluidBath extends Block implements EntityBlock {
 							entity.fluidColor = 0;
 							entity.inputb = null;
 							entity.drainAmt = 0;
-							
+
 							world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1f, 1f);
 							world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(STATUS, 0));
-							player.displayClientMessage(new TextComponent("Drained basin."), true);
+							player.displayClientMessage(Component.literal("Drained basin."), true);
 							if(entity.inputIngredientReturn != null) {
 								ItemHandlerHelper.giveItemToPlayer(player, entity.inputIngredientReturn.getFirst());
 								ItemHandlerHelper.giveItemToPlayer(player, entity.inputIngredientReturn.getSecond());
@@ -119,7 +120,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 							}else {
 								ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Registry.getItem("sludge"), world.getRandom().nextInt(maxSludge)));
 							}
-							
+
 							entity.sendUpdates();
 						}
 
@@ -127,7 +128,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 						ItemStack held = player.getMainHandItem();
 						if (VALID_FILL_ITEMS.contains(held.getItem()) && (!held.getItem().equals(Items.POTION) || PotionUtils.getPotion(held) == Potions.WATER)) {
 							Pair<SoundEvent, BathCraftingFluids> fluids;
-							String rLoc = held.getItem().getRegistryName().toString();
+							String rLoc = ForgeRegistries.ITEMS.getKey(held.getItem()).toString();
 							int fillCount = 4;
 							switch(rLoc) {
 							case("minecraft:lava_bucket"):
@@ -152,14 +153,14 @@ public class BlockFluidBath extends Block implements EntityBlock {
 								world.setBlockAndUpdate(pos, state.setValue(StateProperties.FLUID, fluids.getSecond()).setValue(STATUS, fillCount + state.getValue(STATUS)));
 								entity.fluid = fluids.getSecond();
 								entity.sendUpdates();
-								player.displayClientMessage(new TextComponent("Filled basin."), true);
+								player.displayClientMessage(Component.literal("Filled basin."), true);
 							}else {
-								player.displayClientMessage(new TextComponent("You cannot insert this right now."), true);
+								player.displayClientMessage(Component.literal("You cannot insert this right now."), true);
 							}
-							
+
 						} else {
 							if (entity.fluid == BathCraftingFluids.NONE || state.getValue(StateProperties.FLUID) == BathCraftingFluids.NONE) {
-								player.displayClientMessage(new TextComponent("The basin is empty."), true);
+								player.displayClientMessage(Component.literal("The basin is empty."), true);
 							}else {
 								if (entity.inputa == null) {
 									Item i = held.getItem();
@@ -180,16 +181,16 @@ public class BlockFluidBath extends Block implements EntityBlock {
 										held.shrink(1);
 										BathCrafting crafting = world.getRecipeManager().getRecipeFor(BathCrafting.BATH_RECIPE, entity, world).orElse(null);
 										if (crafting != null && crafting.getFluid().equals(entity.fluid) && state.getValue(STATUS) - crafting.getPercentage().getDrop() >= 0) {
-											
-											
+
+
 											entity.output = crafting.getResultItem().copy();
 											entity.stirsRemaining = crafting.getStirs();
 											entity.fluidColor = crafting.getColor();
 											entity.drainAmt = crafting.getPercentage().getDrop();
 											entity.sendUpdates();
-											
-											
-											
+
+
+
 										}else {
 											if(!ALMConfig.getServerConfig().invalidBathReturnsSludge().get()) {
 												entity.inputIngredientReturn = Pair.of(entity.inputa, entity.inputb);
@@ -222,11 +223,11 @@ public class BlockFluidBath extends Block implements EntityBlock {
 										} else {
 
 											if(!(held.getItem() instanceof ItemStirringStick)) {
-												player.displayClientMessage(new TextComponent("Use a Stirring Stick to mix."), true);
+												player.displayClientMessage(Component.literal("Use a Stirring Stick to mix."), true);
 											}else {
 												ItemStirringStick tss = (ItemStirringStick) held.getItem();
 												if(entity.fluid == BathCraftingFluids.LAVA && tss.getStirringResistance() == TemperatureResistance.COLD) {
-													player.displayClientMessage(new TextComponent("You need a metal Stirring Stick to stir Lava."), true);
+													player.displayClientMessage(Component.literal("You need a metal Stirring Stick to stir Lava."), true);
 												}else {
 													entity.stirsRemaining--;
 													tss.useStirStick(held);
@@ -236,7 +237,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 										}
 									} else {
 										player.displayClientMessage(
-												new TextComponent(
+												Component.literal(
 														"This recipe is invalid. Shift + Right Click to drain basin."),
 												true);
 									}
@@ -271,18 +272,18 @@ public class BlockFluidBath extends Block implements EntityBlock {
 		public TEFluidBath(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("fluid_bath"), pos, state);
 		}
-		
-		
+
+
 
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-			
+
 			if (compound.contains("assemblylinemachines:stirs")) {
 				stirsRemaining = compound.getInt("assemblylinemachines:stirs");
 			}
 			if (compound.contains("assemblylinemachines:fluid")) {
-				fluid = BathCraftingFluids.valueOf(BathCraftingFluids.class, compound.getString("assemblylinemachines:fluid"));
+				fluid = Enum.valueOf(BathCraftingFluids.class, compound.getString("assemblylinemachines:fluid"));
 			}
 			if(compound.contains("assemblylinemachines:fluidcolor")) {
 				fluidColor = compound.getInt("assemblylinemachines:fluidcolor");
@@ -296,11 +297,11 @@ public class BlockFluidBath extends Block implements EntityBlock {
 			if (compound.contains("assemblylinemachines:output")) {
 				output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 			}
-			
+
 			if(compound.contains("assemblylinemachines:returna") && compound.contains("assemblylinemachines:returnb")) {
 				inputIngredientReturn = Pair.of(ItemStack.of(compound.getCompound("assemblylinemachines:returna")), ItemStack.of(compound.getCompound("assemblylinemachines:returnb")));
 			}
-			
+
 			if(compound.contains("assemblylinemachines:drainamt")) {
 				drainAmt = compound.getInt("assemblylinemachines:drainamt");
 			}
@@ -334,7 +335,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 			} else {
 				compound.remove("assemblylinemachines:output");
 			}
-			
+
 			if(inputIngredientReturn != null) {
 				compound.put("assemblylinemachines:returna", inputIngredientReturn.getFirst().save(new CompoundTag()));
 				compound.put("assemblylinemachines:returnb", inputIngredientReturn.getSecond().save(new CompoundTag()));
@@ -369,7 +370,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 				this.getLevel().sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 2);
 			}
 		}
-		
+
 		@Override
 		public boolean isEmpty() {
 			return false;
@@ -388,10 +389,10 @@ public class BlockFluidBath extends Block implements EntityBlock {
 		@Override
 		public void setItem(int arg0, ItemStack arg1) {
 		}
-		
+
 		public int getFluidColor(BlockAndTintGetter reader, BlockPos pos) {
-			
-			
+
+
 			if(output != null && fluidColor != 0) {
 				return fluidColor;
 			}
@@ -402,11 +403,11 @@ public class BlockFluidBath extends Block implements EntityBlock {
 				return BiomeColors.getAverageWaterColor(reader, pos);
 			}
 		}
-		
+
 		public boolean hasOutput() {
 			return output != null;
 		}
-		
+
 		@Override
 		public ItemStack removeItem(int pIndex, int pCount) {
 			return null;

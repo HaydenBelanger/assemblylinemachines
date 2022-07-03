@@ -24,7 +24,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -45,7 +46,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	protected NonNullList<ItemStack> contents;
 	protected int playersUsing;
 	protected int slotCount;
-	protected TranslatableComponent name;
+	protected MutableComponent name;
 	protected int containerId;
 	protected Class<A> clazz;
 	private String secureLock;
@@ -56,7 +57,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	 * code. Remember that A.class in last parameter must be an instance of
 	 * Container and MUST have constructor of A(int windowId, Inventory pInv,
 	 * this.class te) or it WILL NOT WORK.
-	 * 
+	 *
 	 * @param tileEntityTypeIn The specified Tile Entity Type object as obtained
 	 *                         from the Registry.
 	 * @param slotCount        The number of slots this inventory will have.
@@ -65,7 +66,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	 * @param clazz            The class to construct on createMenu(). View warning
 	 *                         above!
 	 */
-	public AbstractMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, TranslatableComponent name, int containerId, Class<A> clazz, BlockPos pos, BlockState state) {
+	public AbstractMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, MutableComponent name, int containerId, Class<A> clazz, BlockPos pos, BlockState state) {
 		super(tileEntityTypeIn, pos, state);
 		this.containerId = containerId;
 		this.name = name;
@@ -85,7 +86,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getTag());
 	}
-	
+
 	//Synchronizes data on world load between client and server.
 	@Override
 	public CompoundTag getUpdateTag() {
@@ -93,12 +94,12 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 		this.saveAdditional(tag);
 		return tag;
 	}
-	
+
 	@Override
 	public void handleUpdateTag(CompoundTag tag) {
 		this.load(tag);
 	}
-		
+
 
 	public void sendUpdates() {
 		this.getLevel().setBlocksDirty(this.getBlockPos(), getBlockState(), getBlockState());
@@ -136,7 +137,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 					return true;
 				}
 			}
-			player.displayClientMessage(new TranslatableComponent("container.isLocked", getDefaultName()), true);
+			player.displayClientMessage(Component.translatable("container.isLocked", getDefaultName()), true);
 			player.playNotifySound(SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 1.0F, 1.0F);
 			return false;
 		}
@@ -182,15 +183,14 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	}
 
 	@Override
-	public BaseComponent getDefaultName() {
+	protected Component getDefaultName() {
 		return name;
 	}
 
-	
 	@Override
 	public AbstractContainerMenu createMenu(int id, Inventory player) {
 		try {
-			return (AbstractContainerMenu) clazz.getConstructor(int.class, Inventory.class, this.getClass()).newInstance(id, player, this);
+			return clazz.getConstructor(int.class, Inventory.class, this.getClass()).newInstance(id, player, this);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -200,7 +200,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 	public final CompoundTag save(CompoundTag compound) {
 		return compound;
 	}
-	
+
 	@Override
 	protected void saveAdditional(CompoundTag compound) {
 		if (!this.trySaveLootTable(compound)) {
@@ -211,7 +211,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			compound.putUUID("assemblylinemachines:lock:slmakeruuid", secureLockMaker);
 			compound.putString("assemblylinemachines:lock:slcode", secureLock);
 		}
-		
+
 		this.save(compound);
 		super.saveAdditional(compound);
 	}
@@ -280,7 +280,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			this.checkDataBridge = null;
 			this.outputSlot = outputSlot;
 		}
-		
+
 		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, IMachineDataBridge check, boolean outputSlot) {
 			super(inventoryIn, index, xPosition, yPosition);
 			this.slot = index;
@@ -292,11 +292,11 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, AbstractMachine<?> check) {
 			this(inventoryIn, index, xPosition, yPosition, check, false);
 		}
-		
+
 		public SlotWithRestrictions(Container inventoryIn, int index, int xPosition, int yPosition, IMachineDataBridge check) {
 			this(inventoryIn, index, xPosition, yPosition, check, false);
 		}
-		
+
 		@Override
 		public boolean mayPlace(ItemStack pStack) {
 			if (outputSlot) {
@@ -366,7 +366,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 				this.addSlot(new Slot(playerInventory, col, hotx + (18 * col), hoty));
 			}
 		}
-		
+
 		@Override
 		public ItemStack quickMoveStack(Player player, int index) {
 			ItemStack itemstack = ItemStack.EMPTY;
@@ -418,22 +418,22 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			this.inventoryText = () -> this.playerInventoryTitle;
 			this.renderTitleText = true;
 			this.renderInventoryText = true;
-			
+
 			bg = new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/" + guipath + ".png");
 		}
 
 		// render
 		@Override
 		public void render(PoseStack mx, final int mousex, final int mousey, final float partialTicks) {
-			
-			
+
+
 			this.mx = mx;
 			super.renderBackground(mx);
 			super.render(mx, mousex, mousey, partialTicks);
 			super.renderTooltip(mx, mousex, mousey);
-			
+
 		}
-		
+
 		//Wrapped blit with MX so to use internally stored PoseStack
 		protected void blit(int a, int b, int c, int d, int e, int f) {
 			super.blit(mx, a, b, c, d, e, f);
@@ -443,49 +443,49 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			//super.func_238470_a_(mx, a, b, c, d, e, tas);
 			GUIHelper.fillAreaWithIcon(tas, x, y, w, h);
 		}
-		
+
 		protected void blit(int x, int y, int w, int h, int v, TextureAtlasSprite tas) {
 			this.blit(x, y, w, h, tas);
 		}
 
 		//WRAPPED renderTooltip = renderComponentTooltip
 		protected void renderComponentTooltip(String a, int b, int c) {
-			super.renderComponentTooltip(mx, List.of((Component) new TextComponent(a)), b, c);
+			super.renderComponentTooltip(mx, List.of((Component) Component.literal(a)), b, c);
 		}
 		public void renderComponentTooltip(List<String> a, int b, int c) {
-			super.renderComponentTooltip(mx, a.stream().map((s) -> (Component) new TextComponent(s)).toList(), b, c);
+			super.renderComponentTooltip(mx, a.stream().map((s) -> (Component) Component.literal(s)).toList(), b, c);
 		}
 
 		//Filled without MX to use internally stored PoseStack
 		public void drawCenteredString(Font a, String b, int c, int d, int e) {
-			super.drawCenteredString(mx, a, new TextComponent(b), c, d, e);
+			super.drawCenteredString(mx, a, Component.literal(b), c, d, e);
 		}
 
-		
+
 		//LINKED - renderLabels = drawGuiContainerForegroundLayer
 		@Override
 		protected void renderLabels(PoseStack p_230451_1_, int p_230451_2_, int p_230451_3_) {
 			this.drawGuiContainerForegroundLayer(p_230451_2_, p_230451_3_);
 		}
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			if (renderTitleText == true) {
+			if (renderTitleText) {
 				this.font.draw(mx, this.getTitle(), titleTextLoc.getFirst(), titleTextLoc.getSecond(), 4210752);
-				
+
 			}
-			if(renderInventoryText == true) {
+			if(renderInventoryText) {
 				this.font.draw(mx, this.inventoryText.get(), invTextLoc.getFirst(), invTextLoc.getSecond(), 4210752);
 			}
-			
+
 		}
 
 		//LINKED - renderBg = drawGuiContainerBackgroundLayer
 		@Override
 		protected void renderBg(PoseStack p_230450_1_, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
-			
+
 			this.drawGuiContainerBackgroundLayer(p_230450_2_, p_230450_3_, p_230450_4_);
 
 		}
-		
+
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			//GL11.glClearColor(1f, 1f, 1f, 1f);
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -495,7 +495,7 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
 			this.blit(x, y, 0, 0, this.imageWidth, this.imageHeight);
-			
+
 			for(Widget w : this.renderables) {
 				if(w instanceof TrueFalseButton) {
 					TrueFalseButton tfb = (TrueFalseButton) w;

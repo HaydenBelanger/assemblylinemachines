@@ -10,7 +10,6 @@ import me.haydenb.assemblylinemachines.block.machines.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockOmnivoid.TEOmnivoid;
 import me.haydenb.assemblylinemachines.block.pipes.PipeConnectorTileEntity;
 import me.haydenb.assemblylinemachines.item.ItemSpores;
-import me.haydenb.assemblylinemachines.registry.config.ALMConfig.PreInit;
 import me.haydenb.assemblylinemachines.world.CapabilityBooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -35,68 +34,67 @@ public class PacketHandler {
 		PACKET_TARGETS.put("machine_builder_gui", (pd, world) -> ((IMachineDataBridge) world.getBlockEntity(pd.get("pos", BlockPos.class))).receiveButtonPacket(pd));
 		PACKET_TARGETS.put("omnivoid_gui", (pd, world) -> ((TEOmnivoid) world.getBlockEntity(pd.get("location", BlockPos.class))).toggleSettings(pd.get("settingtoggle", Integer.class)));
 		PACKET_TARGETS.put("request_book", (pd, world) -> CapabilityBooks.guideBookServerRequestHandler(pd.get("uuid", UUID.class)));
-		
+
 		//SERVER -> CLIENT
 		PACKET_TARGETS.put("vacuum_hopper_particles", (pd, world) -> BlockVacuumHopper.spawnTeleparticles(pd));
 		PACKET_TARGETS.put("experience_hopper_particles", (pd, world) -> BlockExperienceHopper.spawnTeleparticles(pd));
 		PACKET_TARGETS.put("spores_growth", (pd, world) -> ItemSpores.spawnGrowParticles(pd));
-		PACKET_TARGETS.put("experimental_verify", (pd, world) -> PreInit.connectReceiveValidateRequest(pd));
 	}
-	
+
 	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(AssemblyLineMachines.MODID, "primary"), () -> "1", "1"::equals, "1"::equals);
 	public static int simpleId = 0;
-	
+
 	public static class PacketData{
-		
+
 		private final Map<String, Object> map;
 		private final String title;
-		
+
 		public PacketData(String title) {
 			this(title, new HashMap<>());
 		}
-		
+
 		private PacketData(String title, Map<String, Object> map) {
 			this.map = map;
 			this.title = title;
 		}
-		
+
 		public void writeString(String key, String value) {
 			map.put(key, value);
 		}
-		
+
 		public void writeInteger(String key, Integer value) {
 			map.put(key, value);
 		}
-		
+
 		public void writeBoolean(String key, Boolean value) {
 			map.put(key, value);
 		}
-		
+
 		public void writeBlockPos(String key, BlockPos value) {
 			map.put(key, value);
 		}
-		
+
 		public void writeDouble(String key, Double value) {
 			map.put(key, value);
 		}
-		
+
 		public void writeUUID(String key, UUID value) {
 			map.put(key, value);
 		}
-		
+
 		public void writeByteArray(String key, byte[] value) {
 			map.put(key, value);
 		}
-		
+
 		public <T> T get(String key, Class<T> clazz) {
 			return clazz.cast(map.get(key));
 		}
-		
+
 		public String getCategory() {
 			return this.title;
 		}
 	}
-	
+
 	public static void register() {
 		INSTANCE.registerMessage(PacketHandler.simpleId++, PacketData.class, (t, u) -> {
 			//Encoder

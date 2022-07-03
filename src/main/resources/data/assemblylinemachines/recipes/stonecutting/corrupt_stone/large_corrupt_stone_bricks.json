@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "assemblylinemachines:corrupt_stone"
+  },
+  "result": "assemblylinemachines:large_corrupt_stone_bricks",
+  "count": 1
+}

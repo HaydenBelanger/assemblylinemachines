@@ -13,8 +13,8 @@ public class ItemCorruptedShard extends Item implements IGearboxFuel{
 	public ItemCorruptedShard() {
 		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
 	}
-	
-	
+
+
 	@Override
 	public Component getName(ItemStack stack) {
 		if(stack.hasTag() && stack.getTag().contains("assemblylinemachines:internalitem")) {
@@ -24,7 +24,7 @@ public class ItemCorruptedShard extends Item implements IGearboxFuel{
 			return super.getName(stack);
 		}
 	}
-	
+
 	@Override
 	public int getBurnTime(ItemStack itemStack, RecipeType<?> type) {
 		return 9600;
@@ -35,21 +35,21 @@ public class ItemCorruptedShard extends Item implements IGearboxFuel{
 	public int getGearboxBurnTime(ItemStack stack) {
 		return this.getBurnTime(stack, null);
 	}
-	
+
 	public static ItemStack corruptItem(ItemStack orig) {
 		if(orig.getItem() != Registry.getItem("corrupted_shard")) {
 			CompoundTag main = new CompoundTag();
 			CompoundTag sub = new CompoundTag();
-			
+
 			new ItemStack(orig.getItem(), 1).save(sub);
 			main.put("assemblylinemachines:internalitem", sub);
-			
+
 			orig = new ItemStack(Registry.getItem("corrupted_shard"), orig.getCount());
-			
+
 			orig.setTag(main);
 		}
-		
+
 		return orig;
-		
+
 	}
 }

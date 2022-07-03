@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -27,35 +27,35 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 	public float fept = 0;
 	public boolean enabled = true;
 	protected IEnergyStorage energy = new IEnergyStorage() {
-		
+
 		@Override
 		public int receiveEnergy(int maxReceive, boolean simulate) {
 			if(!canReceive()) {
 				return 0;
 			}
-			
+
 			if(properties.capacity < maxReceive + amount) {
 				maxReceive = properties.getCapacity() - amount;
 			}
-			
-			if(simulate == false) {
+
+			if(!simulate) {
 				amount += maxReceive;
 				sendUpdates();
 			}
-			
+
 			return maxReceive;
 		}
-		
+
 		@Override
 		public int getMaxEnergyStored() {
 			return properties.getCapacity();
 		}
-		
+
 		@Override
 		public int getEnergyStored() {
 			return amount;
 		}
-		
+
 		@Override
 		public int extractEnergy(int maxExtract, boolean simulate) {
 			if(!canExtract()) {
@@ -64,34 +64,34 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 			if(maxExtract > amount) {
 				maxExtract = amount;
 			}
-			
-			if(simulate == false) {
+
+			if(!simulate) {
 				amount -= maxExtract;
 				sendUpdates();
 			}
-			
+
 			return maxExtract;
 		}
-		
+
 		@Override
 		public boolean canReceive() {
 			return properties.getIn();
 		}
-		
+
 		@Override
 		public boolean canExtract() {
 			return properties.getOut();
 		}
 	};
 	protected LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> energy);
-	
-	
-	public EnergyMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, TranslatableComponent name, int containerId,
+
+
+	public EnergyMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, MutableComponent name, int containerId,
 			Class<A> clazz, EnergyProperties properties, BlockPos pos, BlockState state) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz, pos, state);
 		this.properties = properties;
 	}
-	
+
 	@Override
 	public void load(CompoundTag compound) {
 		super.load(compound);
@@ -102,28 +102,28 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 			fept = compound.getFloat("assemblylinemachines:fept");
 		}
 	}
-	
+
 	@Override
 	public void saveAdditional(CompoundTag compound) {
 		compound.putInt("assemblylinemachines:stored", amount);
 		compound.putFloat("assemblylinemachines:fept", fept);
 		super.saveAdditional(compound);
 	}
-	
+
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap) {
 		if(cap == CapabilityEnergy.ENERGY) {
 			return energyHandler.cast();
 		}
-		
+
 		return LazyOptional.empty();
 	}
-	
+
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		return this.getCapability(cap);
 	}
-	
+
 	@Override
 	public void setRemoved() {
 		super.setRemoved();
@@ -131,41 +131,41 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 			energyHandler.invalidate();
 		}
 	}
-	
-	
+
+
 	public static class EnergyProperties{
 		private boolean in;
 		private boolean out;
 		private int capacity;
-		
+
 		public EnergyProperties(boolean in, boolean out, int capacity) {
 			this.in = in;
 			this.out = out;
 			this.capacity = capacity;
 		}
-		
+
 		public int getCapacity() {
 			return capacity;
 		}
-		
+
 		public boolean getIn() {
 			return in;
 		}
-		
+
 		public boolean getOut() {
 			return out;
 		}
 	}
-	
+
 	public static class ScreenALMEnergyBased<T extends AbstractContainerMenu> extends ScreenALMBase<T>{
 
 		protected final Pair<Integer, Integer> energyMeterLoc;
 		protected final EnergyMachine<?> machine;
 		protected final boolean usesfept;
 		protected int startx;
-		
+
 		protected boolean usesFe = true;
-		
+
 		public ScreenALMEnergyBased(T screenContainer, Inventory inv, Component titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
 				String guipath, boolean hasCool, Pair<Integer, Integer> energyMeterLoc,
@@ -176,7 +176,7 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 			this.machine = machine;
 			this.usesfept = usesfept;
 		}
-		
+
 		public ScreenALMEnergyBased(T screenContainer, Inventory inv, Component titleIn,
 				Pair<Integer, Integer> size, Pair<Integer, Integer> titleTextLoc, Pair<Integer, Integer> invTextLoc,
 				String guipath, boolean hasCool, Pair<Integer, Integer> energyMeterLoc,
@@ -187,11 +187,11 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 			this.machine = machine;
 			this.usesfept = usesfept;
 		}
-		
+
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-			
+
 			if(usesFe) {
 				int x = (this.width - this.imageWidth) / 2;
 				int y = (this.height - this.imageHeight) / 2;
@@ -201,8 +201,8 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 						ArrayList<String> str = new ArrayList<>();
 						str.add(FormattingHelper.GENERAL_FORMAT.format(machine.amount) + "/" + FormattingHelper.GENERAL_FORMAT.format(machine.properties.capacity) + "FE");
 						if(usesfept) {
-							
-							
+
+
 							str.add(FormattingHelper.GENERAL_FORMAT.format(machine.fept) + " FE/tick");
 						}
 						this.renderComponentTooltip(str,
@@ -211,15 +211,15 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 						this.renderComponentTooltip(FormattingHelper.formatToSuffix(machine.amount) + "/" + FormattingHelper.formatToSuffix(machine.properties.capacity) + "FE",
 								mouseX - x, mouseY - y);
 					}
-					
+
 				}
 			}
 		}
-		
+
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			
+
 			if(usesFe) {
 				int x = (this.width - this.imageWidth) / 2;
 				int y = (this.height - this.imageHeight) / 2;
@@ -227,8 +227,8 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 				super.blit(x + energyMeterLoc.getFirst(), y + energyMeterLoc.getSecond() + (52 - prog), startx, (52 - prog), 16, prog);
 			}
 		}
-		
-		
+
+
 	}
 
 }

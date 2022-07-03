@@ -17,27 +17,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-	
-	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new RecipeType<LumberCrafting>() {
+
+	public static final RecipeType<LumberCrafting> LUMBER_RECIPE = new RecipeType<>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:lumber";
 		}
 	};
-	
+
 	public static final LumberSerializer SERIALIZER = new LumberSerializer();
-	
+
 	private final Lazy<Ingredient> input;
 	private final ItemStack outputa;
 	public final ItemStack outputb;
 	public final float opbchance;
 	public final int time;
 	private final ResourceLocation id;
-	
+
 	public LumberCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack outputa, ItemStack outputb, float opbchance, int time) {
 		this.id = id;
 		this.input = input;
@@ -46,19 +45,19 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 		this.opbchance = opbchance;
 		this.time = time;
 	}
-	
+
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		return input.get().test(inv.getItem(2));
 	}
-	
+
 	@Override
 	public ItemStack assemble(Container inv) {
 		if(inv instanceof IMachineDataBridge data) {
 			inv.getItem(2).shrink(1);
 			if(!this.outputb.isEmpty()) {
 				float chance = data.blockState().is(Registry.getBlock("mkii_lumber_mill")) ? Utils.RAND.nextFloat(0.5f) : Utils.RAND.nextFloat();
-				if(chance <= (opbchance * (1f + (0.5f * (float)((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
+				if(chance <= (opbchance * (1f + (0.5f * ((IMachineDataBridge) inv).getUpgradeAmount(Upgrades.MACHINE_EXTRA)))))
 					((IMachineDataBridge) inv).setSecondaryOutput(this.outputb.copy());
 			}
 			((IMachineDataBridge) inv).setCycles(time);
@@ -75,12 +74,12 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	public ItemStack getResultItem() {
 		return outputa;
 	}
-	
+
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-	
+
 	@Override
 	public List<?> getJEIComponents() {
 		return List.of(input.get(), outputa, outputb);
@@ -100,8 +99,8 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 	public RecipeType<?> getType() {
 		return LUMBER_RECIPE;
 	}
-	
-	public static class LumberSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<LumberCrafting>{
+
+	public static class LumberSerializer implements RecipeSerializer<LumberCrafting>{
 
 		@Override
 		public LumberCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -115,14 +114,14 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 					opbchance = GsonHelper.getAsFloat(json, "opbchance");
 				}
 				int time = GsonHelper.getAsInt(json, "time");
-				
+
 				return new LumberCrafting(recipeId, input, output, outputb, opbchance, time);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-			
-			
+
+
 		}
 
 		@Override
@@ -132,7 +131,7 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 			ItemStack opb = buffer.readItem();
 			float opbc = buffer.readFloat();
 			int time = buffer.readInt();
-			
+
 			return new LumberCrafting(recipeId, Lazy.of(() -> input), output, opb, opbc, time);
 		}
 
@@ -143,8 +142,8 @@ public class LumberCrafting implements Recipe<Container>, IRecipeCategoryBuilder
 			buffer.writeItem(recipe.outputb);
 			buffer.writeFloat(recipe.opbchance);
 			buffer.writeInt(recipe.time);
-			
+
 		}
-		
+
 	}
 }
