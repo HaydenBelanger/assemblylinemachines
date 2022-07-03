@@ -2,11 +2,10 @@
 
 The tool configuration is specified in `assemblylinemachines-experimental.toml` config located in the config directory. This allows more control over stats and features of various tools.
 
-!!! error "1.18.2+ Feature"
-    This feature was made available in 1.18.2-1.4.3. Prior to this version, all tools were controlled through the common config using static fields.
+!!! error "Removed Feature"
+    This feature was exclusively available in 1.18.2-1.4.3 and 1.18.2-1.4.4, and was removed in 1.19-1.4.5 due to a change with Forge not allowing configs to be loaded prior to the preinitialization phase.
 
-!!! warning
-    Any feature that is contained within `assemblylinemachines-experimental.toml` is extremely volatile and may stop working or be removed at any time. Client-server config mismatch will cause all clients to be unable to join. It's recommended to only change these options for a modpack default config, allowing all clients to share the same values.
+    This feature is extremely volatile and may stop working as expected. Client-server config mismatch will cause all clients to be unable to join. It's recommended to only change these options for a modpack default config, allowing all clients to share the same values.
     
 When first opening the configuration file, the array for `toolStats` will be empty. This is because there are no overrides. This configuration section acts on overrides, meaning that if unspecified, a tool will fall back to the default value for that stat.
 
