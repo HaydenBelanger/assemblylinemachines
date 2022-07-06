@@ -1,10 +1,10 @@
-license="AGPL-3.0 License"
+license="LGPL-3.0"
 modLoader="javafml" #mandatory
 loaderVersion="[40,)"
 issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[mods]]
 	modId="assemblylinemachines"
-	version="1.18.2-1.4.4"
+	version="1.18.2-1.4.4.1"
 	displayName="Assembly Line Machines"
 	updateJSONURL="https://haydenb.me/api/versionhistory.json"
 	logoFile="banner-compressed.png" #optional
