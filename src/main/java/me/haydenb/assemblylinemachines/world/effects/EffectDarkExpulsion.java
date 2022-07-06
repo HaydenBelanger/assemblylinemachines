@@ -12,11 +12,11 @@ public class EffectDarkExpulsion extends MobEffect {
 	public EffectDarkExpulsion() {
 		super(MobEffectCategory.HARMFUL, 0xff4d00);
 	}
-	
+
 	@Override
 	public void applyEffectTick(LivingEntity pLivingEntity, int pAmplifier) {
 		if(pLivingEntity instanceof Player) {
-			
+
 			Player player = (Player) pLivingEntity;
 			if(!protectWithAEFG(player, 1000)) {
 				for(ItemStack i : player.getInventory().items) {
@@ -29,17 +29,17 @@ public class EffectDarkExpulsion extends MobEffect {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isDurationEffectTick(int pDuration, int pAmplifier) {
 		return pDuration % 10 == 0;
 	}
-	
+
 	@Override
 	public boolean isInstantenous() {
 		return false;
 	}
-	
+
 	public static boolean protectWithAEFG(Player player, int damage) {
 		for(ItemStack i : player.getInventory().items) {
 			if(i.getItem() instanceof ItemAEFG && ((ItemAEFG) i.getItem()).damageItem(i, damage) != null) {
@@ -48,5 +48,5 @@ public class EffectDarkExpulsion extends MobEffect {
 		}
 		return false;
 	}
-	
+
 }

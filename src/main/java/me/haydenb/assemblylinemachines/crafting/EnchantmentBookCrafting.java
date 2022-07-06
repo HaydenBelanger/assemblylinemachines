@@ -20,27 +20,26 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-	
-	public static final RecipeType<EnchantmentBookCrafting> ENCHANTMENT_BOOK_RECIPE = new RecipeType<EnchantmentBookCrafting>() {
+
+	public static final RecipeType<EnchantmentBookCrafting> ENCHANTMENT_BOOK_RECIPE = new RecipeType<>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:enchantment_book";
 		}
 	};
-	
+
 	public static final EnchantmentBookSerializer SERIALIZER = new EnchantmentBookSerializer();
 	private static final Ingredient BOOK = Ingredient.of(Items.BOOK);
-	
+
 	private final CountIngredient input;
 	private final Enchantment enchantment;
 	private final int cost;
 	private final ResourceLocation id;
 	private final LoadingCache<Integer, ItemStack> bookCache;
-	
+
 	public EnchantmentBookCrafting(ResourceLocation id, CountIngredient input, Enchantment enchantment, int cost) {
 		this.input = input;
 		this.enchantment = enchantment;
@@ -51,13 +50,13 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		if(inv instanceof TEExperienceMill) {
-			
+
 			if(input.test(inv.getItem(1))) {
 				if(BOOK.test(inv.getItem(2))) {
 					return true;
 				}
 			}
-			
+
 			if(input.test(inv.getItem(2))) {
 				if(BOOK.test(inv.getItem(1))) {
 					return true;
@@ -66,33 +65,33 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-	
+
 	@Override
 	public ItemStack assemble(Container inv) {
 		int level = 1;
 		if(inv instanceof TEExperienceMill te) {
 			level = switch(te.getUpgradeAmount(Upgrades.EXP_MILL_LEVEL)) {
 			case 3 -> enchantment.getMaxLevel();
-			case 2 -> (int) Math.ceil((double) enchantment.getMaxLevel() / 2d);
-			case 1 -> (int) Math.ceil((double) enchantment.getMaxLevel() / 3d);
+			case 2 -> (int) Math.ceil(enchantment.getMaxLevel() / 2d);
+			case 1 -> (int) Math.ceil(enchantment.getMaxLevel() / 3d);
 			default -> 1;
 			};
-			
+
 			float spUp = te.getUpgradeAmount(Upgrades.UNIVERSAL_SPEED);
 			int cost = Math.round(this.cost * (1f + (0.1f * spUp))) * level;
-			int cycles = spUp != 0f ? Math.round(((float) this.cost * (0.75f / spUp)) / 10f) * level : Math.round((float) this.cost / 10f) * level;
-			
+			int cycles = spUp != 0f ? Math.round((this.cost * (0.75f / spUp)) / 10f) * level : Math.round(this.cost / 10f) * level;
+
 			if(te.tank.getAmount() < cost) return ItemStack.EMPTY;
-			
+
 			int bookSlot = inv.getItem(1).getItem() == Items.BOOK ? 1 : 2;
 			int catalystSlot = bookSlot == 2 ? 1 : 2;
 			if(inv.getItem(catalystSlot).getCount() < this.input.getCount() * level) return ItemStack.EMPTY;
-			
+
 			te.tank.shrink(cost);
 			inv.getItem(bookSlot).shrink(1);
 			inv.getItem(catalystSlot).shrink(this.input.getCount() * level);
@@ -130,7 +129,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	public RecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
-	
+
 	@Override
 	public List<?> getJEIComponents() {
 		return List.of(input, BOOK, getResultItem());
@@ -140,28 +139,28 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 	public RecipeType<?> getType() {
 		return ENCHANTMENT_BOOK_RECIPE;
 	}
-	
-	public static class EnchantmentBookSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<EnchantmentBookCrafting>{
+
+	public static class EnchantmentBookSerializer implements RecipeSerializer<EnchantmentBookCrafting>{
 
 		@Override
 		public EnchantmentBookCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
 				CountIngredient ingredient = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-				
+
 				int cost = GsonHelper.getAsInt(json, "cost");
 				Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "enchantment")));
-				
+
 				if(enchantment == null) {
 					throw new IllegalArgumentException("This enchantment does not exist.");
 				}
-				
+
 				return new EnchantmentBookCrafting(recipeId, ingredient, enchantment, cost);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-			
-			
+
+
 		}
 
 		@Override
@@ -176,9 +175,9 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, EnchantmentBookCrafting recipe) {
 			recipe.input.toNetwork(buffer);
-			buffer.writeResourceLocation(recipe.enchantment.getRegistryName());
+			buffer.writeResourceLocation(ForgeRegistries.ENCHANTMENTS.getKey(recipe.enchantment));
 			buffer.writeInt(recipe.cost);
 		}
-		
+
 	}
 }

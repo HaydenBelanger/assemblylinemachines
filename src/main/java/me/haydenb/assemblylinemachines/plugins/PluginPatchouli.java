@@ -19,17 +19,17 @@ public class PluginPatchouli {
 		}
 		return new PatchouliInterface() {};
 	});
-	
+
 	public interface PatchouliInterface{
-		
+
 		default ItemStack getBookItem() {
 			return ItemStack.EMPTY;
 		}
-		
+
 	}
-	
+
 	static class PatchouliPresent implements PatchouliInterface{
-		
+
 		@Override
 		public ItemStack getBookItem() {
 			return PatchouliAPI.get().getBookStack(new ResourceLocation(AssemblyLineMachines.MODID, "assembly_lines_and_you"));

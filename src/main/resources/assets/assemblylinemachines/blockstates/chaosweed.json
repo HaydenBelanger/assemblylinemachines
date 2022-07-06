@@ -1,8 +1,9 @@
 {
 	"variants":{
-		"": {
-			"model": "assemblylinemachines:block/chaosweed"
-		}
+		"":[{"model": "assemblylinemachines:block/chaosweed"},
+		{"model": "assemblylinemachines:block/chaosweed_alternatives/chaosweed_1"},
+		{"model": "assemblylinemachines:block/chaosweed_alternatives/chaosweed_2"},
+		{"model": "assemblylinemachines:block/chaosweed_alternatives/chaosweed_3"}]
 	}
 	
 }

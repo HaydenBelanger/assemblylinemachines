@@ -5,7 +5,7 @@ import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPPr
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -24,12 +24,12 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 		super(Block.Properties.of(Material.STONE).strength(3f, 9f));
 		this.registerDefaultState(this.stateDefinition.any().setValue(NATURAL_GRANITE, false));
 	}
-	
+
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(NATURAL_GRANITE);
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn,
@@ -37,33 +37,33 @@ public class BlockBlackGranite extends Block implements TOPProvider{
 		if(canToolMine(player, state)) {
 			return super.getDestroyProgress(state, player, worldIn, pos);
 		}
-		
+
 		return super.getDestroyProgress(state, player, worldIn, pos) * 0.05F;
 	}
 
 	@Override
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
-		if(state.getValue(NATURAL_GRANITE) == true) {
+		if(state.getValue(NATURAL_GRANITE)) {
 			if(canToolMine(player, state)) {
-				probeInfo.horizontal().text(new TextComponent("Block will drop when mined.").withStyle(ChatFormatting.GREEN));
+				probeInfo.horizontal().text(Component.literal("Block will drop when mined.").withStyle(ChatFormatting.GREEN));
 			}else {
-				probeInfo.horizontal().text(new TextComponent("Block will not drop when mined.").withStyle(ChatFormatting.RED));
+				probeInfo.horizontal().text(Component.literal("Block will not drop when mined.").withStyle(ChatFormatting.RED));
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	@Override
 	public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 		if(!player.isCreative() && !canToolMine(player, state)) {
-			player.displayClientMessage(new TextComponent("A Pickaxe with mechanical power is needed to extract the Black Granite.").withStyle(ChatFormatting.RED), true);
+			player.displayClientMessage(Component.literal("A Pickaxe with mechanical power is needed to extract the Black Granite.").withStyle(ChatFormatting.RED), true);
 		}
 		return super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
 	}
-	
+
 	private static boolean canToolMine(Player player, BlockState state) {
-		if(state.getValue(NATURAL_GRANITE) == true) {
+		if(state.getValue(NATURAL_GRANITE)) {
 			ItemStack item = player.getMainHandItem();
 			if(item != ItemStack.EMPTY && item.hasTag()) {
 				CompoundTag compound = item.getTag();

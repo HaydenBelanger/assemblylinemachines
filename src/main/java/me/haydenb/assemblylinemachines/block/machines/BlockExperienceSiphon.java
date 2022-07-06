@@ -24,7 +24,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 public class BlockExperienceSiphon extends BlockTileEntity {
-	
+
 	private static final VoxelShape SHAPE_N = Stream.of(
 			Block.box(0, 0, 0, 16, 3, 2),Block.box(0, 0, 14, 16, 3, 16),
 			Block.box(0, 0, 2, 2, 3, 14),Block.box(14, 0, 2, 16, 3, 14),
@@ -36,7 +36,7 @@ public class BlockExperienceSiphon extends BlockTileEntity {
 			Block.box(14, 3, 1, 15, 15, 2),Block.box(1, 3, 14, 2, 15, 15),
 			Block.box(14, 3, 14, 15, 15, 15)
 			).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
-	
+
 	public BlockExperienceSiphon() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "experience_siphon",
 				SHAPE_N, false, null);
@@ -62,20 +62,20 @@ public class BlockExperienceSiphon extends BlockTileEntity {
 	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
 		return InteractionResult.CONSUME;
 	}
-	
+
 	public static class TEExperienceSiphon extends BasicTileEntity implements ALMTicker<TEExperienceSiphon>{
-		
+
 		private int timer = 0;
 		private IFluidHandler output = null;
-		
+
 		public TEExperienceSiphon(BlockEntityType<?> tileEntityType, BlockPos pos, BlockState state) {
 			super(tileEntityType, pos, state);
 		}
-		
+
 		public TEExperienceSiphon(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("experience_siphon"), pos, state);
 		}
-		
+
 		@Override
 		public void tick() {
 			if(!level.isClientSide) {
@@ -93,7 +93,7 @@ public class BlockExperienceSiphon extends BlockTileEntity {
 					}else {
 						BlockPos bPos = this.getBlockPos();
 						AABB range = new AABB(bPos.getX(), bPos.getY(), bPos.getZ(), bPos.getX() + 1, bPos.getY() + 2, bPos.getZ() + 1);
-						
+
 						List<Player> players = this.getLevel().getEntitiesOfClass(Player.class, range);
 						for(Player player : players) {
 							int toDrain = player.totalExperience < 100 ? player.totalExperience : 100;
@@ -102,15 +102,15 @@ public class BlockExperienceSiphon extends BlockTileEntity {
 								player.giveExperiencePoints(-toDrain);
 								output.fill(fill, FluidAction.EXECUTE);
 							}
-							
+
 						}
 					}
 				}
 			}
-			
+
 		}
-		
-		
+
+
 	}
-	
+
 }

@@ -16,7 +16,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -59,18 +58,18 @@ public class BlockVacuumHopper extends HopperBlock {
 	public BlockVacuumHopper() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
 	}
-	
-	
-	
+
+
+
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
 		return Registry.getBlockEntity("vacuum_hopper").create(pPos, pState);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-		return new BlockEntityTicker<T>() {
+		return new BlockEntityTicker<>() {
 
 			@Override
 			public void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
@@ -79,7 +78,7 @@ public class BlockVacuumHopper extends HopperBlock {
 				}else if(blockEntity instanceof BlockEntityTicker) {
 					((BlockEntityTicker<T>) blockEntity).tick(level, pos, state, blockEntity);
 				}
-				
+
 			}
 		};
 	}
@@ -109,7 +108,7 @@ public class BlockVacuumHopper extends HopperBlock {
 		private int timer = 0;
 		private int sTimer = 0;
 		private AABB bb = null;
-		
+
 		private IItemHandler handler = null;
 
 		@Override
@@ -148,11 +147,11 @@ public class BlockVacuumHopper extends HopperBlock {
 								lO.addListener((lOX) -> handler = null);
 							}
 						}
-						
+
 					}
 					if(handler != null) {
 						ListIterator<ItemStack> iter = this.getItems().listIterator();
-						
+
 						while(iter.hasNext()) {
 							ItemStack item = iter.next();
 							for(int i = 0; i < handler.getSlots(); i++) {
@@ -163,10 +162,10 @@ public class BlockVacuumHopper extends HopperBlock {
 							}
 							iter.set(item);
 						}
-						
+
 					}
 				}
-				
+
 			}
 
 		}
@@ -178,7 +177,7 @@ public class BlockVacuumHopper extends HopperBlock {
 
 		@Override
 		public Component getName() {
-			return new TranslatableComponent(Registry.getBlock("vacuum_hopper").getDescriptionId());
+			return Component.translatable(Registry.getBlock("vacuum_hopper").getDescriptionId());
 		}
 
 		private static void spawnTeleparticles(double x, double y, double z, LevelChunk ch) {

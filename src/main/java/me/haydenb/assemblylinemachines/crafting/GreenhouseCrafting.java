@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
-import java.util.Random;
 
 import com.google.gson.JsonObject;
 
@@ -13,23 +12,23 @@ import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategoryBuilder {
 
-	public static final RecipeType<GreenhouseCrafting> GREENHOUSE_RECIPE = new RecipeType<GreenhouseCrafting>() {
+	public static final RecipeType<GreenhouseCrafting> GREENHOUSE_RECIPE = new RecipeType<>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:greenhouse";
 		}
 	};
-	
+
 	public static final GreenhouseSerializer SERIALIZER = new GreenhouseSerializer();
-	
+
 	private final ResourceLocation id;
 	private final Lazy<Ingredient> input;
 	private final ItemStack baseOutput;
@@ -41,7 +40,7 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 	private final int processingPerUnit;
 	public final Sprout sprout;
 	public final Soil soil;
-	
+
 	public GreenhouseCrafting(ResourceLocation id, Lazy<Ingredient> input, ItemStack baseOutput, int waterPerUnit, float base, float additional, int max, OutputScaling scaling, int processingPerUnit, Sprout sprout, Soil soil) {
 		this.id = id;
 		this.input = input;
@@ -55,12 +54,11 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 		this.sprout = sprout;
 		this.soil = soil;
 	}
-	
+
 	@Override
 	public boolean matches(TEGreenhouse container, Level level) {
 		if(input.get().test(container.getItem(1)) && soil.soil.get().test(container.getItem(3))) {
-			if(soil.requiredSpecialization != null && container.getUpgradeAmount(soil.requiredSpecialization) == 0) return false;
-			if(sprout.requiredSpecialization != null && container.getUpgradeAmount(sprout.requiredSpecialization) == 0) return false;
+			if((soil.requiredSpecialization != null && container.getUpgradeAmount(soil.requiredSpecialization) == 0) || (sprout.requiredSpecialization != null && container.getUpgradeAmount(sprout.requiredSpecialization) == 0)) return false;
 			if(sprout.sunlightReq != null) {
 				if(sprout.sunlightReq.test(soil)) {
 					if(container.getEffectiveLight() < 13) return false;
@@ -78,9 +76,9 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 		if(container.currentFertilizerRemaining <= 0) return ItemStack.EMPTY;
 		int stackAmount = (baseOutput.getCount() + getAdditionalChance(container.getUpgradeAmount(Upgrades.MACHINE_EXTRA), container.getLevel().getRandom())) * container.currentFertilizerMultiplier;
 		int actualWater = Math.min(4000, stackAmount * waterPerUnit);
-		
+
 		if(container.tank.getAmount() < actualWater) return ItemStack.EMPTY;
-		
+
 		int lightPenalty = 1;
 		if(sprout.sunlightReq != null) {
 			if(sprout.sunlightReq.test(soil)) {
@@ -89,7 +87,7 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 				lightPenalty = Math.max(1, container.getEffectiveDarkness() - 3);
 			}
 		}
-		
+
 		container.tank.shrink(actualWater);
 		container.cycles = stackAmount * processingPerUnit * lightPenalty;
 		container.currentFertilizerRemaining--;
@@ -97,7 +95,7 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 			container.currentFertilizerMax = 0;
 			container.currentFertilizerMultiplier = 0;
 		}
-		
+
 		ItemStack output = baseOutput.copy();
 		container.getLevel().setBlockAndUpdate(container.getBlockPos(), container.getBlockState().setValue(BlockGreenhouse.SOIL, soil).setValue(BlockGreenhouse.SPROUT, sprout).setValue(StateProperties.MACHINE_ACTIVE, true));
 		output.setCount(stackAmount);
@@ -128,12 +126,12 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 	public RecipeType<?> getType() {
 		return GREENHOUSE_RECIPE;
 	}
-	
+
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-	
+
 	@Override
 	public List<?> getJEIComponents() {
 		Ingredient upgradeSoil = soil.requiredSpecialization != null ? Ingredient.of(soil.requiredSpecialization.getItem()) : Ingredient.EMPTY;
@@ -142,11 +140,11 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 			upgradeSoil = upgradeSprout;
 			upgradeSprout = Ingredient.EMPTY;
 		}
-		
+
 		return List.of(input.get(), soil.soil.get(), upgradeSoil, upgradeSprout, baseOutput);
 	}
-	
-	private int getAdditionalChance(int upgrades, Random rand) {
+
+	private int getAdditionalChance(int upgrades, RandomSource rand) {
 		if(max == 0) return 0;
 		if(scaling == OutputScaling.PURE_RANDOM) {
 			float actual = base + (additional * upgrades);
@@ -160,7 +158,7 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 		}
 	}
 
-	public static class GreenhouseSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GreenhouseCrafting>{
+	public static class GreenhouseSerializer implements RecipeSerializer<GreenhouseCrafting>{
 
 		@Override
 		public GreenhouseCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -175,10 +173,10 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 				int time = GsonHelper.getAsInt(json, "time");
 				Soil soil = GsonHelper.isValidNode(json, "soil") ? Soil.valueOf(GsonHelper.getAsString(json, "soil").toUpperCase()) : Soil.DIRT;
 				if(soil == Soil.EMPTY) throw new IllegalArgumentException("Soil cannot be EMPTY.");
-				
+
 				Sprout sprout = GsonHelper.isValidNode(json, "sprout") ? Sprout.valueOf(GsonHelper.getAsString(json, "sprout").toUpperCase()) : Sprout.SPROUT;
 				if(sprout == Sprout.EMPTY) throw new IllegalArgumentException("Sprout cannot be EMPTY.");
-				
+
 				return new GreenhouseCrafting(recipeId, input, output, baseWater, base, additional, max, scaling, time, sprout, soil);
 			}catch(Exception e) {
 				e.printStackTrace();
@@ -198,7 +196,7 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 			int time = buffer.readInt();
 			Sprout sprout = buffer.readEnum(Sprout.class);
 			Soil soil = buffer.readEnum(Soil.class);
-			
+
 			return new GreenhouseCrafting(recipeId, Lazy.of(() -> input), output, baseWater, base, additional, max, scaling, time, sprout, soil);
 		}
 
@@ -215,9 +213,9 @@ public class GreenhouseCrafting implements Recipe<TEGreenhouse>, IRecipeCategory
 			buffer.writeEnum(recipe.sprout);
 			buffer.writeEnum(recipe.soil);
 		}
-		
+
 	}
-	
+
 	public static enum OutputScaling{
 		UPGRADE, PURE_RANDOM;
 	}

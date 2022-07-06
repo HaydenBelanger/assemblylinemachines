@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "assemblylinemachines:block/chaosweed_alternatives/tall_blooming_chaosweed_1"
+  }
+}

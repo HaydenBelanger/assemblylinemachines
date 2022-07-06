@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.block.helpers;
 
-import java.lang.annotation.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -39,7 +38,6 @@ import net.minecraft.data.models.blockstates.PropertyDispatch.QuadFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -60,6 +58,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.util.*;
@@ -74,42 +73,42 @@ public class MachineBuilder {
 	public static MachineBlockBuilder block() {
 		return new MachineBlockBuilder();
 	}
-	
+
 	public static MachineBlockEntityBuilder blockEntity() {
 		return new MachineBlockEntityBuilder();
 	}
-	
+
 	public static MachineContainerBuilder container() {
 		return new MachineContainerBuilder();
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static MachineScreenBuilder screen() {
 		return new MachineScreenBuilder();
 	}
-	
+
 	public static class MachineBlockBuilder {
-		
+
 		private boolean activeProperty = false;
 		private Properties properties = Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL);
 		private HashMap<Direction, VoxelShape> shapes = new HashMap<>();
 		private Pair<Function<BlockState, BlockState>, Consumer<Builder<Block, BlockState>>> additionalProperties = null;
 		private QuadFunction<BlockState, Level, BlockPos, Player, InteractionResult> rightClickAction = null;
-		
+
 		private MachineBlockBuilder() {}
-		
+
 		public MachineBlockBuilder properties(Properties properties) {
 			this.properties = properties;
 			return this;
 		}
-		
+
 		public MachineBlockBuilder hasActiveProperty() {
 			this.activeProperty = true;
 			return this;
 		}
-		
+
 		public MachineBlockBuilder voxelShape(VoxelShape northShape, boolean canRotate) {
-			if(canRotate == false) {
+			if(!canRotate) {
 				shapes.put(Direction.NORTH, northShape);
 			}else {
 				shapes.put(Direction.NORTH, northShape);
@@ -119,49 +118,49 @@ public class MachineBuilder {
 			}
 			return this;
 		}
-		
+
 		public MachineBlockBuilder additionalProperties(Function<BlockState, BlockState> defaults, Consumer<Builder<Block, BlockState>> blockStateDefinition) {
 			additionalProperties = Pair.of(defaults, blockStateDefinition);
 			return this;
 		}
-		
+
 		public MachineBlockBuilder rightClickAction(QuadFunction<BlockState, Level, BlockPos, Player, InteractionResult> function) {
 			rightClickAction = function;
 			return this;
 		}
-		
+
 		public Block build(String teName) {
 			return this.build(teName, AbstractMachine.class);
 		}
-		
+
 		public <T extends AbstractMachine<?>> Block build(String teName, Class<T> clazz) {
-			
+
 			class MachineBlock extends BlockScreenBlockEntity<T>{
 
 				public MachineBlock(Properties properties, String teName, Class<T> clazz) {
 					super(properties, teName, clazz);
-					if(activeProperty == true || shapes.size() > 1 || additionalProperties != null) {
+					if(activeProperty || shapes.size() > 1 || additionalProperties != null) {
 						BlockState state = this.stateDefinition.any();
-						if(activeProperty == true) state = state.setValue(StateProperties.MACHINE_ACTIVE, false);
+						if(activeProperty) state = state.setValue(StateProperties.MACHINE_ACTIVE, false);
 						if(shapes.size() > 1) state = state.setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH);
 						if(additionalProperties != null) state = additionalProperties.getFirst().apply(state);
 						this.registerDefaultState(state);
 					}
 				}
-				
+
 				@Override
 				protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-					if(activeProperty == true) builder.add(StateProperties.MACHINE_ACTIVE);
+					if(activeProperty) builder.add(StateProperties.MACHINE_ACTIVE);
 					if(shapes.size() > 1) builder.add(HorizontalDirectionalBlock.FACING);
 					if(additionalProperties != null) additionalProperties.getSecond().accept(builder);
 					super.createBlockStateDefinition(builder);
 				}
-				
+
 				@Override
 				public BlockState getStateForPlacement(BlockPlaceContext context) {
 					return shapes.size() > 1 ? super.getStateForPlacement(context).setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite()) : super.getStateForPlacement(context);
 				}
-				
+
 				@Override
 				public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos,
 						CollisionContext context) {
@@ -171,7 +170,7 @@ public class MachineBuilder {
 					default -> shapes.get(state.getValue(HorizontalDirectionalBlock.FACING));
 					};
 				}
-				
+
 				@Override
 				public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos,
 						Player player) {
@@ -181,18 +180,18 @@ public class MachineBuilder {
 					}
 					return super.blockRightClickServer(state, world, pos, player);
 				}
-				
+
 			}
-			
+
 			return new MachineBlock(properties, teName, clazz);
-			
+
 		}
-		
-		
+
+
 	}
-	
+
 	public static class MachineBlockEntityBuilder{
-		
+
 		private EnergyProperties energy = new EnergyProperties(true, false, 20000);
 		private int baseNTimer = 16;
 		private int baseFECost = 100;
@@ -213,117 +212,117 @@ public class MachineBuilder {
 		private List<List<Integer>> slotDuplicateCheckingGroups = null;
 		private TriPredicate<Integer, ItemStack, BlockEntity> slotValidator = null;
 		private Pair<Predicate<Integer>, BiFunction<Container, Integer, ItemStack>> getCapturer = null;
-		
+
 		private MachineBlockEntityBuilder() {}
-		
+
 		public MachineBlockEntityBuilder energy(boolean in, boolean out, int capacity) {
 			energy = new EnergyProperties(in, out, capacity);
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder energy(int capacity) {
 			energy = new EnergyProperties(true, false, capacity);
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder crankMachine(int crankThresholdPerCycle) {
 			usesFE = false;
 			crankable = true;
 			crankThreshold = crankThresholdPerCycle;
 			return energy(false, false, 0);
 		}
-		
+
 		public MachineBlockEntityBuilder baseProcessingStats(int feCost, int nTimer) {
 			this.baseNTimer = nTimer;
 			this.baseFECost = feCost;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder recipeProcessor(BiFunction<BlockEntity, Container, Optional<Recipe<Container>>> recipeProcessor) {
 			this.recipeProcessor = recipeProcessor;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder slotInfo(int totalSlots, int upgradeSlotNumber) {
 			this.totalSlots = totalSlots;
 			this.upgradeSlotNumber = upgradeSlotNumber;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder executeOnRecipeCompletion(BiConsumer<Container, Recipe<Container>> execute) {
 			this.executeOnRecipeCompletion = execute;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder slotIDTransformer(Function<Integer, Integer> slotTransformer) {
 			this.slotIDTransformer = slotTransformer;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder specialStateModifier(BiFunction<Recipe<Container>, BlockState, BlockState> specialStateModifier) {
 			this.specialStateModifier = specialStateModifier;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder slotExtractableFunction(Predicate<Integer> isExtractableSlot) {
 			this.isExtractableSlot = isExtractableSlot;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder dualProcessorIDTransformer(Function<Integer, Integer> slotTransformer) {
 			this.dualFunctionIDTransformer = slotTransformer;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder outputSlots(int primary, int secondary, int dualProcessing) {
 			this.primaryOutputSlot = primary;
 			this.secondaryOutputSlot = secondary;
 			this.dualProcessingOutputSlot = dualProcessing;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder cycleCountModifier(float cycleCountModifier) {
 			this.cycleCountModifier = cycleCountModifier;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder processesFluids(int capacity, boolean hasExternalTank) {
 			this.processesFluids = true;
 			this.hasExternalTank = hasExternalTank;
 			this.capacity = capacity;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder hasNoInternalTank() {
 			this.hasInternalTank = false;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder duplicateCheckingGroups(List<List<Integer>> slotGroups) {
 			this.slotDuplicateCheckingGroups = slotGroups;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder duplicateCheckingGroup(List<Integer> slotGroup) {
 			this.slotDuplicateCheckingGroups = List.of(slotGroup);
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder mustBeFullBefore(Function<Integer, List<Integer>> mustBeFullBefore) {
 			this.mustBeFullBefore = mustBeFullBefore;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder slotContentsValidator(TriPredicate<Integer, ItemStack, BlockEntity> validator) {
 			this.slotValidator = validator;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder getCapturer(Predicate<Integer> operateOn, BiFunction<Container, Integer, ItemStack> stackProvider) {
 			this.getCapturer = Pair.of(operateOn, stackProvider);
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder outputToRight() {
 			this.outputToRight = true;
 			this.primaryOutputSlot = -1;
@@ -331,14 +330,14 @@ public class MachineBuilder {
 			this.dualProcessingOutputSlot = -1;
 			return this;
 		}
-		
+
 		public MachineBlockEntityBuilder allowedInZero() {
 			this.allowedInZero = true;
 			return this;
 		}
-		
+
 		public BlockEntityType<?> build(String blockName, Block... validBlocks) {
-			
+
 			class MachineBlockEntity extends ManagedSidedMachine<AbstractContainerMenu> implements ALMTicker<MachineBlockEntity>, IMachineDataBridge, ICrankableMachine{
 
 				private int timer, nTimer, cranks;
@@ -355,20 +354,20 @@ public class MachineBuilder {
 				private boolean useInternalTank = true;
 				private boolean allowCranks = false;
 				private int mkiiPneumaticCompressorMold = 0;
-				
+
 				public MachineBlockEntity(BlockPos pos, BlockState state) {
-					super(Registry.getBlockEntity(blockName), totalSlots, new TranslatableComponent(Registry.getBlock(blockName).getDescriptionId())
+					super(Registry.getBlockEntity(blockName), totalSlots, Component.translatable(Registry.getBlock(blockName).getDescriptionId())
 							, Registry.getContainerId(blockName), AbstractContainerMenu.class, new EnergyProperties(false, false, 0), pos, state);
 					this.properties = MachineBlockEntityBuilder.this.energy;
 				}
-				
+
 				@Override
 				public AbstractContainerMenu createMenu(int id, Inventory player) {
 					FriendlyByteBuf fbb = new FriendlyByteBuf(Unpooled.buffer());
 					fbb.writeBlockPos(this.getBlockPos());
 					return Registry.getContainerType(blockName).create(id, player, fbb);
 				}
-				
+
 				@Override
 				public void tick() {
 					if(!level.isClientSide) {
@@ -400,7 +399,7 @@ public class MachineBuilder {
 										}
 									}
 								}
-								
+
 							}else if(!output.isEmpty() || !secondaryOutput.isEmpty() || !dualProcessorOutput.isEmpty()){
 								if(!usesFE || amount - cost >= 0) {
 									if(!crankable || cranks >= crankThreshold) {
@@ -441,7 +440,7 @@ public class MachineBuilder {
 												cycles = 0;
 												progress = 0;
 												if(crankable) allowCranks = true;
-												
+
 											}
 										}else {
 											if(usesFE) {
@@ -453,22 +452,22 @@ public class MachineBuilder {
 										cranks = 0;
 									}
 								}
-								
+
 								sendUpdates = true;
 							}
-							
+
 							if(blockState().hasProperty(StateProperties.MACHINE_ACTIVE)) {
 								boolean machineActive = blockState().getValue(StateProperties.MACHINE_ACTIVE);
-								if((machineActive == true && cycles == 0) || (machineActive == false && cycles != 0)) {
+								if((machineActive && cycles == 0) || (!machineActive && cycles != 0)) {
 									this.getLevel().setBlockAndUpdate(this.getBlockPos(), blockState().setValue(StateProperties.MACHINE_ACTIVE, !machineActive));
 									sendUpdates = true;
 								}
 							}
-							
+
 							if(sendUpdates) {
 								sendUpdates();
 							}
-							
+
 						}
 					}
 				}
@@ -477,12 +476,12 @@ public class MachineBuilder {
 				public boolean validFrom(Direction dir) {
 					return crankable;
 				}
-				
+
 				@Override
 				public boolean requiresGearbox() {
 					return false;
 				}
-				
+
 				@Override
 				public boolean perform() {
 					if(allowCranks) return true;
@@ -490,13 +489,13 @@ public class MachineBuilder {
 					cranks++;
 					return true;
 				}
-				
+
 				@Override
 				public boolean isAllowedInSlot(int slot, ItemStack stack) {
 					if(upgradeSlotNumber != 0 && (slot >= totalSlots - upgradeSlotNumber)) {
 						return (stack.getItem() instanceof ItemUpgrade);
 					}
-					
+
 					if(mustBeFullBefore != null) {
 						List<Integer> res = mustBeFullBefore.apply(slot);
 						if(res != null) {
@@ -511,7 +510,7 @@ public class MachineBuilder {
 					if(slotValidator != null) {
 						if(!slotValidator.test(slot, stack, this)) return false;
 					}
-					
+
 					if(slotDuplicateCheckingGroups != null) {
 						for(List<Integer> groups : slotDuplicateCheckingGroups) {
 							if(groups.contains(slot)) {
@@ -521,31 +520,31 @@ public class MachineBuilder {
 							}
 						}
 					}
-					
+
 					if(slot == 0 && allowedInZero) return true;
 					return super.isAllowedInSlot(slot, stack);
 				}
-				
+
 				@Override
 				public boolean canInsertToSide(boolean isEnergy, int slot, Direction direction) {
 					if(isEnergy && !usesFE) return false;
 					if(isEnergy || isExtractableSlot == null) return super.canInsertToSide(isEnergy, slot, direction);
-					if(enabledSides.getOrDefault(direction, true) == false) return false;
+					if(!enabledSides.getOrDefault(direction, true)) return false;
 					return !isExtractableSlot.test(slot);
 				}
-				
+
 				@Override
 				public boolean canExtractFromSide(boolean isEnergy, int slot, Direction direction) {
 					if(isEnergy && !usesFE) return false;
 					if(isEnergy || isExtractableSlot == null) return super.canExtractFromSide(isEnergy, slot, direction);
-					if(enabledSides.getOrDefault(direction, true) == false) return false;
+					if(!enabledSides.getOrDefault(direction, true)) return false;
 					return isExtractableSlot.test(slot);
 				}
-				
+
 				@Override
 				public void load(CompoundTag compound) {
 					super.load(compound);
-					
+
 					output = ItemStack.of(compound.getCompound("assemblylinemachines:output"));
 					secondaryOutput = ItemStack.of(compound.getCompound("assemblylinemachines:secondaryoutput"));
 					dualProcessorOutput = ItemStack.of(compound.getCompound("assemblylinemachines:dualprocessoroutput"));
@@ -558,7 +557,7 @@ public class MachineBuilder {
 					allowCranks = compound.getBoolean("assemblylinemachines:allowcranks");
 					mkiiPneumaticCompressorMold = compound.getInt("assemblylinemachines:mkiipneumaticmold");
 				}
-				
+
 				@Override
 				public void saveAdditional(CompoundTag compound) {
 					compound.putInt("assemblylinemachines:ntimer", nTimer);
@@ -572,54 +571,54 @@ public class MachineBuilder {
 					if(cranks != 0) compound.putInt("assemblylinemachines:cranks", cranks);
 					if(allowCranks) compound.putBoolean("assemblylinemachines:allowcranks", allowCranks);
 					if(mkiiPneumaticCompressorMold != 0) compound.putInt("assemblylinemachines:mkiipneumaticmold", mkiiPneumaticCompressorMold);
-					
+
 					super.saveAdditional(compound);
 				}
-				
+
 				@Override
 				public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 					if(!usesFE && cap == CapabilityEnergy.ENERGY) return LazyOptional.empty();
 					if(processesFluids && hasInternalTank && useInternalTank && cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return LazyOptional.of(() -> getCraftingFluidHandler(Optional.of(true))).cast();
 					return super.getCapability(cap, side);
 				}
-				
+
 				@Override
 				public float getCycles() {
 					return this.cycles;
 				}
-				
+
 				@Override
 				public float getProgress() {
 					return this.progress;
 				}
-				
+
 				@Override
 				public void setSecondaryOutput(ItemStack output) {
 					this.secondaryOutput = output;
 				}
-				
+
 				@Override
 				public void setCycles(float cycles) {
 					if(this.cycles < (cycles * cycleCountModifier)) this.cycles = (cycles * cycleCountModifier);
 				}
-				
+
 				@Override
 				public boolean getUsingInternalTank() {
 					if(!hasExternalTank) return true;
 					if(!hasInternalTank) return false;
 					return useInternalTank;
 				}
-				
+
 				@Override
 				public BlockState blockState() {
 					return this.getBlockState();
 				}
-				
+
 				@Override
 				public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal) {
-					
+
 					boolean useInternal = preferInternal.isPresent() ? preferInternal.get() : getUsingInternalTank();
-					
+
 					if(useInternal && hasInternalTank) {
 						if(internalLazy == null) {
 							internalLazy = LazyOptional.of(() -> IFluidHandlerBypass.getSimpleOneTankHandler(null, capacity, (oFs) -> {
@@ -636,7 +635,7 @@ public class MachineBuilder {
 									externalLazy = null;
 									return null;
 								}else {
-									externalLazy.addListener((lazy) -> externalLazy = null); 
+									externalLazy.addListener((lazy) -> externalLazy = null);
 								}
 							}else {
 								return null;
@@ -646,7 +645,7 @@ public class MachineBuilder {
 					}
 					return null;
 				}
-				
+
 				@Override
 				public void receiveButtonPacket(PacketData pd) {
 					if(pd.get("function", String.class).equals("toggle_source_tank")) {
@@ -656,7 +655,7 @@ public class MachineBuilder {
 						this.getOrSetMKIIPCSelMold(Optional.of(pd.get("mold", Integer.class)));
 					}
 				}
-				
+
 				@Override
 				public int getUpgradeAmount(Upgrades upgrade) {
 					if(upgradeSlotNumber == 0) return 0;
@@ -669,7 +668,7 @@ public class MachineBuilder {
 
 					return ii;
 				}
-				
+
 				@Override
 				public int getOrSetMKIIPCSelMold(Optional<Integer> set) {
 					if(set.isPresent()) {
@@ -678,7 +677,7 @@ public class MachineBuilder {
 					}
 					return mkiiPneumaticCompressorMold;
 				}
-				
+
 				private IItemHandler getOrCreateRightOutput() {
 					if(rightOutput != null && rightOutput.isPresent()) return rightOutput.orElse(null);
 					Direction toRight = this.blockState().getValue(HorizontalDirectionalBlock.FACING).getCounterClockWise();
@@ -698,11 +697,11 @@ public class MachineBuilder {
 					}
 					return null;
 				}
-				
+
 				class SlotTransformer implements Container, IMachineDataBridge{
 
 					private final Function<Integer, Integer> transformer;
-					
+
 					private SlotTransformer(Function<Integer, Integer> transformer) {
 						this.transformer = transformer;
 					}
@@ -751,7 +750,7 @@ public class MachineBuilder {
 					public boolean stillValid(Player p_18946_) {
 						return MachineBlockEntity.this.stillValid(p_18946_);
 					}
-					
+
 					@Override
 					public boolean isAllowedInSlot(int slot, ItemStack stack) {
 						return MachineBlockEntity.this.isAllowedInSlot(slot, stack);
@@ -761,60 +760,60 @@ public class MachineBuilder {
 					public void setCycles(float cycles) {
 						MachineBlockEntity.this.setCycles(cycles);
 					}
-					
+
 					@Override
 					public int getUpgradeAmount(Upgrades upgrade) {
 						return MachineBlockEntity.this.getUpgradeAmount(upgrade);
 					}
-					
+
 					@Override
 					public float getProgress() {
 						return MachineBlockEntity.this.getProgress();
 					}
-					
+
 					@Override
 					public float getCycles() {
 						return MachineBlockEntity.this.getCycles();
 					}
-					
+
 					@Override
 					public void setSecondaryOutput(ItemStack output) {
 						MachineBlockEntity.this.setSecondaryOutput(output);
 					}
-					
+
 					@Override
 					public IFluidHandler getCraftingFluidHandler(Optional<Boolean> preferInternal) {
 						return MachineBlockEntity.this.getCraftingFluidHandler(preferInternal);
 					}
-					
+
 					@Override
 					public boolean getUsingInternalTank() {
 						return MachineBlockEntity.this.getUsingInternalTank();
 					}
-					
+
 					@Override
 					public void receiveButtonPacket(PacketData pd) {
 						MachineBlockEntity.this.receiveButtonPacket(pd);
 					}
-					
+
 					@Override
 					public BlockState blockState() {
 						return MachineBlockEntity.this.blockState();
 					}
-					
+
 					@Override
 					public int getOrSetMKIIPCSelMold(Optional<Integer> set) {
 						return MachineBlockEntity.this.getOrSetMKIIPCSelMold(set);
 					}
 				}
 			}
-			
+
 			if(validBlocks.length == 0) validBlocks = new Block[]{Registry.getBlock(blockName)};
 			return BlockEntityType.Builder.of((pos, state) -> new MachineBlockEntity(pos, state), validBlocks).build(null);
 		}
-		
+
 		public static interface IMachineDataBridge {
-			
+
 			public void setCycles(float cycles);
 			public int getUpgradeAmount(Upgrades upgrade);
 			public boolean isAllowedInSlot(int slot, ItemStack stack);
@@ -828,51 +827,51 @@ public class MachineBuilder {
 			public int getOrSetMKIIPCSelMold(Optional<Integer> set);
 		}
 	}
-	
+
 	public static class MachineContainerBuilder{
-		
+
 		private Pair<Integer, Integer> invPos = new Pair<>(8, 84);
 		private Pair<Integer, Integer> hotbarPos = new Pair<>(8, 142);
 		private int disallowedMergeBottomUp = 0;
 		private int disallowedMergeTopDown = 1;
 		private List<Triple<Integer, Integer, Boolean>> slotCoordinates = List.of();
-		
+
 		private MachineContainerBuilder() {}
-		
+
 		public MachineContainerBuilder playerInventoryPos(int topLeftX, int topLeftY) {
 			this.invPos = Pair.of(topLeftX, topLeftY);
 			return this;
 		}
-		
+
 		public MachineContainerBuilder playerHotbarPos(int topLeftX, int topLeftY) {
 			this.hotbarPos = Pair.of(topLeftX, topLeftY);
 			return this;
 		}
-		
+
 		public MachineContainerBuilder shiftMergeableSlots(int disallowedMergeBottomUp, int disallowedMergeTopDown) {
 			this.disallowedMergeBottomUp = disallowedMergeBottomUp;
 			this.disallowedMergeTopDown = disallowedMergeTopDown;
 			return this;
 		}
-		
+
 		public MachineContainerBuilder slotCoordinates(List<Triple<Integer, Integer, Boolean>> slotCoordinates) {
 			this.slotCoordinates = slotCoordinates;
 			return this;
 		}
-		
+
 		public MenuType<?> build(String blockName){
-			
+
 			class MachineContainer extends ContainerALMBase<RandomizableContainerBlockEntity>{
-				
+
 				public MachineContainer(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
 					this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data));
 				}
-				
+
 				public MachineContainer(int windowId, Inventory playerInventory, RandomizableContainerBlockEntity tileEntity) {
 					super(Registry.getContainerType(blockName), windowId, tileEntity, playerInventory, invPos, hotbarPos, disallowedMergeBottomUp, disallowedMergeTopDown);
-					
+
 					IMachineDataBridge bridge = (IMachineDataBridge) tileEntity;
-					
+
 					int i = 0;
 					for(Triple<Integer, Integer, Boolean> slot : slotCoordinates) {
 						this.addSlot(new SlotWithRestrictions(this.tileEntity, i, slot.getLeft(), slot.getMiddle(), bridge, slot.getRight()));
@@ -880,15 +879,15 @@ public class MachineBuilder {
 					}
 				}
 			}
-			
+
 			return IForgeMenuType.create((windowId, inv, data) -> new MachineContainer(windowId, inv, data));
 		}
-		
+
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static class MachineScreenBuilder{
-		
+
 		private Pair<Integer, Integer> inventorySize = Pair.of(176, 166);
 		private Pair<Integer, Integer> inventoryTitleLoc = Pair.of(11, 6);
 		private Pair<Integer, Integer> playerInvTitleLoc = Pair.of(11, 73);
@@ -912,35 +911,35 @@ public class MachineBuilder {
 		private int fluidOverlayStartY = 0;
 		private int[] tankButtonStats = null;
 		private boolean isMkiiPneumaticCompressor = false;
-		
+
 		@OnlyIn(Dist.CLIENT)
 		private MachineScreenBuilder() {}
-		
+
 		public MachineScreenBuilder inventorySize(int width, int height) {
 			this.inventorySize = Pair.of(width, height);
 			return this;
 		}
-		
+
 		public MachineScreenBuilder inventoryTitleLoc(int x, int y) {
 			this.inventoryTitleLoc = Pair.of(x, y);
 			return this;
 		}
-		
+
 		public MachineScreenBuilder playerInvTitleLoc(int x, int y) {
 			this.playerInvTitleLoc = Pair.of(x, y);
 			return this;
 		}
-		
+
 		public MachineScreenBuilder hasCoolMode() {
 			this.hasCoolMode = true;
 			return this;
 		}
-		
+
 		public MachineScreenBuilder energyBarLoc(int x, int y) {
 			this.energyBarLoc = Pair.of(x, y);
 			return this;
 		}
-		
+
 		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, int slotToCheck) {
 			ToIntBiFunction<Integer, Integer> previous = pbSlotChecker;
 			pbSlotChecker = (cbx, cby) -> {
@@ -948,28 +947,28 @@ public class MachineBuilder {
 				return previous.applyAsInt(cbx, cby);
 			};
 			return this.addBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, PBDirection.SLOT_EMPTY);
-			
+
 		}
-		
+
 		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction) {
 			return this.addBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, direction, 0, 0, List.of());
 		}
-		
+
 		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {
 			this.progressBars.add(new ProgressBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, direction, frames, frameTime, duplicateAt));
 			return this;
 		}
-		
+
 		public MachineScreenBuilder stateBasedBlitPieceModifier(Function<BlockState, Pair<Integer, Integer>> function) {
 			this.uvModifier = function;
 			return this;
 		}
-		
+
 		public MachineScreenBuilder energyMeterStartX(int energyMeterStartX) {
 			this.energyMeterStartX = energyMeterStartX;
 			return this;
 		}
-		
+
 		public MachineScreenBuilder renderFluidBar(int topLeftX, int topLeftY, int height, int blitX, int blitY) {
 			this.renderFluidBar = true;
 			this.fluidBarTopLeftX = topLeftX;
@@ -979,42 +978,42 @@ public class MachineBuilder {
 			this.fluidOverlayStartY = blitY;
 			return this;
 		}
-		
+
 		public MachineScreenBuilder internalTankSwitchingButton(int x, int y, int activeBlitX, int activeBlitY, int width, int height) {
 			this.tankButtonStats = new int[] {x, y, activeBlitX, activeBlitY, width, height};
 			return this;
 		}
-		
+
 		public MachineScreenBuilder doesNotUseFE() {
 			this.usesFe = false;
 			return doesNotUseFEPT();
 		}
-		
+
 		public MachineScreenBuilder doesNotUseFEPT() {
 			this.usesFept = false;
 			return this;
 		}
-		
+
 		public MachineScreenBuilder defaultMKIIOptions() {
 			this.renderInventoryText = false;
 			this.renderTitleText = false;
 			return this.inventorySize(190, 188).energyMeterStartX(190);
 		}
-		
+
 		public MachineScreenBuilder mkiiPneumaticCompressorButtons() {
 			this.isMkiiPneumaticCompressor = true;
 			return this;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		public void buildAndRegister(String blockName) {
-			
+
 			class MachineScreen extends ScreenALMEnergyBased<ContainerALMBase<RandomizableContainerBlockEntity>>{
-				
+
 				private IMachineDataBridge data;
 				private Cache<Fluid, TextureAtlasSprite> cache = CacheBuilder.newBuilder().build();
 				private ArrayList<ProgressBarInstance> progressBars = new ArrayList<>();
-				
+
 				public MachineScreen(ContainerALMBase<RandomizableContainerBlockEntity> screenContainer, Inventory inv, Component titleIn) {
 					super(screenContainer, inv, titleIn, inventorySize, inventoryTitleLoc, playerInvTitleLoc, blockName, hasCoolMode,
 							energyBarLoc, (EnergyMachine<?>) screenContainer.tileEntity, usesFept);
@@ -1022,19 +1021,19 @@ public class MachineBuilder {
 					this.renderTitleText = MachineScreenBuilder.this.renderTitleText;
 					this.renderInventoryText = MachineScreenBuilder.this.renderInventoryText;
 					this.startx = energyMeterStartX;
-					
+
 					for(ProgressBar pb : MachineScreenBuilder.this.progressBars) {
 						this.progressBars.add(new ProgressBarInstance(this, pb));
 					}
-					
+
 					this.usesFe = MachineScreenBuilder.this.usesFe;
 				}
-				
+
 				@Override
 				protected void init() {
 					super.init();
-					
-					
+
+
 					if(tankButtonStats != null) this.addRenderableWidget(new TrueFalseButton(leftPos+tankButtonStats[0], topPos+tankButtonStats[1], tankButtonStats[2], tankButtonStats[3], tankButtonStats[4], tankButtonStats[5],
 							new TrueFalseButtonSupplier("Draw From Internal Tank", "Draw From External Tank", () -> data.getUsingInternalTank()), (b) -> {
 						PacketData packet = new PacketData("machine_builder_gui");
@@ -1042,7 +1041,7 @@ public class MachineBuilder {
 						packet.writeString("function", "toggle_source_tank");
 						PacketHandler.INSTANCE.sendToServer(packet);
 					}));
-					
+
 					if(isMkiiPneumaticCompressor) {
 						OnPress pcOp = (b) -> {
 							int bid = switch(((TrueFalseButton) b).blity) {
@@ -1050,20 +1049,20 @@ public class MachineBuilder {
 							case 84 -> 2;
 							case 96 -> 3;
 							default -> 0;};
-							
+
 							PacketData packet = new PacketData("machine_builder_gui");
 							packet.writeBlockPos("pos", ((BlockEntity) data).getBlockPos());
 							packet.writeString("function", "change_pneumatic_mold");
 							packet.writeInteger("mold", bid);
 							PacketHandler.INSTANCE.sendToServer(packet);
 						};
-						
+
 						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+37, 190, 72, 12, 12, new TrueFalseButtonSupplier("Rod Mold (Selected)", "Rod Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 1), pcOp));
 						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+50, 190, 84, 12, 12, new TrueFalseButtonSupplier("Plate Mold (Selected)", "Plate Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 2), pcOp));
 						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+63, 190, 96, 12, 12, new TrueFalseButtonSupplier("Gear Mold (Selected)", "Gear Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 3), pcOp));
 					}
 				}
-				
+
 				@Override
 				protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 					int x = (this.width - this.imageWidth) / 2;
@@ -1074,35 +1073,35 @@ public class MachineBuilder {
 						if(fluid == Fluids.WATER) RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 						RenderSystem.setShader(GameRenderer::getPositionTexShader);
 						RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-						try { super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidBarHeight, fluidBarHeight, fluidBarHeight, cache.get(fluid, () -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluid.getAttributes().getStillTexture())));
+						try { super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidBarHeight, fluidBarHeight, fluidBarHeight, cache.get(fluid, () -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fluid).getStillTexture())));
 						}catch(Exception e) {e.printStackTrace();}
 					}
-					
+
 					super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-					
+
 					if(renderFluidBar && handler != null) {
-						
-						int fAmount = Math.round(((float) handler.getFluidInTank(0).getAmount() / (float) handler.getTankCapacity(0)) * (float) fluidBarHeight);
+
+						int fAmount = Math.round(((float) handler.getFluidInTank(0).getAmount() / (float) handler.getTankCapacity(0)) * fluidBarHeight);
 						super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidOverlayStartX, fluidOverlayStartY, 8, fluidBarHeight - fAmount);
 					}
-					
+
 					for(ProgressBarInstance pbi : this.progressBars) pbi.render(x, y);
 				}
-				
+
 				@Override
 				protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 					super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-					
+
 					int x = (this.width - this.imageWidth) / 2;
 					int y = (this.height - this.imageHeight) / 2;
-					
+
 					if(ScreenMath.isMouseBetween(x, y, mouseX, mouseY, fluidBarTopLeftX, fluidBarTopLeftY, fluidBarTopLeftX + 8, fluidBarTopLeftY + fluidBarHeight)) {
 						IFluidHandler handler = data.getCraftingFluidHandler(Optional.of(true));
 						if(renderFluidBar) {
 							if(handler != null && handler.getFluidInTank(0).getAmount() > 0) {
 								this.renderComponentTooltip(List.of(handler.getFluidInTank(0).getDisplayName().getString(),
-										Screen.hasShiftDown() ? FormattingHelper.FEPT_FORMAT.format(handler.getFluidInTank(0).getAmount()) + " mB" : 
-											FormattingHelper.FEPT_FORMAT.format((double)handler.getFluidInTank(0).getAmount() / 1000D) + " B"), mouseX - x, mouseY - y);
+										Screen.hasShiftDown() ? FormattingHelper.FEPT_FORMAT.format(handler.getFluidInTank(0).getAmount()) + " mB" :
+											FormattingHelper.FEPT_FORMAT.format(handler.getFluidInTank(0).getAmount() / 1000D) + " B"), mouseX - x, mouseY - y);
 							}else {
 								this.renderComponentTooltip("Empty", mouseX - x, mouseY - y);
 							}
@@ -1110,33 +1109,33 @@ public class MachineBuilder {
 					}
 				}
 			}
-			
-			MenuScreens.register((MenuType<ContainerALMBase<RandomizableContainerBlockEntity>>)Registry.getContainerType(blockName), 
+
+			MenuScreens.register((MenuType<ContainerALMBase<RandomizableContainerBlockEntity>>)Registry.getContainerType(blockName),
 					new ScreenConstructor<ContainerALMBase<RandomizableContainerBlockEntity>, AbstractContainerScreen<ContainerALMBase<RandomizableContainerBlockEntity>>>() {
 
 				@Override
 				public AbstractContainerScreen<ContainerALMBase<RandomizableContainerBlockEntity>> create(ContainerALMBase<RandomizableContainerBlockEntity> container, Inventory pInv, Component component) {
 					return new MachineScreen(container, pInv, component);
 				}
-				
+
 			});
 		}
-		
+
 		class ProgressBarInstance{
-			
+
 			private final IMachineDataBridge bridge;
 			private final ScreenALMEnergyBased<ContainerALMBase<RandomizableContainerBlockEntity>> screen;
 			private final ProgressBar pb;
 			private int frame, tick = 0;
-			
+
 			ProgressBarInstance(ScreenALMEnergyBased<ContainerALMBase<RandomizableContainerBlockEntity>> screen, ProgressBar pb){
 				this.bridge = (IMachineDataBridge) screen.getMenu().tileEntity;
 				this.screen = screen;
 				this.pb = pb;
 			}
-			
+
 			void render(int x, int y) {
-				
+
 				if(pb.frames != 0) {
 					if(tick++ >= pb.frameTime) {
 						tick = 0;
@@ -1146,16 +1145,16 @@ public class MachineBuilder {
 
 				this.render(x, y, this.pb.blitx, this.pb.blity, true);
 			}
-			
+
 			void render(int x, int y, int blitx, int blity, boolean renderDuplicates) {
 				float progress = bridge.getProgress();
 				float cycles = bridge.getCycles();
-				
+
 				if((progress != 0f && cycles != 0f) || pb.direction == PBDirection.SLOT_EMPTY) {
 					Pair<Integer, Integer> pieces = uvModifier == null ? Pair.of(pb.uvx, pb.uvy) : uvModifier.apply(screen.getMenu().tileEntity.getBlockState());
 					int piecex = pieces.getFirst();
 					int piecey = pieces.getSecond();
-					
+
 					switch(pb.direction) {
 					case LR -> {
 						int prog = Math.min(Math.round((progress/cycles) * pb.defaultWidth), pb.defaultWidth);
@@ -1173,31 +1172,20 @@ public class MachineBuilder {
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
 					}
 					case SLOT_EMPTY -> {
-						if(screen.getMenu().tileEntity.getItem(pbSlotChecker.applyAsInt(blitx, blity)).isEmpty()) 
+						if(screen.getMenu().tileEntity.getItem(pbSlotChecker.applyAsInt(blitx, blity)).isEmpty())
 						screen.blit(x+blitx, y+blity, piecex, piecey + (pb.defaultHeight * this.frame), pb.defaultWidth, pb.defaultHeight);
 					}}
-					
+
 					if(renderDuplicates) for(Pair<Integer, Integer> pair : pb.duplicateAt) this.render(x, y, pair.getFirst(), pair.getSecond(), false);
 				}
 			}
 		}
-		
+
 		public enum PBDirection{
-			
+
 			LR,UD, DU, STATIC, SLOT_EMPTY;
 		}
-		
+
 		record ProgressBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {}
-	}
-	
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.METHOD)
-	public static @interface RegisterableMachine{
-		Phases phase();
-		String blockName();
-		
-		public static enum Phases{
-			BLOCK, CONTAINER, BLOCK_ENTITY, SCREEN;
-		}
 	}
 }

@@ -29,15 +29,15 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class PipeProperties {
-	
+
 	public static final HashMap<Direction, EnumProperty<PipeConnOptions>> DIRECTION_BOOL = new HashMap<>();
 	static {
 		for(Direction d : Direction.values()) {
 			DIRECTION_BOOL.put(d, EnumProperty.create(d.getSerializedName(), PipeConnOptions.class));
 		}
 	}
-	
-	
+
+
 	public static enum PipeConnOptions implements StringRepresentable{
 		NONE, PIPE, CONNECTOR;
 
@@ -46,37 +46,37 @@ public class PipeProperties {
 			return toString().toLowerCase();
 		}
 	}
-	
+
 	public static enum PipeType {
 		BASIC(1, ""), ADVANCED(5, "advanced_"), ULTIMATE(25, "ultimate_");
-	
+
 		private final int baseMultiplier;
 		private final String prefix;
-		
+
 		PipeType(int baseMultiplier, String prefix){
 			this.baseMultiplier = baseMultiplier;
 			this.prefix = prefix;
 		}
-		
+
 		public int getBaseMultiplier() {
 			return baseMultiplier;
 		}
-		
+
 		public String getPrefix() {
 			return prefix;
 		}
-		
+
 	}
-	
+
 	public static enum TransmissionType {
-		
+
 		POWER(2, 5000, 1.5f, "energy_", "energy_pipe", "IEnergyStorage", "Energy", Pair.of(Pair.of(28, 58), Pair.of(39, 58))),
 		FLUID(40, 1000, 2f, "fluid_", "fluid_pipe", "IFluidHandler", "Fluid", Pair.of(Pair.of(28, 47), Pair.of(39, 47))),
 		ITEM(50, 1, 4f, "item_", "item_pipe", "IItemHandler", "Item", Pair.of(Pair.of(28, 36), Pair.of(39, 36))),
 		OMNI(20, 0, 0f, "omni", "omnipipe", null, null, null);
-		
+
 		private static final TransmissionType[] TRANSMISSIONS_FOR_OMNIPIPE = {POWER, FLUID, ITEM};
-		
+
 		private final int nTimerBase;
 		private final int transferBase;
 		private final float stackUpgradeMultiplier;
@@ -85,7 +85,7 @@ public class PipeProperties {
 		private final String capabilityName;
 		private final String prettyName;
 		private final Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> omniCoords;
-		
+
 		TransmissionType(int nTimerBase, int transferBase, float stackUpgradeMultiplier, String name, String descriptionId,
 				String capabilityName, String prettyName, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> omniCoords){
 			this.nTimerBase = nTimerBase;
@@ -97,7 +97,7 @@ public class PipeProperties {
 			this.prettyName = prettyName;
 			this.omniCoords = omniCoords;
 		}
-		
+
 		public static ArrayList<Triple<String, PipeType, TransmissionType>> getPipeRegistryValues(){
 			ArrayList<Triple<String, PipeType, TransmissionType>> list = new ArrayList<>();
 			for(PipeType pt : PipeType.values()) {
@@ -107,7 +107,7 @@ public class PipeProperties {
 			}
 			return list;
 		}
-		
+
 		public boolean hasCapability(Direction dir, BlockEntity blockEntity) {
 			if(blockEntity != null) {
 				switch(this) {
@@ -131,7 +131,7 @@ public class PipeProperties {
 			}
 			return false;
 		}
-		
+
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public Pair<Object, TriConsumer<PipeConnectorTileEntity, Object, Integer>> getCapability(BlockEntity te, Direction dir, PipeConnectorTileEntity pipeConnector) {
 			if(te != null) {
@@ -174,19 +174,19 @@ public class PipeProperties {
 								@Override
 								public void accept(Object t) {
 									pipeConnector.conCapabilities.remove(t);
-									
+
 								}
 							});
-							
+
 							return Pair.of(clazz.cast(res), cons);
 						}
 					}
 				}
 			}
 			return null;
-			
+
 		}
-		
+
 		public int getNTimerBase(int upgradeAmount) {
 			float modifier = 1f;
 			switch(upgradeAmount) {
@@ -201,15 +201,15 @@ public class PipeProperties {
 			}
 			return Math.round(this.nTimerBase * modifier);
 		}
-		
+
 		public int getTransferBase() {
 			return transferBase;
 		}
-		
+
 		public String getCapabilityName() {
 			return capabilityName;
 		}
-		
+
 		public String getGUITexture(PipeType pt) {
 			if(pt == PipeType.BASIC) {
 				return "pipes/basic_pipe_connector";
@@ -223,20 +223,20 @@ public class PipeProperties {
 				}
 			}
 		}
-		
+
 		public float getStackUpgradeMultiplier(float upgradeCount) {
 			return stackUpgradeMultiplier * upgradeCount;
 		}
-		
+
 		private int getMaxTransfer(PipeConnectorTileEntity pipeConnector, PipeType pt) {
-			
+
 			int base = this.getTransferBase() * pt.getBaseMultiplier();
 			int upgradeCount = pipeConnector.getUpgradeAmount(Upgrades.PIPE_STACK);
 			if(upgradeCount != 0) base = Math.round(base * this.getStackUpgradeMultiplier(upgradeCount));
 			if(this == TransmissionType.ITEM) base = Math.min(base, 64);
 			return base;
 		}
-		
+
 		public int getMaxTransfer(PipeConnectorTileEntity pipeConnector, PipeType pt, Object capability) {
 			TransmissionType tt = this;
 			if(tt == TransmissionType.OMNI) {
@@ -244,23 +244,23 @@ public class PipeProperties {
 			}
 			return tt.getMaxTransfer(pipeConnector, pt);
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getDescriptionId() {
 			return descriptionId;
 		}
-		
+
 		public String getPrettyName() {
 			return prettyName;
 		}
-		
+
 		public Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> getOmniCoords() {
 			return omniCoords;
 		}
-		
+
 		public static TransmissionType getTransmissionFromCapability(Object capability) {
 			if(capability instanceof IItemHandler) {
 				return TransmissionType.ITEM;
@@ -271,9 +271,9 @@ public class PipeProperties {
 			}
 			return null;
 		}
-		
+
 	}
-	
+
 	public static class ProcessingAssistant{
 		public static final HashMap<String, TriConsumer<PipeConnectorTileEntity, Object, Integer>> CONNECTOR_DEFAULT_PROCESSING = new HashMap<>();
 		static {
@@ -301,7 +301,7 @@ public class PipeProperties {
 								if (extracted == origSize || extracted >= max) {
 									break;
 								}
-								
+
 							}
 						}
 
@@ -315,43 +315,43 @@ public class PipeProperties {
 
 				}
 			});
-			
+
 			CONNECTOR_DEFAULT_PROCESSING.put(TransmissionType.FLUID.getCapabilityName(), (pipeConnector, handler, max) -> {
 				IFluidHandler output = (IFluidHandler) handler;
-				
-				
+
+
 				FluidStack sim = output.drain(max, FluidAction.SIMULATE);
 				if(sim.getAmount() < max) {
 					max = sim.getAmount();
 				}
-				
+
 				if(!sim.isEmpty() && pipeConnector.checkWhiteBlackList(sim)) {
 					int extracted = 0;
 					double waitTime = 0;
-					
+
 					for(PipeConnectorTileEntity tpc : pipeConnector.targets.descendingSet()) {
 						if(tpc != null) {
 							extracted =+ tpc.attemptAccept(IFluidHandler.class, sim);
-							
+
 							double thisdist = pipeConnector.getBlockPos().distSqr(tpc.getBlockPos());
-							
+
 							if(thisdist > waitTime) {
 								waitTime = thisdist;
 							}
-							
+
 							if(extracted != 0) {
 								break;
 							}
 						}
 					}
-					
+
 					if(extracted != 0) {
 						pipeConnector.pendingCooldown = waitTime / 10;
 						output.drain(extracted, FluidAction.EXECUTE);
 					}
 				}
 			});
-			
+
 			CONNECTOR_DEFAULT_PROCESSING.put(TransmissionType.POWER.getCapabilityName(), (pipeConnector, handler, transferRate) -> {
 				IEnergyStorage output = (IEnergyStorage) handler;
 				double waitTime = 0;
@@ -364,7 +364,7 @@ public class PipeProperties {
 						output.extractEnergy(extracted, false);
 					}
 				}
-				
+
 				pipeConnector.pendingCooldown = waitTime / 20;
 			});
 		}

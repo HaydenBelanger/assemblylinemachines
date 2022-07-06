@@ -13,7 +13,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.*;
@@ -33,13 +32,13 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpecialTooltip{
 
 	private final PowerToolType ptt;
-	
+
 	private static final ArrayList<UUID> FLYING = new ArrayList<>();
-	
+
 	public ItemPowerArmor(ArmorMaterial pMaterial, EquipmentSlot pSlot, Properties pProperties) {
 		this(ItemTiers.getTier(pMaterial).getPowerToolType(), pMaterial, pSlot, pProperties);
 	}
-	
+
 	public ItemPowerArmor(PowerToolType ptt, ArmorMaterial pMaterial, EquipmentSlot pSlot, Properties pProperties) {
 		super(pMaterial, pSlot, pProperties);
 		this.ptt = ptt;
@@ -50,30 +49,30 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 		ItemStack resStack = damageItem(stack, amount);
 		return resStack == null ? super.damageItem(stack, amount, entity, onBroken) : super.damageItem(resStack, 0, entity, onBroken);
 	}
-	
+
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
 		return this.defaultInitCapabilities(stack, nbt);
 	}
-	
+
 	@Override
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents,
 			TooltipFlag pIsAdvanced) {
 		this.addEnergyInfoToHoverText(pStack, pTooltipComponents);
-		if(ptt == PowerToolType.ENHANCED_MYSTIUM) pTooltipComponents.add(new TextComponent("Enables creative flight at the cost of power.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+		if(ptt == PowerToolType.ENHANCED_MYSTIUM) pTooltipComponents.add(Component.literal("Enables creative flight at the cost of power.").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 	}
-	
+
 	@Override
 	public boolean isFoil(ItemStack pStack) {
 		return ptt == PowerToolType.ENHANCED_MYSTIUM ? true : super.isFoil(pStack);
 	}
-	
+
 	@Override
 	public boolean isBarVisible(ItemStack stack) {
 		if(!stack.hasTag() || stack.getTag().getInt(ptt.keyName) == 0) return super.isBarVisible(stack);
 		return stack.getTag().getInt(ptt.keyName) != this.getMaxPower(stack);
 	}
-	
+
 	@Override
 	public int getBarColor(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
@@ -84,16 +83,16 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 			float v = (float) dmg / (float) getMaxPower(stack);
 			return ARGB32.color(255, Math.round(v * 255f), Math.round(v * 255f), 255);
 		}
-		
+
 	}
-	
+
 	@Override
 	public int getBarWidth(ItemStack stack) {
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
 	}
-	
+
 	@Override
 	public PowerToolType getPowerToolType() {
 		return ptt;
@@ -118,17 +117,17 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	public boolean canUseSecondaryAbilities(ItemStack stack) {
 		return false;
 	}
-	
+
 	@Override
 	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
 		return 0f;
 	}
-	
+
 	@Override
 	public void initializeClient(Consumer<IItemRenderProperties> consumer) {
 		consumer.accept(new IItemRenderProperties() {
 			private Optional<ArmorModel> model = null;
-			
+
 			@Override
 			public HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack,
 					EquipmentSlot armorSlot, HumanoidModel<?> _default) {
@@ -137,12 +136,12 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 			}
 		});
 	}
-	
+
 	@Override
 	public void onArmorTick(ItemStack stack, Level world, Player player) {
 		if(!world.isClientSide) {
 			if(stack.getItem().equals(Registry.getItem("enhanced_mystium_chestplate"))) {
-				
+
 				CompoundTag tag = stack.getOrCreateTag();
 				if(tag.getInt(ptt.keyName) > 0) {
 					if(!FLYING.contains(player.getUUID())) {
@@ -150,7 +149,7 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 						player.getAbilities().mayfly = true;
 						player.onUpdateAbilities();
 					}
-					if(player.getAbilities().flying == true) {
+					if(player.getAbilities().flying) {
 						int flightTimer = tag.getInt("assemblylinemachines:flight_timer");
 						if(flightTimer <= 0) {
 							stack.hurtAndBreak(1, player, (br) -> br.broadcastBreakEvent(EquipmentSlot.MAINHAND));
@@ -162,33 +161,33 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 				}else {
 					FlightManagementEvents.remove(player, world);
 				}
-				
+
 			}
 		}
-		
+
 		super.onArmorTick(stack, world, player);
 	}
-	
+
 	@SubscribeEvent
 	public static void cancelFlight(PlayerTickEvent event) {
 		if(!event.player.getItemBySlot(EquipmentSlot.CHEST).getItem().equals(Registry.getItem("enhanced_mystium_chestplate"))) {
 			FlightManagementEvents.remove(event.player, event.player.level);
 		}
 	}
-	
+
 	@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.FORGE)
 	public static class FlightManagementEvents{
-		
+
 		@SubscribeEvent
 		public static void clearOnQuit(EntityLeaveWorldEvent event) {
 			remove(event.getEntity(), event.getWorld());
 		}
-		
+
 		@SubscribeEvent
 		public static void clearOnJoin(EntityJoinWorldEvent event) {
 			remove(event.getEntity(), event.getWorld());
 		}
-		
+
 		private static void remove(Entity entity, Level world) {
 			if(!world.isClientSide() && entity instanceof Player player && FLYING.contains(player.getUUID())) {
 				FLYING.remove(player.getUUID());
@@ -197,9 +196,9 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 					player.getAbilities().mayfly = false;
 					player.onUpdateAbilities();
 				}
-				
+
 			}
 		}
 	}
-	
+
 }

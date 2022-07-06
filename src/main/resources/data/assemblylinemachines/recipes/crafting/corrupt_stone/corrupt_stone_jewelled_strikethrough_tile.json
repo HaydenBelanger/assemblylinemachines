@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"x",
+		"m",
+		"x"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:corrupt_stone_tile"
+		},
+		"m":{
+			"tag": "forge:gems/emerald"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_stone_jewelled_strikethrough_tile",
+		"count": 10
+	}
+}

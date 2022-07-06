@@ -18,11 +18,11 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 public class ConfigCondition implements ICondition {
 
 	private static final ResourceLocation ID = new ResourceLocation(AssemblyLineMachines.MODID, "config");
-	
+
 	private final String configOption;
 	private final boolean enableOn;
 	private final Lazy<Optional<Boolean>> fieldResult;
-	
+
 	public ConfigCondition(String configOption, boolean enableOn) {
 		this.configOption = configOption;
 		this.enableOn = enableOn;
@@ -37,21 +37,21 @@ public class ConfigCondition implements ICondition {
 			}
 		});
 	}
-	
+
 	@Override
 	public ResourceLocation getID() {
 		return ID;
 	}
 
 	@Override
-	public boolean test() {
+	public boolean test(IContext context) {
 		return fieldResult.get().get() == enableOn;
 	}
-	
+
 	public static class ConfigConditionSerializer implements IConditionSerializer<ConfigCondition>{
 
 		public static final ConfigConditionSerializer INSTANCE = new ConfigConditionSerializer();
-		
+
 		@Override
 		public void write(JsonObject json, ConfigCondition value) {
 			json.addProperty("config_option", value.configOption);
@@ -68,6 +68,6 @@ public class ConfigCondition implements ICondition {
 		public ResourceLocation getID() {
 			return ID;
 		}
-		
+
 	}
 }

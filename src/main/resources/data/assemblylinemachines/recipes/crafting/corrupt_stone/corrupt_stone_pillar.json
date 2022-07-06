@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"x",
+		"x"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:smooth_corrupt_stone"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_stone_pillar",
+		"count": 2
+	}
+}

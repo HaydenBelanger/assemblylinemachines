@@ -16,16 +16,16 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID, value = {Dist.CLIENT})
 public class VersionCheck {
-	
+
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public static void join(LoggedInEvent event) {
 		if(ALMConfig.getClientConfig().receiveUpdateMessages().get()) {
 			CheckResult result = VersionChecker.getResult(AssemblyLineMachines.MOD_CONTAINER.get().getModInfo());
 			if(result.status() == Status.BETA_OUTDATED || result.status() == Status.OUTDATED) {
-				MutableComponent tc = new TextComponent("[AssemblyLineMachines] Update available, version " + result.target().getCanonical() + ". ").append(new TextComponent("Click to Update!").withStyle(ChatFormatting.DARK_GREEN));
+				MutableComponent tc = Component.literal("[AssemblyLineMachines] Update available, version " + result.target().getCanonical() + ". ").append(Component.literal("Click to Update!").withStyle(ChatFormatting.DARK_GREEN));
 				tc.withStyle(tc.getStyle().withClickEvent(new ClickEvent(Action.OPEN_URL, result.url())));
-				event.getPlayer().sendMessage(tc, null);
+				event.getPlayer().sendSystemMessage(tc);
 			}
 		}
 	}

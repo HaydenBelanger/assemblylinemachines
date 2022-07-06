@@ -1,0 +1,15 @@
+{
+	"multipart":[
+		{
+			"apply": {"model": "assemblylinemachines:block/corrupt_stone_pillar"}
+		},
+		{
+			"when": {"top": true},
+			"apply": {"model": "assemblylinemachines:block/corrupt_stone_pillar_cappiece"}
+		},
+		{
+			"when": {"bottom": true},
+			"apply": {"model": "assemblylinemachines:block/corrupt_stone_pillar_cappiece", "x": 180}
+		}
+	]
+}

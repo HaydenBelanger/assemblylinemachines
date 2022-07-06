@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"xx",
+		"xx"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:corrupt_stone_conduit"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_stone_conduit_node",
+		"count": 4
+	}
+}

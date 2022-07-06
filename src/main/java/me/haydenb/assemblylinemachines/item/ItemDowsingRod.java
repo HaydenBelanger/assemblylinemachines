@@ -9,7 +9,7 @@ import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids;
 import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids.IChunkFluidCapability;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -20,15 +20,15 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
-	
+
 	public ItemDowsingRod() {
 		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
 	}
-	
+
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		
-		
+
+
 		Level world = context.getLevel();
 		if(!world.isClientSide) {
 			boolean success = false;
@@ -38,18 +38,18 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 					IChunkFluidCapability capability = lazy.orElseThrow(null);
 					if(!capability.getChunkFluid().equals(Fluids.EMPTY)){
 						success = true;
-						context.getPlayer().displayClientMessage(new TextComponent("There is " + FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()) + " mB of " + capability.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
+						context.getPlayer().displayClientMessage(Component.literal("There is " + FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()) + " mB of " + capability.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
 					}
 				}
 			}catch(ExecutionException e) {
 				e.printStackTrace();
 			}finally {
 				if(!success) {
-					context.getPlayer().displayClientMessage(new TextComponent("There is no reservoir in this chunk."), true);
+					context.getPlayer().displayClientMessage(Component.literal("There is no reservoir in this chunk."), true);
 				}
 			}
 		}
-		
+
 		return InteractionResult.CONSUME;
 	}
 
@@ -62,7 +62,7 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 	public int getTopColor() {
 		return IToolWithCharge.PowerToolType.MYSTIUM.argbBorderColor;
 	}
-	
+
 	@Override
 	public int getBottomColor() {
 		return IToolWithCharge.PowerToolType.MYSTIUM.getBottomARGBBorderColor().get();

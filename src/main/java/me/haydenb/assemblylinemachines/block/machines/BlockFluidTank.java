@@ -15,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -73,16 +72,16 @@ public class BlockFluidTank extends Block implements EntityBlock {
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
-	
+
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
 		return Registry.getBlockEntity("fluid_tank").create(pPos, pState);
 	}
-	
+
 	@Override
 	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		if(stack.hasTag()) {
-			
+
 			CompoundTag nbt = stack.getTag();
 			if(world.getBlockEntity(pos) instanceof TEFluidTank tank && !nbt.isEmpty()) {
 				tank.fluid = FluidStack.loadFluidStackFromNBT(nbt.getCompound("assemblylinemachines:fluidstack"));
@@ -92,22 +91,22 @@ public class BlockFluidTank extends Block implements EntityBlock {
 		}
 		super.setPlacedBy(world, pos, state, placer, stack);
 	}
-	
+
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if(stack.hasTag()) {
 			CompoundTag nbt = stack.getTag();
-			
+
 			byte upgraded = nbt.getByte("assemblylinemachines:upgraded");
 			switch(upgraded) {
-			case 1 -> tooltip.add(1, new TextComponent("This Tank has an Internal Water Generator installed.").withStyle(ChatFormatting.BLUE));
-			case 2 -> tooltip.add(1, new TextComponent("This Tank is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
+			case 1 -> tooltip.add(1, Component.literal("This Tank has an Internal Water Generator installed.").withStyle(ChatFormatting.BLUE));
+			case 2 -> tooltip.add(1, Component.literal("This Tank is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
 			}
-			
+
 			FluidStack fs = FluidStack.loadFluidStackFromNBT(nbt.getCompound("assemblylinemachines:fluidstack"));
 			if(!fs.isEmpty()) switch(upgraded) {
-				case 0 -> tooltip.add(1, new TextComponent("This Tank has " + FormattingHelper.formatToSuffix(fs.getAmount()) + " mB of " + fs.getDisplayName().getString() + " stored.").withStyle(ChatFormatting.GREEN));
-				case 2 -> tooltip.add(1, new TextComponent("This Tank has infinite " + fs.getDisplayName().getString() + " stored.").withStyle(ChatFormatting.GREEN));
+				case 0 -> tooltip.add(1, Component.literal("This Tank has " + FormattingHelper.formatToSuffix(fs.getAmount()) + " mB of " + fs.getDisplayName().getString() + " stored.").withStyle(ChatFormatting.GREEN));
+				case 2 -> tooltip.add(1, Component.literal("This Tank has infinite " + fs.getDisplayName().getString() + " stored.").withStyle(ChatFormatting.GREEN));
 			}
 		}
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
@@ -125,20 +124,20 @@ public class BlockFluidTank extends Block implements EntityBlock {
 						if (player.isShiftKeyDown()) {
 							FluidStack f = handler.getFluidInTank(0);
 							if (f.isEmpty() || f.getAmount() == 0) {
-								player.displayClientMessage(new TextComponent("This tank is empty."), true);
+								player.displayClientMessage(Component.literal("This tank is empty."), true);
 							} else {
 								if(f.getAmount() == Integer.MAX_VALUE) {
-									player.displayClientMessage(new TextComponent("Infinite " + f.getFluid().getAttributes().getDisplayName(f).getString()), true);
+									player.displayClientMessage(Component.literal("Infinite " + f.getFluid().getFluidType().getDescription().getString()), true);
 								}else {
-									player.displayClientMessage(new TextComponent(FORMAT.format(f.getAmount()) + "/" + FORMAT.format(handler.getTankCapacity(0)) + " mB "
-											+ f.getFluid().getAttributes().getDisplayName(f).getString()), true);
+									player.displayClientMessage(Component.literal(FORMAT.format(f.getAmount()) + "/" + FORMAT.format(handler.getTankCapacity(0)) + " mB "
+											+ f.getFluid().getFluidType().getDescription().getString()), true);
 								}
-								
+
 							}
 						} else {
 							ItemStack stack = player.getMainHandItem();
 
-							if (!handler.getFluidInTank(0).getFluid().getAttributes().isGaseous()) {
+							if (!handler.getFluidInTank(0).getFluid().getFluidType().isLighterThanAir()) {
 								FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
 								if (!player.isCreative() && far.isSuccess()) {
 									if (stack.getCount() == 1) {
@@ -166,7 +165,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 				}
 			}
 		}
-		
+
 		return InteractionResult.CONSUME;
 
 	}
@@ -178,7 +177,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 
 		private final IFluidHandler fluids;
 		private final LazyOptional<IFluidHandler> handler;
-		
+
 		public final BlockFluidTank block;
 
 		public TEFluidTank(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
@@ -199,7 +198,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 			fluid = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:fluidstack"));
 			upgraded = compound.getByte("assemblylinemachines:upgraded");
 		}
-		
+
 		@Override
 		public void saveAdditional(CompoundTag compound) {
 
@@ -209,10 +208,10 @@ public class BlockFluidTank extends Block implements EntityBlock {
 				compound.put("assemblylinemachines:fluidstack", sub);
 			}
 			if(upgraded != 0) compound.putByte("assemblylinemachines:upgraded", upgraded);
-			
+
 			super.saveAdditional(compound);
 		}
-		
+
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
 			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
@@ -243,10 +242,10 @@ public class BlockFluidTank extends Block implements EntityBlock {
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state,
 				IProbeHitData data) {
 			ItemStack stack = !this.fluid.isEmpty() && this.fluid.getFluid().getBucket() != null ? this.fluid.getFluid().getBucket().getDefaultInstance() : Items.BUCKET.getDefaultInstance();
-			Component text = this.fluid.isEmpty() ? new TextComponent("Empty").withStyle(ChatFormatting.AQUA) : new TextComponent(this.fluid.getDisplayName().getString()).withStyle(ChatFormatting.AQUA);
+			Component text = this.fluid.isEmpty() ? Component.literal("Empty").withStyle(ChatFormatting.AQUA) : Component.literal(this.fluid.getDisplayName().getString()).withStyle(ChatFormatting.AQUA);
 			probeInfo.horizontal().item(stack).vertical().text(text).progress(this.fluid.getAmount(), this.block.capacity, probeInfo.defaultProgressStyle().filledColor(this.block.topProgressColor).alternateFilledColor(this.block.topProgressColor).suffix("mB").numberFormat(NumberFormat.COMMAS));
 		}
-		
+
 		public class TankFluidHandler implements IFluidHandler{
 
 			@Override
@@ -266,9 +265,8 @@ public class BlockFluidTank extends Block implements EntityBlock {
 
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				if(getFluidInTank(0).getAmount() == Integer.MAX_VALUE) return false;
-				if(!getFluidInTank(0).isEmpty() && !stack.getFluid().equals(getFluidInTank(0).getFluid())) return false;
-				return stack.getFluid().getAttributes().getTemperature() < 800 || block.temperatureResistance != TemperatureResistance.COLD;
+				if((getFluidInTank(0).getAmount() == Integer.MAX_VALUE) || (!getFluidInTank(0).isEmpty() && !stack.getFluid().equals(getFluidInTank(0).getFluid()))) return false;
+				return stack.getFluid().getFluidType().getTemperature() < 800 || block.temperatureResistance != TemperatureResistance.COLD;
 			}
 
 			@Override
@@ -304,7 +302,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 			public FluidStack drain(int maxDrain, FluidAction action) {
 				return getFluidInTank(0).isEmpty() ? FluidStack.EMPTY : drain(new FluidStack(getFluidInTank(0).getFluid(), maxDrain), action);
 			}
-			
+
 		}
 	}
 

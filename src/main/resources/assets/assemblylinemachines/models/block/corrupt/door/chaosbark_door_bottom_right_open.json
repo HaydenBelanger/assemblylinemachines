@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_right_open",
+  "textures": {
+    "top": "assemblylinemachines:block/corrupt/chaosbark_door_top",
+    "bottom": "assemblylinemachines:block/corrupt/chaosbark_door_bottom"
+  }
+}

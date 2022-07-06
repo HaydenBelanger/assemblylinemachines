@@ -27,24 +27,24 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class CapabilityChunkFluids {
-	
+
 	public static final Capability<IChunkFluidCapability> CHUNK_FLUID_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 	private static final Cache<String, LazyOptional<IChunkFluidCapability>> CACHED_FLUID_CHUNK_LAZIES = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build();
-	
+
 	public static LazyOptional<IChunkFluidCapability> getChunkFluidCapability(LevelChunk chunk) throws ExecutionException{
-		
+
 		return CACHED_FLUID_CHUNK_LAZIES.get(getCacheKey(chunk.getLevel().dimension(), chunk.getPos()), () -> chunk.getCapability(CHUNK_FLUID_CAPABILITY, null));
-		
+
 	}
-	
+
 	@SubscribeEvent
 	public static void registerFluidManagerCapability(RegisterCapabilitiesEvent event) {
 		event.register(IChunkFluidCapability.class);
 	}
-	
+
 	@SubscribeEvent
 	public static void attachFluidManagerCapability(AttachCapabilitiesEvent<LevelChunk> event) {
-		
+
 		ChunkFluidCapability chunkFluid = new ChunkFluidCapability(event.getObject());
 		LazyOptional<IChunkFluidCapability> lazyChunkFluid = LazyOptional.of(() -> chunkFluid);
 		lazyChunkFluid.addListener((lo) -> CACHED_FLUID_CHUNK_LAZIES.invalidate(getCacheKey(event.getObject().getLevel().dimension(), event.getObject().getPos())));
@@ -66,20 +66,20 @@ public class CapabilityChunkFluids {
 			@Override
 			public void deserializeNBT(CompoundTag nbt) {
 				chunkFluid.load(nbt);
-				
+
 			}
 		};
-		
+
 		event.addCapability(new ResourceLocation(AssemblyLineMachines.MODID, "chunk_fluid"), serializableProvider);
 	}
-	
+
 	public static interface IChunkFluidCapability{
-		
+
 		/**
 		 * @return The type of fluid stored within the chunk, or Fluids.EMPTY if this chunk has no reservoir.
 		 */
 		public Fluid getChunkFluid();
-		
+
 		/**
 		 * This method will extract some amount of whatever fluid is stored within the chunk.
 		 * @param maxDrainAmount The maximum amount of fluid to drain.
@@ -87,49 +87,49 @@ public class CapabilityChunkFluids {
 		 * @return The FluidStack of the amount successfully extracted. Will be FluidStack.EMPTY if nothing could be extracted.
 		 */
 		public FluidStack drain(int maxDrainAmount, boolean simulate);
-		
+
 		/**
-		 * 
+		 *
 		 * @return The amount of contained fluid within the chunk's reservoir.
 		 */
 		public int getFluidAmount();
-		
+
 		/**
-		 * 
+		 *
 		 * @return The display name of the stored fluid.
 		 */
 		public Component getDisplayName();
-		
+
 		/**
 		 * Sets the fluid in the chunk to the given fluid. Also overrides any existing fluid.
 		 * @param stack The fluid to place within the chunk.
 		 */
 		public void setFluid(FluidStack stack);
 	}
-	
+
 	private static String getCacheKey(ResourceKey<Level> dim, ChunkPos pos) {
 		return dim.location().toString() + ":" + pos.x + " " + pos.z;
 	}
-	
+
 	public static class ChunkFluidCapability implements IChunkFluidCapability{
 
 		private boolean initialized = false;
 		private FluidStack storedFluid = FluidStack.EMPTY;
 		private final LevelChunk chunk;
-		
+
 		public ChunkFluidCapability(LevelChunk chunk) {
 			this.chunk = chunk;
 		}
-		
+
 		/**
 		 * @return Serialized data into a CompoundTag, preferably containing the FluidStack stored within the chunk.
 		 */
 		public CompoundTag save() {
 			CompoundTag tag = new CompoundTag();
-			
+
 			tag.put("assemblylinemachines:storedfluid", storedFluid.writeToNBT(new CompoundTag()));
 			tag.putBoolean("assemblylinemachines:initialized", initialized);
-			
+
 			return tag;
 		}
 
@@ -147,14 +147,14 @@ public class CapabilityChunkFluids {
 			if(!initialized) setFluid(FluidInGroundRecipe.assemble(chunk.getPos(), chunk.getLevel()));
 			return storedFluid.getFluid();
 		}
-		
+
 		@Override
 		public void setFluid(FluidStack stack) {
 			if(!initialized) initialized = true;
 			storedFluid = stack;
 			chunk.setUnsaved(true);
 		}
-		
+
 		@Override
 		public FluidStack drain(int maxDrainAmount, boolean simulate) {
 			if(getChunkFluid().equals(Fluids.EMPTY)) return FluidStack.EMPTY;
@@ -169,7 +169,7 @@ public class CapabilityChunkFluids {
 			}
 			return fs;
 		}
-		
+
 		@Override
 		public int getFluidAmount() {
 			if(this.getChunkFluid().equals(Fluids.EMPTY)) return 0;

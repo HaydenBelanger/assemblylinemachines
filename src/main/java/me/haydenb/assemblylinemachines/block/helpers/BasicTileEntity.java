@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicTileEntity extends BlockEntity{
-	
+
 
 	public BasicTileEntity(BlockEntityType<?> pType, BlockPos pLevelPosition, BlockState pBlockState) {
 		super(pType, pLevelPosition, pBlockState);
@@ -30,7 +30,7 @@ public class BasicTileEntity extends BlockEntity{
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getTag());
 	}
-	
+
 	//Synchronizes data on world load between client and server.
 	@Override
 	public CompoundTag getUpdateTag() {
@@ -38,35 +38,35 @@ public class BasicTileEntity extends BlockEntity{
 		this.saveAdditional(tag);
 		return tag;
 	}
-	
+
 	@Override
 	public void handleUpdateTag(CompoundTag tag) {
 		if(tag == null) tag = new CompoundTag();
 		this.load(tag);
 	}
-	
+
 	public final CompoundTag save(CompoundTag compound) {
 		return compound;
 	}
-	
+
 	@Override
 	protected void saveAdditional(CompoundTag compound) {
 		this.save(compound);
 		super.saveAdditional(compound);
 	}
-	
+
 	public void sendUpdates() {
 		this.getLevel().setBlocksDirty(this.getBlockPos(), getBlockState(), getBlockState());
 		this.getLevel().sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 2);
 		this.setChanged();
 	}
-	
+
 	public boolean supportsTOP() {
 		return false;
 	}
-	
+
 	public ArrayList<Pair<String, Object>> getTOPObjectList(){
 		return null;
 	}
-	
+
 }

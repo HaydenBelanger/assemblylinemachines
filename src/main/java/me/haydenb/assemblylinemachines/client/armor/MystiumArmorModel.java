@@ -90,7 +90,7 @@ public class MystiumArmorModel {
 
 		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
-	
+
 	@SuppressWarnings("unused")
 	public static LayerDefinition outerLayer() {
 		MeshDefinition meshdefinition = new MeshDefinition();
@@ -158,7 +158,7 @@ public class MystiumArmorModel {
 
 		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
-	
+
 	@SuppressWarnings("unused")
 	public static LayerDefinition innerLayer() {
 		MeshDefinition meshdefinition = new MeshDefinition();

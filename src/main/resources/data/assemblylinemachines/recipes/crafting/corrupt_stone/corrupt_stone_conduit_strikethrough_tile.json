@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":[
+		"x",
+		"m",
+		"x"
+	],
+	"key":{
+		"x":{
+			"item": "assemblylinemachines:corrupt_stone_tile"
+		},
+		"m":{
+			"item": "assemblylinemachines:corrupt_stone_conduit"
+		}
+	},
+	"result":{
+		"item": "assemblylinemachines:corrupt_stone_conduit_strikethrough_tile",
+		"count": 3
+	}
+}

@@ -27,10 +27,10 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 public class CapabilityBooks {
 
 	public static final Capability<IBookDistroCapability> BOOK_DISTRO_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
-	
+
 	//Registered using listeners, as some events in this class are client-only.
 	public static void registerAllEvents() {
-		
+
 		IEventBus bus = MinecraftForge.EVENT_BUS;
 		bus.addListener((RegisterCapabilitiesEvent event) -> event.register(IBookDistroCapability.class));
 		bus.addGenericListener(Entity.class, (AttachCapabilitiesEvent<Entity> event) -> {
@@ -38,7 +38,7 @@ public class CapabilityBooks {
 				BookDistroCapability bookDistro = new BookDistroCapability(player);
 				LazyOptional<IBookDistroCapability> lazyBookDistro = LazyOptional.of(() -> bookDistro);
 				ICapabilitySerializable<CompoundTag> serializableProvider = new ICapabilitySerializable<>() {
-					
+
 					@Override
 					public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 						if(cap == CapabilityBooks.BOOK_DISTRO_CAPABILITY) {
@@ -46,12 +46,12 @@ public class CapabilityBooks {
 						}
 						return LazyOptional.empty();
 					}
-					
+
 					@Override
 					public CompoundTag serializeNBT() {
 						return bookDistro.save();
 					}
-					
+
 					@Override
 					public void deserializeNBT(CompoundTag nbt) {
 						bookDistro.load(nbt);
@@ -60,7 +60,7 @@ public class CapabilityBooks {
 				event.addCapability(new ResourceLocation(AssemblyLineMachines.MODID, "book_distro"), serializableProvider);
 			}
 		});
-		
+
 		if(FMLLoader.getDist() == Dist.CLIENT) bus.addListener((LoggedInEvent event) -> {
 			if(ALMConfig.getClientConfig().receiveGuideBook().get()) {
 				AssemblyLineMachines.LOGGER.debug("Sending request for guide to server from player " + event.getPlayer().getDisplayName().getString() + ".");
@@ -71,7 +71,7 @@ public class CapabilityBooks {
 			}
 		});
 	}
-	
+
 	//Receives packet request from server to give book to player by UUID.
 	public static void guideBookServerRequestHandler(UUID uuid) {
 		if(ALMConfig.getServerConfig().distributeGuideBook().get()) {
@@ -83,9 +83,9 @@ public class CapabilityBooks {
 		}
 		AssemblyLineMachines.LOGGER.debug("Consuming request to dispense guide from " + uuid.toString() + ".");
 	}
-	
+
 	public static interface IBookDistroCapability{
-		
+
 		/**
 		 * Gives a copy of "Assembly Lines & You" to the Player as long as it is enabled in the config to do so.
 		 * @return Whether or not a book was successfully given to the Player.
@@ -93,30 +93,30 @@ public class CapabilityBooks {
 		public boolean giveBook();
 		public boolean receivedBook();
 	}
-	
+
 	public static class BookDistroCapability implements IBookDistroCapability{
-		
+
 		boolean givenBook = false;
 		private final Player player;
-		
+
 		public BookDistroCapability(Player player) {
 			this.player = player;
 		}
-		
+
 		public CompoundTag save() {
 			CompoundTag tag = new CompoundTag();
-			
+
 			tag.putBoolean("assemblylinemachines:given_book", givenBook);
 			return tag;
 		}
-		
+
 		public void load(CompoundTag tag) {
 			givenBook = tag.getBoolean("assemblylinemachines:given_book");
 		}
-		
+
 		@Override
 		public boolean giveBook() {
-			if(givenBook == false) {
+			if(!givenBook) {
 				ItemStack book = PluginPatchouli.INTERFACE.get().getBookItem();
 				if(!book.isEmpty()) {
 					givenBook = true;
@@ -125,7 +125,7 @@ public class CapabilityBooks {
 					AssemblyLineMachines.LOGGER.debug("Guide dispensed successfully.");
 					return true;
 				}
-				
+
 				AssemblyLineMachines.LOGGER.debug("Patchouli is not installed on the server.");
 				return false;
 			}

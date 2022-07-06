@@ -1,18 +1,16 @@
 package me.haydenb.assemblylinemachines.registry.utils;
 
 import java.util.List;
-import java.util.Random;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.*;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class WhitelistBiomeFilter extends BiomeFilter{
 
@@ -22,27 +20,24 @@ public class WhitelistBiomeFilter extends BiomeFilter{
 		Codec.BOOL.optionalFieldOf("whitelist", true).forGetter((value) -> value.whitelist))
 		.apply(instance, WhitelistBiomeFilter::new);
 	});
-	
-	public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER_REGISTRY = DeferredRegister.create(Registry.PLACEMENT_MODIFIER_REGISTRY, AssemblyLineMachines.MODID);
-	public static final RegistryObject<PlacementModifierType<WhitelistBiomeFilter>> WHITELIST_BIOME_FILTER = PLACEMENT_MODIFIER_REGISTRY.register("whitelist_biome", () -> () -> CODEC);
-	
+
 	private final List<ResourceLocation> biomes;
 	private final boolean whitelist;
-	
+
 	public WhitelistBiomeFilter(List<ResourceLocation> biomes, boolean whitelist) {
 		this.biomes = biomes;
 		this.whitelist = whitelist;
 	}
-	
+
 	@Override
-	protected boolean shouldPlace(PlacementContext context, Random random, BlockPos pos) {
-		ResourceLocation biome = context.getLevel().getBiome(pos).value().getRegistryName();
+	protected boolean shouldPlace(PlacementContext context, RandomSource random, BlockPos pos) {
+		ResourceLocation biome = ForgeRegistries.BIOMES.getKey(context.getLevel().getBiome(pos).value());
 		if((whitelist && !biomes.contains(biome)) || (!whitelist && biomes.contains(biome))) return false;
 		return super.shouldPlace(context, random, pos);
 	}
-	
+
 	@Override
 	public PlacementModifierType<?> type() {
-		return WHITELIST_BIOME_FILTER.get();
+		return Registry.WHITELIST_BIOME_FILTER.get();
 	}
 }
