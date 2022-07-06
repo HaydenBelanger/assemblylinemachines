@@ -51,7 +51,7 @@ public class JEICategoryRegistry implements IModPlugin{
 	@OnlyIn(Dist.CLIENT)
 	public void registerCategories(IRecipeCategoryRegistration registration) {
 		IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
-
+  if(CATEGORY_REGISTRY.isEmpty()) {
 		CATEGORY_REGISTRY.add(new RecipeCategoryBuilder(guiHelper, "lumber", "Lumber Mill Crafting")
 				.background("gui_set_a", 145, 69, 102, 30).icon(Registry.getBlock("lumber_mill")).progressBar("gui_set_a", 199, 99, 19, 5, 200, StartDirection.LEFT, false, 23, 13)
 				.slots((i) -> i == 0 ? RecipeIngredientRole.INPUT : RecipeIngredientRole.OUTPUT, Pair.of(3, 7), Pair.of(50, 7), Pair.of(83, 7)).catalysts(Registry.getBlock("lumber_mill"))
@@ -150,7 +150,6 @@ public class JEICategoryRegistry implements IModPlugin{
 								anim = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), recipe.getFluid().getJeiBlitPiece().getFirst(), recipe.getFluid().getJeiBlitPiece().getSecond(), 15, 16).buildAnimated(200, StartDirection.LEFT, false);
 								progressBars.put(recipe.getFluid(), anim);
 							}
-							anim.draw(v, 42, 5);
 						}
 					}
 				}).slots((i) -> switch(i) {
@@ -172,7 +171,6 @@ public class JEICategoryRegistry implements IModPlugin{
 								drawable = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), recipe.criteria.getJeiBlitX(), recipe.criteria.getJeiBlitY(), 34, 34).build();
 								drawables.put(recipe.criteria, drawable);
 							}
-							drawable.draw(v, 1, 42);
 						}
 					}
 				}).tooltip((pP1, pP2, tooltip) -> {
@@ -221,7 +219,6 @@ public class JEICategoryRegistry implements IModPlugin{
 							}else {
 								bar = recipe.sprout.sunlightReq.test(recipe.soil) ? () -> progBarDay : () -> progBarNight;
 							}
-							bar.get().draw(v, 19, 14);
 						}
 					}
 				}).catalysts(Registry.getItem("greenhouse")).build(GreenhouseCrafting.class));
@@ -235,7 +232,7 @@ public class JEICategoryRegistry implements IModPlugin{
 
 					}
 				}).catalysts(Registry.getBlock("greenhouse")).build(GreenhouseFertilizerCrafting.class));
-
+    }
 		registration.addRecipeCategories(CATEGORY_REGISTRY.toArray(new IRecipeCategory<?>[CATEGORY_REGISTRY.size()]));
 
 		AssemblyLineMachines.LOGGER.debug("Just Enough Items plugin connected to Assembly Line Machines.");
