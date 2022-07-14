@@ -10,6 +10,7 @@ import me.haydenb.assemblylinemachines.item.ItemStirringStick.TemperatureResista
 import me.haydenb.assemblylinemachines.plugins.PluginTOP.PluginTOPRegistry.TOPProvider;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,10 +33,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.*;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BlockFluidTank extends Block implements EntityBlock {
 
@@ -135,31 +135,7 @@ public class BlockFluidTank extends Block implements EntityBlock {
 
 							}
 						} else {
-							ItemStack stack = player.getMainHandItem();
-
-							if (!handler.getFluidInTank(0).getFluid().getFluidType().isLighterThanAir()) {
-								FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
-								if (!player.isCreative() && far.isSuccess()) {
-									if (stack.getCount() == 1) {
-										player.getInventory().removeItemNoUpdate(player.getInventory().selected);
-									} else {
-										stack.shrink(1);
-									}
-									ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-									return InteractionResult.CONSUME;
-
-								}
-								FluidActionResult farx = FluidUtil.tryFillContainer(stack, handler, 1000, player, true);
-								if (!player.isCreative() && farx.isSuccess()) {
-									if (stack.getCount() == 1) {
-										player.getInventory().removeItemNoUpdate(player.getInventory().selected);
-									} else {
-										stack.shrink(1);
-									}
-									ItemHandlerHelper.giveItemToPlayer(player, farx.getResult());
-									return InteractionResult.CONSUME;
-								}
-							}
+							Utils.drainMainHandToHandler(player, handler);
 						}
 					}
 				}

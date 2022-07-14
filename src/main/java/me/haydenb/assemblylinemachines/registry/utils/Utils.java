@@ -18,6 +18,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -26,8 +27,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.fluids.FluidActionResult;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 import net.minecraftforge.registries.tags.ITag;
@@ -127,5 +132,17 @@ public class Utils {
 			return false;
 		}
 
+	}
+	
+	public static boolean drainMainHandToHandler(Player player, IFluidHandler handler) {
+		FluidActionResult far = FluidUtil.tryEmptyContainer(player.getMainHandItem(), handler, Integer.MAX_VALUE, player, true);
+		if(far.isSuccess()) {
+			if(!player.isCreative()) {
+				player.getMainHandItem().shrink(1);
+				ItemHandlerHelper.giveItemToPlayer(player, far.getResult(), player.getInventory().selected);
+			}
+			return true;
+		}
+		return false;
 	}
 }

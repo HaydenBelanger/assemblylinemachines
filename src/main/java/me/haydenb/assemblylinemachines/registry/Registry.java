@@ -94,6 +94,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.*;
@@ -119,8 +120,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.common.PlantType;
+import net.minecraftforge.common.*;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.world.BiomeModifier;
@@ -961,7 +961,8 @@ public class Registry {
 	}
 
 	public static void createFluid(String name, Optional<Fluid> still, Optional<Fluid> flowing, Either<LiquidBlock, Boolean> block, boolean bucket, FluidType.Properties typeProperties, Function<SpecialRenderFluidType, SpecialRenderFluidType> typeModifier) {
-		SpecialRenderFluidType srft = new SpecialRenderFluidType(typeProperties, name, flowing.isPresent());
+		SpecialRenderFluidType srft = new SpecialRenderFluidType(typeProperties.sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+				.sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL).sound(SoundActions.FLUID_VAPORIZE, SoundEvents.LAVA_EXTINGUISH), name, flowing.isPresent());
 		if(typeModifier != null) srft = typeModifier.apply(srft);
 		FLUID_TYPES.put(name, srft);
 

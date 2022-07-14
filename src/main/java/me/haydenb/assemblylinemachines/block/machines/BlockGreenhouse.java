@@ -35,12 +35,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -131,6 +132,16 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SHAPE;
+	}
+	
+	@Override
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if(world.getBlockEntity(pos) instanceof TEGreenhouse basin) {
+			if(basin.handler.isPresent()) {
+				if(Utils.drainMainHandToHandler(player, basin.handler.orElse(null))) return InteractionResult.CONSUME;
+			}
+		}
+		return super.blockRightClickServer(state, world, pos, player);
 	}
 
 	public static enum Sprout implements StringRepresentable{

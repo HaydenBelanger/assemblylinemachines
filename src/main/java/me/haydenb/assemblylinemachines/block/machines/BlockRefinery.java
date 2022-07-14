@@ -56,10 +56,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.*;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
@@ -95,42 +94,8 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 	@Override
 	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
-		ItemStack stack = player.getMainHandItem();
-		if (stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null) != null && world.getBlockEntity(pos) instanceof TERefinery) {
-
-			IFluidHandler handler = ((TERefinery) world.getBlockEntity(pos)).fluids;
-
-			if (!handler.getFluidInTank(0).getFluid().getFluidType().isLighterThanAir()) {
-				FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
-				if (far.isSuccess()) {
-					if(!player.isCreative()) {
-						if (stack.getCount() == 1) {
-							player.getInventory().removeItemNoUpdate(player.getInventory().selected);
-						} else {
-							stack.shrink(1);
-						}
-						ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-
-					}
-					return InteractionResult.CONSUME;
-
-				}
-				FluidActionResult farx = FluidUtil.tryFillContainer(stack, handler, 1000, player, true);
-				if (farx.isSuccess()) {
-					if(!player.isCreative()) {
-						if (stack.getCount() == 1) {
-							player.getInventory().removeItemNoUpdate(player.getInventory().selected);
-						} else {
-							stack.shrink(1);
-						}
-						ItemHandlerHelper.giveItemToPlayer(player, farx.getResult());
-					}
-
-					return InteractionResult.CONSUME;
-				}
-			}
-
-
+		if(world.getBlockEntity(pos) instanceof TERefinery refinery) {
+			if(Utils.drainMainHandToHandler(player, refinery.fluids)) return InteractionResult.CONSUME;
 		}
 		return super.blockRightClickServer(state, world, pos, player);
 	}

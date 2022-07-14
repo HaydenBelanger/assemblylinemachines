@@ -27,6 +27,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
@@ -94,6 +95,17 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 		} else {
 			return SHAPE_N;
 		}
+	}
+	
+	@Override
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if(world.getBlockEntity(pos) instanceof TEFluidRouter router) {
+			IFluidHandler handler = router.handlerX;
+			if(handler != null) {
+				if(Utils.drainMainHandToHandler(player, handler)) return InteractionResult.CONSUME;
+			}
+		}
+		return super.blockRightClickServer(state, world, pos, player);
 	}
 
 	public static class TEFluidRouter extends AbstractMachine<ContainerFluidRouter>{

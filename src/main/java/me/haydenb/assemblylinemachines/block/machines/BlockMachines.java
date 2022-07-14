@@ -28,10 +28,6 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidActionResult;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BlockMachines {
 
@@ -337,19 +333,8 @@ public class BlockMachines {
 				.additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE),
 						(builder) -> builder.add(StateProperties.FLUID))
 				.rightClickAction((state, world, pos, player) -> {
-					if(player.getMainHandItem().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent() && world.getBlockEntity(pos) instanceof IMachineDataBridge) {
-						FluidActionResult far = FluidUtil.tryEmptyContainer(player.getMainHandItem(), ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)), 1000, player, true);
-						if(far.isSuccess()) {
-							if(player.getMainHandItem().getCount() == 1) {
-								player.getInventory().removeItemNoUpdate(player.getInventory().selected);
-							}else {
-								player.getMainHandItem().shrink(1);
-							}
-							ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-							return InteractionResult.CONSUME;
-						}
-					}
-					return null;
+					boolean res = Utils.drainMainHandToHandler(player, ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)));
+					return res ? InteractionResult.CONSUME : null;
 				}).build("electric_fluid_mixer");
 	}
 
@@ -398,19 +383,8 @@ public class BlockMachines {
 				.additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE),
 						(builder) -> builder.add(StateProperties.FLUID))
 				.rightClickAction((state, world, pos, player) -> {
-					if(player.getMainHandItem().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent() && world.getBlockEntity(pos) instanceof IMachineDataBridge) {
-						FluidActionResult far = FluidUtil.tryEmptyContainer(player.getMainHandItem(), ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)), 1000, player, true);
-						if(far.isSuccess()) {
-							if(player.getMainHandItem().getCount() == 1) {
-								player.getInventory().removeItemNoUpdate(player.getInventory().selected);
-							}else {
-								player.getMainHandItem().shrink(1);
-							}
-							ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-							return InteractionResult.CONSUME;
-						}
-					}
-					return null;
+					boolean res = Utils.drainMainHandToHandler(player, ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)));
+					return res ? InteractionResult.CONSUME : null;
 				}).build("mkii_fluid_mixer");
 	}
 

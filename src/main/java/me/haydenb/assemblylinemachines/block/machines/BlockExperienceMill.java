@@ -28,6 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -57,7 +58,11 @@ public class BlockExperienceMill {
 	public static Block experienceMill() {
 		return MachineBuilder.block().voxelShape(Stream.of(
 				Block.box(0, 0, 0, 16, 7, 16),Block.box(6, 7, 6, 10, 10, 10),Block.box(3, 10, 3, 13, 13, 13)
-				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true).additionalProperties((state) -> state.setValue(EXP_MILL_PROP, 0), (builder) -> builder.add(EXP_MILL_PROP)).build("experience_mill", TEExperienceMill.class);
+				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true)
+				.rightClickAction((state, level, pos, player) -> {
+					boolean res = Utils.drainMainHandToHandler(player, ((TEExperienceMill) level.getBlockEntity(pos)).handler);
+					return res ? InteractionResult.CONSUME : null;
+				}).additionalProperties((state) -> state.setValue(EXP_MILL_PROP, 0), (builder) -> builder.add(EXP_MILL_PROP)).build("experience_mill", TEExperienceMill.class);
 	}
 
 	//OFF, ENCHANTMENT, BOOK, ANVIL

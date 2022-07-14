@@ -34,6 +34,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -102,6 +103,17 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			return type.shapeN;
 		}
 	}
+	
+	@Override
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if(world.getBlockEntity(pos) instanceof TEFluidGenerator generator) {
+			IFluidHandler handler = generator.fluids;
+			if(handler != null) {
+				if(Utils.drainMainHandToHandler(player, handler)) return InteractionResult.CONSUME;
+			}
+		}
+		return super.blockRightClickServer(state, world, pos, player);
+	}
 
 	public static class TEFluidGenerator extends EnergyMachine<ContainerFluidGenerator> implements ALMTicker<TEFluidGenerator>, TOPProvider{
 
@@ -116,7 +128,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 
 			@Override
 			public boolean isFluidValid(int tank, FluidStack stack) {
-				if(tank >= 2) return false;
+				if(tank >= 2 || (tank == 1 && getUpgradeAmount(Upgrades.GENERATOR_COOLANT) == 0)) return false;
 				Predicate<GeneratorFluidTypes> typePred = tank == 0 ? (type) -> TEFluidGenerator.this.type.get() == type.equivalentGenerator : (type) -> type == GeneratorFluidTypes.COOLANT;
 				return level.getRecipeManager().getAllRecipesFor(GeneratorFluidCrafting.GENFLUID_RECIPE).stream().anyMatch((recipe) -> typePred.test(recipe.fluidType) && recipe.fluid.equals(stack.getFluid()) && (recipe.powerPerUnit != 0 || recipe.coolantStrength != 0));
 			}

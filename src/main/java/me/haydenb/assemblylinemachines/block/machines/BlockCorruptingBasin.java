@@ -24,10 +24,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -69,7 +72,17 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
-
+	
+	@Override
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if(world.getBlockEntity(pos) instanceof TECorruptingBasin basin) {
+			IFluidHandler handler = basin.handler;
+			if(handler != null) {
+				if(Utils.drainMainHandToHandler(player, handler)) return InteractionResult.CONSUME;
+			}
+		}
+		return super.blockRightClickServer(state, world, pos, player);
+	}
 
 	public static class TECorruptingBasin extends SimpleMachine<ContainerCorruptingBasin> implements ALMTicker<TECorruptingBasin>{
 

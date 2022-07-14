@@ -21,9 +21,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -60,6 +63,16 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> p_49915_) {
 		p_49915_.add(HorizontalDirectionalBlock.FACING);
+	}
+	
+	@Override
+	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
+		if(world.getBlockEntity(pos) instanceof TEOmnivoid oVoid) {
+			if(oVoid.handler.isPresent()) {
+				if(Utils.drainMainHandToHandler(player, oVoid.handler.orElse(null))) return InteractionResult.CONSUME;
+			}
+		}
+		return super.blockRightClickServer(state, world, pos, player);
 	}
 
 	public static class TEOmnivoid extends SimpleMachine<ContainerOmnivoid> implements ALMTicker<TEOmnivoid>{
