@@ -27,6 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
@@ -44,7 +45,6 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.*;
 import net.minecraftforge.fluids.FluidStack;
@@ -59,7 +59,7 @@ public class BlockExperienceMill {
 				Block.box(0, 0, 0, 16, 7, 16),Block.box(6, 7, 6, 10, 10, 10),Block.box(3, 10, 3, 13, 13, 13)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true).additionalProperties((state) -> state.setValue(EXP_MILL_PROP, 0), (builder) -> builder.add(EXP_MILL_PROP)).build("experience_mill", TEExperienceMill.class);
 	}
-
+	
 	//OFF, ENCHANTMENT, BOOK, ANVIL
 	private static final IntegerProperty EXP_MILL_PROP = IntegerProperty.create("display", 0, 3);
 
@@ -83,7 +83,7 @@ public class BlockExperienceMill {
 		private WeakReference<FakePlayer> anvilFp = null;
 
 		public TEExperienceMill(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 6, Component.translatable(Registry.getBlock("experience_mill").getDescriptionId()), Registry.getContainerId("experience_mill"),
+			super(tileEntityTypeIn, 6, new TranslatableComponent(Registry.getBlock("experience_mill").getDescriptionId()), Registry.getContainerId("experience_mill"),
 					ContainerExperienceMill.class, true, pos, state);
 		}
 
@@ -130,15 +130,15 @@ public class BlockExperienceMill {
 
 							switch(getUpgradeAmount(Upgrades.UNIVERSAL_SPEED)) {
 							case 3:
-								cx = Math.round(cx * 1.3f);
+								cx = Math.round((float) cx * 1.3f);
 								timeMul = 0.25f;
 								break;
 							case 2:
-								cx = Math.round(cx * 1.2f);
+								cx = Math.round((float) cx * 1.2f);
 								timeMul = 0.5f;
 								break;
 							case 1:
-								cx = Math.round(cx * 1.1f);
+								cx = Math.round((float) cx * 1.1f);
 								timeMul = 0.75f;
 								break;
 							default:
@@ -231,7 +231,7 @@ public class BlockExperienceMill {
 						this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(EXP_MILL_PROP, (int) mode));
 						sendUpdates = true;
 					}
-					if(sendUpdates) {
+					if(sendUpdates == true) {
 						sendUpdates();
 					}
 				}
@@ -372,7 +372,7 @@ public class BlockExperienceMill {
 			if(!tsfm.tank.isEmpty() && tsfm.tank.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(tsfm.tank.getFluid());
 				if(tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(tsfm.tank.getFluid()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(tsfm.tank.getFluid().getAttributes().getStillTexture());
 				}
 
 				if(tsfm.tank.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
@@ -402,16 +402,16 @@ public class BlockExperienceMill {
 			if(add != -1) {
 				super.blit(modeB.x, modeB.y, 176, 9 + add, modeB.getWidth(), modeB.getHeight());
 			}
-
+			
 			if(tsfm.mode == 1 || tsfm.mode == 3) {
 				super.blit(x+37, y+19, 176, 88, 16, 16);
 			}
-
+			
 			if(tsfm.mode == 2 || tsfm.mode == 3) {
 				if(tsfm.mode == 2) {
 					super.blit(x+37, y+19, 176, 120, 16, 16);
 				}
-
+				
 				super.blit(x+37, y+48, 176, 104, 16, 16);
 			}
 
@@ -433,7 +433,7 @@ public class BlockExperienceMill {
 
 						str.add(FormattingHelper.FEPT_FORMAT.format(tsfm.tank.getAmount()) + " mB");
 					} else {
-						str.add(FormattingHelper.FEPT_FORMAT.format(tsfm.tank.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) tsfm.tank.getAmount() / 1000D) + " B");
 					}
 					this.renderComponentTooltip(str, mouseX - x, mouseY - y);
 				} else {

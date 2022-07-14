@@ -14,32 +14,32 @@ public class ItemStirringStick extends Item {
 		this.sr = sr;
 		this.burnable = burnable;
 	}
-
+	
 	public boolean useStirStick(ItemStack stack) {
 		if(stack.getDamageValue() >= stack.getMaxDamage()) {
 			stack.shrink(1);
 			return true;
 		}
-
+		
 		stack.setDamageValue(stack.getDamageValue() + 1);
 		return false;
 	}
-
+	
 	public TemperatureResistance getStirringResistance() {
 		return sr;
 	}
-
+	
 	public static enum TemperatureResistance{
 		COLD, HOT;
 	}
-
+	
 	@Override
 	public int getBurnTime(ItemStack itemStack, RecipeType<?> type) {
-		if(this.burnable) {
+		if(this.burnable == true) {
 			return 200;
 		}
-
+		
 		return -1;
 	}
-
+	
 }

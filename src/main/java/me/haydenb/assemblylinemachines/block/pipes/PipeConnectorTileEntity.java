@@ -24,7 +24,7 @@ import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,7 +49,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 	//Relevant for all pipes.
 	private boolean inputMode;
 	private boolean outputMode;
-
+	
 	//Only relevant if there are upgrades present/the pipe is an advanced-level.
 	private boolean nearestFirst = true;
 	private boolean whitelist = false;
@@ -59,13 +59,13 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 	private int timer = 0;
 	private int nTimer = 50;
 	double pendingCooldown = 0;
-
+	
 	private HashMap<TransmissionType, Integer> omniPipeTimer = new HashMap<>();
-
+	
 	private HashMap<TransmissionType, Pair<Boolean, Boolean>> omniPipeIO = new HashMap<>();
 
 	HashMap<Object, TriConsumer<PipeConnectorTileEntity, Object, Integer>> conCapabilities = new HashMap<>();
-
+	
 	final PipeType pipeType;
 	final TransmissionType transType;
 
@@ -100,7 +100,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 
 
 	public PipeConnectorTileEntity(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-		super(tileEntityTypeIn, 12, Component.translatable(((BlockPipe) state.getBlock()).transType.getDescriptionId()), Registry.getContainerId("pipe_connector"),
+		super(tileEntityTypeIn, 12, new TranslatableComponent(((BlockPipe) state.getBlock()).transType.getDescriptionId()), Registry.getContainerId("pipe_connector"),
 				PipeConnectorContainer.class, pos, state);
 		BlockPipe bp = (BlockPipe) state.getBlock();
 		this.pipeType = bp.pipeType;
@@ -147,7 +147,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			if (compound.contains("assemblylinemachines:input")) inputMode = compound.getBoolean("assemblylinemachines:input");
 			if (compound.contains("assemblylinemachines:output")) outputMode = compound.getBoolean("assemblylinemachines:output");
 		}
-
+		
 	}
 
 	@Override
@@ -172,9 +172,9 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			compound.putBoolean("assemblylinemachines:redstone", redstone);
 			compound.putInt("assemblylinemachines:priority", priority);
 		}
-
-
-
+		
+		
+		
 		super.saveAdditional(compound);
 	}
 
@@ -182,7 +182,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 	public void tick() {
 
 		if (!level.isClientSide) {
-			if (outputMode) {
+			if (outputMode == true) {
 				if (transType == TransmissionType.OMNI || timer++ == nTimer) {
 					timer = 0;
 					if (pendingCooldown-- <= 0) {
@@ -209,11 +209,11 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 							targets.clear();
 							pathToNearest(this.getLevel(), this.getBlockPos(), new ArrayList<>(), this.getBlockPos(), targets);
 
-							if (conCapabilities.isEmpty() && !connectToOutput()) {
+							if (conCapabilities.isEmpty() && connectToOutput() == false) {
 								return;
 							}
 							if (!conCapabilities.isEmpty()) {
-								if (redstone) {
+								if (redstone == true) {
 									if (getUpgradeAmount(Upgrades.PIPE_REDSTONE) == 0) {
 										redstone = false;
 									} else if (!level.hasNeighborSignal(this.getBlockPos())) {
@@ -230,7 +230,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 								sendUpdates();
 							}
 						}
-
+						
 
 					}
 				}
@@ -241,13 +241,13 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 	@Override
 	public NonNullList<ItemStack> getItems() {
 		for (int i = 0; i < 9; i++) {
-			if (contents.get(i) != ItemStack.EMPTY && !this.enableFilterSlot(i)) {
+			if (contents.get(i) != ItemStack.EMPTY && this.enableFilterSlot(i) == false) {
 				contents.set(i, ItemStack.EMPTY);
 			}
 		}
 		return contents;
 	}
-
+	
 	public void pathToNearest(Level world, BlockPos curPos, ArrayList<BlockPos> checked, BlockPos initial, TreeSet<PipeConnectorTileEntity> targets) {
 		BlockState bs = world.getBlockState(curPos);
 		for (Direction k : Direction.values()) {
@@ -258,7 +258,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 					PipeConnectorTileEntity ipc = (PipeConnectorTileEntity) te;
 					targets.add(ipc);
 				}
-
+				
 			}else if (pco == PipeConnOptions.PIPE) {
 				BlockPos targPos = curPos.relative(k);
 				if (!checked.contains(targPos)) {
@@ -285,7 +285,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		}
 		return ii;
 	}
-
+	
 	@Override
 	public ItemStack removeItem(int pIndex, int pCount) {
 		if(pIndex < 9) {
@@ -293,7 +293,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		}
 		return super.removeItem(pIndex, pCount);
 	}
-
+	
 	@Override
 	public ItemStack removeItemNoUpdate(int pIndex) {
 		if(pIndex < 9) {
@@ -301,11 +301,11 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		}
 		return super.removeItemNoUpdate(pIndex);
 	}
-
+	
 	public int attemptAccept(Class<?> clazz, Object object) {
-		if(!inputMode || (conCapabilities.isEmpty() && !connectToOutput())) return 0;
-
-
+		if(inputMode == false || (conCapabilities.isEmpty() && connectToOutput() == false)) return 0;
+		
+		
 		Object prelimOutput = null;
 		for(Object o : conCapabilities.keySet()) {
 			if(clazz.isInstance(o)) prelimOutput = clazz.cast(o);
@@ -315,7 +315,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			if(prelimOutput instanceof IItemHandler && object instanceof ItemStack) {
 				ItemStack stack = (ItemStack) object;
 				IItemHandler output = (IItemHandler) prelimOutput;
-				if (!checkWhiteBlackList(stack)) {
+				if (checkWhiteBlackList(stack) == false) {
 					return 0;
 				}
 				int added = 0;
@@ -337,9 +337,9 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 				return ((IEnergyStorage) prelimOutput).receiveEnergy((Integer) object, false);
 			}
 		}
-
+		
 		return 0;
-
+		
 	}
 
 	boolean checkWhiteBlackList(ItemStack stack) {
@@ -350,7 +350,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		}
 		return !whitelist;
 	}
-
+	
 	boolean checkWhiteBlackList(FluidStack stack) {
 		for(int i = 0; i < 9; i++) {
 			IFluidHandlerItem lx = contents.get(i).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null);
@@ -360,7 +360,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		}
 		return !whitelist;
 	}
-
+	
 	private boolean enableFilterSlot(int slot) {
 
 		if(pipeType == PipeType.BASIC || transType == TransmissionType.POWER) {
@@ -397,7 +397,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 						success = true;
 					}
 				}
-
+				
 			}
 		}
 
@@ -446,8 +446,8 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			public boolean isActive() {
 				return tileEntity.enableFilterSlot(filterNum);
 			}
-
-
+			
+			
 
 		}
 
@@ -460,18 +460,18 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 				}else {
 					tileEntity.setItem(slot - 36, ItemStack.EMPTY);
 				}
-
+				
 			}
-
+			
 			super.clicked(slot, dragType, clickTypeIn, player);
 		}
-
+		
 		private class PipeUpgradeSlot extends SlotWithRestrictions {
 
 			public PipeUpgradeSlot(Container inventoryIn, int index, int xPosition, int yPosition, AbstractMachine<?> check) {
 				super(inventoryIn, index, xPosition, yPosition, check);
 			}
-
+			
 			@Override
 			public boolean isActive() {
 				return tileEntity.pipeType != PipeType.BASIC;
@@ -493,7 +493,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			tsfm = screenContainer.tileEntity;
 			container = screenContainer;
 			if(tsfm.pipeType != PipeType.BASIC && tsfm.transType != TransmissionType.POWER) {
-				MutableComponent shortInvText = Component.translatable(Util.makeDescriptionId("tileEntity", new ResourceLocation(AssemblyLineMachines.MODID, "inventory_shortened")));
+				TranslatableComponent shortInvText = new TranslatableComponent(Util.makeDescriptionId("tileEntity", new ResourceLocation(AssemblyLineMachines.MODID, "inventory_shortened")));
 				this.inventoryText = () -> shortInvText;
 			}
 		}
@@ -503,13 +503,13 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			super.init();
 			int x = this.leftPos;
 			int y = this.topPos;
-
+			
 			if(tsfm.transType != TransmissionType.OMNI) {
 				int[] ioCoords = new int[]{75, 35, 89, 35};
 				if(tsfm.pipeType != PipeType.BASIC && tsfm.transType != TransmissionType.POWER) {
 					ioCoords = new int[] {33, 50, 33, 32};
 				}
-
+				
 				this.addRenderableWidget(new TrueFalseButton(x+ioCoords[0], y+ioCoords[1], 177, 1, 12, 12, new TrueFalseButtonSupplier("Input Enabled", "Input Disabled", () -> tsfm.inputMode), (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "input")));
 				this.addRenderableWidget(new TrueFalseButton(x+ioCoords[2], y+ioCoords[3], 177, 15, 12, 12, new TrueFalseButtonSupplier("Output Enabled", "Output Disabled", () -> tsfm.outputMode), (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "output")));
 			}else {
@@ -523,8 +523,8 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 					}
 				}
 			}
-
-
+			
+			
 			if(tsfm.pipeType != PipeType.BASIC) {
 				int[] additX = tsfm.transType == TransmissionType.POWER ? new int[] {57, 57} : new int[] {22, 22};
 				int[] additY;
@@ -534,35 +534,35 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 				}else {
 					additY = new int[] {32, 43};
 				}
-
+				
 				this.addRenderableWidget(new TrueFalseButton(x+111, y+32, 8, 8, "Priority Increase", (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "priorityup")));
 				this.addRenderableWidget(new TrueFalseButton(x+111, y+43, 8, 8, "Priority Decrease", (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "prioritydown")));
 				this.addRenderableWidget(new TrueFalseButton(x+111, y+54, 8, 8, "Priority Reset", (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "priorityzero")));
-
+				
 				this.addRenderableWidget(new RedstoneButton(x+additX[1], y+additY[1], 177, 51, 8, 8, new TrueFalseButtonSupplier("Enabled on Redstone Signal", "Always Active", () -> tsfm.redstone), (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "redstone")));
 				this.addRenderableWidget(new TrueFalseButton(x+additX[0], y+additY[0] , 177, 29, 8, 8, new TrueFalseButtonSupplier("Nearest First", "Furthest First", () -> tsfm.nearestFirst), (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "nearest")));
-
+				
 				if(tsfm.transType != TransmissionType.POWER) {
 					int[] whitelistData = tsfm.transType == TransmissionType.OMNI ? new int[] {17, 25} : new int[] {22, 54};
 					this.addRenderableWidget(new TrueFalseButton(x+whitelistData[0], y+whitelistData[1], 177, 41, 8, 8, new TrueFalseButtonSupplier("Whitelist", "Blacklist", () -> tsfm.whitelist), (b) -> sendPipeUpdatePacket(tsfm.getBlockPos(), "whitelist")));
-
+					
 				}
 			}
-
+			
 
 		}
 
 		private class RedstoneButton extends TrueFalseButton{
-
+			
 			public RedstoneButton(int x, int y, int blitx, int blity, int width, int height, TrueFalseButtonSupplier tfbs, OnPress onPress) {
 				super(x, y, blitx, blity, width, height, tfbs, onPress);
 			}
-
+			
 			@Override
 			protected boolean isValidClickButton(int a) {
 				return isRedstoneControlEnabled();
 			}
-
+			
 			@Override
 			public int[] getBlitData() {
 				if(isRedstoneControlEnabled()) {
@@ -570,7 +570,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 				}
 				return new int[] {x, y, 9, 12, this.getWidth(), this.getHeight()};
 			}
-
+			
 			@Override
 			public boolean getSupplierOutput() {
 				if(!isRedstoneControlEnabled()) {
@@ -578,14 +578,14 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 				}
 				return super.getSupplierOutput();
 			}
-
+			
 			@Override
 			public void renderToolTip(PoseStack mx, int mouseX, int mouseY) {
 				if(isRedstoneControlEnabled()) {
 					super.renderToolTip(mx, mouseX, mouseY);
 				}
 			}
-
+			
 			private boolean isRedstoneControlEnabled() {
 				if (tsfm.getUpgradeAmount(Upgrades.PIPE_REDSTONE) > 0) {
 					return true;
@@ -603,7 +603,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			if(tsfm.pipeType != PipeType.BASIC && tsfm.transType != TransmissionType.POWER) {
 				for (int row = 0; row < 3; ++row) {
 					for (int col = 0; col < 3; ++col) {
-						if (!tsfm.enableFilterSlot((row * 3) + col)) {
+						if (tsfm.enableFilterSlot((row * 3) + col) == false) {
 							super.blit(x + 55 + (18 * col), y + 21 + (18 * row), 190, 0, 16, 16);
 						}
 					}
@@ -613,7 +613,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 			if(tsfm.pipeType != PipeType.BASIC) {
 				this.drawCenteredString(this.font, this.tsfm.priority + "", x + 133, y + 43, 0xffffff);
 			}
-
+			
 		}
 
 	}
@@ -624,10 +624,10 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 		pd.writeBlockPos("location", pos);
 		pd.writeString("button", button);
 		pd.writeString("transmissiontype", "none");
-
+		
 		PacketHandler.INSTANCE.sendToServer(pd);
 	}
-
+	
 	public static void sendPipeUpdatePacket(BlockPos pos, String button, String type) {
 		PacketData pd = new PacketData("item_pipe_gui");
 		pd.writeBlockPos("location", pos);
@@ -659,7 +659,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 								ipcte.omniPipeIO.put(tt, Pair.of(orig.getFirst(), !orig.getSecond()));
 							}
 						}
-
+						
 					}else {
 						if(b.equals("input")) {
 							ipcte.inputMode = !ipcte.inputMode;
@@ -688,7 +688,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 						ipcte.redstone = !ipcte.redstone;
 					}
 				}
-
+				
 
 				ipcte.sendUpdates();
 			}

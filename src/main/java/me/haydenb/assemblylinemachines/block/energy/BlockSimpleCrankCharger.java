@@ -24,10 +24,10 @@ public class BlockSimpleCrankCharger extends BlockTileEntity{
 	public BlockSimpleCrankCharger() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "simple_crank_charger");
 	}
-
-
-
-
+	
+	
+	
+	
 	@Override
 	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
 		return InteractionResult.PASS;
@@ -38,20 +38,20 @@ public class BlockSimpleCrankCharger extends BlockTileEntity{
 	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
 		return InteractionResult.PASS;
 	}
-
+	
 	@Override
 	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
 		return bteDefaultReturnBlockEntity(pPos, pState);
 	}
-
+	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
 		return bteDefaultReturnTicker(level, state, blockEntityType);
 	}
-
+	
 	public static class TESimpleCrankCharger extends BasicTileEntity implements ICrankableMachine{
 
-
+		
 		private IItemHandler handler = null;
 		public TESimpleCrankCharger(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
@@ -60,13 +60,13 @@ public class BlockSimpleCrankCharger extends BlockTileEntity{
 		public TESimpleCrankCharger(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("simple_crank_charger"), pos, state);
 		}
-
+		
 		@Override
 		public boolean perform() {
-			if(handler == null && !getCapability()) {
+			if(handler == null && getCapability() == false) {
 				return false;
 			}
-
+			
 			for(int i = 0; i < handler.getSlots(); i++) {
 				ItemStack stack = handler.getStackInSlot(i);
 				if(stack != ItemStack.EMPTY && stack.getItem() instanceof IToolWithCharge) {
@@ -76,20 +76,20 @@ public class BlockSimpleCrankCharger extends BlockTileEntity{
 					}
 				}
 			}
-
+			
 			return false;
 		}
-
+		
 		@Override
 		public boolean requiresGearbox() {
 			return true;
 		}
-
+		
 		@Override
 		public boolean validFrom(Direction dir) {
 			return true;
 		}
-
+		
 		private boolean getCapability() {
 			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
@@ -112,11 +112,11 @@ public class BlockSimpleCrankCharger extends BlockTileEntity{
 					return true;
 				}
 			}
-
+			
 			return false;
 		}
-
-
-
+		
+		
+		
 	}
 }

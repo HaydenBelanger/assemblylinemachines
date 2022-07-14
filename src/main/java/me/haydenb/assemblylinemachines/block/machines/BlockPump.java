@@ -11,7 +11,7 @@ import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids.IChunkFluidCa
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -54,15 +54,15 @@ public class BlockPump extends BlockTileEntity {
 
 		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
-
-
+	
+	
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
 		builder.add(HorizontalDirectionalBlock.FACING);
 	}
-
+	
 	@Override
 	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
 		return bteDefaultReturnBlockEntity(pPos, pState);
@@ -72,7 +72,7 @@ public class BlockPump extends BlockTileEntity {
 	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
 		return bteDefaultReturnTicker(level, state, blockEntityType);
 	}
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
@@ -93,40 +93,40 @@ public class BlockPump extends BlockTileEntity {
 		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 
-
+	
 	@Override
 	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
 		if (world.getBlockEntity(pos) instanceof TEPump) {
 			TEPump pump = (TEPump) world.getBlockEntity(pos);
-			player.displayClientMessage(Component.literal(pump.prevStatusMessage), true);
+			player.displayClientMessage(new TextComponent(pump.prevStatusMessage), true);
 		}
-
+		
 		return InteractionResult.CONSUME;
 	}
-
+	
 	@Override
 	public InteractionResult blockRightClickClient(BlockState state, Level world, BlockPos pos, Player player) {
 		return InteractionResult.CONSUME;
 	}
-
+	
 	public static class BlockPumpshaft extends Block{
-
+		
 		private static final VoxelShape SHAFT = Stream.of(
 				Block.box(1, 5, 7, 3, 11, 9),Block.box(7, 5, 13, 9, 11, 15),
 				Block.box(4, 5, 4, 12, 11, 12),Block.box(13, 5, 7, 15, 11, 9),
 				Block.box(7, 5, 1, 9, 11, 3),Block.box(0, 0, 0, 16, 5, 16),Block.box(0, 11, 0, 16, 16, 16)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get();
-
+		
 		public BlockPumpshaft() {
 			super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
 			this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false));
 		}
-
+		
 		@Override
 		protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 			builder.add(StateProperties.MACHINE_ACTIVE);
 		}
-
+		
 		@Override
 		public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 			return SHAFT;
@@ -150,7 +150,7 @@ public class BlockPump extends BlockTileEntity {
 					maxReceive = 30000 - amount;
 				}
 
-				if (!simulate) {
+				if (simulate == false) {
 					amount += maxReceive;
 					sendUpdates();
 				}
@@ -209,13 +209,13 @@ public class BlockPump extends BlockTileEntity {
 							}
 						}
 					}
-
+					
 					if (this.getLevel().getBlockState(this.getBlockPos().below()).getBlock() != Registry.getBlock("pumpshaft")) {
 						prevStatusMessage = "Not connected to Pumpshaft.";
 						forceState(false);
 					} else {
 						if (extracted.isEmpty()) {
-
+							
 							if (amount - 1800 >= 0) {
 								boolean success = false;
 								try {
@@ -261,7 +261,7 @@ public class BlockPump extends BlockTileEntity {
 							}
 						}
 					}
-
+					
 					sendUpdates();
 
 				}
@@ -282,11 +282,11 @@ public class BlockPump extends BlockTileEntity {
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
 			return super.getCapability(cap);
 		}
-
+		
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-
+			
 			if (compound.contains("assemblylinemachines:fluid")) {
 				extracted = FluidStack.loadFluidStackFromNBT(compound.getCompound("assemblylinemachines:fluid"));
 			}
@@ -305,12 +305,12 @@ public class BlockPump extends BlockTileEntity {
 			compound.putInt("assemblylinemachines:amount", amount);
 			super.saveAdditional(compound);
 		}
-
+		
 		private void forceState(boolean status) {
-
+			
 			BlockState bs = this.getLevel().getBlockState(this.getBlockPos().below());
 			if(bs.hasProperty(StateProperties.MACHINE_ACTIVE)) {
-
+				
 				if(bs.getValue(StateProperties.MACHINE_ACTIVE) != status) {
 					this.getLevel().setBlockAndUpdate(this.getBlockPos().below(), bs.setValue(StateProperties.MACHINE_ACTIVE, status));
 				}

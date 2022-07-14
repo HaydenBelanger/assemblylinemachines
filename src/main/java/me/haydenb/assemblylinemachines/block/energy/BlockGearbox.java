@@ -1,5 +1,7 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
+import java.util.Random;
+
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
@@ -16,9 +18,9 @@ import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -36,14 +38,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 
 public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox> {
-
+	
 	public BlockGearbox() {
 		super(Block.Properties.of(Material.METAL).strength(1f, 2f).sound(SoundType.METAL), "gearbox", TEGearbox.class);
 		this.registerDefaultState(
 				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.MACHINE_ACTIVE, false));
 	}
-
-
+	
+	
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
@@ -64,7 +66,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 
 		return stateIn;
 	}
-
+	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		for(Direction d : Utils.CARDINAL_DIRS) {
@@ -75,22 +77,22 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 		}
 		return null;
 	}
-
+	
 	public static class TEGearbox extends SimpleMachine<ContainerGearbox> implements ALMTicker<TEGearbox>{
-
+		
 		public int timer = 0;
 		public float maxBurnTime = 0;
 		public float burnTime = 0;
 		public int nTimer = 20;
 		public ICrankableMachine mch;
 		public TEGearbox(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 2, Component.translatable(Registry.getBlock("gearbox").getDescriptionId()), Registry.getContainerId("gearbox"), ContainerGearbox.class, pos, state);
+			super(tileEntityTypeIn, 2, new TranslatableComponent(Registry.getBlock("gearbox").getDescriptionId()), Registry.getContainerId("gearbox"), ContainerGearbox.class, pos, state);
 		}
-
+		
 		public TEGearbox(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("gearbox"), pos, state);
 		}
-
+		
 		@Override
 		public void saveAdditional(CompoundTag compound) {
 			compound.putFloat("assemblylinemachines:maxburntime", maxBurnTime);
@@ -98,7 +100,7 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 			compound.putInt("assemblylinemachines:prevtimer", nTimer);
 			super.saveAdditional(compound);
 		}
-
+		
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
@@ -114,10 +116,10 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 		}
 		@Override
 		public void tick() {
-
+			
 			if(!level.isClientSide) {
 				if(timer++ == nTimer) {
-
+					
 					boolean machineValid = true;
 					if(mch == null) {
 						BlockEntity te = getLevel().getBlockEntity(this.getBlockPos().relative(getBlockState().getValue(HorizontalDirectionalBlock.FACING)));
@@ -127,11 +129,11 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 							machineValid = false;
 						}
 					}
-
-					if(machineValid) {
+					
+					if(machineValid == true) {
 						boolean sendUpdate = false;
 						timer = 0;
-
+						
 						Upgrades u = Upgrades.match(contents.get(0));
 						int mul;
 						switch (u) {
@@ -148,15 +150,15 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 							mul = 20;
 							break;
 						}
-
+						
 						if(burnTime != 0) {
-
-
+							
+							
 							if(mch.perform()) {
 								burnTime = burnTime - mul;
 								sendUpdate = true;
 								getLevel().playSound(null, this.getBlockPos(), SoundEvents.WOOD_STEP, SoundSource.BLOCKS, 0.4f, 1f + getPitchNext(getLevel().getRandom()));
-
+								
 							}else {
 								if(u != Upgrades.GB_LIMITER) {
 									burnTime = burnTime - mul;
@@ -164,13 +166,13 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 									getLevel().playSound(null, this.getBlockPos(), SoundEvents.SHULKER_BOX_CLOSE, SoundSource.BLOCKS, 0.4f, 1f);
 								}
 							}
-
-
-
+							
+							
+							
 						}
-
+						
 						if(burnTime <= 0) {
-
+							
 							if(contents.get(1) != ItemStack.EMPTY) {
 								burnTime = ForgeHooks.getBurnTime(contents.get(1), RecipeType.SMELTING);
 								maxBurnTime = burnTime;
@@ -184,8 +186,8 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 								}
 							}
 						}
-
-
+						
+						
 						if(burnTime == 0 && getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
 							getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, false));
 							sendUpdate = true;
@@ -197,12 +199,12 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 							sendUpdates();
 						}
 					}
-
+					
 				}
 			}
-
+			
 		}
-
+		
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if(slot == 0) {
@@ -219,12 +221,12 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 						return true;
 					}
 				}
-
+				
 			}
 			return false;
 		}
-
-
+		
+		
 		@Override
 		public NonNullList<ItemStack> getItems() {
 			if(contents.get(1) != ItemStack.EMPTY && contents.get(1).getItem() != Items.AIR && !(contents.get(1).getItem() instanceof IGearboxFuel)) {
@@ -238,42 +240,42 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 			return super.getItems();
 		}
 	}
-
+	
 	public static class ContainerGearbox extends ContainerALMBase<TEGearbox>{
-
+		
 		private static final Pair<Integer, Integer> UPGRADE_POS = new Pair<>(55, 34);
 		private static final Pair<Integer, Integer> INPUT_POS = new Pair<>(75, 34);
 		private static final Pair<Integer, Integer> PLAYER_INV_POS = new Pair<>(8, 84);
 		private static final Pair<Integer, Integer> PLAYER_HOTBAR_POS = new Pair<>(8, 142);
-
+		
 		public ContainerGearbox(final int windowId, final Inventory playerInventory, final TEGearbox tileEntity) {
 			super(Registry.getContainerType("gearbox"), windowId, tileEntity, playerInventory, PLAYER_INV_POS, PLAYER_HOTBAR_POS, 0, 3);
-
+			
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, UPGRADE_POS.getFirst(), UPGRADE_POS.getSecond(), tileEntity));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, INPUT_POS.getFirst(), INPUT_POS.getSecond(), tileEntity));
 		}
-
-
+		
+		
 		public ContainerGearbox(final int windowId, final Inventory playerInventory, final FriendlyByteBuf data) {
 			this(windowId, playerInventory, Utils.getBlockEntity(playerInventory, data, TEGearbox.class));
 		}
-
-
-
-
+		
+		
+		
+		
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static class ScreenGearbox extends ScreenALMBase<ContainerGearbox>{
-
+		
 		TEGearbox tsfm;
-
+		
 		public ScreenGearbox(ContainerGearbox screenContainer, Inventory inv,
 				Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "gearbox", true);
 			tsfm = screenContainer.tileEntity;
 		}
-
+		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
@@ -282,31 +284,31 @@ public class BlockGearbox extends BlockScreenBlockEntity<BlockGearbox.TEGearbox>
 				int y = (this.height - this.imageHeight) / 2;
 				super.blit(x+29, y+33, 176, 0, 18, 18);
 				super.blit(x+119, y+33, 176, 0, 18, 18);
-
+				
 				int prog = Math.round((tsfm.burnTime/tsfm.maxBurnTime) * 13f);
 				super.blit(x+77, y+18 + (13 - prog), 176, 18 + (13 - prog), 13, prog);
 			}
-
+			
 		}
-
+		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		}
 	}
-
-	private static float getPitchNext(RandomSource rand) {
+	
+	private static float getPitchNext(Random rand) {
 		float f = rand.nextFloat();
-
+		
 		if(f < 0.6f) {
 			f = 0f;
 		}
-
+		
 		if(f > 0.3f) {
 			f = f * -1f;
 		}
-
+		
 		return f;
-
+		
 	}
 
 }

@@ -12,9 +12,8 @@ import me.haydenb.assemblylinemachines.block.helpers.BlockTileEntity.BlockScreen
 import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEnergyBased;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine;
 import me.haydenb.assemblylinemachines.block.helpers.ManagedSidedMachine.ManagedDirection;
-import me.haydenb.assemblylinemachines.registry.PacketHandler;
+import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
 import net.minecraft.ChatFormatting;
@@ -23,7 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -69,7 +68,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-
+	
 	private final BatteryCellStats bcs;
 
 	public BlockBatteryCell(BatteryCellStats bcs) {
@@ -79,13 +78,13 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(StateProperties.BATTERY_PERCENT_STATE, 0));
 		this.bcs = bcs;
 	}
-
+	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING,
 				context.getHorizontalDirection().getOpposite());
 	}
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
@@ -105,12 +104,12 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(HorizontalDirectionalBlock.FACING).add(StateProperties.BATTERY_PERCENT_STATE);
 	}
-
+	
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer,
 			ItemStack stack) {
 		CompoundTag nbt = stack.getOrCreateTag();
-
+		
 		if(level.getBlockEntity(pos) instanceof TEBatteryCell cell && !nbt.isEmpty()) {
 			cell.amount = nbt.getInt("assemblylinemachines:stored");
 			if(nbt.contains("assemblylinemachines:fptout")) cell.fept = nbt.getInt("assemblylinemachines:fptout");
@@ -120,33 +119,33 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		}
 		super.setPlacedBy(level, pos, state, placer, stack);
 	}
-
+	
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip,
 			TooltipFlag flag) {
 		if(stack.hasTag()) {
 			CompoundTag nbt = stack.getTag();
-			if(nbt.contains("assemblylinemachines:stored")) tooltip.add(1, Component.literal("This Cell has " + FormattingHelper.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
-			if(nbt.contains("assemblylinemachines:creative")) tooltip.add(1, Component.literal("This Cell is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
+			if(nbt.contains("assemblylinemachines:stored")) tooltip.add(1, new TextComponent("This Cell has " + FormattingHelper.formatToSuffix(nbt.getInt("assemblylinemachines:stored")) + " FE stored.").withStyle(ChatFormatting.GREEN));
+			if(nbt.contains("assemblylinemachines:creative")) tooltip.add(1, new TextComponent("This Cell is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
 		}
 		super.appendHoverText(stack, level, tooltip, flag);
 	}
-
+	
 	public static enum BatteryCellStats{
-
+		
 		BASIC(2500000, 2000, 2000), ADVANCED(50000000, 25000, 25000), ULTIMATE(500000000, 75000, 75000);
-
+		
 		public final int capacity;
 		public final int maxfept;
 		public final int deffept;
-
+		
 		BatteryCellStats(int capacity, int maxfept, int deffept){
 			this.capacity = capacity;
 			this.maxfept = maxfept;
 			this.deffept = deffept;
 		}
 	}
-
+	
 	public static class TEBatteryCell extends ManagedSidedMachine<ContainerBatteryCell> implements ALMTicker<TEBatteryCell> {
 
 		private int fept;
@@ -154,31 +153,31 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 		private int timer = 0;
 		private final int mx;
 		public boolean creative = false;
-
+		
 		public TEBatteryCell(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 0, Component.translatable(state.getBlock().getDescriptionId()), Registry.getContainerId("battery_cell"),
+			super(tileEntityTypeIn, 0, new TranslatableComponent(state.getBlock().getDescriptionId()), Registry.getContainerId("battery_cell"),
 					ContainerBatteryCell.class, new EnergyProperties(true, true, ((BlockBatteryCell) state.getBlock()).bcs.capacity), pos, state);
 			BlockBatteryCell bbc = (BlockBatteryCell) state.getBlock();
-
+			
 			this.mx = bbc.bcs.maxfept;
 			this.fept = bbc.bcs.deffept;
 		}
-
+		
 		public TEBatteryCell(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("battery_cell"), pos, state);
 		}
-
+		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 			if(cap != CapabilityEnergy.ENERGY || side == getBlockState().getValue(HorizontalDirectionalBlock.FACING)) {
 				return LazyOptional.empty();
 			}
-
+			
 			return super.getCapability(cap, side);
 		}
 
 		private HashMap<Direction, IEnergyStorage> caps = new HashMap<>();
-
+		
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
@@ -190,16 +189,16 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			}
 			creative = compound.getBoolean("assemblylinemachines:creative");
 		}
-
+		
 		@Override
 		public void saveAdditional(CompoundTag compound) {
-
+			
 			compound.putInt("assemblylinemachines:fptout", fept);
 			compound.putBoolean("assemblylinemachines:in", autoIn);
 			if(creative) compound.putBoolean("assemblylinemachines:creative", creative);
 			super.saveAdditional(compound);
 		}
-
+		
 		@Override
 		public void tick() {
 			if(!level.isClientSide) {
@@ -214,28 +213,28 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 								storage = lazy.orElse(null);
 								if(storage != null) {
 									lazy.addListener(new NonNullConsumer<LazyOptional<IEnergyStorage>>() {
-
+										
 										@Override
 										public void accept(LazyOptional<IEnergyStorage> t) {
 											caps.remove(d);
-
+											
 										}
 									});
 									caps.put(d, storage);
 								}
 							}
 						}
-
+						
 						if(storage != null) {
 							LazyOptional<IEnergyStorage> schX = this.getCapability(CapabilityEnergy.ENERGY, d);
 							IEnergyStorage sch = schX.orElse(null);
-
+							
 							if(sch != null) {
 								if(!autoIn) {
-
+									
 									int max = sch.extractEnergy(fept * 5, true);
 									int rs = storage.receiveEnergy(max, false);
-
+									
 									if(rs != 0) {
 										sch.extractEnergy(rs, false);
 										break;
@@ -243,23 +242,23 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 								}else {
 									int max = sch.receiveEnergy(fept * 5, true);
 									int rs = storage.extractEnergy(max, false);
-
+									
 									if(rs != 0) {
 										sch.receiveEnergy(rs, false);
 										break;
 									}
 								}
 							}
-
+							
 						}
 					}
 				}
 			}
-
+			
 		}
-
+		
 		public void recalcBattery(){
-
+			
 			if(getBlockState().hasProperty(StateProperties.BATTERY_PERCENT_STATE)) {
 				double div = (double) amount / (double) properties.getCapacity();
 				if(div > 0.95d) div = 1d;
@@ -299,18 +298,18 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 					}else if (b.equals("feptup")) {
 						Boolean bl = pd.get("shifting", Boolean.class);
 						Boolean cr = pd.get("ctrling", Boolean.class);
-
+						
 						int lim;
 						if(bl == true && cr == true) {
 							lim = 1;
-						}else if(bl) {
+						}else if(bl == true) {
 							lim = 50;
-						}else if(cr){
+						}else if(cr == true){
 							lim = 200;
 						}else {
 							lim = 100;
 						}
-
+						
 						if((tebbc.fept + lim) > tebbc.mx) {
 							tebbc.fept = tebbc.mx;
 						}else {
@@ -319,18 +318,18 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 					}else if (b.equals("feptdown")) {
 						Boolean bl = pd.get("shifting", Boolean.class);
 						Boolean cr = pd.get("ctrling", Boolean.class);
-
+						
 						int lim;
 						if(bl == true && cr == true) {
 							lim = 1;
-						}else if(bl) {
+						}else if(bl == true) {
 							lim = 50;
-						}else if(cr){
+						}else if(cr == true){
 							lim = 200;
 						}else {
 							lim = 100;
 						}
-
+						
 						if((tebbc.fept - lim) < 0) {
 							tebbc.fept = 0;
 						}else {
@@ -339,7 +338,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 					}else if (b.equals("automode")) {
 						tebbc.autoIn = !tebbc.autoIn;
 					}
-
+					
 					tebbc.sendUpdates();
 					tebbc.getLevel().updateNeighborsAt(pos, tebbc.getBlockState().getBlock());
 				}
@@ -377,14 +376,14 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			tsfm = screenContainer.tileEntity;
 		}
 
-
+		
 		@Override
 		protected void init() {
 			super.init();
-
+			
 			int x = this.leftPos;
 			int y = this.topPos;
-
+			
 			this.addRenderableWidget(new TrueFalseButton(x+51, y+28, 177, 83, 8, 8, new TrueFalseButtonSupplier("Top Face Enabled", "Top Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.TOP)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "up")));
 			this.addRenderableWidget(new TrueFalseButton(x+51, y+50, 177, 73, 8, 8, new TrueFalseButtonSupplier("Bottom Face Enabled", "Bottom Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.BOTTOM)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "down")));
 			this.addRenderableWidget(new TrueFalseButton(x+40, y+39, 177, 103, 8, 8, new TrueFalseButtonSupplier("Left Face Enabled", "Left Face Disabled", () -> tsfm.getDirectionEnabled(ManagedDirection.LEFT)), (b) -> sendCellUpdatePacket(tsfm.getBlockPos(), "left")));
@@ -409,7 +408,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 			pd.writeString("button", button);
 			PacketHandler.INSTANCE.sendToServer(pd);
 		}
-
+		
 		public static void sendCellUpdatePacket(BlockPos pos, String button, Boolean shifting, Boolean ctrling) {
 			PacketData pd = new PacketData("battery_cell_gui");
 			pd.writeBlockPos("location", pos);

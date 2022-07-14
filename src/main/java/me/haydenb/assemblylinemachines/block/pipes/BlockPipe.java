@@ -36,10 +36,10 @@ public class BlockPipe extends Block implements EntityBlock {
 		SHAPE_MAP.putAll("DOWN", List.of(Block.box(4, 0, 4, 12, 4, 12), Block.box(3, 0, 3, 13, 4, 13)));
 		SHAPE_MAP.putAll("CARDINAL", List.of(Block.box(0, 4, 4, 4, 12, 12), Block.box(3, 3, 0, 13, 13, 4)));
 	}
-
+	
 	final TransmissionType transType;
 	final PipeType pipeType;
-
+	
 	public BlockPipe(TransmissionType transType, PipeType pipeType) {
 		super(Block.Properties.of(Material.METAL).strength(1f, 2f).sound(SoundType.METAL));
 		this.transType = transType;
@@ -63,11 +63,11 @@ public class BlockPipe extends Block implements EntityBlock {
 				}
 				Containers.dropContents(worldIn, pos, tefm.getItems());
 				worldIn.removeBlockEntity(pos);
-
+				
 			}
 		}
 	}
-
+	
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
 		InteractionHand handIn, BlockHitResult hit) {
@@ -79,12 +79,12 @@ public class BlockPipe extends Block implements EntityBlock {
 							NetworkHooks.openGui((ServerPlayer) player, (PipeConnectorTileEntity) world.getBlockEntity(pos), buf -> buf.writeBlockPos(pos));
 						}catch(NullPointerException e) {}
 						return InteractionResult.CONSUME;
-					}
+					}	
 				}
 			}
 		}
 		return InteractionResult.PASS;
-
+		
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class BlockPipe extends Block implements EntityBlock {
 					combineShape = Utils.rotateShape(rtd, d, SHAPE_MAP.get("CARDINAL").get(vx));
 					break;
 				}
-				rt = Shapes.join(rt, combineShape, BooleanOp.OR);
+				rt = Shapes.join(rt, combineShape, BooleanOp.OR);	
 			}
 		}
 		return rt;
@@ -130,7 +130,7 @@ public class BlockPipe extends Block implements EntityBlock {
 			BlockPos currentPos, BlockPos facingPos) {
 		return this.updateConnections(stateIn, new Direction[]{facing}, (Level) worldIn, currentPos, null, null);
 	}
-
+	
 	public BlockState updateConnections(BlockState state, Direction[] toUpdate, Level world, BlockPos currentPos, Player playerForConnector, Direction clickedFace) {
 		for(Direction d : toUpdate) {
 			PipeConnOptions pco;
@@ -139,13 +139,13 @@ public class BlockPipe extends Block implements EntityBlock {
 				BlockPipe bp = (BlockPipe) world.getBlockState(currentPos.relative(d)).getBlock();
 				pco = (bp.transType == this.transType && bp.pipeType == this.pipeType) ? PipeConnOptions.PIPE : PipeConnOptions.NONE;
 			}else {
-
+				
 				pco = this.transType.hasCapability(d.getOpposite(), world.getBlockEntity(currentPos.relative(d))) && playerForConnector != null && clickedFace != null && clickedFace == d.getOpposite() ? PipeConnOptions.CONNECTOR : PipeConnOptions.NONE;
 				if(pco == PipeConnOptions.CONNECTOR && playerForConnector != null && !playerForConnector.isShiftKeyDown()) pco = PipeConnOptions.NONE;
 				if(state.getValue(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
 					set = false;
 					if(pco == PipeConnOptions.NONE && playerForConnector == null && world.getBlockEntity(currentPos.relative(d)) == null) set = true;
-					if(set) {
+					if(set == true) {
 						if(world.getBlockEntity(currentPos) instanceof PipeConnectorTileEntity) {
 							Containers.dropContents(world, currentPos, ((PipeConnectorTileEntity) world.getBlockEntity(currentPos)).getItems());
 						}
@@ -157,7 +157,7 @@ public class BlockPipe extends Block implements EntityBlock {
 		}
 		return state;
 	}
-
+	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		for(EnumProperty<PipeConnOptions> ep : PipeProperties.DIRECTION_BOOL.values()) {
@@ -167,10 +167,10 @@ public class BlockPipe extends Block implements EntityBlock {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-		return new BlockEntityTicker<>() {
+		return new BlockEntityTicker<T>() {
 
 			@SuppressWarnings("unchecked")
 			@Override
@@ -180,7 +180,7 @@ public class BlockPipe extends Block implements EntityBlock {
 				}else if(blockEntity instanceof BlockEntityTicker) {
 					((BlockEntityTicker<T>) blockEntity).tick(level, pos, state, blockEntity);
 				}
-
+				
 			}
 		};
 	}

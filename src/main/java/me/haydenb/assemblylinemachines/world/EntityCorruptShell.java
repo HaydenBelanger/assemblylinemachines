@@ -18,8 +18,12 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ObjectHolder;
 
 public class EntityCorruptShell extends Zombie{
+
+	@ObjectHolder("assemblylinemachines:corrupt_shell")
+	public static final EntityType<EntityCorruptShell> CORRUPT_SHELL = null;
 
 	public EntityCorruptShell(EntityType<? extends EntityCorruptShell> type, Level worldIn) {
 		super(type, worldIn);
@@ -31,24 +35,24 @@ public class EntityCorruptShell extends Zombie{
 
 	@Override
 	protected SoundEvent getAmbientSound() {
-		return Registry.CORRUPT_SHELL_AMBIENT.get();
+		return Registry.getSound("corrupt_shell_ambient");
 	}
 
 	@Override
 	protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-		return Registry.CORRUPT_SHELL_HURT.get();
+		return Registry.getSound("corrupt_shell_death");
 	}
 
 	@Override
 	protected SoundEvent getDeathSound() {
-		return Registry.CORRUPT_SHELL_DEATH.get();
+		return Registry.getSound("corrupt_shell_death");
 	}
-
+	
 	@Override
 	protected SoundEvent getStepSound() {
-		return Registry.CORRUPT_SHELL_STEP.get();
+		return Registry.getSound("corrupt_shell_step");
 	}
-
+	
 	@Override
 	protected boolean isSunSensitive() {
 		return false;
@@ -98,7 +102,7 @@ public class EntityCorruptShell extends Zombie{
 
 		protected EntityCorruptShellModel(Context context) {
 			super(context.bakeLayer(ModelLayers.ZOMBIE));
-
+			
 			//this(context, ModelLayers.ZOMBIE, ModelLayers.ZOMBIE_INNER_ARMOR, ModelLayers.ZOMBIE_OUTER_ARMOR);
 		}
 

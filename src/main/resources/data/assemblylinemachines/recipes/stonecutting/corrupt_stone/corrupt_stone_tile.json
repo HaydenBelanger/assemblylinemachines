@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "assemblylinemachines:corrupt_stone"
-  },
-  "result": "assemblylinemachines:corrupt_stone_tile",
-  "count": 1
-}

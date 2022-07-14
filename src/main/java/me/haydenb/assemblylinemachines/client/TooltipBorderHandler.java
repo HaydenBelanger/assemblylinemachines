@@ -30,22 +30,21 @@ import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * Class adapted from Relics Mod GitHub with explicit permission from author.
- *
+ * 
  * <pre>{@code This class uses a unique license that precedes AGPL-3.0:
  * - All Rights Reserved unless otherwise explicitly stated.
  * - If you wish to use the contents of this class, please reach out to the original author.}</pre>
- *
+ * 
  * @author SSKrillSS
  * @see <a href="https://github.com/SSKirillSS/relics">https://github.com/SSKirillSS/relics</a>
  *
  */
 @Mod.EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.FORGE, value = Dist.CLIENT)
 public class TooltipBorderHandler {
-
+	
 	public static final HashMap<ResourceLocation, ISpecialTooltip> ADHOC_TOOLTIPS = new HashMap<>();
 	static {
 		ISpecialTooltip steelTooltip = new ISpecialTooltip() {
@@ -70,25 +69,25 @@ public class TooltipBorderHandler {
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_leggings"), steelTooltip);
 		ADHOC_TOOLTIPS.put(new ResourceLocation(AssemblyLineMachines.MODID, "steel_boots"), steelTooltip);
 	}
-
+	
 	public static Boolean colors = null;
 	public static Boolean frames = null;
-
+	
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public static void onTooltipColorEvent(RenderTooltipEvent.Color event) {
 		if(getColorsEnabled()) {
 			ISpecialTooltip special = get(event.getItemStack().getItem());
 			if(special != null && special.isSpecial()) {
-
+				
 				event.setBorderStart(special.getTopColor());
 				event.setBorderEnd(special.getBottomColor());
 			}
 		}
 
-
+		
 	}
-
+	
 	//Method triggered from TooltipMixin.
 	@OnlyIn(Dist.CLIENT)
 	public static void onPostTooltipEvent(ItemStack itemStack, PoseStack matrix, int x, int y, Font tooltipFont, int width, int height, List<ClientTooltipComponent> components) {
@@ -130,7 +129,7 @@ public class TooltipBorderHandler {
 			}
 		}
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static boolean getColorsEnabled() {
 		if(colors == null) {
@@ -138,7 +137,7 @@ public class TooltipBorderHandler {
 		}
 		return colors;
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static boolean getFramesEnabled() {
 		if(frames == null) {
@@ -146,33 +145,33 @@ public class TooltipBorderHandler {
 		}
 		return frames;
 	}
-
+	
 	private static ISpecialTooltip get(Item item) {
-		return item instanceof ISpecialTooltip ist ? ist : ADHOC_TOOLTIPS.get(ForgeRegistries.ITEMS.getKey(item));
+		return item instanceof ISpecialTooltip ? (ISpecialTooltip) item : ADHOC_TOOLTIPS.get(item.getRegistryName());
 	}
-
+	
 	public static interface ISpecialTooltip {
-
+		
 		static final Cache<Integer, Integer> BOTTOM_COLOR_CACHE = CacheBuilder.newBuilder().build();
-
+		
 		/**
 		 * @return Whether or not to render special tooltip color and frame. Defaults to true.
 		 */
 		default public boolean isSpecial() {
 			return true;
 		}
-
+		
 		/**
 		 * @return ResourceLocation of texture to use, or null if you do not wish to render a special border.
 		 */
 		@Nullable
 		public ResourceLocation getTexture();
-
+		
 		/**
 		 * @return The ARGB color value of the top section of the tooltip. Typically, this is lighter than the bottom color.
 		 */
 		public int getTopColor();
-
+		
 		/**
 		 * @return A supplier for the ARGB color value of the bottom section of the tooltip. Defaults to 30% darker than getTopColor.
 		 */
@@ -183,10 +182,10 @@ public class TooltipBorderHandler {
 				e.printStackTrace();
 				return ScreenMath.multiplyARGBColor(getTopColor(), 0.7f);
 			}
-
+			
 		}
-
+		
 	}
-
-
+	
+	
 }

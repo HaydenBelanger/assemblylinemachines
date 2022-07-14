@@ -20,11 +20,11 @@ import net.minecraft.world.phys.shapes.*;
 
 public class BlockQuarryAddon extends Block {
 
-
-
+	
+	
 	private static final HashMap<Direction, BooleanProperty> QUARRY_ADDON_PROPERTIES = new HashMap<>();
 	public static final HashMap<Direction, VoxelShape> MAIN_SHAPES = new HashMap<>();
-
+	
 	static {
 		for(Direction d : Direction.values()) {
 			QUARRY_ADDON_PROPERTIES.put(d, BooleanProperty.create(d.toString().toLowerCase()));
@@ -44,9 +44,9 @@ public class BlockQuarryAddon extends Block {
 			});
 		}
 	}
-
+	
 	private final QuarryAddonShapes shape;
-
+	
 	public BlockQuarryAddon(QuarryAddonShapes shape) {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL));
 
@@ -55,33 +55,33 @@ public class BlockQuarryAddon extends Block {
 		this.registerDefaultState(bs);
 		this.shape = shape;
 	}
-
-
+	
+	
 	public static void addToBuilder(Builder<Block, BlockState> builder){
-
+		
 		for(Direction d : Direction.values()) {
 			builder.add(QUARRY_ADDON_PROPERTIES.get(d));
 		}
 	}
-
+	
 	public static BlockState addToBlockState(BlockState bs) {
 		for(Direction d : Direction.values()) {
 			bs = bs.setValue(QUARRY_ADDON_PROPERTIES.get(d), false);
 		}
 		return bs;
 	}
-
+	
 	public static BooleanProperty getAddonProperty(Direction d) {
 		return QUARRY_ADDON_PROPERTIES.get(d);
 	}
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-
+		
 		addToBuilder(builder);
 		builder.add(BlockStateProperties.FACING);
 	}
-
+	
 	@Override
 	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn,
 			BlockPos currentPos, BlockPos facingPos) {
@@ -95,7 +95,7 @@ public class BlockQuarryAddon extends Block {
 
 		return stateIn;
 	}
-
+	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		for(Direction d : Direction.values()) {
@@ -103,25 +103,25 @@ public class BlockQuarryAddon extends Block {
 				return this.defaultBlockState().setValue(BlockStateProperties.FACING, d).setValue(getAddonProperty(d), true);
 			}
 		}
-
+		
 		return null;
 	}
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-
+		
 		for(Direction d : Direction.values()) {
-
+			
 			if(state.getValue(QUARRY_ADDON_PROPERTIES.get(d))) {
 				return Shapes.join(MAIN_SHAPES.get(d), shape.getShape(d), BooleanOp.OR);
-
+				
 			}
-
+			
 		}
 		return Shapes.empty();
 	}
-
+	
 	public static enum QuarryAddonShapes {
-
+		
 		SPEED(
 			Stream.of(
 				Block.box(2, 2, 2, 14, 4, 14),Block.box(2, 12, 2, 4, 14, 14),
@@ -198,9 +198,9 @@ public class BlockQuarryAddon extends Block {
 				Block.box(12, 2, 12, 14, 14, 14),Block.box(4, 2, 12, 12, 4, 14),
 				Block.box(4, 12, 12, 12, 14, 14),Block.box(5, 5, 5, 11, 11, 11)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get());
-
+		
 		private final HashMap<Direction, VoxelShape> addonShapes = new HashMap<>();
-
+		
 		QuarryAddonShapes(VoxelShape downShape, VoxelShape upShape, VoxelShape northShape){
 			for(Direction d : Direction.values()) {
 				addonShapes.put(d, switch(d) {
@@ -210,7 +210,7 @@ public class BlockQuarryAddon extends Block {
 				});
 			}
 		}
-
+		
 		public VoxelShape getShape(Direction dir) {
 			return addonShapes.get(dir);
 		}

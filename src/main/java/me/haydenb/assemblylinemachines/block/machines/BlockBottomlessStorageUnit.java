@@ -16,7 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
@@ -57,16 +57,16 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
-
+	
 	@Override
 	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-
+		
 		if(stack.hasTag()) {
-
+			
 			CompoundTag nbt = stack.getTag();
-
+			
 			if(world.getBlockEntity(pos) instanceof TEBottomlessStorageUnit && nbt.contains("assemblylinemachines:storeditem") && nbt.contains("assemblylinemachines:stored")) {
-
+				
 				TEBottomlessStorageUnit te = (TEBottomlessStorageUnit) world.getBlockEntity(pos);
 				te.internalStored = nbt.getLong("assemblylinemachines:stored");
 				te.creative = nbt.getBoolean("assemblylinemachines:creative");
@@ -76,26 +76,26 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 		}
 		super.setPlacedBy(world, pos, state, placer, stack);
 	}
-
+	
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if(stack.hasTag()) {
-
+			
 			CompoundTag nbt = stack.getTag();
 			if(nbt.contains("assemblylinemachines:stored") && nbt.contains("assemblylinemachines:storeditem")) {
 				String name = ForgeRegistries.ITEMS.getValue(new ResourceLocation(nbt.getString("assemblylinemachines:storeditem"))).getDescription().getString();
-				tooltip.add(1, Component.literal("This BSU has " + FormattingHelper.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + name + " stored.").withStyle(ChatFormatting.GREEN));
-				if(nbt.getBoolean("assemblylinemachines:creative")) tooltip.add(1, Component.literal("This BSU is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
+				tooltip.add(1, new TextComponent("This BSU has " + FormattingHelper.formatToSuffix(nbt.getLong("assemblylinemachines:stored")) + " of " + name + " stored.").withStyle(ChatFormatting.GREEN));
+				if(nbt.getBoolean("assemblylinemachines:creative")) tooltip.add(1, new TextComponent("This BSU is modified to be creative.").withStyle(ChatFormatting.DARK_PURPLE));
 			}
-
+			
 		}
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 	}
-
+	
 	public static class TEBottomlessStorageUnit extends AbstractMachine<ContainerBottomlessStorageUnit> implements ALMTicker<TEBottomlessStorageUnit> {
 
 		public TEBottomlessStorageUnit(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 2, Component.translatable(Registry.getBlock("bottomless_storage_unit").getDescriptionId()),
+			super(tileEntityTypeIn, 2, new TranslatableComponent(Registry.getBlock("bottomless_storage_unit").getDescriptionId()),
 					Registry.getContainerId("bottomless_storage_unit"), ContainerBottomlessStorageUnit.class, pos, state);
 		}
 
@@ -135,7 +135,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 			@Override
 			public ItemStack extractItem(int slot, int amount, boolean simulate) {
-
+				
 				if (slot == 0) {
 					if (internalStored != 0 && storedItem != null) {
 						int max = storedItem.getDefaultInstance().getMaxStackSize();
@@ -148,7 +148,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 						}
 						ItemStack itemstack = new ItemStack(storedItem, max);
 
-						if (!simulate && !creative) {
+						if (simulate == false && !creative) {
 							internalStored -= max;
 
 							if (internalStored <= 0) storedItem = null;
@@ -162,17 +162,17 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 				return ItemStack.EMPTY;
 			}
-
+			
 			@Override
 			public ItemStack getStackInSlot(int slot) {
 				if(slot == 0) {
 					if(internalStored != 0 && storedItem != null) {
-
+					
 						int amt = storedItem.getDefaultInstance().getMaxStackSize();
 						if(amt >= internalStored) {
 							amt = (int) internalStored;
 						}
-
+						
 						return new ItemStack(storedItem, amt);
 					}
 				}
@@ -210,7 +210,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 				}
 
 				if (internalStored != Long.MAX_VALUE && !contents.get(1).isEmpty()) {
-
+					
 					try {
 						internalStored = Math.addExact(internalStored, contents.get(1).getCount());
 						if (storedItem == null) {
@@ -222,7 +222,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 						contents.set(1, ItemStack.EMPTY);
 						sendUpdates = true;
 					}catch(ArithmeticException e) {}
-
+					
 				}
 
 				if (sendUpdates) {
@@ -244,18 +244,18 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			}
 			creative = compound.getBoolean("assemblylinemachines:creative");
 
-
+			
 		}
 
 		@Override
 		public void saveAdditional(CompoundTag compound) {
 
 			if (storedItem != null && internalStored != 0) {
-				compound.putString("assemblylinemachines:storeditem", ForgeRegistries.ITEMS.getKey(storedItem).toString());
+				compound.putString("assemblylinemachines:storeditem", storedItem.getRegistryName().toString());
 				compound.putLong("assemblylinemachines:stored", internalStored);
 			}
 			compound.putBoolean("assemblylinemachines:creative", creative);
-
+			
 			super.saveAdditional(compound);
 		}
 	}
@@ -293,7 +293,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 						} else if (dragType == 1) {
 
-							max = Math.round(max / 2f);
+							max = Math.round((float) max / 2f);
 
 							this.setCarried(new ItemStack(tileEntity.storedItem, max));
 							reduceInternal(max);
@@ -314,7 +314,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 				}
 			}
-
+			
 			super.clicked(slotId, dragType, clickTypeIn, player);
 		}
 
@@ -335,7 +335,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 	public static class ScreenBottomlessStorageUnit extends ScreenALMBase<ContainerBottomlessStorageUnit> {
 
 		TEBottomlessStorageUnit tsfm;
-
+		
 
 		public ScreenBottomlessStorageUnit(ContainerBottomlessStorageUnit screenContainer, Inventory inv, Component titleIn) {
 			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "bottomless_storage_unit", false);
@@ -350,16 +350,16 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 			if(tsfm.storedItem != null){
 				String n = tsfm.storedItem.getDescription().getString();
-
+				
 				if(n.length() > 30) {
 					n = n.substring(0, 30) + "...";
 				}
-				float wsc = 110f / this.font.width(n);
+				float wsc = 110f / (float) this.font.width(n);
 				if(wsc > 3f) wsc = 3f;
 				ScreenMath.renderScaledText(this.font, 52, 13, wsc, n, false, 0xd4d4d4);
-
+				
 				n = FormattingHelper.GENERAL_FORMAT.format(tsfm.internalStored);
-				wsc = 110f / this.font.width(n);
+				wsc = 110f / (float) this.font.width(n);
 				if(wsc > 2f) wsc = 2f;
 				ScreenMath.renderScaledText(this.font, 52, 54, wsc, n, false, 0xd4d4d4);
 			}
@@ -376,7 +376,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 				this.itemRenderer.renderGuiItem(tsfm.storedItem.getDefaultInstance(), (x + 17), (y + 60));
 				if (tsfm.internalStored < 10000) {
-
+					
 					ScreenMath.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, FormattingHelper.GENERAL_FORMAT.format(tsfm.internalStored));
 				} else {
 					ScreenMath.renderItemSlotBoundScaledText(this.font, x+25, y+68, 0.5f, FormattingHelper.formatToSuffix(tsfm.internalStored));
@@ -384,7 +384,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 			}
 
 		}
-
-
+		
+		
 	}
 }

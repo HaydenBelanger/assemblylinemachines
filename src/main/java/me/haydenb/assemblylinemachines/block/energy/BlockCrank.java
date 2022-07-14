@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.block.energy;
 
+import java.util.Random;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.ICrankableMachine;
@@ -11,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -41,8 +41,8 @@ public class BlockCrank extends Block {
 		this.registerDefaultState(
 				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
-
-
+	
+	
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
@@ -55,12 +55,12 @@ public class BlockCrank extends Block {
 
 		return Utils.rotateShape(Direction.EAST, state.getValue(HorizontalDirectionalBlock.FACING), SHAPE);
 	}
-
+	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		for(Direction d : Utils.CARDINAL_DIRS) {
 			BlockEntity entity = context.getLevel().getBlockEntity(context.getClickedPos().relative(d));
-
+			
 			if(entity instanceof ICrankableMachine crankable) {
 				if(crankable.validFrom(d.getOpposite()) && !crankable.requiresGearbox()) {
 					return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, d.getOpposite());
@@ -92,9 +92,9 @@ public class BlockCrank extends Block {
 				}
 			}
 		}
-
-		if(world.isClientSide) {
-			RandomSource r = world.getRandom();
+		
+		if(world.isClientSide) {	
+			Random r = world.getRandom();
 			world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(r), pos.getY() + getPartNext(r), pos.getZ() + getPartNext(r), 0, 0, 0);
 		}
 		return InteractionResult.CONSUME;
@@ -114,28 +114,28 @@ public class BlockCrank extends Block {
 
 		return stateIn;
 	}
-
-	private static double getPartNext(RandomSource rand) {
+	
+	private static double getPartNext(Random rand) {
 		double d = rand.nextDouble();
 		if(d < 0.2 || d > 0.8) {
 			d = 0.5;
 		}
 		return d;
 	}
-
-	private static float getPitchNext(RandomSource rand) {
+	
+	private static float getPitchNext(Random rand) {
 		float f = rand.nextFloat();
-
+		
 		if(f < 0.6f) {
 			f = 0f;
 		}
-
+		
 		if(f > 0.3f) {
 			f = f * -1f;
 		}
-
+		
 		return f;
-
+		
 	}
 
 }

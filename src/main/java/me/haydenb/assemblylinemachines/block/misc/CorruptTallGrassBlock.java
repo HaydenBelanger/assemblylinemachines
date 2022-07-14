@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.block.misc;
 
+import java.util.Random;
 import java.util.stream.Stream;
 
 import com.mojang.authlib.GameProfile;
@@ -9,7 +10,6 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -38,7 +38,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 	}
 
 	@Override
-	public void performBonemeal(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState) {
+	public void performBonemeal(ServerLevel pLevel, Random pRandom, BlockPos pPos, BlockState pState) {
 		DoublePlantBlock dpb;
 		if(pState.is(Registry.getBlock("chaosweed"))) {
 			dpb = (DoublePlantBlock) Registry.getBlock("tall_chaosweed");
@@ -68,7 +68,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 
 		@Override
 		public void place(LevelAccessor level, BlockState state, BlockPos pos, int flag) {
-			DoublePlantBlock.placeAt(level, state, pos, flag);
+			DoublePlantBlock.placeAt(level, state, pos, flag);			
 		}
 	}
 
@@ -120,7 +120,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 		}
 
 		@Override
-		public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+		public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
 			super.randomTick(pState, pLevel, pPos, pRandom);
 			BlockPos above = pPos.above();
 			if(pLevel.getBlockState(above).getBlock().equals(this) && pLevel.getBlockState(above).getValue(CAP) == true && pState.getValue(CAP) == true) {
@@ -138,7 +138,7 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 
 		@SuppressWarnings("deprecation")
 		@Override
-		public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRand) {
+		public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRand) {
 			if(!pLevel.isAreaLoaded(pPos, 1)) return;
 			super.tick(pState, pLevel, pPos, pRand);
 			boolean shouldBeCap = pLevel.isEmptyBlock(pPos.above()) ? true : false;

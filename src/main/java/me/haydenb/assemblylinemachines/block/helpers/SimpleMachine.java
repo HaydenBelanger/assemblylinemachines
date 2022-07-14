@@ -2,7 +2,7 @@ package me.haydenb.assemblylinemachines.block.helpers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -15,30 +15,30 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 
 public abstract class SimpleMachine<A extends AbstractContainerMenu> extends AbstractMachine<A>{
 
-
+	
 	protected final SimpleInventoryHandlerWrapper items;
 	protected final LazyOptional<SimpleInventoryHandlerWrapper> itemHandler;
-	public SimpleMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, MutableComponent name, int containerId,
+	public SimpleMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, TranslatableComponent name, int containerId,
 			Class<A> clazz, boolean supp, BlockPos pos, BlockState state) {
 		super(tileEntityTypeIn, slotCount, name, containerId, clazz, pos, state);
 		items = new SimpleInventoryHandlerWrapper(this, supp);
 		itemHandler = LazyOptional.of(() -> items);
 	}
-
-	public SimpleMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, MutableComponent name, int containerId,
+	
+	public SimpleMachine(BlockEntityType<?> tileEntityTypeIn, int slotCount, TranslatableComponent name, int containerId,
 			Class<A> clazz, BlockPos pos, BlockState state) {
 		this(tileEntityTypeIn, slotCount, name, containerId, clazz, false, pos, state);
 	}
-
+	
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap) {
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return itemHandler.cast();
 		}
-
+		
 		return super.getCapability(cap);
 	}
-
+	
 	@Override
 	public void setRemoved() {
 		super.setRemoved();
@@ -46,7 +46,7 @@ public abstract class SimpleMachine<A extends AbstractContainerMenu> extends Abs
 			itemHandler.invalidate();
 		}
 	}
-
+	
 	public boolean canBeExtracted(ItemStack stack, int slot) {
 		return true;
 	}
@@ -56,28 +56,28 @@ public abstract class SimpleMachine<A extends AbstractContainerMenu> extends Abs
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return itemHandler.cast();
 		}
-
+		
 		return super.getCapability(cap, side);
 	}
-
+	
 	private class SimpleInventoryHandlerWrapper extends InvWrapper {
-
-
+		
+		
 		private final boolean supp;
 		SimpleInventoryHandlerWrapper(Container inv, boolean supportsExtract){
 			super(inv);
 			this.supp = supportsExtract;
 		}
-
+		
 		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-
-			if(!supp || slot != 0 || !canBeExtracted(getItem(slot), slot)) {
+			
+			if(supp == false || slot != 0 || !canBeExtracted(getItem(slot), slot)) {
 				return ItemStack.EMPTY;
 			}else {
 				return super.extractItem(slot, amount, simulate);
 			}
-
+			
 		}
 	}
 

@@ -37,11 +37,11 @@ public class QuantumLinkTER implements BlockEntityRendererProvider<TEQuantumLink
 	}).collect(ImmutableList.toImmutableList());
 	private static final float MIN = 0.09375f;
 	private static final float MAX = 0.90625f;
-
+	
 	@Override
 	public BlockEntityRenderer<TEQuantumLink> create(Context ctxt) {
-		return new BlockEntityRenderer<>() {
-
+		return new BlockEntityRenderer<TEQuantumLink>() {
+			
 			@Override
 			public void render(TEQuantumLink tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 				RANDOM.setSeed(31100L);
@@ -53,12 +53,12 @@ public class QuantumLinkTER implements BlockEntityRendererProvider<TEQuantumLink
 				renderCube(tileEntityIn, f, 0.15F, matrix4f, bufferIn.getBuffer(RENDER_TYPES.get(0)));
 
 				for(int j = 1; j < i; ++j) {
-					renderCube(tileEntityIn, f, 2.0F / (18 - j), matrix4f, bufferIn.getBuffer(RENDER_TYPES.get(j)));
+					renderCube(tileEntityIn, f, 2.0F / (float)(18 - j), matrix4f, bufferIn.getBuffer(RENDER_TYPES.get(j)));
 				}
 
 			}
-
-
+			
+			
 		};
 	}
 
@@ -73,7 +73,7 @@ public class QuantumLinkTER implements BlockEntityRendererProvider<TEQuantumLink
 		renderFace(tileEntityIn, p_228883_4_, p_228883_5_, MIN, MAX, MIN, MIN, MIN, MIN, MAX, MAX, f, f1, f2, Direction.DOWN);
 		renderFace(tileEntityIn, p_228883_4_, p_228883_5_, MIN, MAX, MAX, MAX, MAX, MAX, MIN, MIN, f, f1, f2, Direction.UP);
 	}
-
+	
 	private static void renderFace(TEQuantumLink tileEntityIn, Matrix4f p_228884_2_, VertexConsumer p_228884_3_, float p_228884_4_, float p_228884_5_, float p_228884_6_, float p_228884_7_, float p_228884_8_, float p_228884_9_, float p_228884_10_, float p_228884_11_, float p_228884_12_, float p_228884_13_, float p_228884_14_, Direction p_228884_15_) {
 		p_228884_3_.vertex(p_228884_2_, p_228884_4_, p_228884_6_, p_228884_8_).color(p_228884_12_, p_228884_13_, p_228884_14_, 1.0F).endVertex();
 		p_228884_3_.vertex(p_228884_2_, p_228884_5_, p_228884_6_, p_228884_9_).color(p_228884_12_, p_228884_13_, p_228884_14_, 1.0F).endVertex();
@@ -105,5 +105,5 @@ public class QuantumLinkTER implements BlockEntityRendererProvider<TEQuantumLink
 		return 0.75F;
 	}
 
-
+	
 }

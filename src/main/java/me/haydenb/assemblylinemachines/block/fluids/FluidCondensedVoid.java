@@ -1,6 +1,8 @@
 package me.haydenb.assemblylinemachines.block.fluids;
 
 import java.util.Iterator;
+import java.util.Random;
+import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.item.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -8,7 +10,6 @@ import me.haydenb.assemblylinemachines.world.chaosplane.ChaosPlaneDimension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -17,15 +18,17 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
-public class FluidCondensedVoid extends SplitFluid {
+public class FluidCondensedVoid extends ALMFluid {
 
 	public FluidCondensedVoid(boolean source) {
-		super(source, Registry.basicFFFProperties("condensed_void"));
+		super(Registry.createFluidProperties("condensed_void", -200, false, true, true), source, 0, 0, 0);
 	}
 
 	@Override
@@ -33,18 +36,8 @@ public class FluidCondensedVoid extends SplitFluid {
 		return 2;
 	}
 
-	@Override
-	protected boolean isRandomlyTicking() {
-		return true;
-	}
-
-	@Override
-	public int getTickDelay(LevelReader world) {
-		return 5;
-	}
-
-	@Override
-	protected void randomTick(Level world, BlockPos pos, FluidState state, RandomSource randomom) {
+	@Override	
+	protected void randomTick(Level world, BlockPos pos, FluidState state, Random randomom) {
 		if(!world.dimension().location().equals(ChaosPlaneDimension.CHAOS_PLANE_LOCATION.location())) {
 			Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
 			while(iter.hasNext()) {
@@ -68,34 +61,55 @@ public class FluidCondensedVoid extends SplitFluid {
 						}
 					}
 				}
-
+					
 			}
 		}
-
-
+		
+		
 		super.randomTick(world, pos, state, randomom);
 	}
+	
+	@Override
+	protected boolean isRandomlyTicking() {
+		return true;
+	}
+	
+	@Override
+	public int getTickDelay(LevelReader world) {
+		return 5;
+	}
+	
+	@Override
+	public float getFogDensity() {
+		return 1f;
+	}
 
-	public static class FluidCondensedVoidBlock extends LiquidBlock {
+	public static class FluidCondensedVoidBlock extends ALMFluidBlock {
 
-		public FluidCondensedVoidBlock() {
-			super(() -> (FlowingFluid) Registry.getFluid("condensed_void"), Block.Properties.of(Material.WATER).noLootTable());
+		public FluidCondensedVoidBlock(Supplier<? extends FlowingFluid> fluid) {
+			super(fluid, ALMFluid.getTag("condensed_void"), Material.WATER);
 		}
 
 		@Override
 		public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entity) {
-
-			if(entity instanceof ItemEntity itemEntity) {
+			
+			if(entity instanceof ItemEntity) {
+				
+				ItemEntity itemEntity = (ItemEntity) entity;
 				ItemStack stack = itemEntity.getItem();
 				if(stack.getItem() != Registry.getItem("corrupted_shard")) {
 					itemEntity.setItem(ItemCorruptedShard.corruptItem(stack));
 				}else {
 					itemEntity.setPos(itemEntity.xOld + ((worldIn.random.nextDouble() * 2D) - 1D), itemEntity.yOld + ((worldIn.random.nextDouble() * 4D) - 2D), itemEntity.zOld + ((worldIn.random.nextDouble() * 2D) - 1D));
 				}
-			}else if (entity instanceof LivingEntity player) {
+			}else if (entity instanceof LivingEntity) {
+				LivingEntity player = (LivingEntity) entity;
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100));
 				player.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 6));
+				
+				entity.makeStuckInBlock(state, new Vec3(0.02D, 0.02D, 0.02D));
 			}
+			super.entityInside(state, worldIn, pos, entity);
 		}
 	}
 

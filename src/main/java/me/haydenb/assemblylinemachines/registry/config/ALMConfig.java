@@ -1,41 +1,75 @@
 package me.haydenb.assemblylinemachines.registry.config;
 
+import java.io.*;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.toml.TomlFormat;
+
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.registry.PacketHandler;
+import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
+import net.minecraft.CrashReport;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.config.ConfigTracker;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.Type;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.network.PacketDistributor;
 
 public class ALMConfig {
 
 	private static final Pair<Client, ForgeConfigSpec> CLIENT = new ForgeConfigSpec.Builder().configure(Client::new);
 	private static final Pair<Common, ForgeConfigSpec> COMMON = new ForgeConfigSpec.Builder().configure(Common::new);
 	private static final Pair<Server, ForgeConfigSpec> SERVER = new ForgeConfigSpec.Builder().configure(Server::new);
-
+	private static final Pair<PreInit, ForgeConfigSpec> PREINIT = new ForgeConfigSpec.Builder().configure(PreInit::new);
+	
 	public static Client getClientConfig() {
 		return CLIENT.getKey();
 	}
-
+	
 	public static Common getCommonConfig() {
 		return COMMON.getKey();
 	}
-
+	
 	public static Server getServerConfig() {
 		return SERVER.getKey();
 	}
-
-	public static void registerSpecs(ModLoadingContext mlc) {
-		mlc.registerConfig(Type.CLIENT, CLIENT.getValue());
-		mlc.registerConfig(Type.COMMON, COMMON.getValue());
-		mlc.registerConfig(Type.SERVER, SERVER.getValue());
+	
+	public static PreInit getPreInitConfig() {
+		return PREINIT.getKey();
 	}
 
+	public static void registerSpecs(ModLoadingContext mlc) {
+		mlc.registerConfig(Type.CLIENT, CLIENT.getValue(), fileName(Type.CLIENT.extension()));
+		mlc.registerConfig(Type.COMMON, COMMON.getValue(), fileName(Type.COMMON.extension()));
+		mlc.registerConfig(Type.SERVER, SERVER.getValue());
+		loadPreInitConfig(mlc.getActiveContainer());
+	}
+	
 	/**Config for anything accessed only on client-side during startup post-registry.*/
 	public static final record Client(BooleanValue customTooltipColors, BooleanValue customTooltipFrames, BooleanValue receiveGuideBook, BooleanValue receiveUpdateMessages) {
-
+		
 		public Client(Builder builder) {
 			this(
 				builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true),
@@ -45,12 +79,12 @@ public class ALMConfig {
 			);
 		}
 	}
-
+	
 	/**Config for standard things, loaded on both sides during startup post-registry.*/
 	public static final record Common(BooleanValue lateGamePlatesRequireCompressor, BooleanValue lateGameGearsRequireCompressor, BooleanValue grinderIMC, BooleanValue alloyIMC, BooleanValue compressorStorageBlockIMC,
 			BooleanValue compressorNuggetIMC, BooleanValue compressorPlateIMC, BooleanValue compressorGearIMC, BooleanValue compressorRodIMC, BooleanValue titaniumOre, BooleanValue blackGranite, BooleanValue blackGraniteNaturalTag,
 			BooleanValue chromiumOre, BooleanValue chromiumOreOnDragonIsland, BooleanValue corruptOres, BooleanValue fleroviumOre, BooleanValue empoweredCoalOre, ConfigValue<String> preferredModid) {
-
+		
 		public Common(Builder builder) {
 			this(
 				builder.push("Progression Crafting").comment("Should late-game (Mystium and beyond) Plates & Sheets require the Pneumatic Compressor to create?").define("lateGamePlatesRequireCompressor", true),
@@ -74,7 +108,7 @@ public class ALMConfig {
 			);
 		}
 	}
-
+	
 	/**Config for world-specific things, loaded during server/world startup and synced to client.*/
 	public static final record Server(BooleanValue reactorExplosions, ConfigValue<Double> crankSnapChance, BooleanValue invalidBathReturnsSludge,
 			ConfigValue<Double> kineticMachineCycleModifier, BooleanValue interactMode, EnumValue<DebugOptions> interactExceptionReporting, BooleanValue distributeGuideBook, BooleanValue gasolineExplosions,
@@ -94,14 +128,116 @@ public class ALMConfig {
 			);
 		}
 	}
-
+	
+	/**Config for all things needed prior to registry initialization. When client connects to server, it will attempt to validate that all options are the same.*/
+	@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
+	public static final record PreInit(ConfigValue<List<? extends Config>> toolStats) implements Serializable {
+		
+		public PreInit(Builder builder) {
+			this(
+				builder.comment("This config's values may be considered extremely unstable and may be removed at any time. Edit at your own risk.",
+						"If the client config does not exactly match values given in the server config, you will be unable to join that server.",
+						"Therefore, it's recommended to only edit these options when creating a modpack where all clients would always have the same default modified values.",
+						"All tools have default stats, this option allows you to override those and provide your own stats.",
+						"For more information, view the developer wiki.").defineListAllowEmpty(List.of("toolStats"), () -> List.of(), (o) -> {
+					if(o instanceof Config c) {
+						List<? extends Number> data = c.get("data");
+						ToolDefaults td = Stream.of(ToolDefaults.values()).filter((tx) -> tx.toString().equals(c.get("type"))).findAny().orElse(null);
+						return td != null && data.size() == td.statTypes.size();
+					}
+					return false;
+				})
+			);
+		}
+		
+		public boolean configsMatch(CommentedConfig serverCfg) {
+			List<? extends Config> serverToolStats = serverCfg.get("toolStats");
+			List<? extends Config> clientToolStats = toolStats.get();
+			if(serverToolStats.size() != clientToolStats.size()) return false;
+			for(int i = 0; i < serverToolStats.size(); i++) {
+				String clientType = clientToolStats.get(i).get("type");
+				String serverType = serverToolStats.get(i).get("type");
+				if(!clientType.equals(serverType)) return false;
+				List<? extends Number> clientVals = clientToolStats.get(i).get("data");
+				List<? extends Number> serverVals = serverToolStats.get(i).get("data");
+				if(clientVals.size() != serverVals.size()) return false;
+				for(int j = 0; j < serverVals.size(); j++) if(clientVals.get(j).doubleValue() != serverVals.get(j).doubleValue()) return false;
+			}
+			return true;
+		}
+		
+		@SubscribeEvent
+		public static void connectSendValidateRequest(PlayerLoggedInEvent event) {
+			try {
+				byte[] data = Files.readAllBytes(ConfigTracker.INSTANCE.fileMap().get(fileName("experimental")).getFullPath());
+				PacketData pd = new PacketData("experimental_verify");
+				pd.writeByteArray("data", data);
+				PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) event.getPlayer()), pd);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static void connectReceiveValidateRequest(PacketData pd) {
+			CommentedConfig serverCfg = TomlFormat.instance().createParser().parse(new ByteArrayInputStream(pd.get("data", byte[].class)));
+			if(!getPreInitConfig().configsMatch(serverCfg)) Minecraft.crash(CrashReport.forThrowable(new RuntimeException("Client experimental config did not match server experimental config."), "Failed to validate config parity when joining server."));
+			AssemblyLineMachines.LOGGER.debug("Passed verification of experimental config.");
+		}
+	}
+	
+	public static enum ToolDefaults{
+		
+		TITANIUM(List.of(Stats.ATTACK, Stats.HRV_SPEED, Stats.ENCHANT, Stats.DURABILITY, Stats.KB_RES, Stats.D_REDUCTION, Stats.TOUGH), 5, 7, 8, 1150, 0, 4, 0),
+		STEEL(List.of(Stats.ATTACK, Stats.HRV_SPEED, Stats.ENCHANT, Stats.DURABILITY, Stats.KB_RES, Stats.D_REDUCTION, Stats.TOUGH), 7, 9, 6, 1800, 0.1, 4, 2.5),
+		CRANK(List.of(Stats.ATTACK, Stats.HRV_SPEED, Stats.ENCHANT, Stats.DURABILITY, Stats.SP_ENERGY), 8, 11, 16, 75, 750),
+		MYSTIUM(List.of(Stats.ATTACK, Stats.HRV_SPEED, Stats.ENCHANT, Stats.DURABILITY, Stats.KB_RES, Stats.D_REDUCTION, Stats.TOUGH, Stats.SP_ENERGY, Stats.SP_ENH_ENERGY), 9, 19, 28, 150, 0.15, 7, 5, 1000000, 10000000),
+		NOVASTEEL(List.of(Stats.ATTACK, Stats.HRV_SPEED, Stats.ENCHANT, Stats.DURABILITY, Stats.SP_ENERGY), 10.5, 23, 37, 300, 20000000),
+		CRG(List.of(Stats.ENCHANT, Stats.DURABILITY, Stats.KB_RES, Stats.D_REDUCTION, Stats.TOUGH), 3, 750, 0, 5, 0);
+		
+		private final List<Stats> statTypes;
+		private final HashMap<Stats, Number> stats = new HashMap<>();
+		
+		ToolDefaults(List<Stats> statTypes, Number... data){
+			if(statTypes.size() != data.length) throw new IllegalArgumentException("Stat types does not equal data length.");
+			this.statTypes = statTypes;
+			for(int i = 0; i < statTypes.size(); i++) stats.put(statTypes.get(i), data[i]);
+		}
+		
+		public Number get(Stats stat) {
+			int index = statTypes.indexOf(stat);
+			List<? extends Number> config = getPreInitConfig().toolStats().get().stream().filter((cfg) -> cfg.get("type").toString().equals(this.toString())).findAny().map((c) -> {
+				List<? extends Number> res = c.get("data");
+				return res;
+			}).orElse(List.of());
+			return !config.isEmpty() && config.size() > index ? config.get(index) : stats.get(stat);
+		}
+	}
+	
+	public static enum Stats{
+		ATTACK, HRV_SPEED, ENCHANT, DURABILITY, KB_RES, D_REDUCTION, TOUGH, SP_ENERGY, SP_ENH_ENERGY;
+	}
+	
 	public static enum DebugOptions{
 		NONE(null), MESSAGE(Level.WARN), STACK_TRACE(Level.DEBUG);
-
+		
 		public final Level level;
-
+		
 		DebugOptions(Level level){
 			this.level = level;
 		}
+	}
+	
+	public static void loadPreInitConfig(ModContainer container) {
+		try {
+			Method method = ObfuscationReflectionHelper.findMethod(ConfigTracker.class, "openConfig", ModConfig.class, Path.class);
+			method.invoke(ConfigTracker.INSTANCE, new ModConfig(Type.COMMON, PREINIT.getValue(), container, fileName("experimental")), FMLPaths.CONFIGDIR.get());
+		}catch(Exception e) {
+			throw new RuntimeException("Error loading experimental config for Assembly Line Machines.", e);
+		}
+	}
+	
+	private static String fileName(String type) {
+		return AssemblyLineMachines.MODID + "/" + AssemblyLineMachines.MODID + "-" + type + ".toml";
 	}
 }

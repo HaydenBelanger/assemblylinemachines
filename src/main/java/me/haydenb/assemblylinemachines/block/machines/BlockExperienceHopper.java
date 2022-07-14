@@ -65,8 +65,8 @@ public class BlockExperienceHopper extends BlockTileEntity {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "experience_hopper");
 		this.registerDefaultState(this.stateDefinition.any().setValue(BlockStateProperties.FACING_HOPPER, Direction.DOWN));
 	}
-
-
+	
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		Direction d = state.getValue(BlockStateProperties.FACING_HOPPER);
@@ -82,7 +82,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 			return SHAPE_UD;
 		}
 	}
-
+	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(BlockStateProperties.FACING_HOPPER);
@@ -92,12 +92,12 @@ public class BlockExperienceHopper extends BlockTileEntity {
 	public BlockEntity bteExtendBlockEntity(BlockPos pPos, BlockState pState) {
 		return bteDefaultReturnBlockEntity(pPos, pState);
 	}
-
+	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> bteExtendTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
 		return bteDefaultReturnTicker(level, state, blockEntityType);
 	}
-
+	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		Direction direction = context.getClickedFace().getOpposite();
@@ -113,15 +113,15 @@ public class BlockExperienceHopper extends BlockTileEntity {
 	public InteractionResult blockRightClickServer(BlockState state, Level world, BlockPos pos, Player player) {
 		return InteractionResult.SUCCESS;
 	}
-
+	
 	public static class TEExperienceHopper extends BasicTileEntity implements ALMTicker<TEExperienceHopper>{
-
+		
 		public IFluidHandler output;
 		private int internalStoredXp;
 		private int timer = 0;
 		private int subTimer = 0;
 		private AABB bb;
-
+		
 		public TEExperienceHopper(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 			super(tileEntityTypeIn, pos, state);
 		}
@@ -129,28 +129,28 @@ public class BlockExperienceHopper extends BlockTileEntity {
 		public TEExperienceHopper(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("experience_hopper"), pos, state);
 		}
-
+		
 		@Override
 		public void load(CompoundTag compound) {
 			super.load(compound);
-
+			
 			internalStoredXp = compound.getInt("assemblylinemachines:internalxp");
 		}
-
+		
 		@Override
 		public void saveAdditional(CompoundTag compound) {
 
 			compound.putInt("assemblylinemachines:internalxp", internalStoredXp);
 			super.saveAdditional(compound);
 		}
-
+		
 		@Override
 		public void tick() {
 			if(!level.isClientSide) {
 				if(timer++ == 40) {
 					boolean sendUpdates = false;
 					timer = 0;
-
+					
 					if(output == null) {
 						Direction dir = this.getBlockState().getValue(BlockStateProperties.FACING_HOPPER);
 						BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(dir));
@@ -165,25 +165,25 @@ public class BlockExperienceHopper extends BlockTileEntity {
 					if(output != null) {
 						if(internalStoredXp != 0 && subTimer++ == 5) {
 							subTimer = 0;
-
+							
 							int max = internalStoredXp;
 							if(max > 500) {
 								max = 500;
 							}
-
+							
 							internalStoredXp -= output.fill(new FluidStack(Registry.getFluid("liquid_experience"), max), FluidAction.EXECUTE);
 							sendUpdates = true;
-
+							
 						}
 					}
-
+					
 					if(internalStoredXp <= 1000) {
 						if (bb == null) {
 							bb = new AABB(this.getBlockPos().relative(getBlockState().getValue(BlockStateProperties.FACING_HOPPER).getOpposite(), 3)).inflate(2);
 						}
-
+						
 						List<ExperienceOrb> el = this.getLevel().getEntitiesOfClass(ExperienceOrb.class, bb);
-
+						
 						for(ExperienceOrb entity : el) {
 							internalStoredXp += (entity.getValue() * 15);
 							spawnTeleparticles(entity.getX(), entity.getY(), entity.getZ(), this.getLevel().getChunkAt(entity.blockPosition()));
@@ -199,9 +199,9 @@ public class BlockExperienceHopper extends BlockTileEntity {
 					}
 				}
 			}
-
+			
 		}
-
+		
 		private static void spawnTeleparticles(double x, double y, double z, LevelChunk ch) {
 			PacketData pd = new PacketData("experience_hopper_particles");
 			pd.writeDouble("x", x);

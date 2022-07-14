@@ -1,15 +1,17 @@
 package me.haydenb.assemblylinemachines.block.fluids;
 
 import java.util.Iterator;
+import java.util.Random;
+import java.util.function.Supplier;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.client.FogRendering.ILiquidFogColor;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,39 +26,78 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
-public class FluidNaphtha extends SplitFluid {
-
+public class FluidNaphtha extends ALMFluid implements ILiquidFogColor {
+	
 	public FluidNaphtha(boolean source) {
-		super(source, Registry.basicFFFProperties("naphtha"));
+		super(Registry.createFluidProperties("naphtha", 2200, false, true, true), source, 222, 79, 22);
 	}
 
+	@Override
+	protected void randomTick(Level world, BlockPos pos, FluidState state, Random random) {
+		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
+		while(iter.hasNext()) {
+			
+			BlockPos cor = iter.next();
+			
+			if(world.getBlockState(cor).isAir() && (world.isLoaded(cor.below()) || isSurroundingBlockFlammable(world, cor)) && !world.getBlockState(cor.below()).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof")))) {
+				
+				world.setBlockAndUpdate(cor, ForgeEventFactory.fireFluidPlaceBlockEvent(world, cor, pos, Registry.getBlock("naphtha_fire").defaultBlockState()));
+				
+			}
+				
+		}
+	}
+	
 	@Override
 	protected boolean isRandomlyTicking() {
 		return true;
 	}
+	
+	private static boolean isSurroundingBlockFlammable(LevelReader worldIn, BlockPos pos) {
+		for (Direction direction : Direction.values()) {
+			if (getCanBlockBurn(worldIn, pos.relative(direction))) {
+				return true;
+			}
+		}
 
+		return false;
+	}
+
+	@SuppressWarnings("deprecation")
+	private static boolean getCanBlockBurn(LevelReader worldIn, BlockPos pos) {
+		return pos.getY() >= 0 && pos.getY() < 256 && !worldIn.hasChunkAt(pos) ? false
+				: worldIn.getBlockState(pos).getMaterial().isFlammable();
+	}
+	
 	@Override
 	public int getTickDelay(LevelReader world) {
 		return 4;
 	}
 
-	@Override
-	protected void randomTick(Level world, BlockPos pos, FluidState state, RandomSource random) {
-		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.above().north().east(), pos.below().south().west()).iterator();
-		while(iter.hasNext()) {
-			BlockPos cor = iter.next();
+	public static class FluidNaphthaBlock extends ALMFluidBlock {
 
-			if(world.getBlockState(cor).isAir() && (world.isLoaded(cor.below()) || ((LavaFluid) Fluids.LAVA).hasFlammableNeighbours(world, cor)) && !world.getBlockState(cor.below()).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof")))) {
-				world.setBlockAndUpdate(cor, ForgeEventFactory.fireFluidPlaceBlockEvent(world, cor, pos, Registry.getBlock("naphtha_fire").defaultBlockState()));
-			}
+		public FluidNaphthaBlock(Supplier<? extends FlowingFluid> fluid) {
+			super(fluid, ALMFluid.getTag("naphtha"), Block.Properties.of(Material.LAVA).strength(100f).lightLevel((state) -> 11).noDrops());
 		}
+		
+		@Override
+		public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entity) {
+			
+			if(entity instanceof LivingEntity) {
+				LivingEntity living = (LivingEntity) entity;
+				living.addEffect(new MobEffectInstance(Registry.getEffect("deep_burn"), 300, 0));
+			}
+			super.entityInside(state, worldIn, pos, entity);
+		}
+		
+		
 	}
-
+	
 	@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 	public static class BlockNaphthaFire extends BaseFireBlock {
 		public BlockNaphthaFire() {
 			super(Block.Properties.of(Material.FIRE, MaterialColor.FIRE).noCollission().randomTicks()
-					.strength(0f).lightLevel((state) -> 15).sound(SoundType.WOOL).noLootTable(), 1f);
+					.strength(0f).lightLevel((state) -> 15).sound(SoundType.WOOL).noDrops(), 1f);
 			this.registerDefaultState(this.stateDefinition.any().setValue(FireBlock.AGE, 0));
 		}
 
@@ -68,7 +109,7 @@ public class FluidNaphtha extends SplitFluid {
 
 		@SuppressWarnings("deprecation")
 		@Override
-		public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand) {
+		public void tick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
 			if (world.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
 				if (!world.isAreaLoaded(pos, 2)) return;
 				if (!state.canSurvive(world, pos)) {
@@ -92,9 +133,9 @@ public class FluidNaphtha extends SplitFluid {
 								if(xAge > 15) xAge = 15;
 								if(world.isLoaded(posx.below()) && !world.getBlockState(posx.below()).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "naphtha_fireproof")))) {
 									world.setBlockAndUpdate(posx, ForgeEventFactory.fireFluidPlaceBlockEvent(world, posx, pos, state.setValue(FireBlock.AGE, nAge)));
-
+									
 									world.setBlockAndUpdate(pos, state.setValue(FireBlock.AGE, xAge));
-
+									
 									if(xAge == 15) {
 										break;
 									}
@@ -114,12 +155,12 @@ public class FluidNaphtha extends SplitFluid {
 
 			if(entity instanceof LivingEntity) {
 				LivingEntity living = (LivingEntity) entity;
-				living.addEffect(new MobEffectInstance(Registry.DEEP_BURN.get(), 140, 0));
+				living.addEffect(new MobEffectInstance(Registry.getEffect("deep_burn"), 140, 0));
 			}
-
+			
 			super.entityInside(state, worldIn, pos, entity);
 		}
-
+		
 		@Override
 		public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
 			return this.canSurvive(stateIn, worldIn, currentPos) ? stateIn : Blocks.AIR.defaultBlockState();
@@ -145,7 +186,7 @@ public class FluidNaphtha extends SplitFluid {
 			}
 			return false;
 		}
-
+		
 		//Event to allow instant-extinguish of Naphtha Fire.
 		@SubscribeEvent
 		public static void extinguishFire(PlayerInteractEvent.LeftClickBlock event) {
@@ -154,7 +195,7 @@ public class FluidNaphtha extends SplitFluid {
 			if(event.getFace() == Direction.UP) {
 				BlockPos up = event.getPos().above();
 				Block block = world.getBlockState(up).getBlock();
-
+				
 				if(block == Registry.getBlock("naphtha_fire")) {
 					if(event.getPlayer().isCreative()) {
 						event.setCanceled(true);
@@ -163,7 +204,7 @@ public class FluidNaphtha extends SplitFluid {
 					world.removeBlock(up, false);
 				}
 			}
-
+				
 		}
 
 	}

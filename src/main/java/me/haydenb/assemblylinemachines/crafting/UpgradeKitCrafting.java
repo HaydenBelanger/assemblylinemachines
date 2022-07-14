@@ -23,24 +23,25 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class UpgradeKitCrafting implements Recipe<Container> {
 
-	public static final RecipeType<UpgradeKitCrafting> UPGRADING_RECIPE = new RecipeType<>() {
+	public static final RecipeType<UpgradeKitCrafting> UPGRADING_RECIPE = new RecipeType<UpgradeKitCrafting>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:upgrade_kit";
 		}
 	};
-
+	
 	public static final UpgradeKitSerializer SERIALIZER = new UpgradeKitSerializer();
-
+	
 	private final Lazy<Ingredient> inputBlock;
 	private final UpgradeKit inputUpgradeKit;
 	private final Block outputBlock;
 	private final Map<Integer, Integer> slotCopying;
 	private final ResourceLocation id;
-
+	
 	public UpgradeKitCrafting(ResourceLocation id, Lazy<Ingredient> inputBlock, UpgradeKit inputUpgradeKit, Block outputBlock, Map<Integer, Integer> slotCopying) {
 		this.inputBlock = inputBlock;
 		this.inputUpgradeKit = inputUpgradeKit;
@@ -48,7 +49,7 @@ public class UpgradeKitCrafting implements Recipe<Container> {
 		this.slotCopying = slotCopying;
 		this.id = id;
 	}
-
+	
 	@Override
 	public boolean matches(Container p_44002_, Level p_44003_) {
 		return true;
@@ -83,12 +84,12 @@ public class UpgradeKitCrafting implements Recipe<Container> {
 	public RecipeType<?> getType() {
 		return UPGRADING_RECIPE;
 	}
-
+	
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-
+	
 	public static boolean tryUpgrade(BlockPos upgradeBlock, Level level, ItemStack upgradeKit) {
 		if(level.isClientSide) throw new IllegalArgumentException("Upgrade attempted from the client side.");
 		List<UpgradeKitCrafting> list = level.getRecipeManager().getAllRecipesFor(UPGRADING_RECIPE);
@@ -103,12 +104,12 @@ public class UpgradeKitCrafting implements Recipe<Container> {
 					}
 					container.setChanged();
 				}
-
+				
 				BlockState df = recipe.outputBlock.defaultBlockState();
 				DirectionProperty facing = HorizontalDirectionalBlock.FACING;
 				if(df.hasProperty(facing) && level.getBlockState(upgradeBlock).hasProperty(facing)) df = df.setValue(facing, level.getBlockState(upgradeBlock).getValue(facing));
 				level.setBlockAndUpdate(upgradeBlock, df);
-
+				
 				if(!copyItems.isEmpty()) {
 					if(level.getBlockEntity(upgradeBlock) instanceof Container) {
 						Container newContainer = (Container) level.getBlockEntity(upgradeBlock);
@@ -125,12 +126,12 @@ public class UpgradeKitCrafting implements Recipe<Container> {
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
-
-	public static class UpgradeKitSerializer implements RecipeSerializer<UpgradeKitCrafting>{
-
+	
+	public static class UpgradeKitSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<UpgradeKitCrafting>{
+		
 		@Override
 		public UpgradeKitCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			Lazy<Ingredient> inputBlock = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input_block")));
@@ -143,10 +144,10 @@ public class UpgradeKitCrafting implements Recipe<Container> {
 					slotCopy.put(Integer.parseInt(entry.getKey()), entry.getValue().getAsInt());
 				});
 			}
-
+			
 			return new UpgradeKitCrafting(recipeId, inputBlock, upgradeKit, block, slotCopy);
 		}
-
+		
 		@Override
 		public UpgradeKitCrafting fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
 			Ingredient inputBlock = Ingredient.fromNetwork(buffer);
@@ -155,22 +156,22 @@ public class UpgradeKitCrafting implements Recipe<Container> {
 			Map<Integer, Integer> slotCopy = buffer.readMap((buf) -> buf.readInt(), (buf) -> buf.readInt());
 			return new UpgradeKitCrafting(recipeId, Lazy.of(() -> inputBlock), upgradeKit, block, slotCopy);
 		}
-
+		
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, UpgradeKitCrafting recipe) {
 			recipe.inputBlock.get().toNetwork(buffer);
 			buffer.writeEnum(recipe.inputUpgradeKit);
-			buffer.writeResourceLocation(ForgeRegistries.BLOCKS.getKey(recipe.outputBlock));
+			buffer.writeResourceLocation(recipe.outputBlock.getRegistryName());
 			buffer.writeMap(recipe.slotCopying, (bufferkey, key) -> bufferkey.writeInt(key), (buffervalue, value) -> buffervalue.writeInt(value));
 		}
-
+		
 	}
-
+	
 	public static enum UpgradeKit{
 		MKII(Registry.getItem("mkii_upgrade_kit")), ELECTRIC(Registry.getItem("electric_upgrade_kit"));
-
+		
 		private final Item item;
-
+		
 		UpgradeKit(Item item){
 			this.item = item;
 		}

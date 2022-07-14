@@ -30,7 +30,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +43,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -75,11 +74,11 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 				if(oFs.isPresent()) tank = oFs.get();
 				return tank;
 		}, (v) -> this.sendUpdates(), true);
-
+		
 		LazyOptional<IFluidHandler> lazy = LazyOptional.of(() -> handler);
 
 		public TEQuantumLink(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 3, Component.translatable(Registry.getBlock("quantum_link").getDescriptionId()), Registry.getContainerId("quantum_link"), ContainerQuantumLink.class, new EnergyProperties(true, true, 10000000), pos, state);
+			super(tileEntityTypeIn, 3, new TranslatableComponent(Registry.getBlock("quantum_link").getDescriptionId()), Registry.getContainerId("quantum_link"), ContainerQuantumLink.class, new EnergyProperties(true, true, 10000000), pos, state);
 		}
 
 		public TEQuantumLink(BlockPos pos, BlockState state) {
@@ -102,12 +101,12 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 
 					if(qln == null) {
 
-						if(connected || passwordEnabled) {
+						if(connected == true || passwordEnabled == true) {
 							connected = false;
 							passwordEnabled = false;
 							sendupdates = true;
 						}
-						if(configured) {
+						if(configured == true) {
 
 							Pair<QuantumLinkStatus, Optional<QuantumLinkNetwork>> result = QuantumLinkManager.getInstance(this.getLevel().getServer()).getHandler().getOrCreateQuantumLink(id, password);
 
@@ -116,13 +115,13 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 								{
 									return new NoSuchElementException();
 								});
-
+								
 								if(result.getFirst() == QuantumLinkStatus.CREATED_PASSWORD || result.getFirst() == QuantumLinkStatus.CREATED_INSECURE) {
 									status = "Created network.";
 								}else {
 									status = "Joined network.";
 								}
-
+								
 								if(result.getFirst() == QuantumLinkStatus.CREATED_PASSWORD || result.getFirst() == QuantumLinkStatus.JOINED_PASSWORD) {
 									passwordEnabled = true;
 								}else {
@@ -139,7 +138,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 						}
 					}else {
 
-						if(!connected) {
+						if(connected == false) {
 							connected = true;
 							sendupdates = true;
 						}
@@ -171,7 +170,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 							if(!getItem(2).isEmpty()) {
 								this.setItem(2, qln.attemptInsertIntoNetwork(this, getItem(2)));
 							}
-
+							
 							sendupdates = true;
 						}
 					}
@@ -255,7 +254,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			}
 
 			connected = compound.getBoolean("assemblylinemachines:connected");
-
+			
 			passwordEnabled = compound.getBoolean("assemblylinemachines:passwordconnection");
 		}
 
@@ -287,7 +286,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 		private EditBox pinField;
 		private String txtId = "";
 		private HashMap<Fluid, TextureAtlasSprite> spriteMap = new HashMap<>();
-
+		
 		private final TextureAtlasSprite netherPortal;
 
 		public ScreenQuantumLink(ContainerQuantumLink screenContainer, Inventory inv,
@@ -312,7 +311,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 
 			this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-			idField = new EditBox(this.font, x + 138, y + 9, 20, 9, Component.literal("ID"));
+			idField = new EditBox(this.font, x + 138, y + 9, 20, 9, new TextComponent("ID"));
 			idField.setCanLoseFocus(true);
 			idField.setBordered(false);
 			idField.setMaxLength(3);
@@ -326,11 +325,11 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 				if(string.trim().isEmpty()) {
 					return true;
 				}
-
+				
 				return StringUtils.isNumeric(string);
 			});
 
-			pinField = new EditBox(this.font, x + 138, y + 24, 32, 9, Component.literal("PIN"));
+			pinField = new EditBox(this.font, x + 138, y + 24, 32, 9, new TextComponent("PIN"));
 			pinField.setCanLoseFocus(true);
 			pinField.setBordered(false);
 			pinField.setMaxLength(4);
@@ -363,7 +362,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 		}
 
 		private class QuantumChannelButton extends TrueFalseButton{
-
+			
 			final int channel;
 			final String tooltip;
 			public QuantumChannelButton(int x, int y, int width, int height, OnPress onPress, int channel) {
@@ -383,16 +382,16 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 					tooltip = null;
 				}
 			}
-
+			
 			@Override
 			public boolean getSupplierOutput() {
 				if(tsfm.pfi[channel] == 0) {
 					return false;
 				}
-
+				
 				return true;
 			}
-
+			
 			@Override
 			public int[] getBlitData() {
 				int xoffset = 12 * channel;
@@ -400,35 +399,35 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 				if(tsfm.pfi[channel] == 1) {
 					yoffset += 12;
 				}
-
+				
 				return new int[] {x, y, 176+xoffset, 74+yoffset, 11, 11};
 			}
-
+			
 			@Override
 			public void renderToolTip(PoseStack pMatrixStack, int pMouseX, int pMouseY) {
 				if(this.isHoveredOrFocused()) {
 					List<Component> vals = new ArrayList<>();
 					switch(tsfm.pfi[channel]) {
 					case 0:
-						vals.add(Component.literal(tooltip + " Receive Mode"));
-						vals.add(Component.literal("Will receive " + tooltip + " from other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
+						vals.add(new TextComponent(tooltip + " Receive Mode"));
+						vals.add(new TextComponent("Will receive " + tooltip + " from other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
 						break;
 					case 1:
-						vals.add(Component.literal(tooltip + " Send Mode"));
-						vals.add(Component.literal("Will transfer " + tooltip + " to other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
+						vals.add(new TextComponent(tooltip + " Send Mode"));
+						vals.add(new TextComponent("Will transfer " + tooltip + " to other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
 						break;
 					case 2:
-						vals.add(Component.literal(tooltip + " Disabled"));
-						vals.add(Component.literal("Will not interact with " + tooltip + ".").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
+						vals.add(new TextComponent(tooltip + " Disabled"));
+						vals.add(new TextComponent("Will not interact with " + tooltip + ".").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
 						break;
 					}
-
+					
 					renderComponentTooltip(pMatrixStack, vals, pMouseX, pMouseY);
 				}
 			}
 		}
-
-
+		
+		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 
@@ -441,7 +440,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			renderFluid(tsfm.tank, x+13, y+13);
 
 			super.blit(x+64, y+6, 69, 69, 69, netherPortal);
-
+			
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 
 			int prog = Math.round(((float) tsfm.amount / (float) tsfm.properties.getCapacity()) * 37F);
@@ -450,18 +449,18 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			renderFluidOverlayBar(tsfm.tank, tsfm.handler.getTankCapacity(0), x + 13, y + 13);
 
 			if(!tsfm.status.isEmpty()) {
-				float wsc = 35f / this.font.width(tsfm.status);
+				float wsc = 35f / (float) this.font.width(tsfm.status);
 				ScreenMath.renderScaledText(font, x + 136, y + 35, wsc, tsfm.status, false, 0xffffff);
 			}
 
 
 			if(tsfm.connected) {
 
-
+				
 				if(tsfm.passwordEnabled) {
 					super.blit(x+160, y+35, 176, 98, 11, 11);
 				}
-
+				
 
 			}else {
 				super.blit(x+64, y+6, 187, 99, 69, 69);
@@ -493,7 +492,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 				}
 
 			}
-
+			
 			if(tsfm.connected && tsfm.passwordEnabled && mouseX >= x + 160 && mouseY >= y + 35 && mouseX <= x + 160 + 11 && mouseY <= y + 35 + 11) {
 				this.renderComponentTooltip("Secure connection!", mouseX - x, mouseY - y);
 			}
@@ -505,7 +504,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fs.getFluid()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fs.getFluid().getAttributes().getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
@@ -520,7 +519,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 		}
 
 		private void renderFluidOverlayBar(FluidStack fs, float capacity, int xblit, int yblit) {
-			int fprog = Math.round((fs.getAmount() / capacity) * 37f);
+			int fprog = Math.round(((float) fs.getAmount() / capacity) * 37f);
 			super.blit(xblit, yblit, 176, 37, 8, 37 - fprog);
 		}
 
@@ -536,7 +535,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
 					} else {
-						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
 					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);
@@ -545,7 +544,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 				}
 			}
 		}
-
+		
 
 		public static void pressButton(int button, BlockPos pos) {
 			PacketData pd = new PacketData("quantum_link_gui");

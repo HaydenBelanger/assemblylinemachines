@@ -22,8 +22,8 @@ import net.minecraft.commands.*;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -43,7 +43,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 @EventBusSubscriber(bus = Bus.FORGE, modid = AssemblyLineMachines.MODID)
 public class ModCommand {
-
+	
 	@SubscribeEvent
 	public static void registerCommand(RegisterCommandsEvent event) {
 		event.getDispatcher().register(Commands.literal("assemblylinemachines").requires((css) -> css.hasPermission(2))
@@ -61,29 +61,29 @@ public class ModCommand {
 						.then(Commands.literal("get").executes(ModCommand::fluidInChunk)
 								.then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ModCommand::fluidInChunk)))));
 	}
-
+	
 	private static int makeCreative(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
 		CommandSourceStack source = context.getSource();
 		BlockPos pos = BlockPosArgument.getLoadedBlockPos(context, "pos");
 		Optional<MutableComponent> result = ItemCreativeUpgradeKit.makeCreative(source.getEntityOrException().getLevel(), pos);
 		if(!result.isEmpty()) {
-			source.sendSuccess(Component.translatable("commands.assemblylinemachines.makecreative.success", result.get(), pos.toShortString()), true);
+			source.sendSuccess(new TranslatableComponent("commands.assemblylinemachines.makecreative.success", result.get(), pos.toShortString()), true);
 			return 1;
 		}
-		source.sendFailure(Component.translatable("commands.assemblylinemachines.makecreative.error", pos.toShortString()));
+		source.sendFailure(new TranslatableComponent("commands.assemblylinemachines.makecreative.error", pos.toShortString()));
 		return 0;
 	}
-
+	
 	private static int giveGuide(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
 		CommandSourceStack source = context.getSource();
 		ItemStack bookStack = PluginPatchouli.INTERFACE.get().getBookItem();
 		if(bookStack.isEmpty()) {
-			source.sendFailure(Component.translatable("commands.assemblylinemachines.guide.missing_mod"));
+			source.sendFailure(new TranslatableComponent("commands.assemblylinemachines.guide.missing_mod"));
 			return 0;
 		}
 		Collection<ServerPlayer> players = Utils.containsArgument(context, "targets") ? EntityArgument.getPlayers(context, "targets") :
 			source.getEntityOrException() instanceof ServerPlayer ? List.of((ServerPlayer) source.getEntityOrException()) : List.of();
-
+		
 		for(ServerPlayer player : players) {
 			ItemStack copy = bookStack.copy();
 			boolean given = player.getInventory().add(copy);
@@ -100,11 +100,11 @@ public class ModCommand {
 				}
 			}
 		}
-
-		source.sendSuccess(Component.translatable("commands.assemblylinemachines.guide.success", players.size()), true);
+		
+		source.sendSuccess(new TranslatableComponent("commands.assemblylinemachines.guide.success", players.size()), true);
 		return players.size();
 	}
-
+	
 	private static int fluidInChunk(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
 		CommandSourceStack source = context.getSource();
 		Entity entity = source.getEntityOrException();
@@ -114,20 +114,20 @@ public class ModCommand {
 			if(lazy.isPresent()) {
 				IChunkFluidCapability capability = lazy.orElseThrow(null);
 				if(!capability.getChunkFluid().equals(Fluids.EMPTY)) {
-					source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.get.success",
+					source.sendSuccess(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.get.success", 
 							FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()), capability.getDisplayName().getString(), pos.toShortString()), false);
 					return 1;
 				}
 			}
-			source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.get.success_empty", pos.toShortString()), false);
+			source.sendSuccess(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.get.success_empty", pos.toShortString()), false);
 			return 1;
 		}catch(ExecutionException e) {
 			e.printStackTrace();
-			source.sendFailure(Component.translatable("commands.assemblylinemachines.chunkfluid.error"));
+			source.sendFailure(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.error"));
 			return 0;
 		}
 	}
-
+	
 	private static int setFluid(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
 		CommandSourceStack source = context.getSource();
 		Entity entity = source.getEntityOrException();
@@ -138,17 +138,17 @@ public class ModCommand {
 			if(lazy.isPresent()) {
 				IChunkFluidCapability capability = lazy.orElseThrow(null);
 				capability.setFluid(new FluidStack(FluidArgument.getFluid(context, "fluid"), amount));
-				source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.set.success",
+				source.sendSuccess(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.set.success",
 						pos.toShortString(), FormattingHelper.GENERAL_FORMAT.format(amount), capability.getDisplayName().getString()), true);
 				return 1;
 			}
 		}catch(ExecutionException e) {
 			e.printStackTrace();
 		}
-		source.sendFailure(Component.translatable("commands.assemblylinemachines.chunkfluid.error"));
+		source.sendFailure(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.error"));
 		return 0;
 	}
-
+	
 	private static int removeFluid(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
 		CommandSourceStack source = context.getSource();
 		Entity entity = source.getEntityOrException();
@@ -158,30 +158,30 @@ public class ModCommand {
 			if(lazy.isPresent()) {
 				IChunkFluidCapability capability = lazy.orElseThrow(null);
 				capability.setFluid(FluidStack.EMPTY);
-				source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.remove.success", pos.toShortString()), true);
+				source.sendSuccess(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.remove.success", pos.toShortString()), true);
 				return 1;
 			}
 		}catch(ExecutionException e) {
 			e.printStackTrace();
 		}
-		source.sendFailure(Component.translatable("commands.assemblylinemachines.chunkfluid.error"));
+		source.sendFailure(new TranslatableComponent("commands.assemblylinemachines.chunkfluid.error"));
 		return 0;
 	}
-
+	
 	public static class FluidArgument implements ArgumentType<Fluid>{
 
 		private static final Collection<String> EXAMPLES = List.of("minecraft:water");
-		private static final DynamicCommandExceptionType ERROR_UNKNOWN_FLUID = new DynamicCommandExceptionType((rl) -> Component.translatable("commands.assemblylinemachines.errors.missing_fluid", rl));
-		private static final SimpleCommandExceptionType ERROR_FLOWING = new SimpleCommandExceptionType(Component.translatable("commands.assemblylinemachines.errors.flowing_fluid"));
-
+		private static final DynamicCommandExceptionType ERROR_UNKNOWN_FLUID = new DynamicCommandExceptionType((rl) -> new TranslatableComponent("commands.assemblylinemachines.errors.missing_fluid", rl));
+		private static final SimpleCommandExceptionType ERROR_FLOWING = new SimpleCommandExceptionType(new TranslatableComponent("commands.assemblylinemachines.errors.flowing_fluid"));
+		
 		public static FluidArgument fluid() {
 			return new FluidArgument();
 		}
-
+		
 		public static Fluid getFluid(CommandContext<CommandSourceStack> context, String argument) {
 			return context.getArgument(argument, Fluid.class);
 		}
-
+		
 		@Override
 		public Fluid parse(StringReader reader) throws CommandSyntaxException {
 			ResourceLocation rl = ResourceLocation.read(reader);
@@ -190,7 +190,7 @@ public class ModCommand {
 			if(!f.defaultFluidState().isSource()) throw ERROR_FLOWING.create();
 			return f;
 		}
-
+		
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
 				SuggestionsBuilder builder) {
@@ -199,11 +199,11 @@ public class ModCommand {
 				return f.isSource(f.defaultFluidState());
 			}), builder);
 		}
-
+		
 		@Override
 		public Collection<String> getExamples() {
 			return EXAMPLES;
 		}
-
+		
 	}
 }

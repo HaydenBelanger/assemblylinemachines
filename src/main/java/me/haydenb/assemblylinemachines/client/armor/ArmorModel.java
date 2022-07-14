@@ -14,13 +14,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class ArmorModel extends HumanoidModel<LivingEntity>{
 	protected final EquipmentSlot slot;
-
+	
 	public ArmorModel(ModelPart root, EquipmentSlot slot) {
 		super(root);
 		this.slot = slot;
 	}
-
-
+	
+	
 	/**
 	 * Copied from vanilla, prevents Armor on Stands from always facing north.
 	 */
@@ -53,14 +53,14 @@ public class ArmorModel extends HumanoidModel<LivingEntity>{
 		this.rightLeg.setPos(-1.9F, 11.0F, 0.0F);
 		this.hat.copyFrom(this.head);
 	}
-
+	
 	@Override
 	public void renderToBuffer(PoseStack pPoseStack, VertexConsumer pBuffer, int pPackedLight, int pPackedOverlay,
 			float pRed, float pGreen, float pBlue, float pAlpha) {
 		setPartVisibility(slot);
 		super.renderToBuffer(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pRed, pGreen, pBlue, pAlpha);
 	}
-
+	
 	@SuppressWarnings("incomplete-switch")
 	private void setPartVisibility(EquipmentSlot slot) {
 		setAllVisible(false);

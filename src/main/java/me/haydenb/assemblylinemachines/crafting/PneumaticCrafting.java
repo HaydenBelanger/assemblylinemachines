@@ -25,25 +25,26 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.NotCondition;
 import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-
-	public static final RecipeType<PneumaticCrafting> PNEUMATIC_RECIPE = new RecipeType<>() {
+	
+	public static final RecipeType<PneumaticCrafting> PNEUMATIC_RECIPE = new RecipeType<PneumaticCrafting>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:pneumatic";
 		}
 	};
-
+	
 	public static final PneumaticSerializer SERIALIZER = new PneumaticSerializer();
-
+	
 	private final CountIngredient input;
 	private final PredicateLazy<ItemStack> output;
 	public final int time;
 	private final ResourceLocation id;
 	public final Item mold;
-
+	
 	public PneumaticCrafting(ResourceLocation id, CountIngredient input, PredicateLazy<ItemStack> outputa, int time, Item mold) {
 		this.id = id;
 		this.input = input;
@@ -51,7 +52,7 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 		this.time = time;
 		this.mold = mold;
 	}
-
+	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
 		if(input.test(inv.getItem(1))) {
@@ -59,7 +60,7 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 		}
 		return false;
 	}
-
+	
 	@Override
 	public ItemStack assemble(Container inv) {
 		if(inv instanceof IMachineDataBridge) {
@@ -78,12 +79,12 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 	public ItemStack getResultItem() {
 		return output.get();
 	}
-
+	
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-
+	
 	@Override
 	public List<?> getJEIComponents() {
 		return List.of(!mold.equals(Items.AIR) ? mold.getDefaultInstance() : ItemStack.EMPTY, input, output.get());
@@ -103,26 +104,26 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 	public RecipeType<?> getType() {
 		return PNEUMATIC_RECIPE;
 	}
-
-	public static class PneumaticSerializer implements RecipeSerializer<PneumaticCrafting>{
+	
+	public static class PneumaticSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<PneumaticCrafting>{
 
 		@Override
 		public PneumaticCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
 				CountIngredient input = CountIngredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
 				PredicateLazy<ItemStack> output = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output"));
-
+				
 				int time = GsonHelper.getAsInt(json, "time");
 				Mold mold = GsonHelper.isValidNode(json, "mold") ? Mold.valueOf(GsonHelper.getAsString(json, "mold").toUpperCase()) : Mold.NONE;
 				Item moldItem = GsonHelper.isValidNode(json, "moldItem") ? ForgeRegistries.ITEMS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "moldItem"))) : mold.item.orElse(Items.AIR);
-
+				
 				return new PneumaticCrafting(recipeId, input, output, time, moldItem);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-
-
+			
+			
 		}
 
 		@Override
@@ -131,7 +132,7 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 			ItemStack output = buffer.readItem();
 			int time = buffer.readInt();
 			Item mold = ForgeRegistries.ITEMS.getValue(buffer.readResourceLocation());
-
+			
 			return new PneumaticCrafting(recipeId, input, PredicateLazy.of(() -> output), time, mold);
 		}
 
@@ -140,30 +141,30 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 			recipe.input.toNetwork(buffer);
 			buffer.writeItem(recipe.output.get());
 			buffer.writeInt(recipe.time);
-			buffer.writeResourceLocation(ForgeRegistries.ITEMS.getKey(recipe.mold));
+			buffer.writeResourceLocation(recipe.mold.getRegistryName());
 		}
-
+		
 	}
-
+	
 	public static enum Mold{
 		PLATE(Registry.getItem("plate_mold")), ROD(Registry.getItem("rod_mold")), GEAR(Registry.getItem("gear_mold")), NONE(null);
-
+		
 		final Optional<Item> item;
-
+		
 		Mold(Item item){
 			this.item = Optional.ofNullable(item);
 		}
 	}
 
 	public static class PneumaticResult implements FinishedRecipe{
-
+	
 		private final ResourceLocation rl;
 		private final CountIngredient input;
 		private final Pair<TagKey<Item>, Integer> output;
 		private final int time;
 		private final Mold mold;
 		private ConfigCondition condition = null;
-
+		
 		public PneumaticResult(ResourceLocation rl, CountIngredient input, TagKey<Item> output, int outputCount, Mold mold, int time) {
 			this.rl = rl;
 			this.input = input;
@@ -171,53 +172,53 @@ public class PneumaticCrafting implements Recipe<Container>, IRecipeCategoryBuil
 			this.time = time;
 			this.mold = mold;
 		}
-
+		
 		@Override
 		public void serializeRecipeData(JsonObject json) {
-
+			
 			json.add("input", input.toJson());
-
+			
 			JsonObject outputJson = new JsonObject();
 			outputJson.addProperty("tag", output.getFirst().location().toString());
 			if(output.getSecond() > 1) outputJson.addProperty("count", output.getSecond());
-
+			
 			json.add("output", outputJson);
 			json.addProperty("time", time);
 			if(mold != Mold.NONE) json.addProperty("mold", mold.toString().toLowerCase());
-
+			
 			JsonArray conditions = new JsonArray();
 			if(condition != null) conditions.add(CraftingHelper.serialize(condition));
 			if(json.getAsJsonObject("input").has("tag")) conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(json.getAsJsonObject("input").get("tag").getAsString()))));
 			conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(output.getFirst().location()))));
 			json.add("conditions", conditions);
 		}
-
+		
 		public PneumaticResult addIMCIfTrue(boolean check, String varName) {
 			if(check) {
 				this.condition = new ConfigCondition(varName, true);
 			}
 			return this;
 		}
-
+	
 		@Override
 		public ResourceLocation getId() {
 			return rl;
 		}
-
+	
 		@Override
 		public RecipeSerializer<?> getType() {
 			return SERIALIZER;
 		}
-
+	
 		@Override
 		public JsonObject serializeAdvancement() {
 			return null;
 		}
-
+	
 		@Override
 		public ResourceLocation getAdvancementId() {
 			return null;
 		}
-
+		
 	}
 }

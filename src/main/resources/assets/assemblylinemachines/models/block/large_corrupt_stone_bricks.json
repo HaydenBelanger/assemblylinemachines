@@ -1,6 +1,0 @@
-{
-	"parent": "block/cube_all",
-	"textures": {
-		"all": "assemblylinemachines:block/corrupt/large_corrupt_stone_bricks"
-	}
-}

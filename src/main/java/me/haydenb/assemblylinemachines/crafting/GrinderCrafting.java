@@ -29,19 +29,20 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.NotCondition;
 import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-
-	public static final RecipeType<GrinderCrafting> GRINDER_RECIPE = new RecipeType<>() {
+	
+	public static final RecipeType<GrinderCrafting> GRINDER_RECIPE = new RecipeType<GrinderCrafting>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:grinder";
 		}
 	};
-
+	
 	public static final GrinderSerializer SERIALIZER = new GrinderSerializer();
-
+	
 	private final Lazy<Ingredient> input;
 	private final PredicateLazy<ItemStack> output;
 
@@ -50,7 +51,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	private final ResourceLocation id;
 	private final boolean machineReqd;
 	public final float chanceToDouble;
-
+	
 	public GrinderCrafting(ResourceLocation id, Lazy<Ingredient> input, PredicateLazy<ItemStack> output, int grinds, Blade tier, boolean machineReqd, float chanceToDouble) {
 		this.input = input;
 		this.output = output;
@@ -60,12 +61,12 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		this.machineReqd = machineReqd;
 		this.chanceToDouble = chanceToDouble;
 	}
-
+	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-
+		
 		if(inv instanceof Inventory) {
-			if(machineReqd) {
+			if(machineReqd == true) {
 				return false;
 			}
 			Inventory pinv = (Inventory) inv;
@@ -83,12 +84,12 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		}
 		return false;
 	}
-
+	
 	@Override
 	public ItemStack assemble(Container inv) {
-
+		
 		ItemStack stack = output.get().copy();
-
+		
 		if(inv instanceof IMachineDataBridge data) {
 			inv.getItem(1).shrink(1);
 			if(data.blockState().is(Registry.getBlock("kinetic_grinder"))){
@@ -97,9 +98,9 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				if(b == null || b.tier < this.tier.tier) return ItemStack.EMPTY;
 				inv.getItem(0).setDamageValue(inv.getItem(0).getDamageValue() + i);
 				if(inv.getItem(0).getDamageValue() >= inv.getItem(0).getMaxDamage()) inv.getItem(0).shrink(1);
-				data.setCycles(grinds * ALMConfig.getServerConfig().kineticMachineCycleModifier().get().floatValue());
+				data.setCycles((float) grinds * ALMConfig.getServerConfig().kineticMachineCycleModifier().get().floatValue());
 			}else {
-				data.setCycles(grinds * 2.3f);
+				data.setCycles((float) grinds * 2.3f);
 			}
 			float chance = data.blockState().is(Registry.getBlock("mkii_grinder")) ? Utils.RAND.nextFloat(0.5f) : Utils.RAND.nextFloat();
 			if(chanceToDouble != 0f && chance <= chanceToDouble) stack.setCount(stack.getCount() * 2);
@@ -116,20 +117,20 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	public ItemStack getResultItem() {
 		return output.get();
 	}
-
+	
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-
+	
 	@Override
 	public List<?> getJEIComponents() {
-		Ingredient ing = this.machineReqd ? Ingredient.of(Registry.getItem("kinetic_grinder"), Registry.getItem("electric_grinder"))
+		Ingredient ing = this.machineReqd ? Ingredient.of(Registry.getItem("kinetic_grinder"), Registry.getItem("electric_grinder")) 
 				: Ingredient.of(Registry.getItem("hand_grinder"), Registry.getItem("kinetic_grinder"), Registry.getItem("electric_grinder"));
 		List<ItemStack> stacks = new ArrayList<>();
 		stacks.add(output.get());
 		if(chanceToDouble != 0f) stacks.add(new ItemStack(output.get().getItem(), output.get().getCount() * 2));
-
+		
 		return List.of(input.get(), ing, Blade.getAllBladesAtMinTier(this.tier.tier), stacks);
 	}
 
@@ -147,18 +148,18 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 	public RecipeType<?> getType() {
 		return GRINDER_RECIPE;
 	}
-
-	public static class GrinderSerializer implements RecipeSerializer<GrinderCrafting>{
+	
+	public static class GrinderSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<GrinderCrafting>{
 
 		@Override
 		public GrinderCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
 			try {
 				Lazy<Ingredient> input = Lazy.of(() -> Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input")));
 				PredicateLazy<ItemStack> supplier = Utils.getItemStackWithTag(GsonHelper.getAsJsonObject(json, "output"));
-
+				
 				int grinds = GsonHelper.getAsInt(json, "grinds");
-				Blade tier = Enum.valueOf(Blade.class, GsonHelper.getAsString(json, "bladetype"));
-
+				Blade tier = Blade.valueOf(Blade.class, GsonHelper.getAsString(json, "bladetype"));
+				
 				if(tier == Blade.NONE) {
 					throw new IllegalArgumentException("Blade cannot be 'NONE'.");
 				}
@@ -168,16 +169,16 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 				}else {
 					machineReqd = false;
 				}
-
+				
 				float chanceToDouble = GsonHelper.isValidNode(json, "chanceToDouble") ? GsonHelper.getAsFloat(json, "chanceToDouble") : 0f;
-
+				
 				return new GrinderCrafting(recipeId, input, supplier, grinds, tier, machineReqd, chanceToDouble);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-
-
+			
+			
 		}
 
 		@Override
@@ -188,7 +189,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			Blade tier = buffer.readEnum(Blade.class);
 			boolean machineReqd = buffer.readBoolean();
 			float chanceToDouble = buffer.readFloat();
-
+			
 			return new GrinderCrafting(recipeId, Lazy.of(() -> input), PredicateLazy.of(() -> stack), grinds, tier, machineReqd, chanceToDouble);
 		}
 
@@ -200,11 +201,11 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			buffer.writeEnum(recipe.tier);
 			buffer.writeBoolean(recipe.machineReqd);
 			buffer.writeFloat(recipe.chanceToDouble);
-
+			
 		}
-
+		
 	}
-
+	
 	public static enum SharpenerResult{
 		PASS, FAIL_NO_RECIPE, FAIL_INCORRECT_BLADE;
 	}
@@ -219,7 +220,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 		private final boolean machineRequired;
 		private final Blade bladeType;
 		private ConfigCondition condition = null;
-
+		
 		public GrinderResult(ResourceLocation rl, Ingredient input, TagKey<Item> outputTag, int outputCount, int grinds, float chanceToDouble, boolean machineRequired, Blade bladeType) {
 			this.rl = rl;
 			this.input = input;
@@ -230,7 +231,7 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			this.machineRequired = machineRequired;
 			this.bladeType = bladeType;
 		}
-
+		
 		@Override
 		public void serializeRecipeData(JsonObject json) {
 			json.add("input", input.toJson());
@@ -238,47 +239,47 @@ public class GrinderCrafting implements Recipe<Container>, IRecipeCategoryBuilde
 			json.addProperty("bladetype", bladeType.toString());
 			json.addProperty("grinds", grinds);
 			if(machineRequired) json.addProperty("machine_required", true);
-
+			
 			JsonObject outputJson = new JsonObject();
 			outputJson.addProperty("tag", outputTag.location().toString());
 			if(outputCount != 1) outputJson.addProperty("count", outputCount);
 			json.add("output", outputJson);
-
+			
 			JsonArray conditions = new JsonArray();
 			if(condition != null) conditions.add(CraftingHelper.serialize(condition));
 			if(json.getAsJsonObject("input").has("tag")) conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(json.getAsJsonObject("input").get("tag").getAsString()))));
 			conditions.add(CraftingHelper.serialize(new NotCondition(new TagEmptyCondition(outputTag.location()))));
 			json.add("conditions", conditions);
 		}
-
+		
 		public GrinderResult addIMCIfTrue(boolean check) {
 			if(check) {
 				this.condition = new ConfigCondition("grinderIMC", true);
 			}
 			return this;
 		}
-
+		
 		@Override
 		public ResourceLocation getId() {
 			return rl;
 		}
-
+		
 		@Override
 		public RecipeSerializer<?> getType() {
 			return SERIALIZER;
 		}
-
+		
 		@Override
 		public JsonObject serializeAdvancement() {
 			return null;
 		}
-
+		
 		@Override
 		public ResourceLocation getAdvancementId() {
 			return null;
 		}
-
+		
 	}
 
-
+	
 }

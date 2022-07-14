@@ -13,11 +13,11 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemGalacticFlesh extends Item{
-
+	
 	public ItemGalacticFlesh() {
 		super(new Item.Properties().tab(Registry.CREATIVE_TAB).food(new FoodProperties.Builder().effect(() -> getRandomMobEffect(), 1f).nutrition(6).fast().saturationMod(0.5f).meat().alwaysEat().build()));
 	}
-
+	
 	private static MobEffectInstance getRandomMobEffect() {
 		Set<Entry<ResourceKey<MobEffect>, MobEffect>> set = ForgeRegistries.MOB_EFFECTS.getEntries();
 		Optional<Entry<ResourceKey<MobEffect>, MobEffect>> meO = ForgeRegistries.MOB_EFFECTS.getEntries().stream().skip((int) (set.size() * Utils.RAND.nextDouble())).findFirst();

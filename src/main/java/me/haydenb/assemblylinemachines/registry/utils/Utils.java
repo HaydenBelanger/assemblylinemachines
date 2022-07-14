@@ -35,11 +35,11 @@ import net.minecraftforge.registries.tags.ITag;
 public class Utils {
 
 	public static final Gson GSON = new Gson();
-
+	
 	public static final Direction[] CARDINAL_DIRS = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
-
+	
 	public static final Random RAND = new Random();
-
+	
 	public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
 		VoxelShape[] buffer = new VoxelShape[] { shape, Shapes.empty() };
 
@@ -63,7 +63,7 @@ public class Utils {
 
 		return clazz.cast(posEntity);
 	}
-
+	
 	public static RandomizableContainerBlockEntity getBlockEntity(Inventory pInv, FriendlyByteBuf data) {
 		return getBlockEntity(pInv, data, RandomizableContainerBlockEntity.class);
 	}
@@ -87,7 +87,7 @@ public class Utils {
 	}
 
 	public static <T extends Recipe<Container>> BiFunction<BlockEntity, Container, Optional<Recipe<Container>>> recipeFunction(RecipeType<T> recipeType){
-
+		
 		return new BiFunction<>() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -96,7 +96,7 @@ public class Utils {
 			}
 		};
 	}
-
+	
 	public static PredicateLazy<ItemStack> getItemStackWithTag(JsonObject json){
 		return PredicateLazy.of(() -> {
 			if(GsonHelper.isValidNode(json, "item")) {
@@ -108,17 +108,17 @@ public class Utils {
 				List<Item> values = new ArrayList<>(tag.stream().toList());
 				String preferredModid = ALMConfig.getCommonConfig().preferredModid().get();
 				if(!preferredModid.isBlank() && ModList.get().isLoaded(preferredModid)) {
-					Optional<Item> optionalItem = values.stream().filter((item) -> ForgeRegistries.ITEMS.getKey(item).getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> ForgeRegistries.ITEMS.getKey(a).toString().compareToIgnoreCase(ForgeRegistries.ITEMS.getKey(b).toString())).findFirst();
+					Optional<Item> optionalItem = values.stream().filter((item) -> item.getRegistryName().getNamespace().equalsIgnoreCase(preferredModid)).sorted((a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString())).findFirst();
 					if(optionalItem.isPresent()) values = new ArrayList<>(List.of(optionalItem.get()));
 				}
-
-				Collections.sort(values, (a, b) -> ForgeRegistries.ITEMS.getKey(a).toString().compareToIgnoreCase(ForgeRegistries.ITEMS.getKey(b).toString()));
+				
+				Collections.sort(values, (a, b) -> a.getRegistryName().toString().compareToIgnoreCase(b.getRegistryName().toString()));
 				return new ItemStack(values.get(0), count);
 			}
 			throw new IllegalArgumentException("Unknown field in ItemStack Tag.");
 		}, (is) -> !is.isEmpty());
 	}
-
+	
 	public static boolean containsArgument(CommandContext<CommandSourceStack> context, String argument) {
 		try {
 			context.getArgument(argument, Object.class);
@@ -126,6 +126,6 @@ public class Utils {
 		}catch(IllegalArgumentException e) {
 			return false;
 		}
-
+		
 	}
 }

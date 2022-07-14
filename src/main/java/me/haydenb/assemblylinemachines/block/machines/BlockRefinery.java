@@ -18,9 +18,9 @@ import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.TERefinery;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
-import me.haydenb.assemblylinemachines.registry.PacketHandler;
+import me.haydenb.assemblylinemachines.plugins.PluginMekanism;
+import me.haydenb.assemblylinemachines.registry.*;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
@@ -33,8 +33,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -53,7 +53,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.*;
@@ -68,8 +67,8 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 				BlockRefinery.TERefinery.class);
 		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.MACHINE_ACTIVE, false).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
-
-
+	
+	
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
@@ -100,7 +99,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 			IFluidHandler handler = ((TERefinery) world.getBlockEntity(pos)).fluids;
 
-			if (!handler.getFluidInTank(0).getFluid().getFluidType().isLighterThanAir()) {
+			if (!handler.getFluidInTank(0).getFluid().getAttributes().isGaseous()) {
 				FluidActionResult far = FluidUtil.tryEmptyContainer(stack, handler, 1000, player, true);
 				if (far.isSuccess()) {
 					if(!player.isCreative()) {
@@ -110,7 +109,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 							stack.shrink(1);
 						}
 						ItemHandlerHelper.giveItemToPlayer(player, far.getResult());
-
+						
 					}
 					return InteractionResult.CONSUME;
 
@@ -125,18 +124,18 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 						}
 						ItemHandlerHelper.giveItemToPlayer(player, farx.getResult());
 					}
-
+					
 					return InteractionResult.CONSUME;
 				}
 			}
-
+			
 
 		}
 		return super.blockRightClickServer(state, world, pos, player);
 	}
 
 	@Override
-	public void animateTick(BlockState stateIn, Level world, BlockPos pos, RandomSource rand) {
+	public void animateTick(BlockState stateIn, Level world, BlockPos pos, Random rand) {
 
 		if (stateIn.getValue(StateProperties.MACHINE_ACTIVE)) {
 			if (world.getBlockState(pos.above()).getBlock() instanceof BlockRefineryAddon) {
@@ -168,17 +167,17 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 		public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 			return addon.shapes.get(state.getValue(HorizontalDirectionalBlock.FACING));
 		}
-
+		
 		@Override
 		public BlockState getStateForPlacement(BlockPlaceContext context) {
-
+			
 			BlockState dbs = context.getLevel().getBlockState(context.getClickedPos().below());
 			if(dbs.getBlock() == Registry.getBlock("refinery")) {
 				return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, dbs.getValue(HorizontalDirectionalBlock.FACING));
 			}
 			return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
 		}
-
+		
 		public static enum RefineryAddon{
 			SEPARATION(Stream.of(
 					Block.box(2, 0, 11, 6, 2, 15),Block.box(3, 2, 11, 6, 4, 15),Block.box(10, 2, 11, 13, 4, 15),Block.box(2, 2, 12, 3, 4, 15),
@@ -186,14 +185,14 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 					Block.box(13, 2, 3, 14, 14, 12),Block.box(2, 2, 3, 3, 14, 12),Block.box(7, 6, 5, 9, 10, 9),Block.box(12, 0, 8, 13, 2, 9),
 					Block.box(3, 0, 8, 4, 2, 9),Block.box(11, 1, 8, 12, 2, 9),Block.box(4, 1, 8, 5, 2, 9),Block.box(11, 1, 7, 12, 3, 8),
 					Block.box(4, 1, 7, 5, 3, 8),Block.box(3, 13, 7, 4, 15, 8),Block.box(12, 13, 7, 13, 15, 8),Block.box(4, 14, 7, 12, 15, 8)
-					).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), (world, pos, rand) ->
+					).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), (world, pos, rand) -> 
 			world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(rand), pos.getY() + getPartNext(rand), pos.getZ() + getPartNext(rand), 0, 0, 0))
 			, ADDITION(Stream.of(
 					Block.box(4, 3, 3, 12, 13, 11),Block.box(5, 2, 2, 6, 14, 12),Block.box(10, 2, 2, 11, 14, 12),Block.box(11, 2, 11, 14, 4, 15),
 					Block.box(2, 2, 11, 5, 4, 15),Block.box(10, 2, 12, 11, 4, 15),Block.box(5, 2, 12, 6, 4, 15),Block.box(10, 0, 11, 14, 2, 15),
 					Block.box(2, 0, 11, 6, 2, 15),Block.box(12, 0, 8, 13, 2, 9),Block.box(3, 0, 8, 4, 2, 9),Block.box(6, 2, 8, 7, 3, 9),
 					Block.box(9, 2, 8, 10, 3, 9),Block.box(4, 1, 8, 12, 2, 9),Block.box(2, 6, 5, 4, 10, 9),Block.box(12, 6, 5, 14, 10, 9),Block.box(14, 5, 4, 16, 11, 10),Block.box(0, 5, 4, 2, 11, 10)
-					).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), (world, pos, rand) ->
+					).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), (world, pos, rand) -> 
 			world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(rand), pos.getY() + getPartNext(rand), pos.getZ() + getPartNext(rand), 0, 0, 0))
 			, HALOGEN(Stream.of(
 					Block.box(10, 3, 12, 14, 4, 15),Block.box(2, 3, 12, 6, 4, 15),Block.box(10, 0, 11, 14, 3, 15),Block.box(2, 0, 11, 6, 3, 15),
@@ -221,40 +220,40 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 					Block.box(2, 13, 7, 5, 14, 10), Block.box(12, 13, 8, 13, 16, 9), Block.box(3, 13, 8, 4, 16, 9),
 					Block.box(0, 0, 0, 16, 5, 16), Block.box(0, 5, 11, 16, 16, 16)).reduce((v1, v2) -> {
 						return Shapes.join(v1, v2, BooleanOp.OR);
-					}).get(), (world, pos, rand) ->
+					}).get(), (world, pos, rand) -> 
 			world.addParticle(ParticleTypes.LARGE_SMOKE, true, pos.getX() + getPartNext(rand), pos.getY() + getPartNext(rand), pos.getZ() + getPartNext(rand), 0, 0, 0));
-
+			
 			private final HashMap<Direction, VoxelShape> shapes = new HashMap<>();
-			private final TriConsumer<Level, BlockPos, RandomSource> particleGenerator;
-
-			RefineryAddon(VoxelShape shapeN, TriConsumer<Level, BlockPos, RandomSource> particleGenerator){
+			private final TriConsumer<Level, BlockPos, Random> particleGenerator;
+			
+			RefineryAddon(VoxelShape shapeN, TriConsumer<Level, BlockPos, Random> particleGenerator){
 				shapes.put(Direction.NORTH, shapeN);
 				shapes.put(Direction.SOUTH, Utils.rotateShape(Direction.NORTH, Direction.SOUTH, shapeN));
 				shapes.put(Direction.WEST, Utils.rotateShape(Direction.NORTH, Direction.WEST, shapeN));
 				shapes.put(Direction.EAST, Utils.rotateShape(Direction.NORTH, Direction.EAST, shapeN));
 				this.particleGenerator = particleGenerator;
 			}
-
+			
 			public BlockRefineryAddon construct() {
 				return new BlockRefineryAddon(this);
 			}
 		}
-
-		private static double getPartNext(RandomSource rand) {
+		
+		private static double getPartNext(Random rand) {
 			return getPartNext(rand, 0.2d, 0.8d, 0.5d);
 		}
-
-		private static double getPartThinNext(RandomSource rand) {
+		
+		private static double getPartThinNext(Random rand) {
 			return getPartNext(rand, 0.3d, 0.7d, 0.5d);
 		}
-
-		private static double getPartNext(RandomSource rand, double min, double max, double def) {
+		
+		private static double getPartNext(Random rand, double min, double max, double def) {
 			double d = rand.nextDouble();
 			if(d < min || d > max) d = def;
 			return d;
 		}
 	}
-
+	
 	public static class TERefinery extends ManagedSidedMachine<ContainerRefinery> implements ALMTicker<TERefinery> {
 
 		private int timer = 0;
@@ -388,13 +387,13 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 					case 1 -> 8;
 					default -> 16;
 					};
-
+					
 					boolean hasGas = false;
 					if (getUpgradeAmount(Upgrades.MACHINE_GAS) != 0) {
 						hasGas = true;
-						cost = Math.round(cost * 2.5f);
-					}
-
+						cost = Math.round((float) cost * 2.5f);
+					}		
+					
 					if (outputRecipe == null) {
 
 						RefiningCrafting recipe = this.getLevel().getRecipeManager().getRecipeFor(RefiningCrafting.REFINING_RECIPE, this, this.getLevel()).orElse(null);
@@ -402,7 +401,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 							recipe.performOperations(this);
 							cycles = recipe.time;
 							outputRecipe = recipe;
-							if (!this.getBlockState().getValue(StateProperties.MACHINE_ACTIVE)) {
+							if (this.getBlockState().getValue(StateProperties.MACHINE_ACTIVE) == false) {
 								this.getLevel().setBlockAndUpdate(this.getBlockPos(), getBlockState().setValue(StateProperties.MACHINE_ACTIVE, true));
 							}
 							sendUpdates = true;
@@ -424,7 +423,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 							} else {
 								List<FluidStack> inputs = hasGas ? List.of() : outputRecipe.getJEIFluidInputs();
-								if(inputs.stream().anyMatch((fs) -> fs.getFluid().getFluidType().isLighterThanAir())) {
+								if(inputs.stream().anyMatch((fs) -> fs.getFluid().getAttributes().isGaseous())) {
 									if(!showGasMsg) {
 										showGasMsg = true;
 										sendUpdates = true;
@@ -521,7 +520,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 		}
 
 		public TERefinery(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 5, Component.translatable(Registry.getBlock("refinery").getDescriptionId()), Registry.getContainerId("refinery"),
+			super(tileEntityTypeIn, 5, new TranslatableComponent(Registry.getBlock("refinery").getDescriptionId()), Registry.getContainerId("refinery"),
 					ContainerRefinery.class, new EnergyProperties(true, false, 160000), pos, state);
 		}
 
@@ -534,10 +533,10 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
 				return fhandler.cast();
 			}
-
-			//LazyOptional<?> gas = PluginMekanism.INTERFACE.get().getFluidGasWrapper(cap, fluids);
-			//if(gas.isPresent()) return gas.cast();
-
+			
+			LazyOptional<?> gas = PluginMekanism.INTERFACE.get().getFluidGasWrapper(cap, fluids);
+			if(gas.isPresent()) return gas.cast();
+			
 			return super.getCapability(cap, side);
 		}
 
@@ -613,7 +612,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 			renderFluid(tsfm.tankouta, x + 99, y + 23);
 			renderFluid(tsfm.tankoutb, x + 112, y + 23);
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-			float capacity = tsfm.fluids.getTankCapacity(0);
+			float capacity = (float) tsfm.fluids.getTankCapacity(0);
 			renderFluidOverlayBar(tsfm.tankin, capacity, x + 65, y + 23);
 			renderFluidOverlayBar(tsfm.tankouta, capacity, x + 99, y + 23);
 			renderFluidOverlayBar(tsfm.tankoutb, capacity, x + 112, y + 23);
@@ -655,7 +654,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fs.getFluid()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fs.getFluid().getAttributes().getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
@@ -670,7 +669,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 		}
 
 		private void renderFluidOverlayBar(FluidStack fs, float capacity, int xblit, int yblit) {
-			int fprog = Math.round((fs.getAmount() / capacity) * 37f);
+			int fprog = Math.round(((float) fs.getAmount() / capacity) * 37f);
 			super.blit(xblit, yblit, 176, 52, 8, 37 - fprog);
 		}
 
@@ -685,11 +684,11 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 
 						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount()) + " mB");
 
-						if (cm) {
+						if (cm == true) {
 							str.add("Click to send to output slot.");
 						}
 					} else {
-						str.add(FormattingHelper.FEPT_FORMAT.format(fs.getAmount() / 1000D) + " B");
+						str.add(FormattingHelper.FEPT_FORMAT.format((double) fs.getAmount() / 1000D) + " B");
 					}
 
 					this.renderComponentTooltip(str, mouseX - bx, mouseY - by);

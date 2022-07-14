@@ -22,19 +22,19 @@ public class ArmorData {
 	public static void registerLayers(RegisterLayerDefinitions event) {
 		event.registerLayerDefinition(Models.MYSTIUM_OUTER_LAYER, () -> MystiumArmorModel.outerLayer());
 		event.registerLayerDefinition(Models.MYSTIUM_INNER_LAYER, () -> MystiumArmorModel.innerLayer());
-
+		
 		event.registerLayerDefinition(Models.ENHANCED_MYSTIUM_OUTER_LAYER, () -> MystiumArmorModel.outerLayerEnhanced());
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void addLayers(AddLayers event) {
 		EntityModelSet ems = event.getEntityModels();
-
+		
 		Models.BAKED_MODELS.put("mystium", bake(ems, Models.MYSTIUM_OUTER_LAYER, Models.MYSTIUM_INNER_LAYER));
 		Models.BAKED_MODELS.put("enhanced_mystium", bake(ems, Models.ENHANCED_MYSTIUM_OUTER_LAYER, Models.MYSTIUM_INNER_LAYER));
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	private static Map<EquipmentSlot, ArmorModel> bake(EntityModelSet ems, ModelLayerLocation outer, ModelLayerLocation inner){
 		Map<EquipmentSlot, ArmorModel> map = new EnumMap<>(EquipmentSlot.class);
@@ -44,25 +44,25 @@ public class ArmorData {
 		}
 		return map;
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	private static ModelLayerLocation get(String setName, String part) {
 		return new ModelLayerLocation(new ResourceLocation(AssemblyLineMachines.MODID, setName + "_" + part), part + "_armor");
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static Optional<ArmorModel> get(String cat, EquipmentSlot slot) {
 		return Optional.ofNullable(Models.BAKED_MODELS.getOrDefault(cat, Collections.emptyMap()).get(slot));
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static class Models{
-
+		
 		private static final HashMap<String, Map<EquipmentSlot, ArmorModel>> BAKED_MODELS = new HashMap<>();
-
+		
 		private static final ModelLayerLocation MYSTIUM_OUTER_LAYER = get("mystium", "outer");
 		private static final ModelLayerLocation MYSTIUM_INNER_LAYER = get("mystium", "inner");
-
+		
 		private static final ModelLayerLocation ENHANCED_MYSTIUM_OUTER_LAYER = get("enhanced_mystium", "outer");
 	}
 }

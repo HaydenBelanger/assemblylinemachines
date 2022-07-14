@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "assemblylinemachines:corrupt_stone_conduit"
-  },
-  "result": "assemblylinemachines:corrupt_stone_conduit_node",
-  "count": 1
-}

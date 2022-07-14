@@ -1,9 +1,10 @@
 package me.haydenb.assemblylinemachines.block.misc;
 
+import java.util.Random;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,20 +17,20 @@ import net.minecraftforge.common.PlantType;
 public class BlockMystiumFarmland extends FarmBlock {
 
 	private static final IntegerProperty AGE = IntegerProperty.create("exhaustion", 0, 32);
-
+	
 	private final boolean canGetExhausted;
-
+	
 	public BlockMystiumFarmland(boolean canGetExhausted) {
 		super(Block.Properties.of(Material.DIRT).strength(0.6F).sound(SoundType.GRAVEL).randomTicks());
 		this.registerDefaultState(this.stateDefinition.any().setValue(MOISTURE, 7).setValue(AGE, 0));
 		this.canGetExhausted = canGetExhausted;
 	}
-
+	
 	@Override
-	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+		
 		int age = state.getValue(AGE);
-
+	
 		if(age != 32) {
 			int rnx = 1;
 			if(age > 5 && age <= 10) {
@@ -55,25 +56,25 @@ public class BlockMystiumFarmland extends FarmBlock {
 				}
 			}
 		}
-
-
+		
+		
 	}
-
+	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(AGE);
 		super.createBlockStateDefinition(builder);
 	}
-
+	
 	@Override
 	public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
 		if(plantable.getPlantType(world, pos) == PlantType.CROP) {
 			return true;
 		}
-
+		
 		return false;
 	}
-
+	
 	@Override
 	public boolean isFertile(BlockState state, BlockGetter world, BlockPos pos) {
 		return true;

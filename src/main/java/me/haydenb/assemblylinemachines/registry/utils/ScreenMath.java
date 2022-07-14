@@ -18,66 +18,66 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class ScreenMath {
-
-
+	
+	
 	//Claimed from ItemRenderer#renderItemOverlayIntoGUI, modified.
 	@OnlyIn(Dist.CLIENT)
 	public static void renderItemSlotBoundScaledText(Font fr, int xpos, int ypos, float scale, String text) {
-
+		
 		xpos = Math.round(xpos * (1.0f / scale));
 		ypos = Math.round(ypos * (1.0f / scale));
 		PoseStack mx = new PoseStack();
-
+		
 		mx.translate(0.0D, 0.0D, 200D);
 		mx.scale(scale, scale, scale);
 		BufferSource irendertypebuffer$impl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-		fr.drawInBatch(text, xpos + 19 - 2 - fr.width(text), ypos + 6 + 3, 16777215, true, mx.last().pose(),
+		fr.drawInBatch(text, (float) (xpos + 19 - 2 - fr.width(text)), (float) (ypos + 6 + 3), 16777215, true, mx.last().pose(),
 				irendertypebuffer$impl, false, 0, 15728880);
-
+		
 		irendertypebuffer$impl.endBatch();
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static void renderScaledText(Font fr, int xpos, int ypos, float scale, String text, boolean dropShadow, int color) {
-
+		
 		xpos = Math.round(xpos * (1.0f / scale));
 		ypos = Math.round(ypos * (1.0f / scale));
 		PoseStack mx = new PoseStack();
-
+		
 		mx.translate(0.0D, 0.0D, 200D);
 		mx.scale(scale, scale, scale);
 		BufferSource irendertypebuffer$impl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-		fr.drawInBatch(text, xpos, ypos, color, dropShadow, mx.last().pose(),
+		fr.drawInBatch(text, (float) xpos, ypos, color, dropShadow, mx.last().pose(),
 				irendertypebuffer$impl, false, 0, 15728880);
 		irendertypebuffer$impl.endBatch();
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	public static void renderScaledText(Font fr, int xpos, int ypos, float scale, String text) {
-
+		
 		renderScaledText(fr, xpos, ypos, scale, text, false, 0xffffff);
 	}
-
+	
 	public static boolean isMouseBetween(int globalX, int globalY, int mouseX, int mouseY, int minX, int minY, int maxX, int maxY) {
 		return mouseX >= globalX + minX && mouseX <= globalX + maxX && mouseY >= globalY + minY && mouseY <= globalY + maxY;
 	}
-
+	
 	public static int multiplyARGBColor(int argb, float multiplier) {
 		int[] argbSplit = new int[] {ARGB32.alpha(argb), ARGB32.red(argb), ARGB32.green(argb), ARGB32.blue(argb)};
-
+		
 		for(int i = 0; i < argbSplit.length; i++) {
-			argbSplit[i] = Math.round(argbSplit[i] * multiplier);
+			argbSplit[i] = Math.round((float) argbSplit[i] * multiplier);
 		}
-
+		
 		return ARGB32.color(argbSplit[0], argbSplit[1], argbSplit[2], argbSplit[3]);
 	}
-
+	
 	public static boolean canFit(ItemStack slotStack, ItemStack newStack) {
 		return slotStack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(slotStack, newStack) && slotStack.getCount() + newStack.getCount() <= slotStack.getMaxStackSize());
 	}
-
+	
 	public static boolean doFit(ItemStack slotStack, ItemStack newStack, Consumer<ItemStack> replace, Consumer<Integer> grow) {
-
+		
 		if(canFit(slotStack, newStack)) {
 			if(slotStack.isEmpty()) {
 				replace.accept(newStack);
@@ -92,7 +92,7 @@ public class ScreenMath {
 	@OnlyIn(Dist.CLIENT)
 	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Font pFont, Component pText, int pX, int pY, int pColor) {
 		FormattedCharSequence formattedcharsequence = pText.getVisualOrderText();
-		pFont.draw(pPoseStack, formattedcharsequence, pX - pFont.width(formattedcharsequence) / 2, pY, pColor);
+		pFont.draw(pPoseStack, formattedcharsequence, (float)(pX - pFont.width(formattedcharsequence) / 2), (float)pY, pColor);
 	}
 
 	@OnlyIn(Dist.CLIENT)

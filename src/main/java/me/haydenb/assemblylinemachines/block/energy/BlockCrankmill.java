@@ -17,7 +17,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +54,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 	private static final VoxelShape SHAPE_S = Utils.rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_N);
 	private static final VoxelShape SHAPE_E = Utils.rotateShape(Direction.NORTH, Direction.EAST, SHAPE_N);
 	private static final VoxelShape SHAPE_W = Utils.rotateShape(Direction.NORTH, Direction.WEST, SHAPE_N);
-
+	
 
 	public BlockCrankmill() {
 		super(Block.Properties.of(Material.METAL).strength(3f, 15f).sound(SoundType.METAL), "crankmill", null, true, Direction.NORTH,
@@ -62,8 +62,8 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 		this.registerDefaultState(
 				this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
-
-
+	
+	
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -85,7 +85,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 			return SHAPE_N;
 		}
 	}
-
+	
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(HorizontalDirectionalBlock.FACING);
@@ -94,31 +94,31 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 	public static class TECrankmill extends EnergyMachine<ContainerCrankmill>
 			implements ICrankableMachine, ALMTicker<TECrankmill>, TOPProvider {
 
-
+		
 		public int rfDif = 0;
 		public int prevAmount = 0;
 		private int timer = 0;
-
+		
 		public TECrankmill(final BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-			super(tileEntityTypeIn, 0, Component.translatable(Registry.getBlock("crankmill").getDescriptionId()), Registry.getContainerId("crankmill"), ContainerCrankmill.class,
+			super(tileEntityTypeIn, 0, new TranslatableComponent(Registry.getBlock("crankmill").getDescriptionId()), Registry.getContainerId("crankmill"), ContainerCrankmill.class,
 					new EnergyProperties(false, true, 12000), pos, state);
 		}
 
 		public TECrankmill(BlockPos pos, BlockState state) {
 			this(Registry.getBlockEntity("crankmill"), pos, state);
 		}
-
+		
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData data) {
-
+			
 			if(fept == 0) {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(Component.literal("Idle").withStyle(ChatFormatting.RED)).text(Component.literal("0 FE/t"));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Idle").withStyle(ChatFormatting.RED)).text(new TextComponent("0 FE/t"));
 			}else {
-				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(Component.literal("Generating...").withStyle(ChatFormatting.GREEN)).text(Component.literal("+" + FormattingHelper.FEPT_FORMAT.format(fept) + " FE/t").withStyle(ChatFormatting.GREEN));
+				probeInfo.horizontal().item(new ItemStack(Items.REDSTONE)).vertical().text(new TextComponent("Generating...").withStyle(ChatFormatting.GREEN)).text(new TextComponent("+" + FormattingHelper.FEPT_FORMAT.format(fept) + " FE/t").withStyle(ChatFormatting.GREEN));
 			}
-
+			
 		}
-
+		
 		@Override
 		public boolean isAllowedInSlot(int slot, ItemStack stack) {
 			if (ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) != 0) {
@@ -140,23 +140,23 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 					fept = 0;
 					sendUpdates();
 				}
-
+				
 				return false;
 			}
 
 			amount += max;
-
+			
 			fept  = (float) 700 / (float) timer;
 			timer = 0;
 			sendUpdates();
 			return true;
 		}
-
+		
 		@Override
 		public boolean validFrom(Direction dir) {
 			return this.getBlockState().getValue(HorizontalDirectionalBlock.FACING) == dir;
 		}
-
+		
 		@Override
 		public boolean requiresGearbox() {
 			return false;
@@ -164,7 +164,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 
 		@Override
 		public void tick() {
-
+			
 			if(timer++ == 120) {
 				timer = 0;
 				if(fept != 0) {
@@ -172,7 +172,7 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 					sendUpdates();
 				}
 			}
-
+			
 		}
 
 	}
@@ -209,14 +209,14 @@ public class BlockCrankmill extends BlockScreenBlockEntity<BlockCrankmill.TECran
 			super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 			int x = (this.width - this.imageWidth) / 2;
 			int y = (this.height - this.imageHeight) / 2;
-
+			
 			if(tsfm.fept == 0) {
 				this.drawCenteredString(this.font, "0/t", x+114, y+38, 0xffffff);
 			}else {
 				super.blit(x+74, y+33, 176, 52, 18, 18);
 				this.drawCenteredString(this.font, "+" + FormattingHelper.FEPT_FORMAT.format(tsfm.fept) + "/t", x+114, y+38, 0x76f597);
 			}
-
+			
 
 		}
 

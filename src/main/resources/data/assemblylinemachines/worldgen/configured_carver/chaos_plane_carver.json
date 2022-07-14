@@ -18,16 +18,7 @@
     "yScale": 0.5,
     "horizontal_radius_multiplier": 1.0,
     "vertical_radius_multiplier": 1.0,
-    "floor_level": -0.7,
-    "replaceable":[
-    	"assemblylinemachines:corrupt_stone",
-    	"assemblylinemachines:corrupt_basalt",
-    	"assemblylinemachines:corrupt_sandstone",
-    	"assemblylinemachines:corrupt_dirt",
-    	"assemblylinemachines:corrupt_sand",
-    	"assemblylinemachines:corrupt_grass",
-    	"assemblylinemachines:dark_energy_block"
-    ]
+    "floor_level": -0.7
   },
   "type": "assemblylinemachines:chaos_plane_carver"
 }

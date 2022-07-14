@@ -1,7 +1,0 @@
-{
-    "parent": "block/cube_column",
-    "textures": {
-        "end": "assemblylinemachines:block/corrupt/corrupt_stone_tile",
-        "side": "assemblylinemachines:block/corrupt/corrupt_stone_conduit_strikethrough_tile"
-    }
-}

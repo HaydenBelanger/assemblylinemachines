@@ -8,8 +8,7 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
@@ -17,32 +16,33 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBuilder{
 
-
-	public static final RecipeType<FluidInGroundRecipe> FIG_RECIPE = new RecipeType<>() {
+	
+	public static final RecipeType<FluidInGroundRecipe> FIG_RECIPE = new RecipeType<FluidInGroundRecipe>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:fluid_in_ground";
 		}
 	};
-
+	
 	public static final FluidInGroundSerializer SERIALIZER = new FluidInGroundSerializer();
-
+	
 	private final Fluid fluid;
 	private final ResourceLocation id;
 	public int odds;
 	private int minAmount;
 	private int maxAmount;
 	public FluidInGroundCriteria criteria;
-
+	
 	public FluidInGroundRecipe(ResourceLocation id, Fluid fluid, int odds, int minAmount, int maxAmount, FluidInGroundCriteria figc) {
-
+		
 		this.fluid = fluid;
 		this.id = id;
 		this.odds = odds;
@@ -50,14 +50,14 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		this.maxAmount = maxAmount;
 		this.criteria = figc;
 	}
-
-
+	
+	
 	@Override
 	public boolean matches(Container inv, Level worldIn) {
-
+		
 		return true;
 	}
-
+	
 	@Override
 	public ItemStack assemble(Container inv) {
 		return ItemStack.EMPTY;
@@ -87,34 +87,34 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 	public RecipeType<?> getType() {
 		return FIG_RECIPE;
 	}
-
+	
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-
+	
 	@Override
 	public List<?> getJEIComponents() {
 		return List.of(new FluidStack(fluid, 1000));
 	}
-
+	
 	public static FluidStack assemble(ChunkPos pos, Level world) {
 		List<FluidInGroundRecipe> recipes = world.getRecipeManager().getAllRecipesFor(FluidInGroundRecipe.FIG_RECIPE);
-
+		
 		float tc = world.getBiome(pos.getMiddleBlockPosition(63)).value().getBaseTemperature();
 		ResourceLocation currentDim = world.dimension().location();
-
+		
 		for (FluidInGroundRecipe recipe : recipes) {
 
 			boolean canProcess = false;
 			boolean notPreferredBiome = false;
-
+			
 			switch(recipe.criteria) {
 			case END:
-				if(currentDim.equals(BuiltinDimensionTypes.END.location())) canProcess = true;
+				if(currentDim.equals(DimensionType.END_LOCATION.location())) canProcess = true;
 				break;
 			case NETHER:
-				if(currentDim.equals(BuiltinDimensionTypes.NETHER.location())) canProcess = true;
+				if(currentDim.equals(DimensionType.NETHER_LOCATION.location())) canProcess = true;
 				break;
 			case OVERWORLD_ANY, OVERWORLD_ONLYCOLD, OVERWORLD_ONLYHOT, OVERWORLD_PREFCOLD, OVERWORLD_PREFHOT:
 				Pair<Boolean, Boolean> pair = getAllowanceForOverworld(recipe.criteria, currentDim, tc);
@@ -124,7 +124,7 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 			if(canProcess) {
 				if (world.getRandom().nextInt(100) <= recipe.odds) {
 					int amt = (recipe.minAmount + world.getRandom().nextInt(recipe.maxAmount - recipe.minAmount)) * 10000;
-					if (notPreferredBiome) amt = Math.round(amt / 2f);
+					if (notPreferredBiome) amt = Math.round((float) amt / 2f);
 					return new FluidStack(recipe.fluid, amt);
 				}
 			}
@@ -132,9 +132,9 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 
 		return FluidStack.EMPTY;
 	}
-
+	
 	private static Pair<Boolean, Boolean> getAllowanceForOverworld(FluidInGroundCriteria criteria, ResourceLocation currentDim, float temperature){
-		if(!currentDim.equals(BuiltinDimensionTypes.OVERWORLD.location())) return Pair.of(false, false);
+		if(!currentDim.equals(DimensionType.OVERWORLD_LOCATION.location())) return Pair.of(false, false);
 		switch(criteria) {
 		case OVERWORLD_ONLYCOLD:
 		case OVERWORLD_PREFCOLD:
@@ -157,8 +157,8 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		}
 		return Pair.of(true, false);
 	}
-
-	public static class FluidInGroundSerializer implements RecipeSerializer<FluidInGroundRecipe>{
+	
+	public static class FluidInGroundSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<FluidInGroundRecipe>{
 
 		@Override
 		public FluidInGroundRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -167,7 +167,7 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 				if(f == null) {
 					throw new IllegalArgumentException("Could not find this fluid.");
 				}
-
+				
 				int odds = GsonHelper.getAsInt(json, "chance") - 1;
 				if(odds < 0 || odds > 99) {
 					throw new IllegalArgumentException("Chance must be more than 0 and less than 101.");
@@ -180,8 +180,8 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 				e.printStackTrace();
 				return null;
 			}
-
-
+			
+			
 		}
 
 		@Override
@@ -191,31 +191,31 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 			int min = buffer.readInt();
 			int max = buffer.readInt();
 			FluidInGroundCriteria figc = buffer.readEnum(FluidInGroundCriteria.class);
-
+			
 			return new FluidInGroundRecipe(recipeId, f, odds, min, max, figc);
 		}
 
 		@Override
 		public void toNetwork(FriendlyByteBuf buffer, FluidInGroundRecipe recipe) {
-			buffer.writeResourceLocation(ForgeRegistries.FLUIDS.getKey(recipe.fluid));
+			buffer.writeResourceLocation(recipe.fluid.getRegistryName());
 			buffer.writeInt(recipe.odds);
 			buffer.writeInt(recipe.minAmount);
 			buffer.writeInt(recipe.maxAmount);
 			buffer.writeEnum(recipe.criteria);
 		}
-
+		
 	}
-
+	
 	public static enum FluidInGroundCriteria{
-		OVERWORLD_PREFCOLD(68, 111, true, Component.literal("Favors very cold biomes.").withStyle(ChatFormatting.BLUE)), OVERWORLD_PREFHOT(102, 77, true, Component.literal("Favors very hot biomes.").withStyle(ChatFormatting.RED)),
-		OVERWORLD_ONLYCOLD(68, 111, true, Component.literal("Only in very cold biomes.").withStyle(ChatFormatting.BLUE)), OVERWORLD_ONLYHOT(102, 77, true, Component.literal("Only in very hot biomes.").withStyle(ChatFormatting.RED)),
-		OVERWORLD_ANY(0, 111, false, Component.literal("Found in The Overworld.").withStyle(ChatFormatting.DARK_GREEN)), NETHER(34, 111, false, Component.literal("Found in The Nether.").withStyle(ChatFormatting.DARK_RED)),
-		END(68, 77, false, Component.literal("Found in The End.").withStyle(ChatFormatting.DARK_PURPLE));
-
+		OVERWORLD_PREFCOLD(68, 111, true, new TextComponent("Favors very cold biomes.").withStyle(ChatFormatting.BLUE)), OVERWORLD_PREFHOT(102, 77, true, new TextComponent("Favors very hot biomes.").withStyle(ChatFormatting.RED)), 
+		OVERWORLD_ONLYCOLD(68, 111, true, new TextComponent("Only in very cold biomes.").withStyle(ChatFormatting.BLUE)), OVERWORLD_ONLYHOT(102, 77, true, new TextComponent("Only in very hot biomes.").withStyle(ChatFormatting.RED)),
+		OVERWORLD_ANY(0, 111, false, new TextComponent("Found in The Overworld.").withStyle(ChatFormatting.DARK_GREEN)), NETHER(34, 111, false, new TextComponent("Found in The Nether.").withStyle(ChatFormatting.DARK_RED)), 
+		END(68, 77, false, new TextComponent("Found in The End.").withStyle(ChatFormatting.DARK_PURPLE));
+		
 		private final int jeiBlitX, jeiBlitY;
 		private final MutableComponent descriptor;
 		private final boolean isOverworld;
-
+		
 		FluidInGroundCriteria(int jeiBlitX, int jeiBlitY, boolean isOverworld, MutableComponent descriptor){
 			this.jeiBlitX = jeiBlitX;
 			this.jeiBlitY = jeiBlitY;
@@ -225,19 +225,19 @@ public class FluidInGroundRecipe implements Recipe<Container>, IRecipeCategoryBu
 		public int getJeiBlitX() {
 			return jeiBlitX;
 		}
-
+		
 		public int getJeiBlitY() {
 			return jeiBlitY;
 		}
-
+		
 		public List<Component> getTooltip(int chanceToGenerate){
-
+			
 			if(isOverworld) {
-				return List.of(OVERWORLD_ANY.descriptor, this.descriptor, Component.literal(chanceToGenerate + "% chance to generate.").withStyle(ChatFormatting.YELLOW));
+				return List.of(OVERWORLD_ANY.descriptor, this.descriptor, new TextComponent(chanceToGenerate + "% chance to generate.").withStyle(ChatFormatting.YELLOW));
 			}else {
-				return List.of(this.descriptor, Component.literal(chanceToGenerate + "% chance to generate.").withStyle(ChatFormatting.YELLOW));
+				return List.of(this.descriptor, new TextComponent(chanceToGenerate + "% chance to generate.").withStyle(ChatFormatting.YELLOW));
 			}
 		}
 	}
-
+	
 }

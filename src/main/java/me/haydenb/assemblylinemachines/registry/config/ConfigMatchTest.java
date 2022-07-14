@@ -1,20 +1,21 @@
 package me.haydenb.assemblylinemachines.registry.config;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig.Common;
-import net.minecraft.util.RandomSource;
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ConfigMatchTest extends RuleTest {
 
@@ -25,7 +26,10 @@ public class ConfigMatchTest extends RuleTest {
 		RuleTest.CODEC.fieldOf("rule_test").forGetter((value) -> value.ruleTest))
 		.apply(instance, ConfigMatchTest::new);
 	});
-
+	
+	public static final DeferredRegister<RuleTestType<?>> RULE_TEST_REGISTRY = DeferredRegister.create(Registry.RULE_TEST_REGISTRY, AssemblyLineMachines.MODID);
+	public static final RegistryObject<RuleTestType<ConfigMatchTest>> CONFIG_TEST = RULE_TEST_REGISTRY.register("config", () -> () -> CODEC);
+	
 	private final RuleTest ruleTest;
 	private final boolean enableOn;
 	private final List<String> configOptions;
@@ -48,14 +52,14 @@ public class ConfigMatchTest extends RuleTest {
 			return Optional.of(true);
 		});
 	}
-
+	
 	@Override
-	public boolean test(BlockState pState, RandomSource pRandom) {
-		return passedAllOptions.get().get() ? ruleTest.test(pState, pRandom) : false;
+	public boolean test(BlockState pState, Random pRandom) {
+		return passedAllOptions.get().get() == true ? ruleTest.test(pState, pRandom) : false;
 	}
-
+	
 	@Override
 	protected RuleTestType<?> getType() {
-		return Registry.CONFIG_RULE_TEST.get();
+		return CONFIG_TEST.get();
 	}
 }

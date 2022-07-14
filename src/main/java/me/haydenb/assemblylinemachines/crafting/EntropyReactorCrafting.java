@@ -13,25 +13,26 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
-
-	public static final RecipeType<EntropyReactorCrafting> ERO_RECIPE = new RecipeType<>() {
+	
+	public static final RecipeType<EntropyReactorCrafting> ERO_RECIPE = new RecipeType<EntropyReactorCrafting>() {
 		@Override
 		public String toString() {
 			return "assemblylinemachines:entropy_reactor";
 		}
 	};
-
+	
 	public static final EntropyReactorSerializer SERIALIZER = new EntropyReactorSerializer();
-
+	
 	private final ItemStack output;
 	public final float odds;
 	public final float varietyReqd;
 	public final int max;
 	private final ResourceLocation id;
-
+	
 	public EntropyReactorCrafting(ResourceLocation id, ItemStack output, float odds, int max, float varietyReqd) {
 		this.id = id;
 		this.output = output;
@@ -43,7 +44,7 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 	public boolean matches(Container inv, Level worldIn) {
 		return true;
 	}
-
+	
 	@Override
 	public ItemStack assemble(Container inv) {
 		return this.output.copy();
@@ -58,12 +59,12 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 	public ItemStack getResultItem() {
 		return output;
 	}
-
+	
 	@Override
 	public boolean isSpecial() {
 		return true;
 	}
-
+	
 	@Override
 	public List<?> getJEIComponents() {
 		return List.of(Ingredient.of(Registry.getItem("corrupted_shard")), output);
@@ -83,8 +84,8 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 	public RecipeType<?> getType() {
 		return ERO_RECIPE;
 	}
-
-	public static class EntropyReactorSerializer implements RecipeSerializer<EntropyReactorCrafting>{
+	
+	public static class EntropyReactorSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<EntropyReactorCrafting>{
 
 		@Override
 		public EntropyReactorCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -102,14 +103,14 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 				if(max < 0) {
 					throw new IllegalArgumentException("max must be more than 0.");
 				}
-
+				
 				return new EntropyReactorCrafting(recipeId, output, odds, max, varietyReqd);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-
-
+			
+			
 		}
 
 		@Override
@@ -118,7 +119,7 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 			float odds = buffer.readFloat();
 			float varietyReqd = buffer.readFloat();
 			int max = buffer.readInt();
-
+			
 			return new EntropyReactorCrafting(recipeId, output, odds, max, varietyReqd);
 		}
 
@@ -128,8 +129,8 @@ public class EntropyReactorCrafting implements Recipe<Container>, IRecipeCategor
 			buffer.writeFloat(recipe.odds);
 			buffer.writeFloat(recipe.varietyReqd);
 			buffer.writeInt(recipe.max);
-
+			
 		}
-
+		
 	}
 }

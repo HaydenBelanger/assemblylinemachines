@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 @Mixin(HoeItem.class)
 public class HoeItemTillingMixin {
-
+	
 	//This Mixin is responsible for patching in Mystium Farmland when certain conditions are met.
 	@Inject(method = "changeIntoState", at = @At("HEAD"), cancellable = true)
 	private static void changeIntoState(BlockState state, CallbackInfoReturnable<Consumer<UseOnContext>> cir) {
@@ -30,7 +30,7 @@ public class HoeItemTillingMixin {
 			context.getLevel().setBlock(context.getClickedPos(), state, 11);
 		});
 	}
-
+	
 	//This Mixin is responsible for changing the durability cost of a Hoe when certain conditions are met.
 	@Redirect(method = "useOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"))
 	private void hurtAndBreak(ItemStack stack, int amount, LivingEntity entity, Consumer<LivingEntity> onBroken) {

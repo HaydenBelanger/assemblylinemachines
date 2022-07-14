@@ -7,6 +7,7 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -15,9 +16,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemMobCrystal extends Item{
 
-
+	
 	public static final HashMap<EntityType<?>, Integer> MOB_COLORS = new HashMap<>();
-
+	
 	static {
 		MOB_COLORS.put(EntityType.BAT, 0x402400);
 		MOB_COLORS.put(EntityType.CAT, 0x7d4600);
@@ -89,31 +90,31 @@ public class ItemMobCrystal extends Item{
 		MOB_COLORS.put(EntityType.AXOLOTL, 0xb2d5d6);
 		MOB_COLORS.put(EntityType.GOAT, 0xe8ebeb);
 		//MOB_COLORS.put(EntityType.WARDEN, null);
-
+		
 	}
-
+	
 	private static final String TRANSLATION_TAG = Util.makeDescriptionId("item", new ResourceLocation(AssemblyLineMachines.MODID, "mob_crystal_tuned"));
-
+	
 	public ItemMobCrystal() {
 		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
-
-
+		
+		
 	}
-
+	
 	@Override
 	public Component getName(ItemStack stack) {
-
+		
 		if(stack.hasTag()) {
-
+			
 			EntityType<?> entity = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(stack.getTag().getString("assemblylinemachines:mob")));
 			if(entity != null) {
-				return Component.translatable(TRANSLATION_TAG, entity.getDescription().copy().withStyle(ChatFormatting.AQUA));
+				return new TranslatableComponent(TRANSLATION_TAG, entity.getDescription().copy().withStyle(ChatFormatting.AQUA));
 			}
-
+			
 		}
 		return super.getName(stack);
 	}
-
+	
 	@Override
 	public boolean isFoil(ItemStack stack) {
 		if(stack.hasTag()) {

@@ -3,6 +3,6 @@
 	"ingredient":{
 		"tag": "forge:dusts/netherite"
 	},
-	"result": "minecraft:netherite_ingot",
+	"result": "minecraft:netherite_scrap",
 	"cookingtime": 100
 }
