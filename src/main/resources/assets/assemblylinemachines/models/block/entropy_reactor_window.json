@@ -1,5 +1,6 @@
 {
 	"credit": "Made with Blockbench",
+	"render_type": "cutout",
 	"textures": {
 		"0": "assemblylinemachines:block/entropy_reactor/entropy_reactor_window",
 		"1": "assemblylinemachines:block/entropy_reactor/entropy_reactor_wall",

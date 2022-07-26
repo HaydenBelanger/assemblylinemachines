@@ -9,10 +9,9 @@ public class ItemHammer extends SwordItem {
 	public ItemHammer(Tier tier, int attackDamageIn, float attackSpeedIn, Properties builder) {
 		super(tier, attackDamageIn, attackSpeedIn, builder.durability(tier.getUses()));
 	}
-
+	
 	@Override
-	public ItemStack getContainerItem(ItemStack origStack) {
-
+	public ItemStack getCraftingRemainingItem(ItemStack origStack) {
 		ItemStack itemStack = origStack.copy();
 
 		if(itemStack.getDamageValue() >= itemStack.getMaxDamage()) {

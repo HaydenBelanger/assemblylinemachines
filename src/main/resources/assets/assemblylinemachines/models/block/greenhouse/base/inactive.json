@@ -1,5 +1,6 @@
 {
 	"parent": "block/cube",
+	"render_type": "cutout",
 	"textures": {
 		"0": "assemblylinemachines:block/greenhouse/greenhouse_side",
 		"1": "assemblylinemachines:block/machine_basic_top",

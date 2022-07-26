@@ -26,8 +26,8 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.IFluidTypeRenderProperties;
-import net.minecraftforge.client.event.EntityViewRenderEvent.RenderFogEvent;
+import net.minecraftforge.client.event.ViewportEvent.RenderFog;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidType;
@@ -147,8 +147,8 @@ public class SplitFluid extends ForgeFlowingFluid {
 		}
 
 		@Override
-		public void initializeClient(Consumer<IFluidTypeRenderProperties> consumer) {
-			consumer.accept(new IFluidTypeRenderProperties() {
+		public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
+			consumer.accept(new IClientFluidTypeExtensions() {
 				@Override
 				public ResourceLocation getStillTexture() {
 					return stillTexture;
@@ -173,7 +173,7 @@ public class SplitFluid extends ForgeFlowingFluid {
 
 			@SubscribeEvent
 			@OnlyIn(Dist.CLIENT)
-			public static void renderFog(RenderFogEvent event) {
+			public static void renderFog(RenderFog event) {
 				FluidType rType = event.getCamera().getBlockAtCamera().getFluidState().getFluidType();
 				if(rType instanceof SpecialRenderFluidType type) {
 					event.setCanceled(true);

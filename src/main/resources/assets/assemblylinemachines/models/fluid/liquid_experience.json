@@ -1,6 +1,7 @@
 {
     "textures": {
         "particle": "assemblylinemachines:fluid/liquid_experience"
-    }
+    },
+    "render_type": "translucent"
 }
 

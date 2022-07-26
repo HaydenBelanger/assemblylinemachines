@@ -58,7 +58,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.util.*;
@@ -1073,7 +1073,7 @@ public class MachineBuilder {
 						if(fluid == Fluids.WATER) RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 						RenderSystem.setShader(GameRenderer::getPositionTexShader);
 						RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-						try { super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidBarHeight, fluidBarHeight, fluidBarHeight, cache.get(fluid, () -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fluid).getStillTexture())));
+						try { super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidBarHeight, fluidBarHeight, fluidBarHeight, cache.get(fluid, () -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fluid.getFluidType()).getStillTexture())));
 						}catch(Exception e) {e.printStackTrace();}
 					}
 

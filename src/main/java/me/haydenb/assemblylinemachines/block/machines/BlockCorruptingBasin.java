@@ -41,7 +41,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -275,7 +275,7 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fs.getFluid()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fs.getFluid().getFluidType()).getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 

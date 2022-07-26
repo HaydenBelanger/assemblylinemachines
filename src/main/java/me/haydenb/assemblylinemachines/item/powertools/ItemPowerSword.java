@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
-import me.haydenb.assemblylinemachines.item.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -120,7 +119,7 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 			ServerPlayer spe = (ServerPlayer) event.getSource().getEntity();
 			ItemStack stack = spe.getMainHandItem();
 
-			if(ItemMobCrystal.MOB_COLORS.get(event.getEntity().getType()) != null && stack.getItem() instanceof ItemPowerSword chargeTool) {
+			if(stack.getItem() instanceof ItemPowerSword chargeTool) {
 				if(spe.getLevel().getRandom().nextFloat() <= chargeTool.getPowerToolType().chanceToDropMobCrystal && chargeTool.canUseSecondaryAbilities(stack)) {
 					ItemStack inert = null;
 					for(int i = 0; i < spe.getInventory().getContainerSize(); i++) {
@@ -133,7 +132,7 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 					if(spe.isCreative() || inert != null) {
 						ItemStack crystal = new ItemStack(Registry.getItem("mob_crystal"), 1);
 						CompoundTag tag = new CompoundTag();
-						tag.putString("assemblylinemachines:mob", ForgeRegistries.ENTITIES.getKey(event.getEntity().getType()).toString());
+						tag.putString("assemblylinemachines:mob", ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString());
 						crystal.setTag(tag);
 						event.getEntity().spawnAtLocation(crystal);
 						stack.hurtAndBreak(20, spe, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});

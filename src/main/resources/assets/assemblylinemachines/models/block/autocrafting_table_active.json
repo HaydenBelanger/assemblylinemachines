@@ -15,6 +15,7 @@
 		"12": "assemblylinemachines:block/autocrafting_table/grid_pad",
 		"particle": "assemblylinemachines:block/machine_basic_top"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"name": "Bottom",

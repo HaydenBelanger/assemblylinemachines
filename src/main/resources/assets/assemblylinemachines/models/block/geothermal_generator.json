@@ -13,6 +13,7 @@
 		"11": "assemblylinemachines:block/geo_gen/geothermal_glass_tube_back",
 		"particle": "assemblylinemachines:block/machine_advanced_top"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"name": "Bottom",

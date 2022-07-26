@@ -1,6 +1,7 @@
 {
     "textures": {
         "particle": "assemblylinemachines:fluid/diesel"
-    }
+    },
+    "render_type": "translucent"
 }
 

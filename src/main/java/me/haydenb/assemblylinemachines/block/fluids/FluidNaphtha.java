@@ -150,16 +150,16 @@ public class FluidNaphtha extends SplitFluid {
 		@SubscribeEvent
 		public static void extinguishFire(PlayerInteractEvent.LeftClickBlock event) {
 
-			Level world = event.getWorld();
+			Level world = event.getLevel();
 			if(event.getFace() == Direction.UP) {
 				BlockPos up = event.getPos().above();
 				Block block = world.getBlockState(up).getBlock();
 
 				if(block == Registry.getBlock("naphtha_fire")) {
-					if(event.getPlayer().isCreative()) {
+					if(event.getEntity().isCreative()) {
 						event.setCanceled(true);
 					}
-					world.levelEvent(event.getPlayer(), 1009, up, 0);
+					world.levelEvent(event.getEntity(), 1009, up, 0);
 					world.removeBlock(up, false);
 				}
 			}

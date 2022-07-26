@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/cross",
+  "render_type": "cutout",
   "textures": {
     "cross": "assemblylinemachines:block/chaosweed_alternatives/tall_chaosweed_3"
   }

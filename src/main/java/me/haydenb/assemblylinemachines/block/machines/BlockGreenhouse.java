@@ -52,7 +52,7 @@ import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
@@ -468,7 +468,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 			int y = (this.height - this.imageHeight) / 2;
 
 			if(!tsfm.tank.isEmpty()) {
-				TextureAtlasSprite tas = spriteMap.computeIfAbsent(tsfm.tank.getFluid(), (fluid) -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fluid).getStillTexture()));
+				TextureAtlasSprite tas = spriteMap.computeIfAbsent(tsfm.tank.getFluid(), (fluid) -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fluid.getFluidType()).getStillTexture()));
 				if(tsfm.tank.getFluid().equals(Fluids.WATER)) {
 					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				}else {

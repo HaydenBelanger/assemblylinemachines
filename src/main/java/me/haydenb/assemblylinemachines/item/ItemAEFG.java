@@ -65,10 +65,10 @@ public class ItemAEFG extends Item implements IToolWithCharge, ISpecialTooltip {
 	}
 
 	@Override
-	public int getItemEnchantability(ItemStack stack) {
+	public int getEnchantmentValue(ItemStack stack) {
 		return 30;
 	}
-
+	
 	@Override
 	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
 		return getCurrentCharge(stack) > 0 && entity != null && (entity.hasEffect(Registry.ENTROPY_POISONING.get()) || entity.hasEffect(Registry.DARK_EXPULSION.get())) ? 1f : 0f;

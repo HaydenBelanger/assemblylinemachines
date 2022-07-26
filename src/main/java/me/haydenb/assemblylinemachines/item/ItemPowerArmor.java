@@ -3,6 +3,8 @@ package me.haydenb.assemblylinemachines.item;
 import java.util.*;
 import java.util.function.Consumer;
 
+import org.jetbrains.annotations.NotNull;
+
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.client.armor.ArmorData;
@@ -19,11 +21,11 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.IItemRenderProperties;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -122,17 +124,17 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	public float getActivePropertyState(ItemStack stack, LivingEntity entity) {
 		return 0f;
 	}
-
+	
 	@Override
-	public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-		consumer.accept(new IItemRenderProperties() {
+	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		consumer.accept(new IClientItemExtensions() {
 			private Optional<ArmorModel> model = null;
 
 			@Override
-			public HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack,
-					EquipmentSlot armorSlot, HumanoidModel<?> _default) {
-				if(model == null) model = ArmorData.get(ptt.toString().toLowerCase(), armorSlot);
-				return model.isPresent() ? model.get() : _default;
+			public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack,
+					EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
+				if(model == null) model = ArmorData.get(ptt.toString().toLowerCase(), equipmentSlot);
+				return model.isPresent() ? model.get() : original;
 			}
 		});
 	}
@@ -178,14 +180,15 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	@EventBusSubscriber(modid = AssemblyLineMachines.MODID, bus = Bus.FORGE)
 	public static class FlightManagementEvents{
 
+		
 		@SubscribeEvent
-		public static void clearOnQuit(EntityLeaveWorldEvent event) {
-			remove(event.getEntity(), event.getWorld());
+		public static void clearOnQuit(EntityLeaveLevelEvent event) {
+			remove(event.getEntity(), event.getLevel());
 		}
 
 		@SubscribeEvent
-		public static void clearOnJoin(EntityJoinWorldEvent event) {
-			remove(event.getEntity(), event.getWorld());
+		public static void clearOnJoin(EntityJoinLevelEvent event) {
+			remove(event.getEntity(), event.getLevel());
 		}
 
 		private static void remove(Entity entity, Level world) {

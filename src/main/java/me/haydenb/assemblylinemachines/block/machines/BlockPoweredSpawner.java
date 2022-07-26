@@ -64,7 +64,7 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 			super.load(compound);
 
 			if(compound.contains("assemblylinemachines:spawntype")) {
-				spawnType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(compound.getString("assemblylinemachines:spawntype")));
+				spawnType = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(compound.getString("assemblylinemachines:spawntype")));
 			}
 			nTimer = compound.getInt("assemblylinemachines:ntimer");
 		}
@@ -73,7 +73,7 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 		public void saveAdditional(CompoundTag compound) {
 
 			if(spawnType != null) {
-				compound.putString("assemblylinemachines:spawntype", ForgeRegistries.ENTITIES.getKey(spawnType).toString());
+				compound.putString("assemblylinemachines:spawntype", ForgeRegistries.ENTITY_TYPES.getKey(spawnType).toString());
 			}
 			compound.putInt("assemblylinemachines:ntimer", nTimer);
 			super.saveAdditional(compound);
@@ -97,7 +97,7 @@ public class BlockPoweredSpawner extends BlockScreenBlockEntity<BlockPoweredSpaw
 
 					if(crystal.getItem() == Registry.getItem("mob_crystal") && crystal.hasTag() && crystal.getTag().contains("assemblylinemachines:mob")) {
 
-						spawnType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(crystal.getTag().getString("assemblylinemachines:mob")));
+						spawnType = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(crystal.getTag().getString("assemblylinemachines:mob")));
 						sendUpdates = true;
 					}
 				}

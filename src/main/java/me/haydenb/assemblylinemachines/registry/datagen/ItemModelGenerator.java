@@ -20,7 +20,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemModelGenerator extends ItemModelProvider {

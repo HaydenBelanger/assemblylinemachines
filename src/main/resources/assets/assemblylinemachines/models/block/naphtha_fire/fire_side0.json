@@ -1,5 +1,6 @@
 {
     "parent": "assemblylinemachines:block/naphtha_fire/fire_side",
+    "render_type": "cutout",
     "textures": {
         "particle": "assemblylinemachines:block/naphtha_fire/fire_0",
         "fire": "assemblylinemachines:block/naphtha_fire/fire_0"

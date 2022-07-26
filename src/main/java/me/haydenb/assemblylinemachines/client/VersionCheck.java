@@ -7,7 +7,7 @@ import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedInEvent;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.VersionChecker;
 import net.minecraftforge.fml.VersionChecker.CheckResult;
@@ -19,7 +19,7 @@ public class VersionCheck {
 
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
-	public static void join(LoggedInEvent event) {
+	public static void join(LoggingIn event) {
 		if(ALMConfig.getClientConfig().receiveUpdateMessages().get()) {
 			CheckResult result = VersionChecker.getResult(AssemblyLineMachines.MOD_CONTAINER.get().getModInfo());
 			if(result.status() == Status.BETA_OUTDATED || result.status() == Status.OUTDATED) {

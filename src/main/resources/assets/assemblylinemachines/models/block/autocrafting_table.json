@@ -13,6 +13,7 @@
 		"9": "assemblylinemachines:block/autocrafting_table/pylon_top",
 		"particle": "assemblylinemachines:block/machine_basic_top"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"name": "Bottom",

@@ -210,7 +210,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 									ItemStack st = this.getItem(i);
 									if(ing.test(st)) {
 
-										if(st.hasContainerItem()) {
+										if(st.hasCraftingRemainingItem()) {
 
 											if(!containerItemSlots.contains(i)) {
 												containerItemSlots.add(i);
@@ -263,7 +263,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 									}
 									for(Integer i : containerItemSlots) {
 
-										setItem(i, getItem(i).getContainerItem());
+										setItem(i, getItem(i).getCraftingRemainingItem());
 									}
 									cost += tCost;
 									devicePerformed = true;
@@ -274,7 +274,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 									}
 									for(Integer i : containerItemSlots) {
 
-										setItem(i, getItem(i).getContainerItem());
+										setItem(i, getItem(i).getCraftingRemainingItem());
 									}
 									cost += tCost;
 									devicePerformed = true;
@@ -305,7 +305,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 										}
 										for(Integer i : containerItemSlots) {
 
-											setItem(i, getItem(i).getContainerItem());
+											setItem(i, getItem(i).getCraftingRemainingItem());
 										}
 										cost += tCost;
 										devicePerformed = true;
@@ -317,7 +317,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 										}
 										for(Integer i : containerItemSlots) {
 
-											setItem(i, getItem(i).getContainerItem());
+											setItem(i, getItem(i).getCraftingRemainingItem());
 										}
 										cost += tCost;
 										devicePerformed = true;

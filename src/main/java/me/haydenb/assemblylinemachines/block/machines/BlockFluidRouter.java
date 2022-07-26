@@ -45,7 +45,7 @@ import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -337,7 +337,7 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 			if(!tsfm.tank.isEmpty() && tsfm.tank.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(tsfm.tank.getFluid());
 				if(tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(tsfm.tank.getFluid()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) tsfm.tank.getFluid().getFluidType()).getStillTexture());
 				}
 
 				if(tsfm.tank.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
@@ -382,7 +382,7 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 			if(fluid != Fluids.EMPTY) {
 				TextureAtlasSprite tas = spriteMap.get(fluid);
 				if(tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fluid).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) tsfm.tank.getFluid().getFluidType()).getStillTexture());
 					spriteMap.put(fluid, tas);
 				}
 

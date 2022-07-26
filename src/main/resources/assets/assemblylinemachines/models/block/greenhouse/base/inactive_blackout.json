@@ -1,5 +1,6 @@
 {
 	"parent": "assemblylinemachines:block/greenhouse/base/inactive",
+	"render_type": "cutout",
 	"textures": {
 		"0": "assemblylinemachines:block/greenhouse/greenhouse_blackout_side",
 		"5": "assemblylinemachines:block/greenhouse/greenhouse_blackout_inside_glass",

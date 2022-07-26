@@ -146,7 +146,7 @@ public class BlockFluidBath extends Block implements EntityBlock {
 									if(rLoc.equalsIgnoreCase("minecraft:potion")) {
 										ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.GLASS_BOTTLE, 1));
 									}else {
-										ItemHandlerHelper.giveItemToPlayer(player, held.getContainerItem());
+										ItemHandlerHelper.giveItemToPlayer(player, held.getCraftingRemainingItem());
 									}
 									held.shrink(1);
 								}

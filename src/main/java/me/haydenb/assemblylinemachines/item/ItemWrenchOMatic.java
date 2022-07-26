@@ -85,7 +85,7 @@ public class ItemWrenchOMatic extends Item {
 		}
 		return InteractionResult.SUCCESS;
 	}
-
+	
 	@Override
 	public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents,
 			TooltipFlag pIsAdvanced) {
@@ -127,7 +127,7 @@ public class ItemWrenchOMatic extends Item {
 	}
 
 	@Override
-	public int getItemEnchantability(ItemStack stack) {
+	public int getEnchantmentValue(ItemStack stack) {
 		return 30;
 	}
 

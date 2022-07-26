@@ -15,7 +15,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 
 
 @OnlyIn(Dist.CLIENT)
@@ -31,7 +31,7 @@ public class TankTER implements BlockEntityRendererProvider<TEFluidTank> {
 				matrixStack.pushPose(); // push the current transformation matrix + normals matrix
 				if (!tank.fluid.isEmpty()) {
 					TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-							.apply(RenderProperties.get(tank.fluid.getFluid()).getStillTexture());
+							.apply(((IClientFluidTypeExtensions) tank.fluid.getFluid().getFluidType()).getStillTexture());
 
 					VertexConsumer builder = renderBuffer.getBuffer(RenderType.translucent());
 

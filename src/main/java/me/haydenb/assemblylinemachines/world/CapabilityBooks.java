@@ -15,7 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedInEvent;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
@@ -61,7 +61,7 @@ public class CapabilityBooks {
 			}
 		});
 
-		if(FMLLoader.getDist() == Dist.CLIENT) bus.addListener((LoggedInEvent event) -> {
+		if(FMLLoader.getDist() == Dist.CLIENT) bus.addListener((LoggingIn event) -> {
 			if(ALMConfig.getClientConfig().receiveGuideBook().get()) {
 				AssemblyLineMachines.LOGGER.debug("Sending request for guide to server from player " + event.getPlayer().getDisplayName().getString() + ".");
 				PacketData pd = new PacketData("request_book");

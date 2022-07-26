@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -52,7 +53,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
@@ -433,7 +434,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 	public static class ContainerFluidGenerator extends ContainerALMBase<TEFluidGenerator>{
 
 		public ContainerFluidGenerator(final int windowId, final Inventory playerInventory, final TEFluidGenerator tileEntity) {
-			super(Registry.getContainerType("fluid_generator"), windowId, tileEntity, playerInventory, com.mojang.datafixers.util.Pair.of(8, 84), com.mojang.datafixers.util.Pair.of(8, 142), 0);
+			super(Registry.getContainerType("fluid_generator"), windowId, tileEntity, playerInventory, Pair.of(8, 84), Pair.of(8, 142), 0);
 
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 0, 149, 21, tileEntity));
 			this.addSlot(new AbstractMachine.SlotWithRestrictions(this.tileEntity, 1, 149, 39, tileEntity));
@@ -460,7 +461,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 
 		public ScreenFluidGenerator(ContainerFluidGenerator screenContainer, Inventory inv,
 				Component titleIn) {
-			super(screenContainer, inv, titleIn, new com.mojang.datafixers.util.Pair<>(176, 166), new com.mojang.datafixers.util.Pair<>(11, 6), new com.mojang.datafixers.util.Pair<>(11, 73), "", false, new com.mojang.datafixers.util.Pair<>(14, 17), screenContainer.tileEntity, false);
+			super(screenContainer, inv, titleIn, new Pair<>(176, 166), new Pair<>(11, 6), new Pair<>(11, 73), "", false, new Pair<>(14, 17), screenContainer.tileEntity, false);
 			tsfm = screenContainer.tileEntity;
 		}
 
@@ -531,7 +532,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(RenderProperties.get(fs.getFluid()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fs.getFluid().getFluidType()).getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 

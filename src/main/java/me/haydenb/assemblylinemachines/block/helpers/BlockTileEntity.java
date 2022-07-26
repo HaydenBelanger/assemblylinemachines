@@ -160,7 +160,7 @@ public abstract class BlockTileEntity extends Block implements EntityBlock{
 			if(clazz.isInstance(te)) {
 
 				try {
-					NetworkHooks.openGui((ServerPlayer) player, (MenuProvider) clazz.cast(te), new Consumer<FriendlyByteBuf>() {
+					NetworkHooks.openScreen((ServerPlayer) player, (MenuProvider) clazz.cast(te), new Consumer<FriendlyByteBuf>() {
 
 						@Override
 						public void accept(FriendlyByteBuf t) {

@@ -8,6 +8,7 @@
 		"3": "assemblylinemachines:block/tank/novasteel_tank_bottom",
 		"particle": "assemblylinemachines:block/tank/novasteel_tank_beams"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"from": [0, 0, 0],

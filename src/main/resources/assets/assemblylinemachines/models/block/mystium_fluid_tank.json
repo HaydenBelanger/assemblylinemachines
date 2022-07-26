@@ -8,6 +8,7 @@
 		"3": "assemblylinemachines:block/tank/mystium_tank_bottom",
 		"particle": "assemblylinemachines:block/tank/mystium_tank_beams"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"from": [0, 0, 0],

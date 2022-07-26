@@ -85,7 +85,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.commands.synchronization.*;
@@ -118,12 +118,13 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType;
 import net.minecraft.world.level.material.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.common.*;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.world.BiomeModifier;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidType;
@@ -133,7 +134,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.*;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
@@ -651,7 +651,7 @@ public class Registry {
 		});
 
 		//CONTAINERS
-		event.register(Keys.CONTAINER_TYPES, (h) -> {
+		event.register(Keys.MENU_TYPES, (h) -> {
 			createContainer("gearbox", ContainerGearbox.class);
 			createContainer("pipe_connector", PipeConnectorContainer.class);
 			createContainer("coal_generator", ContainerCoalGenerator.class);
@@ -743,6 +743,7 @@ public class Registry {
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
+		/*
 		List.of("steel_fluid_tank", "wooden_fluid_tank", "mystium_fluid_tank", "attuned_titanium_fluid_tank", "novasteel_fluid_tank", "autocrafting_table", "blooming_chaosweed",
 				"geothermal_generator", "naphtha_fire", "powered_spawner", "entropy_reactor_block", "chaosbark_leaves", "chaosbark_sapling", "cocoa_leaves", "cocoa_sapling", "chaosweed",
 				"tall_chaosweed", "tall_blooming_chaosweed", "mandelbloom", "prism_rose", "brain_cactus", "bright_prism_rose", "greenhouse")
@@ -751,7 +752,7 @@ public class Registry {
 		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_glass"), RenderType.cutoutMipped());
 
 		FLUIDS.values().forEach((f) -> ItemBlockRenderTypes.setRenderLayer(f, RenderType.translucent()));
-
+		*/
 		BlockEntityRenderers.register((BlockEntityType<TEFluidTank>)getBlockEntity("fluid_tank"), new TankTER());
 		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
 		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());
@@ -799,21 +800,21 @@ public class Registry {
 	//BLOCK COLORS
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
-	public static void registerBlockColorHandlers(ColorHandlerEvent.Block event) {
+	public static void registerBlockColorHandlers(RegisterColorHandlersEvent.Block event) {
 
-		event.getBlockColors().register((state, reader, pos, tint) -> reader.getBlockEntity(pos) instanceof TEFluidBath bath ? bath.getFluidColor(reader, pos) : 0, getBlock("fluid_bath"));
-		event.getBlockColors().register((state, reader, pos, tint) -> reader.getBlockEntity(pos) instanceof TEGreenhouse greenhouse ? greenhouse.getBlockState().getValue(BlockGreenhouse.SPROUT).getTint(greenhouse.getItem(1).getItem(), tint) : 0, getBlock("greenhouse"));
-		event.getBlockColors().register((state, reader, pos, tint) -> reader.getBlockTint(pos, BiomeColors.FOLIAGE_COLOR_RESOLVER), getBlock("cocoa_leaves"));
+		event.register((state, reader, pos, tint) -> reader.getBlockEntity(pos) instanceof TEFluidBath bath ? bath.getFluidColor(reader, pos) : 0, getBlock("fluid_bath"));
+		event.register((state, reader, pos, tint) -> reader.getBlockEntity(pos) instanceof TEGreenhouse greenhouse ? greenhouse.getBlockState().getValue(BlockGreenhouse.SPROUT).getTint(greenhouse.getItem(1).getItem(), tint) : 0, getBlock("greenhouse"));
+		event.register((state, reader, pos, tint) -> reader.getBlockTint(pos, BiomeColors.FOLIAGE_COLOR_RESOLVER), getBlock("cocoa_leaves"));
 	}
 
 	//ITEM COLORS
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
-	public static void registerItemColorHandlers(ColorHandlerEvent.Item event) {
-		event.getItemColors().register((stack, index) -> {
+	public static void registerItemColorHandlers(RegisterColorHandlersEvent.Item event) {
+		event.register((stack, index) -> {
 			if(stack.hasTag()) {
-				EntityType<?> entity = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(stack.getTag().getString("assemblylinemachines:mob")));
-				if(entity != null) return ItemMobCrystal.MOB_COLORS.getOrDefault(entity, 0x7d7d7d);
+				EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(stack.getTag().getString("assemblylinemachines:mob")));
+				if(entity != null) return ItemMobCrystal.MOB_COLORS.getUnchecked(entity);
 			}
 			return 0x7d7d7d;
 		}, getItem("mob_crystal"));

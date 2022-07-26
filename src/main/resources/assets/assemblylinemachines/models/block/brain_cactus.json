@@ -1,5 +1,6 @@
 {
 	"parent": "block/cube",
+	"render_type": "cutout",
 	"textures": {
 		"0": "assemblylinemachines:block/corrupt/plants/brain_cactus/cactus_top",
 		"1": "assemblylinemachines:block/corrupt/plants/brain_cactus/cactus_shaft",

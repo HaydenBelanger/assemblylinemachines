@@ -13,6 +13,7 @@
 		"12": "assemblylinemachines:block/geo_gen/geothermal_powerbar_active",
 		"particle": "assemblylinemachines:block/machine_advanced_top"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"name": "Bottom",

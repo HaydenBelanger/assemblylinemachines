@@ -76,7 +76,7 @@ public class BlockPipe extends Block implements EntityBlock {
 				for (Direction d : Direction.values()) {
 					if (world.getBlockState(pos).getValue(PipeProperties.DIRECTION_BOOL.get(d)) == PipeConnOptions.CONNECTOR) {
 						try {
-							NetworkHooks.openGui((ServerPlayer) player, (PipeConnectorTileEntity) world.getBlockEntity(pos), buf -> buf.writeBlockPos(pos));
+							NetworkHooks.openScreen((ServerPlayer) player, (PipeConnectorTileEntity) world.getBlockEntity(pos), buf -> buf.writeBlockPos(pos));
 						}catch(NullPointerException e) {}
 						return InteractionResult.CONSUME;
 					}
