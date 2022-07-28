@@ -1073,7 +1073,7 @@ public class MachineBuilder {
 						if(fluid == Fluids.WATER) RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 						RenderSystem.setShader(GameRenderer::getPositionTexShader);
 						RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-						try { super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidBarHeight, fluidBarHeight, fluidBarHeight, cache.get(fluid, () -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fluid.getFluidType()).getStillTexture())));
+						try { super.blit(x+fluidBarTopLeftX, y+fluidBarTopLeftY, fluidBarHeight, fluidBarHeight, fluidBarHeight, cache.get(fluid, () -> Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(IClientFluidTypeExtensions.of(fluid).getStillTexture())));
 						}catch(Exception e) {e.printStackTrace();}
 					}
 

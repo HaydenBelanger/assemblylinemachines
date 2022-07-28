@@ -1,7 +1,5 @@
 package me.haydenb.assemblylinemachines.item;
 
-import java.util.concurrent.ExecutionException;
-
 import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -30,24 +28,17 @@ public class ItemDowsingRod extends Item implements ISpecialTooltip {
 
 
 		Level world = context.getLevel();
-		if(!world.isClientSide) {
+		if(!world.isClientSide) {	
 			boolean success = false;
-			try {
-				LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(world.getChunkAt(context.getClickedPos()));
-				if(lazy.isPresent()) {
-					IChunkFluidCapability capability = lazy.orElseThrow(null);
-					if(!capability.getChunkFluid().equals(Fluids.EMPTY)){
-						success = true;
-						context.getPlayer().displayClientMessage(Component.literal("There is " + FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()) + " mB of " + capability.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
-					}
-				}
-			}catch(ExecutionException e) {
-				e.printStackTrace();
-			}finally {
-				if(!success) {
-					context.getPlayer().displayClientMessage(Component.literal("There is no reservoir in this chunk."), true);
+			LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(world.getChunkAt(context.getClickedPos()));
+			if(lazy.isPresent()) {
+				IChunkFluidCapability capability = lazy.orElseThrow(null);
+				if(!capability.getChunkFluid().equals(Fluids.EMPTY)){
+					success = true;
+					context.getPlayer().displayClientMessage(Component.literal("There is " + FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()) + " mB of " + capability.getDisplayName().getString() + " in this chunk.").withStyle(ChatFormatting.GOLD), true);
 				}
 			}
+			if(!success) context.getPlayer().displayClientMessage(Component.literal("There is no reservoir in this chunk."), true);
 		}
 
 		return InteractionResult.CONSUME;

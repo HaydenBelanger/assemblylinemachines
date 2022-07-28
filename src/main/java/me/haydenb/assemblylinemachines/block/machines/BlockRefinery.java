@@ -16,6 +16,7 @@ import me.haydenb.assemblylinemachines.block.helpers.EnergyMachine.ScreenALMEner
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.BlockRefineryAddon.RefineryAddon;
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.TERefinery;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
+import me.haydenb.assemblylinemachines.crafting.RefiningCrafting.RefData;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
@@ -388,7 +389,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 								}
 
 							} else {
-								List<FluidStack> inputs = hasGas ? List.of() : outputRecipe.getJEIFluidInputs();
+								List<FluidStack> inputs = hasGas ? List.of() : outputRecipe.get(RefData.JEI_FLUID_INPUTS);
 								if(inputs.stream().anyMatch((fs) -> fs.getFluid().getFluidType().isLighterThanAir())) {
 									if(!showGasMsg) {
 										showGasMsg = true;
@@ -620,7 +621,7 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fs.getFluid().getFluidType()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(IClientFluidTypeExtensions.of(fs.getFluid()).getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 

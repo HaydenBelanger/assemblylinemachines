@@ -2,10 +2,8 @@ package me.haydenb.assemblylinemachines.item;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.*;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -34,7 +32,14 @@ public class ItemWrenchOMatic extends Item {
 
 	private static final UUID KNOCKBACK_UUID = UUID.fromString("8D9D86FB-0503-4094-A07A-8F8D39D3C434");
 
-	private static final Cache<Integer, Multimap<Attribute, AttributeModifier>> WRATH_MODE_ATTRIBUTE_CACHE = CacheBuilder.newBuilder().build();
+	private static final LoadingCache<Integer, Multimap<Attribute, AttributeModifier>> WRATH_MODE_ATTRIBUTE_CACHE = CacheBuilder.newBuilder().build(CacheLoader.from((i) -> {
+		Multimap<Attribute, AttributeModifier> attributes = ArrayListMultimap.create();
+
+		attributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Damage", ALMConfig.getServerConfig().engineersFuryMultiplier().get(), Operation.ADDITION));
+		attributes.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Attack Speed", -0.8d, Operation.ADDITION));
+		attributes.put(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(KNOCKBACK_UUID, "Knockback", Math.min(5d, 0.5d + (i * ALMConfig.getServerConfig().engineersFuryMultiplier().get())), Operation.ADDITION));
+		return attributes;
+	}));
 
 	public ItemWrenchOMatic() {
 		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
@@ -104,19 +109,7 @@ public class ItemWrenchOMatic extends Item {
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
 		if(slot == EquipmentSlot.MAINHAND && stack.getOrCreateTag().getInt("assemblylinemachines:wrenchmode") == 2) {
-			int engineersFuryLevel = stack.getEnchantmentLevel(Registry.ENGINEERS_FURY.get());
-			try {
-				return WRATH_MODE_ATTRIBUTE_CACHE.get(engineersFuryLevel, () -> {
-					Multimap<Attribute, AttributeModifier> attributes = ArrayListMultimap.create();
-
-					attributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Damage", ALMConfig.getServerConfig().engineersFuryMultiplier().get(), Operation.ADDITION));
-					attributes.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Attack Speed", -0.8d, Operation.ADDITION));
-					attributes.put(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(KNOCKBACK_UUID, "Knockback", Math.min(5d, 0.5d + (engineersFuryLevel * ALMConfig.getServerConfig().engineersFuryMultiplier().get())), Operation.ADDITION));
-					return attributes;
-				});
-			}catch(ExecutionException e) {
-				e.printStackTrace();
-			}
+			return WRATH_MODE_ATTRIBUTE_CACHE.getUnchecked(stack.getEnchantmentLevel(Registry.ENGINEERS_FURY.get()));
 		}
 		return super.getAttributeModifiers(slot, stack);
 	}

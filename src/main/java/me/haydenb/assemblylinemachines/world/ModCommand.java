@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.world;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -61,7 +60,7 @@ public class ModCommand {
 						.then(Commands.literal("get").executes(ModCommand::fluidInChunk)
 								.then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ModCommand::fluidInChunk)))));
 	}
-
+	
 	private static int makeCreative(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
 		CommandSourceStack source = context.getSource();
 		BlockPos pos = BlockPosArgument.getLoadedBlockPos(context, "pos");
@@ -109,23 +108,17 @@ public class ModCommand {
 		CommandSourceStack source = context.getSource();
 		Entity entity = source.getEntityOrException();
 		BlockPos pos = Utils.containsArgument(context, "pos") ? BlockPosArgument.getLoadedBlockPos(context, "pos") : entity.blockPosition();
-		try {
-			LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(entity.getLevel().getChunkAt(pos));
-			if(lazy.isPresent()) {
-				IChunkFluidCapability capability = lazy.orElseThrow(null);
-				if(!capability.getChunkFluid().equals(Fluids.EMPTY)) {
-					source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.get.success",
-							FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()), capability.getDisplayName().getString(), pos.toShortString()), false);
-					return 1;
-				}
+		LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(entity.getLevel().getChunkAt(pos));
+		if(lazy.isPresent()) {
+			IChunkFluidCapability capability = lazy.orElseThrow(null);
+			if(!capability.getChunkFluid().equals(Fluids.EMPTY)) {
+				source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.get.success",
+						FormattingHelper.GENERAL_FORMAT.format(capability.getFluidAmount()), capability.getDisplayName().getString(), pos.toShortString()), false);
+				return 1;
 			}
-			source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.get.success_empty", pos.toShortString()), false);
-			return 1;
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			source.sendFailure(Component.translatable("commands.assemblylinemachines.chunkfluid.error"));
-			return 0;
 		}
+		source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.get.success_empty", pos.toShortString()), false);
+		return 1;
 	}
 
 	private static int setFluid(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
@@ -133,17 +126,13 @@ public class ModCommand {
 		Entity entity = source.getEntityOrException();
 		BlockPos pos = Utils.containsArgument(context, "pos") ? BlockPosArgument.getLoadedBlockPos(context, "pos") : entity.blockPosition();
 		int amount = Utils.containsArgument(context, "amount") ? IntegerArgumentType.getInteger(context, "amount") : 1000000;
-		try {
-			LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(entity.getLevel().getChunkAt(pos));
-			if(lazy.isPresent()) {
-				IChunkFluidCapability capability = lazy.orElseThrow(null);
-				capability.setFluid(new FluidStack(FluidArgument.getFluid(context, "fluid"), amount));
-				source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.set.success",
-						pos.toShortString(), FormattingHelper.GENERAL_FORMAT.format(amount), capability.getDisplayName().getString()), true);
-				return 1;
-			}
-		}catch(ExecutionException e) {
-			e.printStackTrace();
+		LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(entity.getLevel().getChunkAt(pos));
+		if(lazy.isPresent()) {
+			IChunkFluidCapability capability = lazy.orElseThrow(null);
+			capability.setFluid(new FluidStack(FluidArgument.getFluid(context, "fluid"), amount));
+			source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.set.success",
+					pos.toShortString(), FormattingHelper.GENERAL_FORMAT.format(amount), capability.getDisplayName().getString()), true);
+			return 1;
 		}
 		source.sendFailure(Component.translatable("commands.assemblylinemachines.chunkfluid.error"));
 		return 0;
@@ -153,16 +142,12 @@ public class ModCommand {
 		CommandSourceStack source = context.getSource();
 		Entity entity = source.getEntityOrException();
 		BlockPos pos = Utils.containsArgument(context, "pos") ? BlockPosArgument.getLoadedBlockPos(context, "pos") : entity.blockPosition();
-		try {
-			LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(entity.getLevel().getChunkAt(pos));
-			if(lazy.isPresent()) {
-				IChunkFluidCapability capability = lazy.orElseThrow(null);
-				capability.setFluid(FluidStack.EMPTY);
-				source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.remove.success", pos.toShortString()), true);
-				return 1;
-			}
-		}catch(ExecutionException e) {
-			e.printStackTrace();
+		LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(entity.getLevel().getChunkAt(pos));
+		if(lazy.isPresent()) {
+			IChunkFluidCapability capability = lazy.orElseThrow(null);
+			capability.setFluid(FluidStack.EMPTY);
+			source.sendSuccess(Component.translatable("commands.assemblylinemachines.chunkfluid.remove.success", pos.toShortString()), true);
+			return 1;
 		}
 		source.sendFailure(Component.translatable("commands.assemblylinemachines.chunkfluid.error"));
 		return 0;

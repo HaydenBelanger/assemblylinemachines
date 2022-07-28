@@ -85,7 +85,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.commands.synchronization.*;
@@ -743,16 +743,8 @@ public class Registry {
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-		/*
-		List.of("steel_fluid_tank", "wooden_fluid_tank", "mystium_fluid_tank", "attuned_titanium_fluid_tank", "novasteel_fluid_tank", "autocrafting_table", "blooming_chaosweed",
-				"geothermal_generator", "naphtha_fire", "powered_spawner", "entropy_reactor_block", "chaosbark_leaves", "chaosbark_sapling", "cocoa_leaves", "cocoa_sapling", "chaosweed",
-				"tall_chaosweed", "tall_blooming_chaosweed", "mandelbloom", "prism_rose", "brain_cactus", "bright_prism_rose", "greenhouse")
-		.forEach((s) -> ItemBlockRenderTypes.setRenderLayer(getBlock(s), RenderType.cutout()));
-
-		ItemBlockRenderTypes.setRenderLayer(getBlock("prism_glass"), RenderType.cutoutMipped());
-
 		FLUIDS.values().forEach((f) -> ItemBlockRenderTypes.setRenderLayer(f, RenderType.translucent()));
-		*/
+		
 		BlockEntityRenderers.register((BlockEntityType<TEFluidTank>)getBlockEntity("fluid_tank"), new TankTER());
 		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
 		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());

@@ -115,7 +115,7 @@ public class ItemModelGenerator extends ItemModelProvider {
 
 		class BucketLoader extends CustomLoaderBuilder<ItemModelBuilder>{
 
-			private static final ResourceLocation BUCKET_LOADER = new ResourceLocation("forge", "bucket");
+			private static final ResourceLocation BUCKET_LOADER = new ResourceLocation("forge", "fluid_container");
 
 			protected BucketLoader(ItemModelBuilder parent,
 					ExistingFileHelper existingFileHelper) {

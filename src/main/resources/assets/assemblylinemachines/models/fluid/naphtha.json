@@ -1,7 +1,7 @@
 {
     "textures": {
         "particle": "assemblylinemachines:fluid/naphtha"
-    },
-    "render_type": "translucent"
+    }
+    
 }
 

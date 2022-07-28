@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.block.machines;
 
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
@@ -218,24 +217,19 @@ public class BlockPump extends BlockTileEntity {
 
 							if (amount - 1800 >= 0) {
 								boolean success = false;
-								try {
-									LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(this.getLevel().getChunkAt(this.getBlockPos()));
-									if(lazy.isPresent()) {
-										IChunkFluidCapability capability = lazy.orElseThrow(null);
-										FluidStack xfs = capability.drain(2000, false);
-										if(!xfs.isEmpty() && xfs.getAmount() != 0) {
-											success = true;
-											amount = amount - 1800;
-											extracted = xfs;
-										}
+								LazyOptional<IChunkFluidCapability> lazy = CapabilityChunkFluids.getChunkFluidCapability(this.getLevel().getChunkAt(this.getBlockPos()));
+								if(lazy.isPresent()) {
+									IChunkFluidCapability capability = lazy.orElseThrow(null);
+									FluidStack xfs = capability.drain(2000, false);
+									if(!xfs.isEmpty() && xfs.getAmount() != 0) {
+										success = true;
+										amount = amount - 1800;
+										extracted = xfs;
 									}
-								}catch(ExecutionException e) {
-									e.printStackTrace();
-								}finally {
-									if(!success) {
-										prevStatusMessage = "Could not connect to reservoir in chunk.";
-										forceState(false);
-									}
+								}
+								if(!success) {
+									prevStatusMessage = "Could not connect to reservoir in chunk.";
+									forceState(false);
 								}
 							} else {
 								prevStatusMessage = "Not enough power for operation.";

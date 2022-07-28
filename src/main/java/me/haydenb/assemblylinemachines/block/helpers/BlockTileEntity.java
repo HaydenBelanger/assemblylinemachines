@@ -1,10 +1,8 @@
 package me.haydenb.assemblylinemachines.block.helpers;
 
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.*;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
@@ -26,11 +24,11 @@ import net.minecraftforge.network.NetworkHooks;
 
 public abstract class BlockTileEntity extends Block implements EntityBlock{
 
-	private final Cache<Direction, VoxelShape> shapes;
+	private final LoadingCache<Direction, VoxelShape> shapes;
 	private final VoxelShape defaultShape;
-	private final Direction defaultDirection;
 	private final boolean shouldRotate;
-
+	private final Direction defaultDirection;
+	
 	private final String teName;
 
 	private static final VoxelShape NO_SHAPE_CUBE = Shapes.block();
@@ -42,7 +40,7 @@ public abstract class BlockTileEntity extends Block implements EntityBlock{
 		this.defaultDirection = defaultDirection;
 		this.shouldRotate = shouldRotate;
 
-		this.shapes = shape != null && shouldRotate && defaultDirection != null ? CacheBuilder.newBuilder().build() : null;
+		this.shapes = shape != null && shouldRotate && defaultDirection != null ? CacheBuilder.newBuilder().build(CacheLoader.from((dir) -> Utils.rotateShape(defaultDirection, dir, defaultShape))) : null;
 	}
 
 	public BlockTileEntity(Properties properties, String teName, VoxelShape shape) {
@@ -115,21 +113,7 @@ public abstract class BlockTileEntity extends Block implements EntityBlock{
 
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-		if(defaultShape != null) {
-			if(shouldRotate && defaultDirection != null && state.hasProperty(HorizontalDirectionalBlock.FACING)) {
-				try {
-					Direction facingDir = state.getValue(HorizontalDirectionalBlock.FACING);
-					return shapes.get(facingDir, () -> Utils.rotateShape(defaultDirection, facingDir, defaultShape));
-				}catch(ExecutionException e) {
-					e.printStackTrace();
-					return defaultShape;
-				}
-			}else {
-				return defaultShape;
-			}
-		}else {
-			return NO_SHAPE_CUBE;
-		}
+		return defaultShape != null ? shouldRotate && defaultDirection != null && state.hasProperty(HorizontalDirectionalBlock.FACING) ? shapes.getUnchecked(state.getValue(HorizontalDirectionalBlock.FACING)) : defaultShape : NO_SHAPE_CUBE;
 	}
 
 	@Override

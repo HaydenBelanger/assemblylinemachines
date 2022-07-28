@@ -1,20 +1,15 @@
 package me.haydenb.assemblylinemachines.world;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -29,12 +24,10 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 public class CapabilityChunkFluids {
 
 	public static final Capability<IChunkFluidCapability> CHUNK_FLUID_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
-	private static final Cache<String, LazyOptional<IChunkFluidCapability>> CACHED_FLUID_CHUNK_LAZIES = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build();
+	private static final LoadingCache<LevelChunk, LazyOptional<IChunkFluidCapability>> CACHED_FLUID_CHUNK_LAZIES = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build(CacheLoader.from((chunk) -> chunk.getCapability(CHUNK_FLUID_CAPABILITY, null)));
 
-	public static LazyOptional<IChunkFluidCapability> getChunkFluidCapability(LevelChunk chunk) throws ExecutionException{
-
-		return CACHED_FLUID_CHUNK_LAZIES.get(getCacheKey(chunk.getLevel().dimension(), chunk.getPos()), () -> chunk.getCapability(CHUNK_FLUID_CAPABILITY, null));
-
+	public static LazyOptional<IChunkFluidCapability> getChunkFluidCapability(LevelChunk chunk) {
+		return CACHED_FLUID_CHUNK_LAZIES.getUnchecked(chunk);
 	}
 
 	@SubscribeEvent
@@ -47,7 +40,7 @@ public class CapabilityChunkFluids {
 
 		ChunkFluidCapability chunkFluid = new ChunkFluidCapability(event.getObject());
 		LazyOptional<IChunkFluidCapability> lazyChunkFluid = LazyOptional.of(() -> chunkFluid);
-		lazyChunkFluid.addListener((lo) -> CACHED_FLUID_CHUNK_LAZIES.invalidate(getCacheKey(event.getObject().getLevel().dimension(), event.getObject().getPos())));
+		lazyChunkFluid.addListener((lo) -> CACHED_FLUID_CHUNK_LAZIES.invalidate(event.getObject()));
 		ICapabilitySerializable<CompoundTag> serializableProvider = new ICapabilitySerializable<>() {
 
 			@Override
@@ -105,10 +98,6 @@ public class CapabilityChunkFluids {
 		 * @param stack The fluid to place within the chunk.
 		 */
 		public void setFluid(FluidStack stack);
-	}
-
-	private static String getCacheKey(ResourceKey<Level> dim, ChunkPos pos) {
-		return dim.location().toString() + ":" + pos.x + " " + pos.z;
 	}
 
 	public static class ChunkFluidCapability implements IChunkFluidCapability{

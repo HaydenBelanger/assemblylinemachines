@@ -1,13 +1,11 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.*;
 import com.google.gson.JsonObject;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockRefinery.TERefinery;
@@ -41,12 +39,11 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 
 	public static final RefiningSerializer SERIALIZER = new RefiningSerializer();
 
-	private final Cache<Integer, List<?>> streamCache = CacheBuilder.newBuilder().build();
-
 	public final Block attachmentBlock;
 	private final List<RefineryIO> io;
 	public final int time;
 	private final ResourceLocation id;
+	private final LoadingCache<Integer, List<?>> streamCache;
 
 	public RefiningCrafting(ResourceLocation id, Block attachmentBlock, List<RefineryIO> io, int time) {
 
@@ -54,6 +51,34 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		this.attachmentBlock = attachmentBlock;
 		this.time = time;
 		this.io = io;
+		
+		//Depending on the specified operation, performs different responsive operations.
+		this.streamCache = CacheBuilder.newBuilder().build(CacheLoader.from((op) -> {
+			return switch (op) {
+			case 0 -> io.stream().filter((rio) -> rio.isInput && !rio.fluid.isEmpty()).map((rio) -> rio.fluid).toList();
+			case 1 -> Stream.concat(get(RefData.CRAFTING_STATIONS).stream(), get(RefData.ITEM_INGREDIENTS).stream()).toList();
+			case 2 -> io.stream().filter((rio) -> rio.isInput && !rio.input.get().isEmpty()).map((rio) -> rio.input.get()).toList();
+			case 3 -> List.of(Ingredient.of(attachmentBlock), Ingredient.of(Registry.getBlock("refinery")));
+			case 4 -> io.stream().filter((rio) -> !rio.isInput && !rio.fluid.isEmpty()).map((rio) -> rio.fluid).toList();
+			case 5 -> io.stream().filter((rio) -> !rio.isInput && !rio.output.isEmpty()).map((rio) -> rio.output).toList();
+			case 6 -> io.stream().filter((rio) -> rio.isInput).toList();
+			case 7 -> io.stream().filter((rio) -> !rio.isInput).toList();
+			case 8 -> {
+				ArrayList<Object> inputs = new ArrayList<>(Stream.of(get(RefData.JEI_ITEM_INGREDIENTS), get(RefData.JEI_FLUID_INPUTS)).flatMap(Collection::stream).toList());
+				while(inputs.size() < 4) {
+					inputs.add(Ingredient.EMPTY);
+				}
+
+				ArrayList<Object> outputs = new ArrayList<>(Stream.of(inputs, get(RefData.JEI_ITEM_OUTPUTS), get(RefData.JEI_FLUID_OUTPUTS)).flatMap(Collection::stream).toList());
+				while(outputs.size() < 7) {
+					outputs.add(Ingredient.EMPTY);
+				}
+
+				yield outputs;
+			}
+			default -> List.of();
+			};
+		}));
 	}
 
 	@Override
@@ -62,11 +87,11 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		if(inv instanceof TERefinery refinery) {
 			if(!refinery.getLevel().getBlockState(refinery.getBlockPos().above()).getBlock().equals(attachmentBlock)) return false;
 
-			for(Ingredient ing : this.getItemIngredients()) {
+			for(Ingredient ing : get(RefData.ITEM_INGREDIENTS)) {
 				if(!ing.test(refinery.getItem(1))) return false;
 			}
 
-			for(FluidStack fs : this.getJEIFluidInputs()) {
+			for(FluidStack fs : get(RefData.JEI_FLUID_INPUTS)) {
 				if(!fs.isFluidEqual(refinery.tankin) || refinery.tankin.getAmount() < fs.getAmount()) return false;
 			}
 
@@ -76,7 +101,7 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 	}
 
 	public void performOperations(TERefinery refinery) {
-		for(RefineryIO io : getAll(true)) {
+		for(RefineryIO io : get(RefData.ALL_INPUTS)) {
 			float chance = io.odds;
 			chance = switch(refinery.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION)) {
 			case 3 -> chance * 2f;
@@ -101,7 +126,7 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		ArrayList<Consumer<Void>> actions = new ArrayList<>();
 		boolean useFirstTank = true;
 
-		for(RefineryIO io : getAll(false)) {
+		for(RefineryIO io : get(RefData.ALL_OUTPUTS)) {
 			float chance = io.odds;
 			chance = switch(refinery.getUpgradeAmount(Upgrades.MACHINE_EXTRA)) {
 			case 3 -> chance * 2f;
@@ -189,91 +214,6 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 		return REFINING_RECIPE;
 	}
 
-	public List<FluidStack> getJEIFluidInputs() {
-		try {
-			return (List<FluidStack>) streamCache.get(0, () -> io.stream().filter((rio) -> rio.isInput && !rio.fluid.isEmpty()).map((rio) -> rio.fluid).toList());
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	public List<Ingredient> getJEIItemIngredients() {
-		try {
-			return (List<Ingredient>) streamCache.get(1, () -> Stream.concat(getCraftingStationIngredients().stream(), getItemIngredients().stream()).toList());
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	public List<Ingredient> getItemIngredients(){
-		try {
-			return (List<Ingredient>) streamCache.get(2, () -> io.stream().filter((rio) -> rio.isInput && !rio.input.get().isEmpty()).map((rio) -> rio.input.get()).toList());
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	public List<Ingredient> getCraftingStationIngredients(){
-		try {
-			return (List<Ingredient>) streamCache.get(3, () -> List.of(Ingredient.of(attachmentBlock), Ingredient.of(Registry.getBlock("refinery"))));
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	public List<FluidStack> getJEIFluidOutputs() {
-		try {
-			return (List<FluidStack>) streamCache.get(4, () -> io.stream().filter((rio) -> !rio.isInput && !rio.fluid.isEmpty()).map((rio) -> rio.fluid).toList());
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	public List<ItemStack> getJEIItemOutputs() {
-		try {
-			return (List<ItemStack>) streamCache.get(5, () -> io.stream().filter((rio) -> !rio.isInput && !rio.output.isEmpty()).map((rio) -> rio.output).toList());
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	public List<RefineryIO> getAll(boolean inputs){
-		try {
-			return (List<RefineryIO>) streamCache.get(inputs ? 6 : 7, () -> io.stream().filter((rio) -> rio.isInput == inputs).toList());
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
-	@Override
-	public List<?> getJEIComponents() {
-		try {
-			return streamCache.get(8, () -> {
-				ArrayList<Object> inputs = new ArrayList<>(Stream.of(getJEIItemIngredients(), getJEIFluidInputs()).flatMap(Collection::stream).toList());
-				while(inputs.size() < 4) {
-					inputs.add(Ingredient.EMPTY);
-				}
-
-				ArrayList<Object> outputs = new ArrayList<>(Stream.of(inputs, getJEIItemOutputs(), getJEIFluidOutputs()).flatMap(Collection::stream).toList());
-				while(outputs.size() < 7) {
-					outputs.add(Ingredient.EMPTY);
-				}
-
-				return outputs;
-			});
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return List.of();
-		}
-	}
-
 	public static class RefiningSerializer implements RecipeSerializer<RefiningCrafting>{
 
 		@Override
@@ -334,6 +274,38 @@ public class RefiningCrafting implements Recipe<Container>, IRecipeCategoryBuild
 			});
 		}
 
+	}
+
+	@Override
+	public List<?> getJEIComponents() {
+		return this.get(RefData.JEI_COMPONENTS);
+	}
+	
+	public <T> List<T> get(RefData<T> operation){
+		return operation.get(this);
+	}
+	
+	public static class RefData<T>{
+		
+		public static final RefData<FluidStack> JEI_FLUID_INPUTS = new RefData<>(0);
+		public static final RefData<Ingredient> JEI_ITEM_INGREDIENTS = new RefData<>(1);
+		public static final RefData<Ingredient> ITEM_INGREDIENTS = new RefData<>(2);
+		public static final RefData<Ingredient> CRAFTING_STATIONS = new RefData<>(3);
+		public static final RefData<FluidStack> JEI_FLUID_OUTPUTS = new RefData<>(4);
+		public static final RefData<ItemStack> JEI_ITEM_OUTPUTS = new RefData<>(5);
+		public static final RefData<RefineryIO> ALL_INPUTS = new RefData<>(6);
+		public static final RefData<RefineryIO> ALL_OUTPUTS = new RefData<>(7);
+		public static final RefData<?> JEI_COMPONENTS = new RefData<>(8);
+		
+		private final int operation;
+		
+		private RefData(int operation){
+			this.operation = operation;
+		}
+		
+		private List<T> get(RefiningCrafting recipe){
+			return (List<T>) recipe.streamCache.getUnchecked(operation);
+		}
 	}
 
 	public static class RefineryIO{

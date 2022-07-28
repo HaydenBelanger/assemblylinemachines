@@ -377,7 +377,7 @@ public class BlockExperienceMill {
 			if(!tsfm.tank.isEmpty() && tsfm.tank.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(tsfm.tank.getFluid());
 				if(tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) tsfm.tank.getFluid().getFluidType()).getStillTexture());
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(IClientFluidTypeExtensions.of(tsfm.tank.getFluid()).getStillTexture());
 				}
 
 				if(tsfm.tank.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {

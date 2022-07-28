@@ -532,7 +532,8 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 			if (!fs.isEmpty() && fs.getAmount() != 0) {
 				TextureAtlasSprite tas = spriteMap.get(fs.getFluid());
 				if (tas == null) {
-					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(((IClientFluidTypeExtensions) fs.getFluid().getFluidType()).getStillTexture());
+					
+					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(IClientFluidTypeExtensions.of(fs.getFluid()).getStillTexture());
 					spriteMap.put(fs.getFluid(), tas);
 				}
 

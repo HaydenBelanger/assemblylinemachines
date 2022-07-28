@@ -2,14 +2,12 @@ package me.haydenb.assemblylinemachines.client;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.*;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -153,7 +151,7 @@ public class TooltipBorderHandler {
 
 	public static interface ISpecialTooltip {
 
-		static final Cache<Integer, Integer> BOTTOM_COLOR_CACHE = CacheBuilder.newBuilder().build();
+		static final LoadingCache<Integer, Integer> BOTTOM_COLOR_CACHE = CacheBuilder.newBuilder().build(CacheLoader.from((i) -> ScreenMath.multiplyARGBColor(i, 0.7f)));
 
 		/**
 		 * @return Whether or not to render special tooltip color and frame. Defaults to true.
@@ -177,12 +175,7 @@ public class TooltipBorderHandler {
 		 * @return A supplier for the ARGB color value of the bottom section of the tooltip. Defaults to 30% darker than getTopColor.
 		 */
 		default public int getBottomColor(){
-			try {
-				return BOTTOM_COLOR_CACHE.get(getTopColor(), () -> ScreenMath.multiplyARGBColor(getTopColor(), 0.7f));
-			}catch(ExecutionException e) {
-				e.printStackTrace();
-				return ScreenMath.multiplyARGBColor(getTopColor(), 0.7f);
-			}
+			return BOTTOM_COLOR_CACHE.getUnchecked(getTopColor());
 
 		}
 

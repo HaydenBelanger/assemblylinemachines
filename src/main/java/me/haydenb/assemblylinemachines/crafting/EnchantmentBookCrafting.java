@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import com.google.common.cache.*;
 import com.google.gson.JsonObject;
@@ -97,12 +96,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 			inv.getItem(catalystSlot).shrink(this.input.getCount() * level);
 			te.cycles = cycles;
 		}
-		try {
-			return bookCache.get(level).copy();
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return ItemStack.EMPTY;
-		}
+		return bookCache.getUnchecked(level).copy();
 	}
 
 	@Override
@@ -112,12 +106,7 @@ public class EnchantmentBookCrafting implements Recipe<Container>, IRecipeCatego
 
 	@Override
 	public ItemStack getResultItem() {
-		try {
-			return bookCache.get(1);
-		}catch(ExecutionException e) {
-			e.printStackTrace();
-			return ItemStack.EMPTY;
-		}
+		return bookCache.getUnchecked(1);
 	}
 
 	@Override
