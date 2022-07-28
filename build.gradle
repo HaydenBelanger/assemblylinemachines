@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.19-1.4.8'
+version = '1.19.1-1.4.9'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -122,7 +122,7 @@ jar{
 }
 
 dependencies {
-  	minecraft 'net.minecraftforge:forge:1.19-41.1.0'
+  	minecraft 'net.minecraftforge:forge:1.19.1-42.0.0'
 
 	//Compatibilities - 'implementation' because it needs to be during runtime and compilation.
 	implementation fg.deobf("curse.maven:theoneprobe-245211:3871444")

@@ -348,7 +348,7 @@ public class Registry {
 
 			createItem("overclocked_convection_component", "overclocked_conduction_component");
 
-			createItem("music_disc_assembly_required", new RecordItem(1, () -> ASSEMBLY_REQUIRED.get(), new Item.Properties().tab(CREATIVE_TAB).stacksTo(1).rarity(Rarity.RARE)));
+			createItem("music_disc_assembly_required", new RecordItem(1, () -> ASSEMBLY_REQUIRED.get(), new Item.Properties().tab(CREATIVE_TAB).stacksTo(1).rarity(Rarity.RARE), 5100));
 
 			createItem("mkii_upgrade_kit", new ItemUpgradeKit());
 			createItem("electric_upgrade_kit", new ItemUpgradeKit());

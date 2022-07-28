@@ -6,7 +6,7 @@ to Minecraft.
 
 ## Downloads
 
-This mod is currently available using the Forge Modloader for current versions of Minecraft, and can be downloaded from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/assemblylinemachines) or [Modrinth](https://modrinth.com/mod/assemblylinemachines).
+This mod is currently available using the Forge Modloader for current versions of Minecraft, and can be downloaded from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/assemblylinemachines).
 
 ## Wiki
 
