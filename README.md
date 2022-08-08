@@ -13,3 +13,5 @@ This mod is currently available using the Forge Modloader for current versions o
 For documentation about progression, we strongly recommend [Patchouli](https://www.curseforge.com/minecraft/mc-mods/patchouli).
 
 For developer/packmaker information, the [Web Wiki](https://assemblylinemachines.haydenb.me/en/latest/) will host up-to-date documentation for specification on how to implement custom recipes and more.
+
+For any other forms of support, check us out and talk to the developers, or just hang out, at our [Discord Server!](https://discord.gg/azjJ8j3AGn)
