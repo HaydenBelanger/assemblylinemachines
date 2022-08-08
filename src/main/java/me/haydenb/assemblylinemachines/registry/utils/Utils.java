@@ -1,8 +1,11 @@
 package me.haydenb.assemblylinemachines.registry.utils;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import com.google.common.base.CaseFormat;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
@@ -144,5 +147,29 @@ public class Utils {
 			return true;
 		}
 		return false;
+	}
+
+	public static <T> HashMap<String, T> getAllMethods(Class<?> classToSearch, Class<T> type, String nameToRemove) {
+		HashMap<String, T> map = new HashMap<>();
+		if(nameToRemove == null) nameToRemove = "";
+		for(Method m : classToSearch.getDeclaredMethods()) {
+			try {
+				if(m.getReturnType().equals(type) && m.getParameterCount() == 0 && Modifier.isStatic(m.getModifiers())) map.put(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, m.getName().replace(nameToRemove, "")), type.cast(m.invoke(null)));
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		return map;
+	}
+	
+	public static void invokeAllMethods(Class<?> classToSearch, Class<?> type) {
+		for(Method m : classToSearch.getDeclaredMethods()) {
+			try {
+				if(m.getReturnType().equals(type) && m.getParameterCount() == 0 && Modifier.isStatic(m.getModifiers())) m.invoke(null);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

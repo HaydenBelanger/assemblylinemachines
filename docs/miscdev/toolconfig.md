@@ -3,7 +3,7 @@
 The tool configuration is specified in `assemblylinemachines-experimental.toml` config located in the config directory. This allows more control over stats and features of various tools.
 
 !!! error "Removed Feature"
-    This feature was exclusively available in 1.18.2-1.4.3 and 1.18.2-1.4.4, and was removed in 1.19-1.4.5 due to a change with Forge not allowing configs to be loaded prior to the preinitialization phase.
+    This feature was exclusively available in versions released for 1.18.2 including and after 1.18.2-1.4.3, and was removed in 1.19-1.4.5 due to a change with Forge not allowing configs to be loaded prior to the preinitialization phase.
 
     This feature is extremely volatile and may stop working as expected. Client-server config mismatch will cause all clients to be unable to join. It's recommended to only change these options for a modpack default config, allowing all clients to share the same values.
     

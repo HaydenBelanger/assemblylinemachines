@@ -74,6 +74,7 @@ import me.haydenb.assemblylinemachines.registry.config.ConfigCondition.ConfigCon
 import me.haydenb.assemblylinemachines.registry.config.ConfigMatchTest;
 import me.haydenb.assemblylinemachines.registry.datagen.*;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import me.haydenb.assemblylinemachines.registry.utils.WhitelistBiomeFilter;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell;
 import me.haydenb.assemblylinemachines.world.EntityCorruptShell.EntityCorruptShellRenderFactory;
@@ -391,7 +392,8 @@ public class Registry {
 		event.register(Keys.BLOCKS, (h) -> {
 			TransmissionType.getPipeRegistryValues().forEach((pipeData) -> createBlock(pipeData.getLeft(), new BlockPipe(pipeData.getRight(), pipeData.getMiddle()), true));
 			BlockCorruptOres.createCorruptOres();
-
+			Utils.getAllMethods(BlockMachines.class, Block.class, null).forEach((name, block) -> createBlock(name, block, true));
+			
 			createBlock("titanium_ore", Material.STONE, 3f, 15f, SoundType.STONE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 			createBlock("deepslate_titanium_ore", Material.STONE, 4f, 20f, SoundType.DEEPSLATE, true, BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_DIAMOND_TOOL, true);
 
@@ -449,23 +451,6 @@ public class Registry {
 			createBlock("autocrafting_table", new BlockAutocraftingTable(), true);
 
 			createBlock("naphtha_fire", new BlockNaphthaFire(), false);
-
-			createBlock("alloy_smelter", BlockMachines.alloySmelter(), true);
-			createBlock("mkii_alloy_smelter", BlockMachines.mkIIAlloySmelter(), true);
-			createBlock("electric_furnace", BlockMachines.electricFurnace(), true);
-			createBlock("mkii_furnace", BlockMachines.mkIIFurnace(), true);
-			createBlock("kinetic_grinder", BlockMachines.kineticGrinder(), true);
-			createBlock("electric_grinder", BlockMachines.electricGrinder(), true);
-			createBlock("mkii_grinder", BlockMachines.mkIIGrinder(), true);
-			createBlock("kinetic_fluid_mixer", BlockMachines.kineticFluidMixer(), true);
-			createBlock("electric_fluid_mixer", BlockMachines.electricFluidMixer(), true);
-			createBlock("mkii_fluid_mixer", BlockMachines.mkIIFluidMixer(), true);
-			createBlock("electric_purifier", BlockMachines.electricPurifier(), true);
-			createBlock("mkii_purifier", BlockMachines.mkIIPurifier(), true);
-			createBlock("pneumatic_compressor", BlockMachines.pneumaticCompressor(), true);
-			createBlock("mkii_pneumatic_compressor", BlockMachines.mkIIPneumaticCompressor(), true);
-			createBlock("lumber_mill", BlockMachines.lumberMill(), true);
-			createBlock("mkii_lumber_mill", BlockMachines.mkIILumberMill(), true);
 			
 			createBlock("pump", new BlockPump(), true);
 			createBlock("pumpshaft", new BlockPumpshaft(), true);
@@ -601,6 +586,7 @@ public class Registry {
 
 		//BLOCK ENTITIES
 		event.register(Keys.BLOCK_ENTITY_TYPES, (h) -> {
+			Utils.getAllMethods(BlockMachines.class, BlockEntityType.class, "Entity").forEach(Registry::createBlockEntity);
 			createBlockEntity("pipe_connector", PipeConnectorTileEntity.class, Lists.transform(TransmissionType.getPipeRegistryValues(), (t) -> BLOCKS.get(t.getLeft())));
 			createBlockEntity("hand_grinder", TEHandGrinder.class);
 			createBlockEntity("fluid_bath", TEFluidBath.class);
@@ -630,28 +616,13 @@ public class Registry {
 			createBlockEntity("experience_siphon", TEExperienceSiphon.class);
 			createBlockEntity("omnivoid", TEOmnivoid.class);
 			createBlockEntity("greenhouse", TEGreenhouse.class);
-			createBlockEntity("alloy_smelter", BlockMachines.alloySmelterEntity());
-			createBlockEntity("mkii_alloy_smelter", BlockMachines.mkIIAlloySmelterEntity());
-			createBlockEntity("electric_furnace", BlockMachines.electricFurnaceEntity());
-			createBlockEntity("mkii_furnace", BlockMachines.mkIIFurnaceEntity());
-			createBlockEntity("kinetic_grinder", BlockMachines.kineticGrinderBlockEntity());
-			createBlockEntity("electric_grinder", BlockMachines.electricGrinderEntity());
-			createBlockEntity("mkii_grinder", BlockMachines.mkIIGrinderEntity());
-			createBlockEntity("kinetic_fluid_mixer", BlockMachines.kineticFluidMixerEntity());
-			createBlockEntity("electric_fluid_mixer", BlockMachines.electricFluidMixerEntity());
-			createBlockEntity("mkii_fluid_mixer", BlockMachines.mkIIFluidMixerEntity());
-			createBlockEntity("electric_purifier", BlockMachines.electricPurifierEntity());
-			createBlockEntity("mkii_purifier", BlockMachines.mkIIPurifierEntity());
-			createBlockEntity("pneumatic_compressor", BlockMachines.pneumaticCompressorEntity());
-			createBlockEntity("mkii_pneumatic_compressor", BlockMachines.mkIIPneumaticCompressorEntity());
-			createBlockEntity("lumber_mill", BlockMachines.lumberMillEntity());
-			createBlockEntity("mkii_lumber_mill", BlockMachines.mkIILumberMillBlockEntity());
 
 			BLOCK_ENTITIES.forEach((k, v) -> h.register(k, v));
 		});
 
 		//CONTAINERS
 		event.register(Keys.MENU_TYPES, (h) -> {
+			Utils.getAllMethods(BlockMachines.class, MenuType.class, "Container").forEach(Registry::createContainer);
 			createContainer("gearbox", ContainerGearbox.class);
 			createContainer("pipe_connector", PipeConnectorContainer.class);
 			createContainer("coal_generator", ContainerCoalGenerator.class);
@@ -671,22 +642,6 @@ public class Registry {
 			createContainer("corrupting_basin", ContainerCorruptingBasin.class);
 			createContainer("omnivoid", ContainerOmnivoid.class);
 			createContainer("greenhouse", ContainerGreenhouse.class);
-			createContainer("alloy_smelter", BlockMachines.alloySmelterContainer());
-			createContainer("mkii_alloy_smelter", BlockMachines.mkIIAlloySmelterContainer());
-			createContainer("electric_furnace", BlockMachines.electricFurnaceContainer());
-			createContainer("mkii_furnace", BlockMachines.mkIIFurnaceContainer());
-			createContainer("kinetic_grinder", BlockMachines.kineticGrinderContainer());
-			createContainer("electric_grinder", BlockMachines.electricGrinderContainer());
-			createContainer("mkii_grinder", BlockMachines.mkIIGrinderContainer());
-			createContainer("kinetic_fluid_mixer", BlockMachines.kineticFluidMixerContainer());
-			createContainer("electric_fluid_mixer", BlockMachines.electricFluidMixerContainer());
-			createContainer("mkii_fluid_mixer", BlockMachines.mkIIFluidMixerContainer());
-			createContainer("electric_purifier", BlockMachines.electricPurifierContainer());
-			createContainer("mkii_purifier", BlockMachines.mkIIPurifierContainer());
-			createContainer("pneumatic_compressor", BlockMachines.pneumaticCompressorContainer());
-			createContainer("mkii_pneumatic_compressor", BlockMachines.mkIIPneumaticCompressorContainer());
-			createContainer("lumber_mill", BlockMachines.lumberMillContainer());
-			createContainer("mkii_lumber_mill", BlockMachines.mkIILumberMillContainer());
 
 			CONTAINERS.forEach((k, v) -> h.register(k, v.getFirst()));
 		});
@@ -749,6 +704,7 @@ public class Registry {
 		BlockEntityRenderers.register((BlockEntityType<TEPoweredSpawner>)getBlockEntity("powered_spawner"), new PoweredSpawnerTER());
 		BlockEntityRenderers.register((BlockEntityType<TEQuantumLink>)getBlockEntity("quantum_link"), new QuantumLinkTER());
 
+		Utils.invokeAllMethods(BlockMachines.class, Void.TYPE);
 		registerScreen("gearbox", ContainerGearbox.class, ScreenGearbox.class);
 		registerScreen("pipe_connector", PipeConnectorContainer.class, PipeConnectorScreen.class);
 		registerScreen("coal_generator", ContainerCoalGenerator.class, ScreenCoalGenerator.class);
@@ -768,22 +724,7 @@ public class Registry {
 		registerScreen("corrupting_basin", ContainerCorruptingBasin.class, ScreenCorruptingBasin.class);
 		registerScreen("omnivoid", ContainerOmnivoid.class, ScreenOmnivoid.class);
 		registerScreen("greenhouse", ContainerGreenhouse.class, ScreenGreenhouse.class);
-		BlockMachines.alloySmelterScreen();
-		BlockMachines.mkIIAlloySmelterScreen();
-		BlockMachines.electricFurnaceScreen();
-		BlockMachines.mkIIFurnaceScreen();
-		BlockMachines.kineticGrinderScreen();
-		BlockMachines.electricGrinderScreen();
-		BlockMachines.mkIIGrinderScreen();
-		BlockMachines.kineticFluidMixerScreen();
-		BlockMachines.electricFluidMixerScreen();
-		BlockMachines.mkIIFluidMixerScreen();
-		BlockMachines.electricPurifierScreen();
-		BlockMachines.mkIIPurifierScreen();
-		BlockMachines.pneumaticCompressorScreen();
-		BlockMachines.mkIIPneumaticCompressorScreen();
-		BlockMachines.lumberMillScreen();
-		BlockMachines.mkIILumberMillScreen();
+		
 
 		ItemProperties.registerGeneric(new ResourceLocation(AssemblyLineMachines.MODID, "active"), (stack, level, entity, seed) -> stack.getItem() instanceof IToolWithCharge charge ? charge.getActivePropertyState(stack, entity) : 0f);
 		ItemProperties.register(getItem("wrench_o_matic"), new ResourceLocation(AssemblyLineMachines.MODID, "wrenchmode"), (stack, level, entity, seed) -> stack.getOrCreateTag().getInt("assemblylinemachines:wrenchmode") /2f);
