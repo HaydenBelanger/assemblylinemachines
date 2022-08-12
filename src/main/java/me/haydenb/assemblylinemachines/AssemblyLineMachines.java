@@ -3,6 +3,7 @@ package me.haydenb.assemblylinemachines;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import me.haydenb.assemblylinemachines.plugins.PluginMekanism;
 import me.haydenb.assemblylinemachines.plugins.PluginTOP;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -37,6 +38,6 @@ public final class AssemblyLineMachines{
 		Registry.registerDeferredRegistries();
 
 		//Registers gases if Mekanism is installed.
-		//PluginMekanism.INTERFACE.get().registerGases();
+		PluginMekanism.INTERFACE.get().registerGases();
 	}
 }

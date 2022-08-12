@@ -4,7 +4,7 @@ loaderVersion="[42,)"
 issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[mods]]
 	modId="assemblylinemachines"
-	version="1.19.1-1.4.9"
+	version="1.19.1-1.4.10"
 	displayName="Assembly Line Machines"
 	updateJSONURL="https://haydenb.me/api/versionhistory.json"
 	logoFile="banner-compressed.png" #optional
@@ -13,12 +13,12 @@ issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[dependencies.assemblylinemachines]]
     modId="forge"
     mandatory=true
-    versionRange="[42.0.0,)" #mandatory
+    versionRange="[42.0.9,)" #mandatory
     ordering="NONE"
     side="BOTH"
 [[dependencies.assemblylinemachines]]
     modId="jei"
     mandatory=false
-    versionRange="[11.0.0,)" #mandatory
+    versionRange="[11.2.0,)" #mandatory
     ordering="NONE"
     side="BOTH"

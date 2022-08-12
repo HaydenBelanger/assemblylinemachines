@@ -19,6 +19,7 @@ import me.haydenb.assemblylinemachines.crafting.RefiningCrafting;
 import me.haydenb.assemblylinemachines.crafting.RefiningCrafting.RefData;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade;
 import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
+import me.haydenb.assemblylinemachines.plugins.PluginMekanism;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -501,8 +502,8 @@ public class BlockRefinery extends BlockScreenBlockEntity<TERefinery> {
 				return fhandler.cast();
 			}
 
-			//LazyOptional<?> gas = PluginMekanism.INTERFACE.get().getFluidGasWrapper(cap, fluids);
-			//if(gas.isPresent()) return gas.cast();
+			LazyOptional<?> gas = PluginMekanism.INTERFACE.get().getFluidGasWrapper(cap, fluids);
+			if(gas.isPresent()) return gas.cast();
 
 			return super.getCapability(cap, side);
 		}

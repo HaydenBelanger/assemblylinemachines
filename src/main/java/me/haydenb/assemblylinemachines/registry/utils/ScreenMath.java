@@ -9,9 +9,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.texture.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -99,5 +103,35 @@ public class ScreenMath {
 	public static void drawCenteredStringWithoutShadow(PoseStack pPoseStack, Component pText, int pX, int pY) {
 		Minecraft mc = Minecraft.getInstance();
 		drawCenteredStringWithoutShadow(pPoseStack, mc.font, pText, pX, pY, 4210752);
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static int getColorFrom(ResourceLocation location) {
+		AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS);
+		if (texture instanceof TextureAtlas) {
+			return getColorFrom(((TextureAtlas) texture).getSprite(location));
+		}
+		return 0;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static int getColorFrom(TextureAtlasSprite sprite) {
+		if (sprite == null) return -1;
+		if (sprite.getFrameCount() == 0) return -1;
+		float total = 0, red = 0, blue = 0, green = 0;
+		for (int x = 0; x < sprite.getWidth(); x++) {
+			for (int y = 0; y < sprite.getHeight(); y++) {
+				int color = sprite.getPixelRGBA(0, x, y);
+				int alpha = color >> 24 & 0xFF;
+			// if (alpha != 255) continue; // this creates problems for translucent textures
+			total += alpha;
+			red += (color & 0xFF) * alpha;
+			green += (color >> 8 & 0xFF) * alpha;
+			blue += (color >> 16 & 0xFF) * alpha;
+			}
+		}
+
+		if (total > 0) return FastColor.ARGB32.color( 255, (int)(red / total), (int) (green / total), (int) (blue / total));
+		return -1;
 	}
 }

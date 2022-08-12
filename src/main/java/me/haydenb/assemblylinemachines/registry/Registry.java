@@ -5,6 +5,7 @@ import static net.minecraft.core.Registry.*;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -576,10 +577,10 @@ public class Registry {
 			createFluid("dark_energy", (b) -> new SplitFluid(b, basicFFFProperties("dark_energy").tickRate(3)), Either.left(SplitFluid.effectLiquidBlock("dark_energy", () -> List.of(new MobEffectInstance(DARK_EXPULSION.get(), 129, 0, false, false, true)))), true, FluidType.Properties.create().temperature(-100).canSwim(false).canDrown(false).canPushEntity(false), (f) -> f.color(0, 0, 0).fog(() -> ItemChaoticReductionGoggles.modifyFogColor()));
 			createFluid("liquid_experience", (b) -> new SplitFluid(b, basicFFFProperties("liquid_experience")), Either.right(true), true, FluidType.Properties.create().temperature(35), (f) -> f.color(0, 184, 18).fog(24f));
 			createFluid("glacier_water", FluidGlacierWater::new, Either.right(true), true, FluidType.Properties.create().temperature(-100).motionScale(0.00025).canSwim(false).canPushEntity(false), (f) -> f.color(114, 154, 219).fog(11.5f));
-			createFluid("propane", Optional.of(new GasFluid("propane")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100));
-			createFluid("propylene", Optional.of(new GasFluid("propylene")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100));
-			createFluid("ethane", Optional.of(new GasFluid("ethane")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100));
-			createFluid("ethylene", Optional.of(new GasFluid("ethylene")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100));
+			createFluid("propane", Optional.of(new GasFluid("propane")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(95, 15, 28));
+			createFluid("propylene", Optional.of(new GasFluid("propylene")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(40, 13, 85));
+			createFluid("ethane", Optional.of(new GasFluid("ethane")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(19, 95, 15));
+			createFluid("ethylene", Optional.of(new GasFluid("ethylene")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(179, 170, 195));
 
 			BLOCKS.forEach((k, v) -> h.register(k, v));
 		});
@@ -874,8 +875,8 @@ public class Registry {
 		return FLUID_TYPES.get(name);
 	}
 
-	public static Collection<Fluid> getAllFluids(){
-		return Collections.unmodifiableCollection(FLUIDS.values());
+	public static Set<Entry<String, Fluid>> getAllFluids(){
+		return Collections.unmodifiableSet(FLUIDS.entrySet());
 	}
 
 	public static ForgeFlowingFluid.Properties basicFFFProperties(String name){

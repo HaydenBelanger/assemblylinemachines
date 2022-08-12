@@ -1,6 +1,28 @@
 package me.haydenb.assemblylinemachines.plugins;
 
-/*
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.fluids.SplitFluid.SpecialRenderFluidType;
+import me.haydenb.assemblylinemachines.registry.Registry;
+import mekanism.api.Action;
+import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.gas.*;
+import mekanism.common.capabilities.Capabilities;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegisterEvent;
+
 public class PluginMekanism {
 
 	public static final Lazy<MekanismInterface> INTERFACE = Lazy.of(() -> {
@@ -31,18 +53,21 @@ public class PluginMekanism {
 		@Override
 		public void registerGases() {
 
-			FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Gas.class, (RegistryEvent.Register<Gas> event) -> {
-				Registry.getAllFluids().stream().filter((fff) -> fff.getAttributes().isGaseous() && (fff instanceof ALMFluid)).map((fff) -> (ALMFluid) fff).forEach((amf) -> {
-					gas.put(amf, new Gas(GasBuilder.builder().hidden().color(ARGB32.color(255, amf.getRGB()[0], amf.getRGB()[1], amf.getRGB()[2]))).setRegistryName(amf.getRegistryName()));
+			FMLJavaModLoadingContext.get().getModEventBus().addListener((RegisterEvent event) -> {
+				event.register(MekanismAPI.gasRegistryName(), (h) -> {
+					Registry.getAllFluids().stream().filter((e) -> e.getValue().getFluidType().isLighterThanAir() && e.getValue().getFluidType() instanceof SpecialRenderFluidType).forEach((e) -> {
+						SpecialRenderFluidType srft = (SpecialRenderFluidType) e.getValue().getFluidType();
+						Gas g = new Gas(GasBuilder.builder().hidden().color(ARGB32.color(255, srft.colorI.getX(), srft.colorI.getY(), srft.colorI.getZ())));
+						gas.put(e.getValue(), g);
+						h.register(new ResourceLocation(AssemblyLineMachines.MODID, e.getKey()), g);
+					});
 				});
-
-				gas.values().forEach((g) -> event.getRegistry().register(g));
 			});
 		}
 
 		@Override
 		public <T> LazyOptional<T> getFluidGasWrapper(Capability<T> cap, IFluidHandler handler) {
-			if(cap == Capabilities.GAS_HANDLER_CAPABILITY) {
+			if(cap == Capabilities.GAS_HANDLER) {
 				return LazyOptional.of(() -> new IGasHandler() {
 
 					@Override
@@ -98,5 +123,3 @@ public class PluginMekanism {
 		}
 	}
 }
-
-*/

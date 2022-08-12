@@ -14,6 +14,7 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -123,7 +124,9 @@ public class SplitFluid extends ForgeFlowingFluid {
 		private final ResourceLocation stillTexture;
 		private final ResourceLocation flowingTexture;
 
-		private Vector3f color = null;
+		private Vector3f colorF = null;
+		public Vec3i colorI = null;
+		
 		private Supplier<Float> fogDepthProvider = null;
 
 		public SpecialRenderFluidType(Properties properties, String textureName, boolean hasFlowing) {
@@ -133,7 +136,8 @@ public class SplitFluid extends ForgeFlowingFluid {
 		}
 
 		public SpecialRenderFluidType color(int red, int green, int blue) {
-			this.color = new Vector3f(red / 255f, green / 255f, blue / 255f);
+			this.colorF = new Vector3f(red / 255f, green / 255f, blue / 255f);
+			this.colorI = new Vec3i(red, green, blue);
 			return this;
 		}
 
@@ -162,7 +166,7 @@ public class SplitFluid extends ForgeFlowingFluid {
 				@Override
 				public @NotNull Vector3f modifyFogColor(Camera camera, float partialTick, ClientLevel level,
 						int renderDistance, float darkenWorldAmount, Vector3f fluidFogColor) {
-					return color != null ? color : fluidFogColor;
+					return colorF != null ? colorF : fluidFogColor;
 				}
 			});
 		}

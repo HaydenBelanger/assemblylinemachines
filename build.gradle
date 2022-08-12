@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.19.1-1.4.9'
+version = '1.19.1-1.4.10'
 group = 'me.haydenb.assemblylinemachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'assemblylinemachines'
 
@@ -122,13 +122,13 @@ jar{
 }
 
 dependencies {
-  	minecraft 'net.minecraftforge:forge:1.19.1-42.0.0'
+  	minecraft 'net.minecraftforge:forge:1.19.1-42.0.9'
 
 	//Compatibilities - 'implementation' because it needs to be during runtime and compilation.
 	implementation fg.deobf("curse.maven:theoneprobe-245211:3871444")
 	implementation fg.deobf("vazkii.patchouli:Patchouli:1.19-76-SNAPSHOT")
- 	implementation fg.deobf("mezz.jei:jei-1.19-forge:11.1.0.235")
-    //implementation fg.deobf("curse.maven:mekanism-268560:3743835")
+ 	implementation fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.246")
+    implementation fg.deobf("curse.maven:mekanism-268560:3922056")
     
     //Runtime - for testing purposes to make sure certain mechanics work.
     //runtimeOnly fg.deobf("curse.maven:ato-405593:3801220")
