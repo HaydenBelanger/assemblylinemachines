@@ -72,7 +72,7 @@ public class LootTableGenerator extends LootTableProvider {
 			this.dropOther(Registry.getBlock("mystium_farmland"), Blocks.DIRT);
 			this.dropOther(Registry.getBlock("nova_farmland"), Blocks.DIRT);
 			
-			List.of("novasteel_fluid_tank", "attuned_titanium_fluid_tank", "mystium_fluid_tank", "steel_fluid_tank", "wooden_fluid_tank").forEach((s) -> this.nbtCopyDrop(Registry.getBlock(s), "upgraded"));
+			List.of("novasteel_fluid_tank", "attuned_titanium_fluid_tank", "mystium_fluid_tank", "steel_fluid_tank", "wooden_fluid_tank").forEach((s) -> this.nbtCopyDrop(Registry.getBlock(s), "upgraded", "fluidstack"));
 			List.of("basic_battery_cell", "advanced_battery_cell", "ultimate_battery_cell").forEach((s) -> this.nbtCopyDrop(Registry.getBlock(s), "stored", "fptout", "in", "creative"));
 			this.nbtCopyDrop(Registry.getBlock("bottomless_storage_unit"), "stored", "storeditem", "creative");
 			

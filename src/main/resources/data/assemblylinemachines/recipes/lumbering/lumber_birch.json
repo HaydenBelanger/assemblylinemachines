@@ -10,6 +10,6 @@
 	"secondaryoutput":{
 		"item": "assemblylinemachines:sawdust"
 	},
-	"opbchance": 0.25,
+	"opbchance": 0.40,
 	"time": 6
 }
