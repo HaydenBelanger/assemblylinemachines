@@ -1,8 +1,6 @@
 package me.haydenb.assemblylinemachines.block.misc;
 
-import java.util.List;
-
-import org.jetbrains.annotations.Nullable;
+import java.util.Random;
 
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster;
@@ -119,11 +117,9 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 
 		BlockPos pos1 = pos.above();
 		BlockPos pos2 = pos.above(2);
-		List<Player> players = world.getEntitiesOfClass(Player.class, new AABB(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5, pos2.getX() + 1.5, pos2.getY() + 1.5, pos2.getZ() + 1.5));
-
-		for(Player p : players) {
-			p.addEffect(new MobEffectInstance(Registry.ENTROPY_POISONING.get(), 100, 0, false, false, true));
-		}
+		world.getEntitiesOfClass(Player.class, new AABB(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5, pos2.getX() + 1.5, pos2.getY() + 1.5, pos2.getZ() + 1.5)).stream().filter((p) -> !p.isCreative()).forEach((p) -> {
+			p.addEffect(new MobEffectInstance(Registry.getEffect("entropy_poisoning"), 100, 0, false, false, true));
+		});
 	}
 
 	//Used for Chaosbark/Stripped Chaosbark Logs.

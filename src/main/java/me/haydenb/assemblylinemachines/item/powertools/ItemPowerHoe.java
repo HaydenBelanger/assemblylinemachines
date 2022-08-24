@@ -3,11 +3,9 @@ package me.haydenb.assemblylinemachines.item.powertools;
 import java.util.List;
 import java.util.function.Consumer;
 
-import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -17,7 +15,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class ItemPowerHoe extends HoeItem implements IToolWithCharge, ISpecialTooltip {
+public class ItemPowerHoe extends HoeItem implements IToolWithCharge {
 
 	private final IToolWithCharge.PowerToolType ptt;
 
@@ -73,21 +71,6 @@ public class ItemPowerHoe extends HoeItem implements IToolWithCharge, ISpecialTo
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
-	}
-
-	@Override
-	public ResourceLocation getTexture() {
-		return ptt.borderTexturePath;
-	}
-
-	@Override
-	public int getTopColor() {
-		return ptt.argbBorderColor;
-	}
-
-	@Override
-	public int getBottomColor() {
-		return ptt.getBottomARGBBorderColor().orElse(ISpecialTooltip.super.getBottomColor());
 	}
 
 	@Override

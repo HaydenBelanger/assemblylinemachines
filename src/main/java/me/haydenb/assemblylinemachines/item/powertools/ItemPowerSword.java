@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
+import me.haydenb.assemblylinemachines.item.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.InteractionHand;
@@ -26,7 +25,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
-public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpecialTooltip {
+public class ItemPowerSword extends SwordItem implements IToolWithCharge {
 
 	private final IToolWithCharge.PowerToolType ptt;
 
@@ -91,21 +90,6 @@ public class ItemPowerSword extends SwordItem implements IToolWithCharge, ISpeci
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
-	}
-
-	@Override
-	public ResourceLocation getTexture() {
-		return ptt.borderTexturePath;
-	}
-
-	@Override
-	public int getTopColor() {
-		return ptt.argbBorderColor;
-	}
-
-	@Override
-	public int getBottomColor() {
-		return ptt.getBottomARGBBorderColor().orElse(ISpecialTooltip.super.getBottomColor());
 	}
 
 	@Override

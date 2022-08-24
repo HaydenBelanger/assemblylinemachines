@@ -4,10 +4,12 @@ import java.util.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockCorruptingBasin.TECorruptingBasin;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -119,10 +121,11 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 
 		return List.of(!input.get().isEmpty() ? input.get() : new FluidStack(inputFluid, 1000), !outputFluid.equals(Fluids.EMPTY) ? new FluidStack(outputFluid, 1000) : stacks);
 	}
-
-	public Optional<Block> testBlock(RandomSource randomSource, Block test){
-		if(input.get().isEmpty() || !input.get().test(test.asItem().getDefaultInstance())) return Optional.empty();
-		return Optional.of(getRandom(randomSource));
+	
+	public Optional<Either<Block, Fluid>> testBlock(Random rand, Level level, BlockPos pos){
+		if(input.get().test(level.getBlockState(pos).getBlock().asItem().getDefaultInstance())) return Optional.of(Either.left(getRandom(rand)));
+		if(!inputFluid.equals(Fluids.EMPTY) && inputFluid.equals(level.getFluidState(pos).getType())) return Optional.of(Either.right(outputFluid));
+		return Optional.empty();
 	}
 
 	public Block getRandom(RandomSource rand) {
@@ -133,12 +136,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 		}
 		return output;
 	}
-
-	public Optional<Fluid> testFluid(Fluid test){
-		if(inputFluid.equals(Fluids.EMPTY)) return Optional.empty();
-		return inputFluid.equals(test) ? Optional.of(outputFluid) : Optional.empty();
-	}
-
+	
 	public Optional<Float> getChanceOfSubdrop(Item stack) {
 		for(Pair<Float, Block> pair : this.additionalOutputs) {
 			if(pair.getSecond().asItem().equals(stack)) {

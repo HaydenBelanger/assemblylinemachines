@@ -4,12 +4,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemHammer;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +18,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
-public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpecialTooltip {
+public class ItemPowerHammer extends ItemHammer implements IToolWithCharge {
 
 	private final IToolWithCharge.PowerToolType ptt;
 
@@ -79,21 +77,6 @@ public class ItemPowerHammer extends ItemHammer implements IToolWithCharge, ISpe
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
-	}
-
-	@Override
-	public ResourceLocation getTexture() {
-		return ptt.borderTexturePath;
-	}
-
-	@Override
-	public int getTopColor() {
-		return ptt.argbBorderColor;
-	}
-
-	@Override
-	public int getBottomColor() {
-		return ptt.getBottomARGBBorderColor().orElse(ISpecialTooltip.super.getBottomColor());
 	}
 
 	@Override

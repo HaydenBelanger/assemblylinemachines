@@ -5,9 +5,6 @@
 	"mixins": [
 		"common.HoeItemTillingMixin"
 	],
-	"client":[
-		"client.TooltipMixin"
-	],
 	"injectors": {
 		"defaultRequire": 1
 	},

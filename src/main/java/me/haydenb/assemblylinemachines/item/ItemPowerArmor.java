@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.client.armor.ArmorData;
 import me.haydenb.assemblylinemachines.client.armor.ArmorModel;
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
@@ -15,7 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +30,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
 @EventBusSubscriber(modid = AssemblyLineMachines.MODID)
-public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpecialTooltip{
+public class ItemPowerArmor extends ArmorItem implements IToolWithCharge {
 
 	private final PowerToolType ptt;
 
@@ -98,21 +97,6 @@ public class ItemPowerArmor extends ArmorItem implements IToolWithCharge, ISpeci
 	@Override
 	public PowerToolType getPowerToolType() {
 		return ptt;
-	}
-
-	@Override
-	public ResourceLocation getTexture() {
-		return ptt.borderTexturePath;
-	}
-
-	@Override
-	public int getTopColor() {
-		return ptt.argbBorderColor;
-	}
-
-	@Override
-	public int getBottomColor() {
-		return ptt == PowerToolType.MYSTIUM || ptt == PowerToolType.ENHANCED_MYSTIUM ? 0xffb81818 : ISpecialTooltip.super.getBottomColor();
 	}
 
 	@Override

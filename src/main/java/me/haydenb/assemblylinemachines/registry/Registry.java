@@ -769,12 +769,16 @@ public class Registry {
 
 		PrintWriter pw = new PrintWriter("logs/almdatagen.log", "UTF-8");
 		pw.println("[DATAGEN SYSTEM - INFO]: Commencing ALM data generation...");
-
-		new DataProviderContainer(pw, event);
-		new AutoRecipeGenerator(event, pw);
-		new LootTableGenerator(event, pw);
-		new ItemModelGenerator(event, pw);
-
+		
+		if(event.includeServer()) {
+			new DataProviderContainer(pw, event);
+			new AutoRecipeGenerator(event, pw);
+			new LootTableGenerator(event, pw);
+		}
+		if(event.includeClient()) {
+			new ItemModelGenerator(event, pw);
+		}
+		
 		event.getGenerator().run();
 		pw.close();
 	}

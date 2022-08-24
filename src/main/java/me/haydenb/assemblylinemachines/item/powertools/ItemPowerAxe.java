@@ -1,12 +1,14 @@
 package me.haydenb.assemblylinemachines.item.powertools;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.mojang.datafixers.util.Either;
+
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -24,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
-public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTooltip {
+public class ItemPowerAxe extends AxeItem implements IToolWithCharge {
 
 	private final IToolWithCharge.PowerToolType ptt;
 
@@ -46,8 +48,8 @@ public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTo
 			BlockState bs = world.getBlockState(pos);
 
 			if(bs.is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "mystium_axe_mineable")))) {
-				int cmax = ptt == IToolWithCharge.PowerToolType.NOVASTEEL ? 50 : 10;
-				stack.hurtAndBreak(breakAndBreakConnected(world, bs, 0, cmax, pos, player), player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
+				int cost = 2 * Utils.breakConnected(world, Either.right(bs), pos, Optional.of(player));
+				stack.hurtAndBreak(cost, player, (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
 			}
 			return true;
 		}
@@ -99,41 +101,7 @@ public class ItemPowerAxe extends AxeItem implements IToolWithCharge, ISpecialTo
 	}
 
 	@Override
-	public ResourceLocation getTexture() {
-		return ptt.borderTexturePath;
-	}
-
-	@Override
-	public int getTopColor() {
-		return ptt.argbBorderColor;
-	}
-
-	@Override
-	public int getBottomColor() {
-		return ptt.getBottomARGBBorderColor().orElse(ISpecialTooltip.super.getBottomColor());
-	}
-
-	@Override
 	public IToolWithCharge.PowerToolType getPowerToolType() {
 		return ptt;
-	}
-
-	private static int breakAndBreakConnected(Level world, BlockState origState, int ctx, int cmax, BlockPos posx, LivingEntity player) {
-		world.destroyBlock(posx, true, player);
-
-		int cost = 2;
-		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(posx.below().north().west(), posx.above().south().east()).iterator();
-
-		while(iter.hasNext()) {
-			BlockPos posq = iter.next();
-
-			BlockState bs = world.getBlockState(posq);
-			if(bs.getBlock() == origState.getBlock() && ctx <= cmax) {
-				ctx++;
-				cost = cost + breakAndBreakConnected(world, origState, ctx, cmax, posq, player);
-			}
-		}
-
-		return cost;
 	}
 }
