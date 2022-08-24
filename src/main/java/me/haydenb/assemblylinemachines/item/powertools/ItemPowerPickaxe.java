@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import me.haydenb.assemblylinemachines.client.TooltipBorderHandler.ISpecialTooltip;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.FastColor.ARGB32;
@@ -26,7 +24,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class ItemPowerPickaxe extends PickaxeItem implements IToolWithCharge, ISpecialTooltip {
+public class ItemPowerPickaxe extends PickaxeItem implements IToolWithCharge {
 
 	private final IToolWithCharge.PowerToolType ptt;
 	
@@ -118,21 +116,6 @@ public class ItemPowerPickaxe extends PickaxeItem implements IToolWithCharge, IS
 		CompoundTag compound = stack.hasTag() ? stack.getTag() : new CompoundTag();
 		int dmg = compound.getInt(ptt.keyName);
 		return dmg == 0 ? super.getBarWidth(stack) : Math.round(((float)dmg/ (float) getMaxPower(stack)) * 13.0f);
-	}
-	
-	@Override
-	public ResourceLocation getTexture() {
-		return ptt.borderTexturePath;
-	}
-
-	@Override
-	public int getTopColor() {
-		return ptt.argbBorderColor;
-	}
-	
-	@Override
-	public int getBottomColor() {
-		return ptt.getBottomARGBBorderColor().orElse(ISpecialTooltip.super.getBottomColor());
 	}
 
 	@Override

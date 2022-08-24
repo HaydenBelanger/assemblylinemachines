@@ -1,0 +1,53 @@
+{
+	"definitions":[
+		{
+			"selectors": ["assemblylinemachines:mystium_sword", "assemblylinemachines:mystium_pickaxe",
+			"assemblylinemachines:mystium_axe", "assemblylinemachines:mystium_hoe", "assemblylinemachines:mystium_shovel",
+			"assemblylinemachines:mystium_hammer", "assemblylinemachines:mystium_chestplate", "assemblylinemachines:mystium_boots",
+			"assemblylinemachines:mystium_helmet", "assemblylinemachines:mystium_leggings", "assemblylinemachines:enhanced_mystium_chestplate",
+			"assemblylinemachines:mystium_dowsing_rod"],
+			"image": "assemblylinemachines:textures/gui/tooltip_borders.png",
+			"index": 1,
+			"startColor": "#2546CC",
+			"endColor": "#B81818",
+			"priority": 1
+		},
+		{
+			"selectors": ["assemblylinemachines:crank_sword", "assemblylinemachines:crank_pickaxe",
+			"assemblylinemachines:crank_axe", "assemblylinemachines:crank_hoe", "assemblylinemachines:crank_shovel",
+			"assemblylinemachines:crank_hammer"],
+			"image": "assemblylinemachines:textures/gui/tooltip_borders.png",
+			"index": 0,
+			"startColor": "#994A09",
+			"endColor": "#6B3306",
+			"priority": 1
+		},
+		{
+			"selectors": ["assemblylinemachines:novasteel_sword", "assemblylinemachines:novasteel_pickaxe",
+			"assemblylinemachines:novasteel_axe", "assemblylinemachines:novasteel_hoe", "assemblylinemachines:novasteel_shovel",
+			"assemblylinemachines:novasteel_hammer"],
+			"image": "assemblylinemachines:textures/gui/tooltip_borders.png",
+			"index": 3,
+			"startColor": "#5D0082",
+			"endColor": "#41005A",
+			"priority": 1
+		},
+		{
+			"selectors": ["assemblylinemachines:steel_sword", "assemblylinemachines:steel_pickaxe", "assemblylinemachines:steel_hammer",
+			"assemblylinemachines:steel_axe", "assemblylinemachines:steel_hoe", "assemblylinemachines:steel_shovel"],
+			"image": "assemblylinemachines:textures/gui/tooltip_borders.png",
+			"index": 2,
+			"startColor": "#676767",
+			"endColor": "#484848",
+			"priority": 1
+		},
+		{
+			"selectors": ["assemblylinemachines:aefg", "assemblylinemachines:chaotic_reduction_goggles"],
+			"image": "assemblylinemachines:textures/gui/tooltip_borders.png",
+			"index": 15,
+			"startColor": "#E3E3E3",
+			"endColor": "#545454",
+			"priority": 1
+		}
+	]
+}

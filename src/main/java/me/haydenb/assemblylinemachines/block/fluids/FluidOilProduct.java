@@ -1,12 +1,14 @@
 package me.haydenb.assemblylinemachines.block.fluids;
 
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Supplier;
+
+import com.mojang.datafixers.util.Either;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -16,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.*;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
@@ -43,30 +44,13 @@ public class FluidOilProduct extends ALMFluid {
 				
 				if(world.getBlockState(cor).is(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "gas_flammable")))) {
 					if(world.getRandom().nextInt(3) == 0) {
-						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), breakAndBreakConnected(world, state, cor), true, BlockInteraction.BREAK);
+						float pow = (float) Utils.breakConnected(world, Either.left(state), cor, Optional.empty()) * 2f;
+						world.explode(null, cor.getX(), cor.getY() + 1, cor.getZ(), pow, true, BlockInteraction.BREAK);
 						
 					}
 				}
 			}
 		}
-	}
-	
-	private float breakAndBreakConnected(Level world, FluidState origState, BlockPos posx) {
-		world.setBlockAndUpdate(posx, Blocks.AIR.defaultBlockState());
-		
-		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(posx.below().north().west(), posx.above().south().east()).iterator();
-		
-		float pow = 2;
-		while(iter.hasNext()) {
-			BlockPos posq = iter.next();
-			
-			FluidState fs = world.getFluidState(posq);
-			if(fs.getType() == origState.getType()) {
-				pow = pow + breakAndBreakConnected(world, origState, posq);
-			}
-		}
-		
-		return pow;
 	}
 	
 	private static int[] getRGBFromFluidName(String name) {

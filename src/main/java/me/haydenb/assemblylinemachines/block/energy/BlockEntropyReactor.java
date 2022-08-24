@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 
 import mcjty.theoneprobe.api.*;
@@ -26,7 +27,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.*;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -55,6 +58,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.*;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReactor.TEEntropyReactor>{
 
@@ -779,7 +783,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 						
 					}
 					
-					if(cyclesRemaining == 0 && operationTimer++ == 20) {
+					if(cyclesRemaining == 0 && operationTimer++ >= 20) {
 						operationTimer = 0;
 						
 						int cycleUpCt = getUpgradeAmount(Upgrades.E_R_CYCLE_DELAY);
@@ -852,7 +856,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 				}
 				
-				if(entropyTimer++ == nEntropyTimer) {
+				if(entropyTimer++ >= nEntropyTimer) {
 					entropyTimer = 0;
 					
 					sendUpdates = true;
@@ -886,6 +890,10 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			return ii;
 		}
 		
+		/**
+		 * @param entropy
+		 * @return
+		 */
 		public float performEntropyTask(float entropy) {
 			boolean hasUpgrade = getUpgradeAmount(Upgrades.E_R_ENTROPIC_HARNESSER) == 1;
 			Random rand = this.getLevel().getRandom();
@@ -982,21 +990,16 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 					BlockPos posx = new BlockPos(new Vec3(x, y, z));
 					if(!this.getLevel().isEmptyBlock(posx) || !this.getLevel().getFluidState(posx).getType().equals(Fluids.EMPTY)) {
 						for(WorldCorruptionCrafting recipe : this.getLevel().getRecipeManager().getAllRecipesFor(WorldCorruptionCrafting.WORLD_CORRUPTION_RECIPE)) {
-							Optional<Block> res = recipe.testBlock(this.getLevel().getRandom(), this.getLevel().getBlockState(posx).getBlock());
+							Optional<Either<Block, Fluid>> res = recipe.testBlock(this.getLevel().getRandom(), this.getLevel(), posx);
 							if(res.isPresent()) {
-								Block block = res.get();
-								//Special processing for DoublePlantBlock
-								if(block instanceof ISpecialEntropyPlacement) {
-									((ISpecialEntropyPlacement) block).place(this.getLevel(), block.defaultBlockState(), posx);
+								if(res.get().left().isPresent() && res.get().left().get() instanceof ISpecialEntropyPlacement isep) {
+									isep.place(this.getLevel(), res.get().left().get().defaultBlockState(), posx);
 								}else {
-									this.getLevel().setBlockAndUpdate(posx, block.defaultBlockState());
+									this.getLevel().setBlockAndUpdate(posx, res.get().map((b) -> b.defaultBlockState(), (f) -> f.defaultFluidState().createLegacyBlock()));
 								}
-								entropy -= 0.00025f;
-								i++;
-							}
-							Optional<Fluid> resF = recipe.testFluid(this.getLevel().getFluidState(posx).getType());
-							if(resF.isPresent()) {
-								this.getLevel().setBlockAndUpdate(posx, resF.get().defaultFluidState().createLegacyBlock());
+								if(this.getLevel().getBlockState(posx.above()).is(TagKey.create(Keys.BLOCKS, new ResourceLocation("minecraft", "logs")))) {
+									Utils.breakConnected(this.getLevel(), Either.right(this.getLevel().getBlockState(posx.above())), posx.above(), Optional.empty());
+								}
 								entropy -= 0.00025f;
 								i++;
 							}

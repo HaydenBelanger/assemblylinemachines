@@ -2,9 +2,7 @@ package me.haydenb.assemblylinemachines.item.powertools;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Optional;
 
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.ItemAEFG;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
@@ -15,7 +13,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -183,11 +180,11 @@ public interface IToolWithCharge{
 	}
 	
 	public static enum PowerToolType{
-		CRANK("assemblylinemachines:cranks", 1, 30, false, new TextComponent("Cranks").withStyle(ChatFormatting.GOLD), false, null, 0.0f, ToolDefaults.CRANK.get(Stats.SP_ENERGY).intValue(), 0xff994a09, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/crank.png")),
-		MYSTIUM("assemblylinemachines:fe", 150, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_PURPLE), true, "mystium_farmland", 0.1f, ToolDefaults.MYSTIUM.get(Stats.SP_ENERGY).intValue(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png")),
-		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_AQUA), true, "nova_farmland", 0.25f, ToolDefaults.NOVASTEEL.get(Stats.SP_ENERGY).intValue(), 0xff5d0082, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/novasteel.png")),
-		AEFG("assemblylinemachines:fe", 1, 1, false, new TextComponent("FE").withStyle(ChatFormatting.BLUE), true, null, 0.0f, 10000000, 0x0, null),
-		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, MYSTIUM.friendlyNameOfUnit, true, null, 0.0f, ToolDefaults.MYSTIUM.get(Stats.SP_ENH_ENERGY).intValue(), 0xff2546cc, new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/tooltip/mystium.png"));
+		CRANK("assemblylinemachines:cranks", 1, 30, false, new TextComponent("Cranks").withStyle(ChatFormatting.GOLD), false, null, 0.0f, ToolDefaults.CRANK.get(Stats.SP_ENERGY).intValue()),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_PURPLE), true, "mystium_farmland", 0.1f, ToolDefaults.MYSTIUM.get(Stats.SP_ENERGY).intValue()),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_AQUA), true, "nova_farmland", 0.25f, ToolDefaults.NOVASTEEL.get(Stats.SP_ENERGY).intValue()),
+		AEFG("assemblylinemachines:fe", 1, 1, false, new TextComponent("FE").withStyle(ChatFormatting.BLUE), true, null, 0.0f, 10000000),
+		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, MYSTIUM.friendlyNameOfUnit, true, null, 0.0f, ToolDefaults.MYSTIUM.get(Stats.SP_ENH_ENERGY).intValue());
 		
 		public final String keyName;
 		public final int costMultiplier;
@@ -198,11 +195,9 @@ public interface IToolWithCharge{
 		public final String nameOfSecondaryFarmland;
 		public final int configMaxCharge;
 		public final float chanceToDropMobCrystal;
-		public final int argbBorderColor;
-		public final ResourceLocation borderTexturePath;
 		
 		PowerToolType(String keyName, int costMultiplier, int chargeMultiplier, boolean hasSecondaryAbilities, MutableComponent friendlyNameOfUnit, 
-				boolean hasEnergyCapability, String nameOfSecondaryFarmland, float chanceToDropMobCrystal, int configMaxCharge, int argbBorderColor, ResourceLocation borderTexturePath) {
+				boolean hasEnergyCapability, String nameOfSecondaryFarmland, float chanceToDropMobCrystal, int configMaxCharge) {
 			this.keyName = keyName;
 			this.costMultiplier = costMultiplier;
 			this.chargeMultiplier = chargeMultiplier;
@@ -212,13 +207,7 @@ public interface IToolWithCharge{
 			this.nameOfSecondaryFarmland = nameOfSecondaryFarmland;
 			this.configMaxCharge = configMaxCharge;
 			this.chanceToDropMobCrystal = chanceToDropMobCrystal;
-			this.argbBorderColor = argbBorderColor;
-			this.borderTexturePath = borderTexturePath;
 			
-		}
-		
-		public Optional<Integer> getBottomARGBBorderColor() {
-			return this == PowerToolType.MYSTIUM ? Optional.of(0xffb81818) : Optional.empty();
 		}
 		
 		public boolean needsActiveModel(Item item) {

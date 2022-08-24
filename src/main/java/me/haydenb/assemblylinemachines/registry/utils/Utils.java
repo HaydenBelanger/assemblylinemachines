@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.datafixers.util.Either;
 
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import net.minecraft.commands.CommandSourceStack;
@@ -16,14 +17,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.fml.ModList;
@@ -117,6 +122,32 @@ public class Utils {
 			}
 			throw new IllegalArgumentException("Unknown field in ItemStack Tag.");
 		}, (is) -> !is.isEmpty());
+	}
+	
+	public static int breakConnected(Level level, Either<FluidState, BlockState> matchState, BlockPos pos, Optional<LivingEntity> player) {
+		if(matchState.left().isPresent()) {
+			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+		}else {
+			player.ifPresentOrElse((p) -> level.destroyBlock(pos, true, p), () -> level.destroyBlock(pos, true));
+		}
+		
+		
+		
+		int destroyedBlocks = 1;
+		Iterator<BlockPos> iter = BlockPos.betweenClosedStream(pos.below().north().west(), pos.above().south().east()).filter((bpx) -> {
+			if(matchState.left().isPresent()) {
+				return level.getFluidState(bpx).is(matchState.left().get().getType());
+			}else if(matchState.right().isPresent()) {
+				return level.getBlockState(bpx).is(matchState.right().get().getBlock());
+			}
+			return false;
+		}).iterator();
+		
+		while(iter.hasNext()) {
+			BlockPos bpx = iter.next();
+			destroyedBlocks += breakConnected(level, matchState, bpx, player);
+		}
+		return destroyedBlocks;
 	}
 	
 	public static boolean containsArgument(CommandContext<CommandSourceStack> context, String argument) {
