@@ -224,7 +224,7 @@ public class BlockMachines {
 		return MachineBuilder.container().shiftMergeableSlots(0, 0).slotCoordinates(List.of(Triple.of(53, 26, false), Triple.of(75, 48, false))).build("kinetic_grinder");
 	}
 
-	public static BlockEntityType<?> kineticGrinderBlockEntity(){
+	public static BlockEntityType<?> kineticGrinderEntity(){
 		return MachineBuilder.blockEntity().crankMachine(1).baseProcessingStats(0, 16).recipeProcessor(Utils.recipeFunction(GrinderCrafting.GRINDER_RECIPE))
 				.slotInfo(2, 0).outputToRight().allowedInZero().slotExtractableFunction((i) -> false).slotContentsValidator((i, is, be) -> i == 0 ? Blade.getBladeFromItem(is.getItem()) != null : true).build("kinetic_grinder");
 	}
@@ -621,7 +621,7 @@ public class BlockMachines {
 				Triple.of(107, 22, false), Triple.of(149, 21, false), Triple.of(149, 39, false), Triple.of(149, 57, false), Triple.of(167, 21, false), Triple.of(167, 39, false), Triple.of(167, 57, false))).build("mkii_lumber_mill");
 	}
 
-	public static BlockEntityType<?> mkiiLumberMillBlockEntity(){
+	public static BlockEntityType<?> mkiiLumberMillEntity(){
 		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(360, 16).recipeProcessor(Utils.recipeFunction(LumberCrafting.LUMBER_RECIPE))
 				.slotInfo(11, 6).slotExtractableFunction((slot) -> slot < 3).outputSlots(0, 2, 1)
 				.slotIDTransformer((in) -> switch(in) {
