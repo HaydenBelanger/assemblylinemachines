@@ -1,0 +1,29 @@
+{
+	"name": "Зачарования",
+	"category": "assemblylinemachines:items",
+	"icon": "minecraft:enchanted_book",
+	"pages": [
+		{
+			"type": "text",
+			"text": "Мод добавляет несколько новых зачарований, многократно усиливающих новые предметы. Их можно получить и через классический Стол зачарований. Максимально поддерживаемый Уровень - $(d)X."
+		},
+		{
+			"type": "relations",
+			"entries": [
+				"assemblylinemachines:items/mystium_tools",
+				"assemblylinemachines:items/novasteel_tools"
+			],
+			"title": "Разгон",
+			"text": "Зачарование $(5)Разгон$() можно наложить на любой предмет с внутренним зарядом, например инструменты из Звёздной стали или Мистия, или ГААП. Оно повышает емкость батареи на 20% за каждый уровень зачарования."
+		},
+		{
+			"type": "relations",
+			"entries": [
+				"assemblylinemachines:items/wrench_o_matic"
+			],
+			"title": "Ярость инженера",
+			"anchor": "engineersfury",
+			"text": "Зачарование $(4)Ярость инженера$() накладывется только на Wrench-O-Matic повышает отбрасывание в режиме $(4)Гнева.$()"
+		}
+	]
+}

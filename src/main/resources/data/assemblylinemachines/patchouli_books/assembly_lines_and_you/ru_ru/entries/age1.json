@@ -1,0 +1,84 @@
+{
+	"name": "Примитивная эра",
+	"category": "assemblylinemachines:walkthrough",
+	"icon": "assemblylinemachines:fluid_bath",
+	"pages": [
+		{
+			"type": "text",
+			"text": "Добро пожаловать в Assembly Line Machines.$(p)Первое, что вам надо сделать - взять Железную кирку и спуститься поглубже, за Титановой рудой. Она редка и генерируется очень глубоко, даже ниже лавовых озёр."
+		},
+		{
+			"type": "image",
+			"images": [
+				"assemblylinemachines:textures/gui/patchouli/titanium_example.png"
+			],
+			"border": true
+		},
+		{
+			"type": "text",
+			"text": "Первое, что вы скрафтите - $(item)Жидкостная ванна.$() С её помощью можно сделать много чего.$(p)В рецептах используется два предмета и жидкость. Для завершения крафта, вам необходимо будет помешать $(item)специальной палкой.$()$(p)В жидкостную ванну можно налить как Воду, так и Лаву, но для второго варианта не подойдёт $(item)Деревянная палка."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/wooden_stirring_stick",
+			"recipe2": "assemblylinemachines:crafting/fluid_bath",
+			"title": "Жидкостная ванна"
+		},
+		{
+			"type": "text",
+			"text": "Попробуйте смешать Песок и Гравий вместе с водой и получите $(item)Ил.$() Правильные комбинации специально будут подсвечиваться!$(c) Неправильные же окрасятся в чёрный цвет. Достать предметы можно с помощью Shift+ПКМ.$(thing) Вот так можно получить Осадок!$()$(p)Вам понадобится 12 Ила. Из него можно сделать Илистые кирпичи и Ручную дробилку."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/silt/smooth_silt",
+			"recipe2": "assemblylinemachines:crafting/silt/silt_brick"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/hand_grinder",
+			"recipe2": "assemblylinemachines:crafting/titanium_blade_piece",
+			"text": "Так же вам понадобится три $(item)Части титанового лезвия..."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/titanium_blade",
+			"text": "...и вы сможете сделать $(item)Титановое лезвие!$()$(p)Поставьте Дробилку и нажмите ПКМ с Титановым лезвием в руках, чтобы установить его!"
+		},
+		{
+			"type": "text",
+			"text": "Теперь, когда у вас есть дробилка, вы можете измельчать материалы. Вам необходимо измельчить Железо и Золото (Руду или Слитки), чтобы получить $(thing)Порошковую руду.$() Объедините её с Илом и Водой в Жидкостной ванне, перемешайте, и получите $(thing)Илистую руду.$() Переплавьте полученный результат и получите $(item)Слиток чистого металла!$(p)$()Можете расплавить и просто порошок, чтобы получить в $(6)два раза больше слитков!"
+		},
+		{
+			"type": "smelting",
+			"recipe": "assemblylinemachines:smelting/silt/silt_iron",
+			"recipe2": "assemblylinemachines:smelting/silt/silt_gold",
+			"title": "Рудный ил",
+			"text": "$(o)$(7)Процесс можно провернуть и с Титаном, но это не обязательно для прохождения Эры."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/pure_iron_stirring_stick",
+			"title": "Металлическая мешалка",
+			"text": "Объедините Часть титанового лезвия с Чистым золотом и Лавой, перемешайте $(thing)Палкой из чистого железа$(), и получите $(item)Покрытую чистым золотом часть лезвия."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/pure_gold_blade",
+			"text": "Данным лезвием можно измельчать $(item)Уголь$()!$(p)$(7)$(o)Нажмите Shift+ПКМ по дробилке, чтобы убрать старое лезвие."
+		},
+		{
+			"type": "spotlight",
+			"item": "assemblylinemachines:steel_ingot",
+			"title": "Сталь",
+			"link_recipe": true,
+			"text": "Объедините Угольный порошок (или Древесноугольный порошок) с Железным порошком и Лавой в Жидкостной ванне, перемешайте и получите $(item)Стальной слиток!$()$(p)На этом заканчивается Примитивная Эра. Переходите на страницу $(l:age2)Механическая эра$(), чтобы продолжить!"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/steel_stirring_stick",
+			"recipe2": "assemblylinemachines:crafting/steel_blade"
+		}
+	],
+	"sortnum": 1,
+	"read_by_default": true
+}

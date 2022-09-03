@@ -1,0 +1,148 @@
+{
+	"name": "Механическая эра",
+	"category": "assemblylinemachines:walkthrough",
+	"icon": "assemblylinemachines:pure_gold_gear",
+	"pages": [
+		{
+			"type": "text",
+			"text": "Поздравляем с продвижением! Вы смогли сделать Сталь и теперь можете приступать к созданию механизмов. Давайте начнём с $(item)Кривошипа, $()и $(item)Рукоятки."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/crank_shaft",
+			"recipe2": "assemblylinemachines:crafting/crank"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/kinetic_grinder",
+			"text": "Далее, используя старую Дробилку и некоторые материалы, вы можете создать $(item)Кинетическую дробилку.$()$(br)Это ваш первый механизм. На картинке справа пример использования."
+		},
+		{
+			"type": "multiblock",
+			"multiblock": {
+				"mapping": {
+					"c": "assemblylinemachines:crank",
+					"0": "assemblylinemachines:kinetic_grinder[facing=west]",
+					"f": "minecraft:chest[facing=west]"
+				},
+				"pattern": [
+					[
+						"c0f"
+					]
+				]
+			},
+			"name": "Кинетическая дробилка",
+			"enable_visualize": false,
+			"text": "$(7)$(o)Сундук обязательно размещать на правой стороне, а Рукоятку можно поставить с любой другой."
+		},
+		{
+			"type": "text",
+			"text": "Положите материал в механизм, перед этим установив лезвие, нажмите на Рукоятку и удерживайте, через некоторое время вы получите результат крафта в Сундуке!$(br)Теперь, вы можете улучшить ваш механизм. Измельчите стальной блок и получите $(item)Стальные стержни!$()$(p)$(c)При холостой работе есть небольшой шанс, что Рукоятка разлетится вдребезги!"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/wooden_fluid_tank",
+			"text": "$(item)Деревянные дощечки$() можно получить, засунув в дробилку Доски."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/steel_fluid_tank",
+			"recipe2": "assemblylinemachines:crafting/kinetic_fluid_mixer"
+		},
+		{
+			"type": "multiblock",
+			"multiblock": {
+				"mapping": {
+					"c": "assemblylinemachines:crank",
+					"0": "assemblylinemachines:kinetic_fluid_mixer[facing=west]",
+					"f": "minecraft:chest[facing=west]",
+					"t": "assemblylinemachines:steel_fluid_tank"
+				},
+				"pattern": [
+					[
+						"c0f"
+					],
+					[
+						" t "
+					]
+				]
+			},
+			"name": "Кинетическая мешалка",
+			"enable_visualize": false,
+			"text": "$(7)$(o)Мешалка работает по тому же принципу, что и предыдущий механизм, только необходимо добавить Резервуар под механизм."
+		},
+		{
+			"type": "text",
+			"text": "Как и в Жидкостную ванну, сюда загружается два предмета, а жидкость заливается в Резервуар. Покрутите ручку и получите результат в Сундуке!$(p)Первое, что вам понадобится сделать - $(item)Усиленный уголь$() Смешайте $(thing)Угольный порошок$() и $(thing)Красную пыль$() с Лавой.$(br)$(6)Подсказка: Мешалкой вы можете делать всё то же, что и в Жидкостной ванне."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/steel/steel_hammer",
+			"title": "Молот",
+			"text": "Далее, для создания $(item)Панелей$(), необходимых для производства $(item)Шестерней$(), вам понадобится $(item)Молот.$()$(p)$(9)Прямо сейчас вы можете сделать Титановый молот!"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/plates/pure_iron",
+			"recipe2": "assemblylinemachines:crafting/gears/pure_iron"
+		},
+		{
+			"type": "text",
+			"text": "Принцип создания Панелей и Шестерней для всех металлов одинаков. Но получаемое количество разнится: $(li)Медь: 5 панелей/слиток, 1.25 шестерни/панель$(li)Железо: 3 панели/слиток, 1 шестерня/панель$(li)Золото: 2 панели/слиток, 0.25 шестерни/панель$(li)Титан: 5 панелей/слиток, 0.5 шестерни/панель$(br)$()$(6)Таким образом, из меди делать выгоднее всего!$(br)$(3)Важно, панели делаются только из Чистых слитков!"
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/gearbox",
+			"recipe2": "assemblylinemachines:crafting/simple_crank_charger"
+		},
+		{
+			"type": "multiblock",
+			"multiblock": {
+				"mapping": {
+					"g": "assemblylinemachines:gearbox[facing=south,active=true]",
+					"0": "assemblylinemachines:simple_crank_charger",
+					"c": "minecraft:chest[facing=west]"
+				},
+				"pattern": [
+					[
+						" c "
+					],
+					[
+						"g0 "
+					]
+				]
+			},
+			"name": "Механическая зарядка",
+			"enable_visualize": false,
+			"text": "$(7)$(o)Теперь вы можете сделать Механическую зарядку! Сверху ставите сундук, а Коробку передач с любой другой стороны."
+		},
+		{
+			"type": "text",
+			"text": "$(item)Коробку передач$() можно использовать вместо Рукояток: Направьте её в сторону простого механизма. Добавьте энергии и Коробка передач сама всё сделает. $(p)$(item)Механическая зарядка$() не работает с Рукояткой, ей обязательно нужна Коробка передач.$(br)$(c)Коробка передач использует Усиленный уголь в качестве топлива. $(2)Хотите это изменить? Воспользуйтесь $(l:items/upgrades#gearboxcompatability)Улучшением$(/l), чтобы использовать другие виды топлива."
+		},
+		{
+			"type": "crafting",
+			"recipe": "assemblylinemachines:crafting/tools/crank/crank_pickaxe",
+			"title": "Инструменты с кривошипом",
+			"text": "Здесь представлен рецепт $(item)Кирки с кривошипом.$()$(p)Так же можно сделать Лопату, Молот, Топор, Мотыгу и Меч с кривошипом."
+		},
+		{
+			"type": "text",
+			"text": "У этих инструментов не сильно большая прочность, но, если положить их в Сундук над Механической зарядкой, они получат 'Прокруты', которые будут тратиться в первую очередь, вместо прочности.$(p)Вы можете использовать их для сбора уникально Адского камня, $(item)Чёрного гранита.$() Другими кирками добыть этот гранит нельзя."
+		},
+		{
+			"type": "image",
+			"images": [
+				"assemblylinemachines:textures/gui/patchouli/blackgranite_example.png"
+			],
+			"border": true,
+			"text": "$(2)Но это ограничение снимается после первого разрушения, смело используйте его в постройках!"
+		},
+		{
+			"type": "text",
+			"text": "Теперь, когда вы получили Чёрный гранит, можете переходить в $(l:age3)Электрическую эру,$() и начинать создавать свою производственную линию."
+		}
+	],
+	"sortnum": 2,
+	"read_by_default": true
+}
