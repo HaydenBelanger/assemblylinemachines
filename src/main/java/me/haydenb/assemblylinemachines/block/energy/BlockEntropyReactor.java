@@ -744,7 +744,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 							entropy = 1f;
 						}
 
-						List<EntropyReactorCrafting> recipes = level.getRecipeManager().getAllRecipesFor(EntropyReactorCrafting.ERO_RECIPE);
+						List<EntropyReactorCrafting> recipes = new ArrayList<>(level.getRecipeManager().getAllRecipesFor(EntropyReactorCrafting.ERO_RECIPE));
 						Collections.sort(recipes, Comparator.comparing((r) -> r.varietyReqd));
 						Collections.reverse(recipes);
 						for(EntropyReactorCrafting erc : recipes) {
