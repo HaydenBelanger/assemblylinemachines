@@ -41,9 +41,9 @@ import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TEBatteryCell> {
@@ -170,7 +170,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap != CapabilityEnergy.ENERGY || side == getBlockState().getValue(HorizontalDirectionalBlock.FACING)) {
+			if(cap != ForgeCapabilities.ENERGY || side == getBlockState().getValue(HorizontalDirectionalBlock.FACING)) {
 				return LazyOptional.empty();
 			}
 
@@ -210,7 +210,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 						if(storage == null) {
 							BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(d));
 							if(te != null) {
-								LazyOptional<IEnergyStorage> lazy = te.getCapability(CapabilityEnergy.ENERGY, d.getOpposite());
+								LazyOptional<IEnergyStorage> lazy = te.getCapability(ForgeCapabilities.ENERGY, d.getOpposite());
 								storage = lazy.orElse(null);
 								if(storage != null) {
 									lazy.addListener(new NonNullConsumer<LazyOptional<IEnergyStorage>>() {
@@ -227,7 +227,7 @@ public class BlockBatteryCell extends BlockScreenBlockEntity<BlockBatteryCell.TE
 						}
 
 						if(storage != null) {
-							LazyOptional<IEnergyStorage> schX = this.getCapability(CapabilityEnergy.ENERGY, d);
+							LazyOptional<IEnergyStorage> schX = this.getCapability(ForgeCapabilities.ENERGY, d);
 							IEnergyStorage sch = schX.orElse(null);
 
 							if(sch != null) {

@@ -1,6 +1,6 @@
 license="LGPL-3.0"
 modLoader="javafml" #mandatory
-loaderVersion="[42,)"
+loaderVersion="[43,)"
 issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[mods]]
 	modId="assemblylinemachines"
@@ -13,12 +13,12 @@ issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[dependencies.assemblylinemachines]]
     modId="forge"
     mandatory=true
-    versionRange="[42.0.9,)" #mandatory
+    versionRange="[43.1.3,)" #mandatory
     ordering="NONE"
     side="BOTH"
 [[dependencies.assemblylinemachines]]
     modId="jei"
     mandatory=false
-    versionRange="[11.2.0,)" #mandatory
+    versionRange="[11.3.0,)" #mandatory
     ordering="NONE"
     side="BOTH"

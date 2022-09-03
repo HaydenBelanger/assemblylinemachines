@@ -37,10 +37,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.*;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
 
 public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContainer>
@@ -353,7 +355,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 
 	boolean checkWhiteBlackList(FluidStack stack) {
 		for(int i = 0; i < 9; i++) {
-			IFluidHandlerItem lx = contents.get(i).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null);
+			IFluidHandlerItem lx = contents.get(i).getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
 			if(lx != null && lx.getFluidInTank(0).getFluid().equals(stack.getFluid())) {
 				return whitelist;
 			}

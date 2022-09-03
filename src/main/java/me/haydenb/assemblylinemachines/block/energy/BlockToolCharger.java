@@ -22,11 +22,10 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class BlockToolCharger extends BlockTileEntity{
@@ -169,7 +168,7 @@ public class BlockToolCharger extends BlockTileEntity{
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
+			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == ForgeCapabilities.ENERGY) {
 				return energyHandler.cast();
 			}
 
@@ -199,7 +198,7 @@ public class BlockToolCharger extends BlockTileEntity{
 		private boolean getCapability() {
 			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
-				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+				LazyOptional<IItemHandler> cap = te.getCapability(ForgeCapabilities.ITEM_HANDLER,
 						Direction.DOWN);
 				IItemHandler output = cap.orElse(null);
 				if (output != null) {
@@ -232,7 +231,7 @@ public class BlockToolCharger extends BlockTileEntity{
 					if(handler != null || getCapability()) {
 						for(int i = 0; i < handler.getSlots(); i++) {
 							ItemStack stack = handler.getStackInSlot(i);
-							LazyOptional<IEnergyStorage> opt = stack.getCapability(CapabilityEnergy.ENERGY);
+							LazyOptional<IEnergyStorage> opt = stack.getCapability(ForgeCapabilities.ENERGY);
 							IEnergyStorage storage = opt.orElse(null);
 
 							if(storage != null) {

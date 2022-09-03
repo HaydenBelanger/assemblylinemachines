@@ -60,13 +60,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.util.*;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.*;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 public class MachineBuilder {
 
@@ -577,8 +577,8 @@ public class MachineBuilder {
 
 				@Override
 				public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-					if(!usesFE && cap == CapabilityEnergy.ENERGY) return LazyOptional.empty();
-					if(processesFluids && hasInternalTank && useInternalTank && cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return LazyOptional.of(() -> getCraftingFluidHandler(Optional.of(true))).cast();
+					if(!usesFE && cap == ForgeCapabilities.ENERGY) return LazyOptional.empty();
+					if(processesFluids && hasInternalTank && useInternalTank && cap == ForgeCapabilities.FLUID_HANDLER) return LazyOptional.of(() -> getCraftingFluidHandler(Optional.of(true))).cast();
 					return super.getCapability(cap, side);
 				}
 
@@ -630,7 +630,7 @@ public class MachineBuilder {
 					}else if(!useInternal && hasExternalTank) {
 						if(externalLazy == null) {
 							if(this.getLevel().getBlockEntity(this.getBlockPos().below()) != null) {
-								externalLazy = this.getLevel().getBlockEntity(this.getBlockPos().below()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.UP);
+								externalLazy = this.getLevel().getBlockEntity(this.getBlockPos().below()).getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.UP);
 								if(!externalLazy.isPresent()) {
 									externalLazy = null;
 									return null;
@@ -683,7 +683,7 @@ public class MachineBuilder {
 					Direction toRight = this.blockState().getValue(HorizontalDirectionalBlock.FACING).getCounterClockWise();
 					BlockEntity be = this.getLevel().getBlockEntity(this.getBlockPos().relative(toRight));
 					if(be != null) {
-						LazyOptional<?> handler = be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, toRight.getOpposite());
+						LazyOptional<?> handler = be.getCapability(ForgeCapabilities.ITEM_HANDLER, toRight.getOpposite());
 						if(handler.isPresent()) {
 							this.rightOutput = handler.cast();
 							this.rightOutput.addListener(new NonNullConsumer<LazyOptional<IItemHandler>>() {

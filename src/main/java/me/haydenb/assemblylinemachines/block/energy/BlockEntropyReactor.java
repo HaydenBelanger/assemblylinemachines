@@ -25,10 +25,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.*;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -53,10 +54,12 @@ import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.*;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
 public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReactor.TEEntropyReactor>{
@@ -522,9 +525,9 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(this.getBlockState().getValue(ENTROPY_REACTOR_PIECE) == EntropyReactorOptions.ITEM && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			if(this.getBlockState().getValue(ENTROPY_REACTOR_PIECE) == EntropyReactorOptions.ITEM && cap == ForgeCapabilities.ITEM_HANDLER) {
 				return itemsHandler.cast();
-			}else if(this.getBlockState().getValue(ENTROPY_REACTOR_PIECE) == EntropyReactorOptions.ENERGY && cap == CapabilityEnergy.ENERGY) {
+			}else if(this.getBlockState().getValue(ENTROPY_REACTOR_PIECE) == EntropyReactorOptions.ENERGY && cap == ForgeCapabilities.ENERGY) {
 				return energyHandler.cast();
 			}
 

@@ -1,7 +1,5 @@
 package me.haydenb.assemblylinemachines.block.misc;
 
-import java.util.Random;
-
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.IMiningLevelDataGenProvider;
@@ -118,7 +116,7 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		BlockPos pos1 = pos.above();
 		BlockPos pos2 = pos.above(2);
 		world.getEntitiesOfClass(Player.class, new AABB(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5, pos2.getX() + 1.5, pos2.getY() + 1.5, pos2.getZ() + 1.5)).stream().filter((p) -> !p.isCreative()).forEach((p) -> {
-			p.addEffect(new MobEffectInstance(Registry.getEffect("entropy_poisoning"), 100, 0, false, false, true));
+			p.addEffect(new MobEffectInstance(Registry.ENTROPY_POISONING.get(), 100, 0, false, false, true));
 		});
 	}
 
@@ -147,7 +145,7 @@ public class CorruptBlock extends Block implements TagMaster.IMiningLevelDataGen
 		}
 
 		@Override
-		public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction,
+		public BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction,
 				boolean simulate) {
 			if(ForgeRegistries.BLOCKS.getKey(this).toString().equals("assemblylinemachines:chaosbark_log") && toolAction.equals(ToolActions.AXE_STRIP)) {
 				return Registry.getBlock("stripped_chaosbark_log").defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS));

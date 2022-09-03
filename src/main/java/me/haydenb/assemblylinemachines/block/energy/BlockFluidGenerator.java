@@ -55,11 +55,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator> {
@@ -352,7 +351,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap == CapabilityEnergy.ENERGY) {
+			if(cap == ForgeCapabilities.ENERGY) {
 
 				if(type != null) {
 					if(type.get().outputSide == null) {
@@ -367,7 +366,7 @@ public class BlockFluidGenerator extends BlockScreenBlockEntity<TEFluidGenerator
 				}else {
 					return super.getCapability(cap);
 				}
-			}else if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+			}else if(cap == ForgeCapabilities.FLUID_HANDLER) {
 				if(type != null) {
 					if(type.get().inputSide == null) {
 						return fhandler.cast();

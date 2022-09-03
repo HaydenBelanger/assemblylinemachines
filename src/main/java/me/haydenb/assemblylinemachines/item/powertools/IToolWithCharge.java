@@ -12,7 +12,8 @@ import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,11 +22,9 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 public interface IToolWithCharge{
@@ -151,7 +150,7 @@ public interface IToolWithCharge{
 				}
 				@Override
 				public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-					if (cap == CapabilityEnergy.ENERGY) {
+					if (cap == ForgeCapabilities.ENERGY) {
 						return energyHandler.cast();
 					}
 					return  LazyOptional.empty();
@@ -181,10 +180,10 @@ public interface IToolWithCharge{
 	}
 
 	public static enum PowerToolType{
-		CRANK("assemblylinemachines:cranks", 1, 30, false, new TextComponent("Cranks").withStyle(ChatFormatting.GOLD), false, null, 0.0f, ToolDefaults.CRANK.get(Stats.SP_ENERGY).intValue()),
-		MYSTIUM("assemblylinemachines:fe", 150, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_PURPLE), true, "mystium_farmland", 0.1f, ToolDefaults.MYSTIUM.get(Stats.SP_ENERGY).intValue()),
-		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, new TextComponent("FE").withStyle(ChatFormatting.DARK_AQUA), true, "nova_farmland", 0.25f, ToolDefaults.NOVASTEEL.get(Stats.SP_ENERGY).intValue()),
-		AEFG("assemblylinemachines:fe", 1, 1, false, new TextComponent("FE").withStyle(ChatFormatting.BLUE), true, null, 0.0f, 10000000),
+		CRANK("assemblylinemachines:cranks", 1, 30, false, Component.literal("Cranks").withStyle(ChatFormatting.GOLD), false, null, 0.0f, ToolDefaults.CRANK.get(Stats.SP_ENERGY).intValue()),
+		MYSTIUM("assemblylinemachines:fe", 150, 1, true, Component.literal("FE").withStyle(ChatFormatting.DARK_PURPLE), true, "mystium_farmland", 0.1f, ToolDefaults.MYSTIUM.get(Stats.SP_ENERGY).intValue()),
+		NOVASTEEL("assemblylinemachines:fe", 75, 1, true, Component.literal("FE").withStyle(ChatFormatting.DARK_AQUA), true, "nova_farmland", 0.25f, ToolDefaults.NOVASTEEL.get(Stats.SP_ENERGY).intValue()),
+		AEFG("assemblylinemachines:fe", 1, 1, false, Component.literal("FE").withStyle(ChatFormatting.BLUE), true, null, 0.0f, 10000000),
 		ENHANCED_MYSTIUM("assemblylinemachines:fe", 150, 1, false, MYSTIUM.friendlyNameOfUnit, true, null, 0.0f, ToolDefaults.MYSTIUM.get(Stats.SP_ENH_ENERGY).intValue());
 		
 		public final String keyName;

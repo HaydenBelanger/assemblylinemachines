@@ -16,8 +16,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 public abstract class EnergyMachine<A extends AbstractContainerMenu> extends SimpleMachine<A> {
@@ -112,7 +112,7 @@ public abstract class EnergyMachine<A extends AbstractContainerMenu> extends Sim
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-		if(cap == CapabilityEnergy.ENERGY) {
+		if(cap == ForgeCapabilities.ENERGY) {
 			return energyHandler.cast();
 		}
 

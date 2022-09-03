@@ -23,11 +23,10 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
@@ -201,7 +200,7 @@ public class BlockPump extends BlockTileEntity {
 					if(handler == null) {
 						BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().above());
 						if(te != null) {
-							LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.DOWN);
+							LazyOptional<IFluidHandler> cap = te.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.DOWN);
 							handler = cap.orElse(null);
 							if(handler != null) {
 								cap.addListener((h) -> handler = null);
@@ -265,7 +264,7 @@ public class BlockPump extends BlockTileEntity {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == CapabilityEnergy.ENERGY) {
+			if (side == getBlockState().getValue(HorizontalDirectionalBlock.FACING).getOpposite() && cap == ForgeCapabilities.ENERGY) {
 				return energyHandler.cast();
 			}
 

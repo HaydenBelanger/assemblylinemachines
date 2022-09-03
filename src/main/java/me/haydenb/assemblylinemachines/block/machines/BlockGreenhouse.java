@@ -54,10 +54,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 
@@ -375,7 +375,7 @@ public class BlockGreenhouse extends BlockScreenBlockEntity<TEGreenhouse> {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return handler.cast();
+			if(cap == ForgeCapabilities.FLUID_HANDLER) return handler.cast();
 			return super.getCapability(cap, side);
 		}
 

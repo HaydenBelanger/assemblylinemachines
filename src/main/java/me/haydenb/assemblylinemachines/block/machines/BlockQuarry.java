@@ -40,9 +40,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
@@ -384,7 +384,7 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		private boolean getCapability() {
 			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
-				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+				LazyOptional<IItemHandler> cap = te.getCapability(ForgeCapabilities.ITEM_HANDLER,
 						Direction.DOWN);
 				IItemHandler output = cap.orElse(null);
 				if (output != null) {

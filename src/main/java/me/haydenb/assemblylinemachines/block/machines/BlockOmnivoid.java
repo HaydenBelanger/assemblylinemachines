@@ -36,13 +36,11 @@ import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
@@ -128,7 +126,7 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || cap == CapabilityEnergy.ENERGY) {
+			if(cap == ForgeCapabilities.ITEM_HANDLER || cap == ForgeCapabilities.FLUID_HANDLER || cap == ForgeCapabilities.ENERGY) {
 				return handler.cast();
 			}
 			return super.getCapability(cap);
@@ -136,7 +134,7 @@ public class BlockOmnivoid extends BlockScreenBlockEntity<TEOmnivoid> {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || cap == CapabilityEnergy.ENERGY) {
+			if(cap == ForgeCapabilities.ITEM_HANDLER || cap == ForgeCapabilities.FLUID_HANDLER || cap == ForgeCapabilities.ENERGY) {
 				return handler.cast();
 			}
 			return super.getCapability(cap, side);

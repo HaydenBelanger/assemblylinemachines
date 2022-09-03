@@ -32,7 +32,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class BlockMachines {
 
 	//ALLOY SMELTER
-
 	public static Block alloySmelter() {
 		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
 			Block.box(0, 0, 0, 16, 3, 16),Block.box(0, 13, 0, 16, 16, 16),
@@ -169,6 +168,8 @@ public class BlockMachines {
 	public static void electricFurnaceScreen() {
 		MachineBuilder.screen().addBar(95, 35, 176, 64, 16, 14, PBDirection.LR).addBar(76, 53, 176, 52, 13, 12, PBDirection.STATIC).buildAndRegister("electric_furnace");
 	}
+	
+	//MKII ELECTRIC FURNACE
 
 	public static Block mkiiFurnace() {
 		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(

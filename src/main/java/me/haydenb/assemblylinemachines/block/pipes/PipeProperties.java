@@ -17,15 +17,13 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class PipeProperties {
@@ -112,10 +110,10 @@ public class PipeProperties {
 			if(blockEntity != null) {
 				switch(this) {
 				case FLUID:
-					if(blockEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir).orElse(null) != null) return true;
+					if(blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, dir).orElse(null) != null) return true;
 					break;
 				case ITEM:
-					if(blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir).orElse(null) != null) return true;
+					if(blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, dir).orElse(null) != null) return true;
 					break;
 				case OMNI:
 					for(TransmissionType tt : TRANSMISSIONS_FOR_OMNIPIPE) {
@@ -125,7 +123,7 @@ public class PipeProperties {
 					}
 					break;
 				case POWER:
-					if(blockEntity.getCapability(CapabilityEnergy.ENERGY, dir).orElse(null) != null) return true;
+					if(blockEntity.getCapability(ForgeCapabilities.ENERGY, dir).orElse(null) != null) return true;
 					break;
 				}
 			}
@@ -139,15 +137,15 @@ public class PipeProperties {
 				Class<?> clazz;
 				switch(this) {
 				case FLUID:
-					lx = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir);
+					lx = te.getCapability(ForgeCapabilities.FLUID_HANDLER, dir);
 					clazz = IFluidHandler.class;
 					break;
 				case ITEM:
-					lx = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir);
+					lx = te.getCapability(ForgeCapabilities.ITEM_HANDLER, dir);
 					clazz = IItemHandler.class;
 					break;
 				case POWER:
-					lx = te.getCapability(CapabilityEnergy.ENERGY, dir);
+					lx = te.getCapability(ForgeCapabilities.ENERGY, dir);
 					clazz = IEnergyStorage.class;
 					break;
 				case OMNI:

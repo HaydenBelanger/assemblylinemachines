@@ -16,10 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
@@ -194,7 +193,7 @@ public class QuantumLinkManager extends SavedData{
 					}else {
 						if(src != targ && targ.pfi[1] == 0) {
 
-							IFluidHandler ifh = targ.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.UP).orElse(null);
+							IFluidHandler ifh = targ.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.UP).orElse(null);
 							if(ifh == null) {
 								iter.remove();
 							}else {
@@ -224,7 +223,7 @@ public class QuantumLinkManager extends SavedData{
 					}else {
 						if(src != targ && targ.pfi[0] == 0) {
 
-							IEnergyStorage ieh = targ.getCapability(CapabilityEnergy.ENERGY, Direction.UP).orElse(null);
+							IEnergyStorage ieh = targ.getCapability(ForgeCapabilities.ENERGY, Direction.UP).orElse(null);
 							if(ieh == null) {
 								iter.remove();
 							}else {

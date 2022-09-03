@@ -14,9 +14,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class BlockSimpleCrankCharger extends BlockTileEntity{
@@ -93,7 +93,7 @@ public class BlockSimpleCrankCharger extends BlockTileEntity{
 		private boolean getCapability() {
 			BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(Direction.UP));
 			if(te != null) {
-				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+				LazyOptional<IItemHandler> cap = te.getCapability(ForgeCapabilities.ITEM_HANDLER,
 						Direction.DOWN);
 				IItemHandler output = cap.orElse(null);
 				if (output != null) {

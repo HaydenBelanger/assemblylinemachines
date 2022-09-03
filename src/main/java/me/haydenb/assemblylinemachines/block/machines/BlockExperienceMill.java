@@ -47,9 +47,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.*;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -294,7 +294,7 @@ public class BlockExperienceMill {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+			if (cap == ForgeCapabilities.FLUID_HANDLER) {
 				return lazy.cast();
 			}
 			return super.getCapability(cap, side);
@@ -302,7 +302,7 @@ public class BlockExperienceMill {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+			if (cap == ForgeCapabilities.FLUID_HANDLER) {
 				return lazy.cast();
 			}
 			return super.getCapability(cap);

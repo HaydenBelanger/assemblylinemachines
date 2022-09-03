@@ -35,8 +35,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -112,7 +112,7 @@ public class BlockBottomlessStorageUnit extends BlockScreenBlockEntity<BlockBott
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap) {
-			if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			if (cap == ForgeCapabilities.ITEM_HANDLER) {
 				return itemHandler.cast();
 			}
 

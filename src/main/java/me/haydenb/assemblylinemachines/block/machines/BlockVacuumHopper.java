@@ -30,8 +30,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -141,7 +141,7 @@ public class BlockVacuumHopper extends HopperBlock {
 					if(handler == null) {
 						Direction d = this.getBlockState().getValue(HopperBlock.FACING);
 						if(this.getLevel().getBlockEntity(this.getBlockPos().relative(d)) != null) {
-							LazyOptional<IItemHandler> lO = this.getLevel().getBlockEntity(this.getBlockPos().relative(d)).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
+							LazyOptional<IItemHandler> lO = this.getLevel().getBlockEntity(this.getBlockPos().relative(d)).getCapability(ForgeCapabilities.ITEM_HANDLER, d.getOpposite());
 							if(lO.orElse(null) != null) {
 								handler = lO.orElse(null);
 								lO.addListener((lOX) -> handler = null);

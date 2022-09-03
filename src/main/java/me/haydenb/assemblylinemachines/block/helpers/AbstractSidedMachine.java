@@ -14,11 +14,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> extends EnergyMachine<A> {
@@ -39,9 +38,9 @@ public abstract class AbstractSidedMachine<A extends AbstractContainerMenu> exte
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || cap == CapabilityEnergy.ENERGY) {
+		if(cap == ForgeCapabilities.ITEM_HANDLER || cap == ForgeCapabilities.ENERGY) {
 
-			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			if(cap == ForgeCapabilities.ITEM_HANDLER) {
 				LazyOptional<SidedItemHandler> sih = itemLazies.getOrDefault(side, LazyOptional.empty());
 				if(sih.orElse(null) != null) {
 					if(sih.orElse(null).side == side) {

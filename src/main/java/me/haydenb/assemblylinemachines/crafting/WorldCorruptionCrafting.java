@@ -122,7 +122,7 @@ public class WorldCorruptionCrafting implements Recipe<Container>, IRecipeCatego
 		return List.of(!input.get().isEmpty() ? input.get() : new FluidStack(inputFluid, 1000), !outputFluid.equals(Fluids.EMPTY) ? new FluidStack(outputFluid, 1000) : stacks);
 	}
 	
-	public Optional<Either<Block, Fluid>> testBlock(Random rand, Level level, BlockPos pos){
+	public Optional<Either<Block, Fluid>> testBlock(RandomSource rand, Level level, BlockPos pos){
 		if(input.get().test(level.getBlockState(pos).getBlock().asItem().getDefaultInstance())) return Optional.of(Either.left(getRandom(rand)));
 		if(!inputFluid.equals(Fluids.EMPTY) && inputFluid.equals(level.getFluidState(pos).getType())) return Optional.of(Either.right(outputFluid));
 		return Optional.empty();

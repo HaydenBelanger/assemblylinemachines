@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.item.ItemMobCrystal;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.nbt.CompoundTag;

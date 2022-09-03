@@ -34,9 +34,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.network.PacketDistributor;
@@ -155,7 +155,7 @@ public class BlockExperienceHopper extends BlockTileEntity {
 						Direction dir = this.getBlockState().getValue(BlockStateProperties.FACING_HOPPER);
 						BlockEntity te = this.getLevel().getBlockEntity(this.getBlockPos().relative(dir));
 						if(te != null) {
-							LazyOptional<IFluidHandler> cap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir.getOpposite());
+							LazyOptional<IFluidHandler> cap = te.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite());
 							output = cap.orElse(null);
 							if(output != null) {
 								cap.addListener((h) -> output = null);
