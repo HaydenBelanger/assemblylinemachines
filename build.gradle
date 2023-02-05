@@ -27,7 +27,7 @@ minecraft {
     
     runs {
         client {
-            workingDirectory project.file('run')
+            workingDirectory project.file('run-cli')
             
             //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
@@ -45,7 +45,7 @@ minecraft {
         }
 
         server {
-            workingDirectory project.file('run')
+            workingDirectory project.file('run-srv')
             
             //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
@@ -63,7 +63,7 @@ minecraft {
         }
 
         data {
-            workingDirectory project.file('run')
+            workingDirectory project.file('run-cli')
             
             //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'

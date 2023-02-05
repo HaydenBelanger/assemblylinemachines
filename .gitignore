@@ -21,7 +21,8 @@ src/generated/*
 
 # other
 eclipse
-run
+run-cli
+run-srv
 
 # Files from Forge MDK
 README.txt
