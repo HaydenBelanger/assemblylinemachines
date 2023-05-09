@@ -1,18 +1,17 @@
 {
 	"type": "assemblylinemachines:bath",
 	"input_a":{
-		"tag": "forge:dusts/redstone"
+		"tag": "forge:dusts/energized_gold"
 	},
 	"input_b":{
-		"tag": "forge:dusts/lapis"
+		"tag": "forge:dusts/attuned_titanium"
 	},
 	"output":{
 		"item": "assemblylinemachines:mystium_blend",
 		"count": 2
 	},
 	"stirs": 5,
-	"fluid": "lava",
-	"mix_color": "#000000",
+	"fluid": "minecraft:lava",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "FULL"
 }

@@ -1,8 +1,9 @@
 package me.haydenb.assemblylinemachines.client.ter;
 
+import org.joml.Vector4f;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector4f;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank;
 import net.minecraft.client.Minecraft;

@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import com.google.common.reflect.TypeToken;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
@@ -733,7 +732,7 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 			@Override
 			public int[] getBlitData() {
 				if(!isEnabledSlot()) {
-					return new int[] {x, y, 54, 17, width, height};
+					return new int[] {this.getX(), this.getY(), 54, 17, width, height};
 				}
 				return super.getBlitData();
 			}
@@ -745,13 +744,6 @@ public class BlockAutocraftingTable extends BlockScreenBlockEntity<BlockAutocraf
 				}
 
 				return super.getSupplierOutput();
-			}
-
-			@Override
-			public void renderToolTip(PoseStack mx, int mouseX, int mouseY) {
-				if(isEnabledSlot()) {
-					super.renderToolTip(mx, mouseX, mouseY);
-				}
 			}
 
 			private boolean isEnabledSlot(){

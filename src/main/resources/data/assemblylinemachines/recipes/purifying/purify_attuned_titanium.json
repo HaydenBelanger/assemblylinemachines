@@ -1,7 +1,7 @@
 {
 	"type": "assemblylinemachines:purifier",
 	"part_a":{
-		"tag": "forge:dusts/mystium"
+		"tag": "forge:dusts/attuned_titanium"
 	},
 	"part_b":{
 		"tag": "forge:ender_pearls"

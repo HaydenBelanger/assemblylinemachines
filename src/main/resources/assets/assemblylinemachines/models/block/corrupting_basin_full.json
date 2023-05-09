@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "assemblylinemachines:block/corrupting_basin_inside",
 		"1": "assemblylinemachines:block/corrupting_basin",
-		"2": "assemblylinemachines:fluid/condensed_void",
+		"2": "assemblylinemachines:block/fluid/condensed_void",
 		"particle": "assemblylinemachines:block/corrupting_basin_inside"
 	},
 	"elements": [

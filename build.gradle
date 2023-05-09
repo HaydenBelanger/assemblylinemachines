@@ -1,18 +1,18 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://maven.minecraftforge.net'}
+        maven { url = 'https://maven.parchmentmc.org'}
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath files("gradle/plugins/mixingradle-0.7-FG5BUILD.jar")
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
-
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
-apply plugin: 'org.spongepowered.mixin'
 
 version = "${project.mcVersion}-${project.modVersion}"
 group = 'me.haydenb.assemblylinemachines'
@@ -23,8 +23,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
 
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    mappings channel: 'official', version: '1.19'
-    
+    mappings channel: 'parchment', version: '2023.02.05-1.19.3'
     runs {
         client {
             workingDirectory project.file('run-cli')
@@ -32,10 +31,9 @@ minecraft {
             //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
         	property 'forge.logging.markers', 'REGISTRIES'
-        	//Mixin-required properties and arg (3)
+        	//Mixin-required properties and arg (2)
         	property 'mixin.env.remapRefMap', 'true'
         	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
-        	arg '-mixin.config=mixins.assemblylinemachines.json'
             
             mods {
                 assemblylinemachines {
@@ -50,10 +48,9 @@ minecraft {
             //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
         	property 'forge.logging.markers', 'REGISTRIES'
-        	//Mixin-required properties and arg (3)
+        	//Mixin-required properties and arg (2)
         	property 'mixin.env.remapRefMap', 'true'
         	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
-        	arg '-mixin.config=mixins.assemblylinemachines.json'
         	
             mods {
                 assemblylinemachines {
@@ -68,10 +65,9 @@ minecraft {
             //Forge-required properties (2)
             property 'forge.logging.console.level', 'debug'
         	property 'forge.logging.markers', 'REGISTRIES'
-        	//Mixin-required properties and arg (3)
+        	//Mixin-required properties and arg (2)
         	property 'mixin.env.remapRefMap', 'true'
         	property 'mixin.env.refMapRemappingFile', file('build/createSrgToMcp/output.srg')
-        	arg '-mixin.config=mixins.assemblylinemachines.json'
         	//Datagen-required args (4)
             args '--mod', 'assemblylinemachines', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--input', file('src/main/resources/')
             mods {
@@ -93,36 +89,37 @@ sourceSets {
 
 repositories{
 	maven{
-		//CurseForge project to Maven wrapper - for IMC projects.
+		//Cursemaven
 		url "https://cursemaven.com"
 	}
 	maven{
-		//Sponge Maven - for Mixins.
+		//Sponge
 		url "https://repo.spongepowered.org/maven"
 	}
+
+    maven{
+        //Patchouli
+        url "https://maven.blamejared.com"
+    }
+
     flatDir{
-    	//Flatdir for local jars.
-    	dirs "gradle/plugins"
+        //Local
+        dirs "gradle/plugins"
     }
 }
 
 dependencies {
   	minecraft "net.minecraftforge:forge:${project.mcVersion}-${project.forgeVersion}"
-	annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 	
 	//IMC
- 	implementation fg.deobf("curse.maven:jei-238222:3963975")
-    implementation fg.deobf("curse.maven:patchouli-306770:3936481")
-    implementation fg.deobf("curse.maven:theoneprobe-245211:3927520")
-    implementation fg.deobf("curse.maven:mekanism-268560:3954410")
-    runtimeOnly fg.deobf("local.legendarytooltips:legendarytooltips:1.19-DATAGENFIX")
-    runtimeOnly fg.deobf("curse.maven:iceberg-520110:3898603")
-    runtimeOnly fg.deobf("curse.maven:prism-638111:3910027")
-    runtimeOnly fg.deobf("curse.maven:ato-405593:3964725")
-}
-
-mixin {
-	add sourceSets.main, "mixins.assemblylinemachines.refmap.json"
+ 	implementation fg.deobf("curse.maven:jei-238222:4371830")
+    implementation fg.deobf("vazkii.patchouli:Patchouli:1.19.3-78-SNAPSHOT")
+    implementation fg.deobf("curse.maven:theoneprobe-245211:4159743")
+    //implementation fg.deobf("curse.maven:mekanism-268560:3954410")
+    runtimeOnly fg.deobf("local.legendarytooltips:legendarytooltips:1.19.3-DATAGENFIX")
+    runtimeOnly fg.deobf("curse.maven:iceberg-520110:4257665")
+    runtimeOnly fg.deobf("curse.maven:prism-638111:4238759")
+    //runtimeOnly fg.deobf("curse.maven:ato-405593:3964725")
 }
 
 jar.finalizedBy("reobfJar")
@@ -130,12 +127,7 @@ jar.finalizedBy("reobfJar")
 jar{
 	manifest{
 		attributes([
-			"Implementation-Version": project.version,
-			"MixinConfigs": "mixins.assemblylinemachines.json"
+			"Implementation-Version": project.version
 		])
 	}
-}
-
-task eclipseWithMap(type: GradleBuild){
-	tasks = ["createMcpToSrg", "eclipse", "genEclipseRuns"]
 }

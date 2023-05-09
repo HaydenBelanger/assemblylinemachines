@@ -4,7 +4,6 @@ import java.util.List;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -21,7 +20,7 @@ public class ItemKey extends Item {
 
 	private String translationKey;
 	public ItemKey() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 		translationKey = Util.makeDescriptionId("item", new ResourceLocation(AssemblyLineMachines.MODID, "key_configured"));
 	}
 

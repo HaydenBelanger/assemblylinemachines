@@ -1,9 +1,9 @@
 package me.haydenb.assemblylinemachines.registry;
 
-import static net.minecraft.core.Registry.*;
-
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +30,7 @@ import me.haydenb.assemblylinemachines.block.fluids.FluidCondensedVoid.FluidCond
 import me.haydenb.assemblylinemachines.block.fluids.FluidNaphtha.BlockNaphthaFire;
 import me.haydenb.assemblylinemachines.block.fluids.SplitFluid.GasFluid;
 import me.haydenb.assemblylinemachines.block.fluids.SplitFluid.SpecialRenderFluidType;
+import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineBlockEntityBuilder.IMachineDataBridge;
 import me.haydenb.assemblylinemachines.block.machines.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockAutocraftingTable.*;
 import me.haydenb.assemblylinemachines.block.machines.BlockBottomlessStorageUnit.*;
@@ -92,6 +93,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.commands.synchronization.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -127,7 +129,11 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.data.event.GatherDataEvent.DataGeneratorConfig;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
+import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent.Operation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
@@ -136,6 +142,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.*;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
@@ -148,7 +155,8 @@ public class Registry {
 	private static final ConcurrentHashMap<String, Block> BLOCKS = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, BlockEntityType<?>> BLOCK_ENTITIES = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Pair<MenuType<?>, Integer>> CONTAINERS = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<String, RecipeSerializer<?>> RECIPES = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, RecipeSerializer<?>> RECIPE_SERIALIZERS = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, RecipeType<?>> RECIPE_TYPES = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, Fluid> FLUIDS = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, FluidType> FLUID_TYPES = new ConcurrentHashMap<>();
 
@@ -157,9 +165,9 @@ public class Registry {
 	private static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(Keys.ENCHANTMENTS, AssemblyLineMachines.MODID);
 	private static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Keys.SOUND_EVENTS, AssemblyLineMachines.MODID);
 	private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Keys.ENTITY_TYPES, AssemblyLineMachines.MODID);
-	private static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = DeferredRegister.create(COMMAND_ARGUMENT_TYPE_REGISTRY, AssemblyLineMachines.MODID);
-	private static final DeferredRegister<RuleTestType<?>> RULE_TESTS = DeferredRegister.create(RULE_TEST_REGISTRY, AssemblyLineMachines.MODID);
-	private static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIERS = DeferredRegister.create(PLACEMENT_MODIFIER_REGISTRY, AssemblyLineMachines.MODID);
+	private static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, AssemblyLineMachines.MODID);
+	private static final DeferredRegister<RuleTestType<?>> RULE_TESTS = DeferredRegister.create(Registries.RULE_TEST, AssemblyLineMachines.MODID);
+	private static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIERS = DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, AssemblyLineMachines.MODID);
 	private static final DeferredRegister<Codec<? extends BiomeModifier>> BIOME_MODIFIERS = DeferredRegister.create(Keys.BIOME_MODIFIER_SERIALIZERS, AssemblyLineMachines.MODID);
 
 	//EFFECTS
@@ -172,11 +180,11 @@ public class Registry {
 	public static final RegistryObject<Enchantment> ENGINEERS_FURY = ENCHANTMENTS.register("engineers_fury", () -> new EnchantmentEngineersFury());
 
 	//SOUND EVENTS
-	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_AMBIENT = SOUNDS.register("corrupt_shell_ambient", () -> new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_ambient")));
-	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_HURT = SOUNDS.register("corrupt_shell_hurt", () -> new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_hurt")));
-	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_DEATH = SOUNDS.register("corrupt_shell_death", () -> new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_death")));
-	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_STEP = SOUNDS.register("corrupt_shell_step", () -> new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_step")));
-	public static final RegistryObject<SoundEvent> ASSEMBLY_REQUIRED = SOUNDS.register("assembly_required", () -> new SoundEvent(new ResourceLocation(AssemblyLineMachines.MODID, "assembly_required")));
+	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_AMBIENT = SOUNDS.register("corrupt_shell_ambient", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_ambient")));
+	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_HURT = SOUNDS.register("corrupt_shell_hurt", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_hurt")));
+	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_DEATH = SOUNDS.register("corrupt_shell_death", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_death")));
+	public static final RegistryObject<SoundEvent> CORRUPT_SHELL_STEP = SOUNDS.register("corrupt_shell_step", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell_step")));
+	public static final RegistryObject<SoundEvent> ASSEMBLY_REQUIRED = SOUNDS.register("assembly_required", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AssemblyLineMachines.MODID, "assembly_required")));
 
 	//MISC
 	public static final RegistryObject<EntityType<EntityCorruptShell>> CORRUPT_SHELL = ENTITIES.register("corrupt_shell", () -> EntityType.Builder.of(EntityCorruptShell::new, MobCategory.MONSTER).build(new ResourceLocation(AssemblyLineMachines.MODID, "corrupt_shell").toString()));
@@ -184,9 +192,6 @@ public class Registry {
 	public static final RegistryObject<RuleTestType<ConfigMatchTest>> CONFIG_RULE_TEST = RULE_TESTS.register("config", () -> () -> ConfigMatchTest.CODEC);
 	public static final RegistryObject<PlacementModifierType<WhitelistBiomeFilter>> WHITELIST_BIOME_FILTER = PLACEMENT_MODIFIERS.register("whitelist_biome", () -> () -> WhitelistBiomeFilter.CODEC);
 	public static final RegistryObject<Codec<? extends BiomeModifier>> RAW_FEATURE_MODIFIER = BIOME_MODIFIERS.register("raw_features", () -> RawFeatureDeserializer.CODEC);
-
-	//CREATIVE TAB
-	public static final ModCreativeTab CREATIVE_TAB = new ModCreativeTab(AssemblyLineMachines.MODID);
 
 	//REGISTER DEFERRED REGISTRIES
 	public static void registerDeferredRegistries() {
@@ -204,12 +209,13 @@ public class Registry {
 
 		//ITEMS
 		event.register(Keys.ITEMS, (h) -> {
+			
 			createItem("titanium_ingot", "titanium_nugget", "raw_titanium");
 
 			createItem("titanium_blade_piece", "pure_gold_blade_piece", "steel_blade_piece");
-			createItem("titanium_blade", new Item.Properties().durability(Blade.TITANIUM.uses).tab(Registry.CREATIVE_TAB));
-			createItem("pure_gold_blade", new Item.Properties().durability(Blade.PUREGOLD.uses).tab(Registry.CREATIVE_TAB));
-			createItem("steel_blade", new Item.Properties().durability(Blade.STEEL.uses).tab(Registry.CREATIVE_TAB));
+			createItem("titanium_blade", new Item.Properties().durability(Blade.TITANIUM.uses));
+			createItem("pure_gold_blade", new Item.Properties().durability(Blade.PUREGOLD.uses));
+			createItem("steel_blade", new Item.Properties().durability(Blade.STEEL.uses));
 
 			createItem("ground_iron", "ground_gold", "ground_titanium", "ground_coal", "ground_charcoal", "ground_copper", "ground_lapis_lazuli");
 			createItem("sludge");
@@ -253,50 +259,50 @@ public class Registry {
 			createItem("mystium_blend", "mystium_ingot");
 			createItem("corrupted_shard", new ItemCorruptedShard());
 
-			createItem("titanium_sword", new SwordItem(ItemTiers.TITANIUM.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_pickaxe", new PickaxeItem(ItemTiers.TITANIUM.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_shovel", new ShovelItem(ItemTiers.TITANIUM.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_hoe", new HoeItem(ItemTiers.TITANIUM.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_hammer", new ItemHammer(ItemTiers.TITANIUM.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("titanium_sword", new SwordItem(ItemTiers.TITANIUM.getItemTier(), 2, -1.5f, new Item.Properties()));
+			createItem("titanium_axe", new AxeItem(ItemTiers.TITANIUM.getItemTier(), 3, -3.5f, new Item.Properties()));
+			createItem("titanium_pickaxe", new PickaxeItem(ItemTiers.TITANIUM.getItemTier(), 0, -1.5f, new Item.Properties()));
+			createItem("titanium_shovel", new ShovelItem(ItemTiers.TITANIUM.getItemTier(), 0, -1.3f, new Item.Properties()));
+			createItem("titanium_hoe", new HoeItem(ItemTiers.TITANIUM.getItemTier(), 0, -0.5f, new Item.Properties()));
+			createItem("titanium_hammer", new ItemHammer(ItemTiers.TITANIUM.getItemTier(), 8, -3.2f, new Item.Properties()));
 
-			createItem("crank_sword", new ItemPowerSword(ItemTiers.CRANK, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("crank_axe", new ItemPowerAxe(ItemTiers.CRANK, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("crank_pickaxe", new ItemPowerPickaxe(ItemTiers.CRANK, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("crank_shovel", new ItemPowerShovel(ItemTiers.CRANK, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("crank_hoe", new ItemPowerHoe(ItemTiers.CRANK, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("crank_hammer", new ItemPowerHammer(ItemTiers.CRANK, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("crank_sword", new ItemPowerSword(ItemTiers.CRANK, new Item.Properties()));
+			createItem("crank_axe", new ItemPowerAxe(ItemTiers.CRANK, new Item.Properties()));
+			createItem("crank_pickaxe", new ItemPowerPickaxe(ItemTiers.CRANK, new Item.Properties()));
+			createItem("crank_shovel", new ItemPowerShovel(ItemTiers.CRANK, new Item.Properties()));
+			createItem("crank_hoe", new ItemPowerHoe(ItemTiers.CRANK, new Item.Properties()));
+			createItem("crank_hammer", new ItemPowerHammer(ItemTiers.CRANK, new Item.Properties()));
 
-			createItem("mystium_sword", new ItemPowerSword(ItemTiers.MYSTIUM, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_axe", new ItemPowerAxe(ItemTiers.MYSTIUM, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_pickaxe", new ItemPowerPickaxe(ItemTiers.MYSTIUM, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_shovel", new ItemPowerShovel(ItemTiers.MYSTIUM, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_hoe", new ItemPowerHoe(ItemTiers.MYSTIUM, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_hammer", new ItemPowerHammer(ItemTiers.MYSTIUM, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("mystium_sword", new ItemPowerSword(ItemTiers.MYSTIUM, new Item.Properties()));
+			createItem("mystium_axe", new ItemPowerAxe(ItemTiers.MYSTIUM, new Item.Properties()));
+			createItem("mystium_pickaxe", new ItemPowerPickaxe(ItemTiers.MYSTIUM, new Item.Properties()));
+			createItem("mystium_shovel", new ItemPowerShovel(ItemTiers.MYSTIUM, new Item.Properties()));
+			createItem("mystium_hoe", new ItemPowerHoe(ItemTiers.MYSTIUM, new Item.Properties()));
+			createItem("mystium_hammer", new ItemPowerHammer(ItemTiers.MYSTIUM, new Item.Properties()));
 
-			createItem("novasteel_sword", new ItemPowerSword(ItemTiers.NOVASTEEL, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("novasteel_axe", new ItemPowerAxe(ItemTiers.NOVASTEEL, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("novasteel_pickaxe", new ItemPowerPickaxe(ItemTiers.NOVASTEEL, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("novasteel_shovel", new ItemPowerShovel(ItemTiers.NOVASTEEL, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("novasteel_hoe", new ItemPowerHoe(ItemTiers.NOVASTEEL, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("novasteel_hammer", new ItemPowerHammer(ItemTiers.NOVASTEEL, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("novasteel_sword", new ItemPowerSword(ItemTiers.NOVASTEEL, new Item.Properties()));
+			createItem("novasteel_axe", new ItemPowerAxe(ItemTiers.NOVASTEEL, new Item.Properties()));
+			createItem("novasteel_pickaxe", new ItemPowerPickaxe(ItemTiers.NOVASTEEL, new Item.Properties()));
+			createItem("novasteel_shovel", new ItemPowerShovel(ItemTiers.NOVASTEEL, new Item.Properties()));
+			createItem("novasteel_hoe", new ItemPowerHoe(ItemTiers.NOVASTEEL, new Item.Properties()));
+			createItem("novasteel_hammer", new ItemPowerHammer(ItemTiers.NOVASTEEL, new Item.Properties()));
 
-			createItem("steel_sword", new SwordItem(ItemTiers.STEEL.getItemTier(), 2, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_axe", new AxeItem(ItemTiers.STEEL.getItemTier(), 3, -3.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_pickaxe", new PickaxeItem(ItemTiers.STEEL.getItemTier(), 0, -1.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_shovel", new ShovelItem(ItemTiers.STEEL.getItemTier(), 0, -1.3f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_hoe", new HoeItem(ItemTiers.STEEL.getItemTier(), 0, -0.5f, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL.getItemTier(), 8, -3.2f, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("steel_sword", new SwordItem(ItemTiers.STEEL.getItemTier(), 2, -1.5f, new Item.Properties()));
+			createItem("steel_axe", new AxeItem(ItemTiers.STEEL.getItemTier(), 3, -3.5f, new Item.Properties()));
+			createItem("steel_pickaxe", new PickaxeItem(ItemTiers.STEEL.getItemTier(), 0, -1.5f, new Item.Properties()));
+			createItem("steel_shovel", new ShovelItem(ItemTiers.STEEL.getItemTier(), 0, -1.3f, new Item.Properties()));
+			createItem("steel_hoe", new HoeItem(ItemTiers.STEEL.getItemTier(), 0, -0.5f, new Item.Properties()));
+			createItem("steel_hammer", new ItemHammer(ItemTiers.STEEL.getItemTier(), 8, -3.2f, new Item.Properties()));
 
-			createItem("steel_helmet", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("steel_boots", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("steel_helmet", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties()));
+			createItem("steel_chestplate", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties()));
+			createItem("steel_leggings", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties()));
+			createItem("steel_boots", new ArmorItem(ItemTiers.STEEL.getArmorTier(), EquipmentSlot.FEET, new Item.Properties()));
 
-			createItem("titanium_helmet", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("titanium_helmet", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties()));
+			createItem("titanium_chestplate", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties()));
+			createItem("titanium_leggings", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties()));
+			createItem("titanium_boots", new ArmorItem(ItemTiers.TITANIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties()));
 
 			createItem("crank_shaft", "convection_component", "conduction_component", "empowered_conduction_component", "empowered_convection_component", "basic_battery",
 					"temperature_regulator", "fluid_regulator", "stainless_steel_tank_component", "steel_tank_component", "pneumatic_device", "basic_pneumatic_device");
@@ -331,10 +337,11 @@ public class Registry {
 			createItem("quark_matter", new ItemReactorOutput(Component.literal("Medium-Quality").withStyle(ChatFormatting.BLUE)));
 			createItem("strange_matter", new ItemReactorOutput(Component.literal("High-Quality").withStyle(ChatFormatting.GREEN)));
 
-			createItem("corrupt_shell_spawn_egg", new ForgeSpawnEggItem(() -> CORRUPT_SHELL.get(), 0x005f85, 0x22a1d4, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem("corrupt_shell_spawn_egg", new ForgeSpawnEggItem(() -> CORRUPT_SHELL.get(), 0x005f85, 0x22a1d4, new Item.Properties()));
 			createItem("reality_crystal");
 			createItem("galactic_flesh", new ItemGalacticFlesh());
 
+			createItem("energizing_blend", "energizing_compound", "balanced_blend");
 			createItem("electrified_netherite_blend", "ground_netherite");
 
 			createItem("chaotic_sawdust", "graphene_rod", "prismatic_dust");
@@ -350,18 +357,18 @@ public class Registry {
 
 			createItem("overclocked_convection_component", "overclocked_conduction_component");
 
-			createItem("music_disc_assembly_required", new RecordItem(1, () -> ASSEMBLY_REQUIRED.get(), new Item.Properties().tab(CREATIVE_TAB).stacksTo(1).rarity(Rarity.RARE), 5100));
+			createItem("music_disc_assembly_required", new RecordItem(1, () -> ASSEMBLY_REQUIRED.get(), new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 5100));
 
 			createItem("mkii_upgrade_kit", new ItemUpgradeKit());
 			createItem("electric_upgrade_kit", new ItemUpgradeKit());
 
 			createItem("wrench_o_matic", new ItemWrenchOMatic());
 
-			createItem("mystium_helmet", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_chestplate", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_leggings", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("mystium_boots", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties().tab(CREATIVE_TAB)));
-			createItem("enhanced_mystium_chestplate", new ItemPowerArmor(PowerToolType.ENHANCED_MYSTIUM, ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().tab(CREATIVE_TAB).rarity(Rarity.EPIC)));
+			createItem("mystium_helmet", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties()));
+			createItem("mystium_chestplate", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties()));
+			createItem("mystium_leggings", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.LEGS, new Item.Properties()));
+			createItem("mystium_boots", new ItemPowerArmor(ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.FEET, new Item.Properties()));
+			createItem("enhanced_mystium_chestplate", new ItemPowerArmor(PowerToolType.ENHANCED_MYSTIUM, ItemTiers.MYSTIUM.getArmorTier(), EquipmentSlot.CHEST, new Item.Properties().rarity(Rarity.EPIC)));
 
 			createItem("mystium_armor_plating", "mystium_crystal", "mystium_flight_harness");
 
@@ -375,14 +382,14 @@ public class Registry {
 			createItem("forest_fungus", new ItemSpores(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "forest_fungus_plantable")), Blocks.PODZOL));
 			createItem("grass_seeds", new ItemSpores(TagKey.create(Keys.BLOCKS, new ResourceLocation(AssemblyLineMachines.MODID, "grass_seeds_plantable")), Blocks.GRASS_BLOCK));
 
-			createItem("gear_mold", new Item.Properties().stacksTo(1).tab(CREATIVE_TAB));
-			createItem("plate_mold", new Item.Properties().stacksTo(1).tab(CREATIVE_TAB));
-			createItem("rod_mold", new Item.Properties().stacksTo(1).tab(CREATIVE_TAB));
+			createItem("gear_mold", new Item.Properties().stacksTo(1));
+			createItem("plate_mold", new Item.Properties().stacksTo(1));
+			createItem("rod_mold", new Item.Properties().stacksTo(1));
 
 			createItem("chromium_rod", "copper_rod", "gold_rod", "iron_rod", "mystium_gear", "ground_steel", "mystium_rod", "novasteel_gear", "novasteel_rod", "titanium_rod", "ground_amethyst",
 					"graphene_gear", "graphene_ingot", "graphene_plate", "attuned_titanium_rod", "attuned_titanium_gear");
 			createItem("quantum_fuel", new ItemGearboxFuel(12800, Rarity.RARE));
-			createItem("glacier_sauce", new Item.Properties().rarity(Rarity.UNCOMMON).tab(Registry.CREATIVE_TAB).food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 3600), 1f).nutrition(1).fast().saturationMod(2.4f).alwaysEat().build()));
+			createItem("glacier_sauce", new Item.Properties().rarity(Rarity.UNCOMMON).food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 3600), 1f).nutrition(1).fast().saturationMod(2.4f).alwaysEat().build()));
 			createItem("internal_water_generator", new ItemInternalWaterGenerator());
 			createItem("creative_upgrade_kit", new ItemCreativeUpgradeKit());
 
@@ -517,10 +524,11 @@ public class Registry {
 			createBlock("chaosbark_planks", Material.WOOD, 2f, 6f, SoundType.WOOD, false, true);
 			createBlock("chaosbark_stairs", new StairBlock(() -> Registry.getBlock("chaosbark_planks").defaultBlockState(), Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD)), true);
 			createBlock("chaosbark_slab", new SlabBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD)), true);
-			createBlock("chaosbark_door", new DoorBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion()), true);
-			createBlock("chaosbark_trapdoor", new TrapDoorBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion()), true);
+			
+			createBlock("chaosbark_door", new DoorBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion(), SoundEvents.WOODEN_DOOR_CLOSE, SoundEvents.WOODEN_DOOR_OPEN), true);
+			createBlock("chaosbark_trapdoor", new TrapDoorBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion(), SoundEvents.WOODEN_TRAPDOOR_CLOSE, SoundEvents.WOODEN_TRAPDOOR_OPEN), true);
 			createBlock("chaosbark_fence", new ChaosbarkFenceBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).noOcclusion().strength(2f, 6f)), true);
-			createBlock("chaosbark_fence_gate", new FenceGateBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion()), true);
+			createBlock("chaosbark_fence_gate", new FenceGateBlock(Block.Properties.of(Material.WOOD).strength(2f, 6f).sound(SoundType.WOOD).noOcclusion(), SoundEvents.FENCE_GATE_CLOSE, SoundEvents.FENCE_GATE_OPEN), true);
 
 			createBlock("smooth_corrupt_stone", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
 			createBlock("large_corrupt_stone_bricks", Material.STONE, 3f, 9f, SoundType.STONE, false, true);
@@ -537,9 +545,9 @@ public class Registry {
 			createBlock("blooming_chaosweed", new CorruptTallGrassBlock(), true);
 			createBlock("tall_chaosweed", new CorruptDoubleTallGrassBlock(), true);
 			createBlock("tall_blooming_chaosweed", new CorruptDoubleTallGrassBlock(), true);
-			createBlock("mandelbloom", new CorruptFlowerBlock(MobEffects.CONFUSION, 15, 0), true);
-			createBlock("prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 30, 7), true);
-			createBlock("bright_prism_rose", new CorruptFlowerBlock(MobEffects.GLOWING, 240, 15), true);
+			createBlock("mandelbloom", new CorruptFlowerBlock(() -> MobEffects.CONFUSION, 15, 0), true);
+			createBlock("prism_rose", new CorruptFlowerBlock(() -> MobEffects.GLOWING, 30, 7), true);
+			createBlock("bright_prism_rose", new CorruptFlowerBlock(() -> MobEffects.GLOWING, 240, 15), true);
 			createBlock("brain_cactus", new BrainCactusBlock(Block.Properties.of(Material.CACTUS).strength(3f, 9f).randomTicks().sound(SoundType.WOOL)), true);
 
 			createBlock("flerovium_block", Material.METAL, 5f, 20f, SoundType.METAL, false, true);
@@ -567,7 +575,10 @@ public class Registry {
 			createBlock("cocoa_sapling", new BlockModdedSapling(new ResourceLocation(AssemblyLineMachines.MODID, "cocoa_tree"), PlantType.PLAINS), true);
 			createBlock("cocoa_leaves", new LeavesBlock(Block.Properties.of(Material.LEAVES).sound(SoundType.GRASS).randomTicks().noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never)), true);
 
-			//FLUIDS
+			BLOCKS.forEach((k, v) -> h.register(k, v));
+		});
+		
+		event.register(Keys.FLUIDS, (h) -> {
 			createFluid("oil", (b) -> new SplitFluid(b, 5, basicFFFProperties("oil").levelDecreasePerBlock(2).tickRate(25)), Either.left(SplitFluid.effectLiquidBlock("oil", () -> List.of(new MobEffectInstance(MobEffects.BLINDNESS, 60), new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 3)))), true, FluidType.Properties.create().canSwim(false).temperature(400), (f) -> f.color(0, 0, 0).fog(6f));
 			createFluid("naphtha", FluidNaphtha::new, Either.left(SplitFluid.effectLiquidBlock("naphtha", () -> List.of(new MobEffectInstance(DEEP_BURN.get(), 300, 0)), Block.Properties.of(Material.LAVA).lightLevel((state) -> 11).noLootTable())), true, FluidType.Properties.create().temperature(2200).canDrown(false), (f) -> f.color(222, 79, 22).fog(11f));
 			createFluid("condensed_void", FluidCondensedVoid::new, Either.left(new FluidCondensedVoidBlock()), true, FluidType.Properties.create().temperature(-200).canSwim(false).canPushEntity(false).canDrown(false).viscosity(9000).motionScale(0.0005).fallDistanceModifier(0.25f), (f) -> f.color(0, 0, 0).fog(1f));
@@ -581,8 +592,8 @@ public class Registry {
 			createFluid("propylene", Optional.of(new GasFluid("propylene")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(40, 13, 85));
 			createFluid("ethane", Optional.of(new GasFluid("ethane")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(19, 95, 15));
 			createFluid("ethylene", Optional.of(new GasFluid("ethylene")), Optional.empty(), Either.right(false), false, FluidType.Properties.create().temperature(0).density(-100), (f) -> f.color(179, 170, 195));
-
-			BLOCKS.forEach((k, v) -> h.register(k, v));
+			
+			FLUIDS.forEach((k, v) -> h.register(k, v));
 		});
 
 		//BLOCK ENTITIES
@@ -648,7 +659,8 @@ public class Registry {
 		});
 
 		//CRAFTING
-		event.register(Keys.RECIPE_SERIALIZERS, (h) -> {
+		event.register(Keys.RECIPE_TYPES, (h) -> {
+			
 			createRecipe(GrinderCrafting.GRINDER_RECIPE, GrinderCrafting.SERIALIZER);
 			createRecipe(BathCrafting.BATH_RECIPE, BathCrafting.SERIALIZER);
 			createRecipe(PurifierCrafting.PURIFIER_RECIPE, PurifierCrafting.SERIALIZER);
@@ -664,30 +676,68 @@ public class Registry {
 			createRecipe(UpgradeKitCrafting.UPGRADING_RECIPE, UpgradeKitCrafting.SERIALIZER);
 			createRecipe(GreenhouseCrafting.GREENHOUSE_RECIPE, GreenhouseCrafting.SERIALIZER);
 			createRecipe(GreenhouseFertilizerCrafting.FERTILIZER_RECIPE, GreenhouseFertilizerCrafting.SERIALIZER);
-
-			RECIPES.forEach((k, v) -> h.register(k, v));
+			
+			RECIPE_TYPES.forEach((k, v) -> h.register(k, v));
+		});
+		
+		event.register(Keys.RECIPE_SERIALIZERS, (h) -> {
+			RECIPE_SERIALIZERS.forEach((k, v) -> h.register(k, v));
 		});
 
-		event.register(Keys.FLUIDS, (h) -> FLUIDS.forEach((k, v) -> h.register(k, v)));
 		event.register(Keys.FLUID_TYPES, (h) -> FLUID_TYPES.forEach((k, v) -> h.register(k, v)));
 		event.register(Keys.WORLD_CARVERS, (h) -> h.register("chaos_plane_carver", new ChaosPlaneCarver()));
 	}
 
-	//ENTITY ATTRIBUTES
+	//ENTITIES
 	@SubscribeEvent
 	public static void registerEntAttributes(EntityAttributeCreationEvent event) {
 		event.put(CORRUPT_SHELL.get(), EntityCorruptShell.registerAttributeMap().build());
 	}
 
+	public static void registerSpawnPlacements(SpawnPlacementRegisterEvent event) {
+		event.register(CORRUPT_SHELL.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMobSpawnRules, Operation.AND);
+	}
+	
 	//COMMON SETUP
 	@SubscribeEvent
 	public static void common(FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> {
 			craftingConditions();
-			SpawnPlacements.register(CORRUPT_SHELL.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMobSpawnRules);
 		});
 	}
 
+	//CREATIVE TAB
+	@SubscribeEvent
+	public static void makeTab(CreativeModeTabEvent.Register event) {
+		event.registerCreativeModeTab(new ResourceLocation(AssemblyLineMachines.MODID, "creative_tab"), builder -> 
+				builder.title(Component.translatable("item_group." + AssemblyLineMachines.MODID + ".creative_tab"))
+				.icon(() -> new ItemStack(Registry.getItem("pure_steel_gear")))
+				.displayItems((flags, populator, hasPermissions) -> {
+					ArrayList<Item> items = new ArrayList<>(getAllItems());
+					items.sort(new Comparator<Item>() {
+
+						@Override
+						public int compare(Item i1, Item i2) {
+							if(i1 instanceof BlockItem && !(i2 instanceof BlockItem)) {
+								return -1;
+							}else if(i2 instanceof BlockItem && !(i1 instanceof BlockItem)) {
+								return 1;
+							}else {
+								return i1.getName(i1.getDefaultInstance()).getContents().toString().compareTo(i2.getName(i2.getDefaultInstance()).getContents().toString());
+
+							}
+						}
+					});
+					
+					for(Item i : items) {
+						populator.accept(i);
+					}
+				})
+				.withBackgroundLocation(new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/creative/page.png"))
+				.withTabsImage(new ResourceLocation(AssemblyLineMachines.MODID, "textures/gui/creative/tabs.png"))
+				);
+	}
+	
 	//CRAFTING CONDITIONS
 	private static void craftingConditions() {
 		CraftingHelper.register(ConfigConditionSerializer.INSTANCE);
@@ -735,10 +785,28 @@ public class Registry {
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void registerBlockColorHandlers(RegisterColorHandlersEvent.Block event) {
-
-		event.register((state, reader, pos, tint) -> reader.getBlockEntity(pos) instanceof TEFluidBath bath ? bath.getFluidColor(reader, pos) : 0, getBlock("fluid_bath"));
 		event.register((state, reader, pos, tint) -> reader.getBlockEntity(pos) instanceof TEGreenhouse greenhouse ? greenhouse.getBlockState().getValue(BlockGreenhouse.SPROUT).getTint(greenhouse.getItem(1).getItem(), tint) : 0, getBlock("greenhouse"));
 		event.register((state, reader, pos, tint) -> reader.getBlockTint(pos, BiomeColors.FOLIAGE_COLOR_RESOLVER), getBlock("cocoa_leaves"));
+		event.register((state, reader, pos, tint) -> {
+			if(reader.getBlockEntity(pos) instanceof IMachineDataBridge bridge) {
+				BathCrafting bc = (BathCrafting) bridge.getCurrentRecipe();
+				if(bc != null) return bc.getFluidTextureColor();
+			}
+			return 0;
+		}, getBlock("kinetic_fluid_mixer"), getBlock("electric_fluid_mixer"), getBlock("mkii_fluid_mixer"));
+		event.register((state, reader, pos, tint) -> {
+			if(reader.getBlockEntity(pos) instanceof TEFluidBath bath) {
+				if(bath.getRecipe() != null) {
+					return bath.getRecipe().getOutputTextureColor();
+				}else {
+					return switch(bath.getBlockState().getValue(BlockFluidBath.FLUID)) {
+					case LAVA -> 0xcb3d07;
+					case WATER -> BiomeColors.getAverageWaterColor(reader, pos);
+					case NONE -> 0;
+				};}
+			}
+			return 0;
+		}, getBlock("fluid_bath"));
 	}
 
 	//ITEM COLORS
@@ -766,17 +834,21 @@ public class Registry {
 	public static void gatherData(GatherDataEvent event) throws Exception {
 
 		craftingConditions();
-
+		
+		Field f = ObfuscationReflectionHelper.findField(GatherDataEvent.class, "config");
+		f.trySetAccessible();
+		Collection<Path> inputs = ((DataGeneratorConfig) f.get(event)).getInputs();
+		
 		PrintWriter pw = new PrintWriter("logs/almdatagen.log", "UTF-8");
 		pw.println("[DATAGEN SYSTEM - INFO]: Commencing ALM data generation...");
 		
 		if(event.includeServer()) {
 			new DataProviderContainer(pw, event);
-			new AutoRecipeGenerator(event, pw);
+			new AutoRecipeGenerator(event, pw, inputs);
 			new LootTableGenerator(event, pw);
 		}
 		if(event.includeClient()) {
-			new ItemModelGenerator(event, pw);
+			new ItemModelGenerator(event, pw, inputs);
 		}
 		
 		event.getGenerator().run();
@@ -795,7 +867,7 @@ public class Registry {
 
 	private static void createItem(String name) {
 
-		Item.Properties properties = new Item.Properties().tab(CREATIVE_TAB);
+		Item.Properties properties = new Item.Properties();
 		createItem(name, properties);
 	}
 
@@ -856,7 +928,7 @@ public class Registry {
 	public static void createBlock(String name, Block block, boolean item) {
 		BLOCKS.put(name, block);
 		if(item) {
-			createItem(name, new BlockItem(block, new Item.Properties().tab(CREATIVE_TAB)));
+			createItem(name, new BlockItem(block, new Item.Properties()));
 		}
 
 	}
@@ -889,7 +961,7 @@ public class Registry {
 
 	public static void createFluid(String name, Function<Boolean, Fluid> fluidFunction, Either<LiquidBlock, Boolean> block, boolean bucket, FluidType.Properties typeProperties) {
 		createFluid(name, Optional.of(fluidFunction.apply(true)), Optional.of(fluidFunction.apply(false)), block, bucket, typeProperties);
-	}
+	} 
 
 	public static void createFluid(String name, Optional<Fluid> still, Optional<Fluid> flowing, Either<LiquidBlock, Boolean> block, boolean bucket, FluidType.Properties typeProperties) {
 		createFluid(name, still, flowing, block, bucket, typeProperties, null);
@@ -913,7 +985,7 @@ public class Registry {
 			BLOCKS.put(name + "_block", regBlock);
 		}
 
-		if(bucket) ITEMS.put(name + "_bucket", new BucketItem(() -> FLUIDS.get(name), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(Registry.CREATIVE_TAB)));
+		if(bucket) ITEMS.put(name + "_bucket", new BucketItem(() -> FLUIDS.get(name), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 	}
 
 	//TILE ENTITIES
@@ -1001,6 +1073,7 @@ public class Registry {
 
 	//CRAFTING
 	public static void createRecipe(RecipeType<?> type, RecipeSerializer<?> serializer) {
-		RECIPES.put(type.toString().split(":")[1], serializer);
+		RECIPE_TYPES.put(type.toString().split(":")[1], type);
+		RECIPE_SERIALIZERS.put(type.toString().split(":")[1], serializer);
 	}
 }

@@ -10,7 +10,6 @@
 		"item": "assemblylinemachines:pure_gold_blade_piece"
 	},
 	"stirs": 15,
-	"fluid": "lava",
-	"mix_color": "#f5f242",
+	"fluid": "minecraft:lava",
 	"drain_percent": "FULL"
 }

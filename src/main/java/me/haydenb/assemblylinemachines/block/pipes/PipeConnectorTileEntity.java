@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.apache.logging.log4j.util.TriConsumer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
@@ -570,7 +569,7 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 				if(isRedstoneControlEnabled()) {
 					return super.getBlitData();
 				}
-				return new int[] {x, y, 9, 12, this.getWidth(), this.getHeight()};
+				return new int[] {this.getX(), this.getY(), 9, 12, this.getWidth(), this.getHeight()};
 			}
 
 			@Override
@@ -579,13 +578,6 @@ public class PipeConnectorTileEntity extends SimpleMachine<PipeConnectorContaine
 					return true;
 				}
 				return super.getSupplierOutput();
-			}
-
-			@Override
-			public void renderToolTip(PoseStack mx, int mouseX, int mouseY) {
-				if(isRedstoneControlEnabled()) {
-					super.renderToolTip(mx, mouseX, mouseY);
-				}
 			}
 
 			private boolean isRedstoneControlEnabled() {

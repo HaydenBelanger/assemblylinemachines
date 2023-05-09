@@ -16,7 +16,6 @@ import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -340,7 +339,7 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(IClientFluidTypeExtensions.of(tsfm.tank.getFluid()).getStillTexture());
 				}
 
-				if(tsfm.tank.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
+				if(tsfm.tank.getFluid() == Fluids.WATER) {
 					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 
@@ -386,7 +385,7 @@ public class BlockFluidRouter extends BlockScreenBlockEntity<BlockFluidRouter.TE
 					spriteMap.put(fluid, tas);
 				}
 
-				if(fluid == BathCraftingFluids.WATER.getAssocFluid()) {
+				if(fluid == Fluids.WATER) {
 					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 

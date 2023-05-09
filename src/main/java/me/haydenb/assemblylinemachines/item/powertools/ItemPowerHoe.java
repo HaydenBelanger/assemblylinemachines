@@ -3,18 +3,26 @@ package me.haydenb.assemblylinemachines.item.powertools;
 import java.util.List;
 import java.util.function.Consumer;
 
+import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.item.ItemTiers;
+import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.event.level.BlockEvent.BlockToolModificationEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+@EventBusSubscriber(modid = AssemblyLineMachines.MODID)
 public class ItemPowerHoe extends HoeItem implements IToolWithCharge {
 
 	private final IToolWithCharge.PowerToolType ptt;
@@ -76,5 +84,19 @@ public class ItemPowerHoe extends HoeItem implements IToolWithCharge {
 	@Override
 	public IToolWithCharge.PowerToolType getPowerToolType() {
 		return ptt;
+	}
+	
+	@SubscribeEvent
+	public static void hoeBlockChange(BlockToolModificationEvent event) {
+		System.out.println("test");
+		if(event.getToolAction() == ToolActions.HOE_TILL && event.getPlayer() != null) {
+			ItemStack stack = event.getHeldItemStack();
+			if(stack.getItem() instanceof ItemPowerHoe tool) {
+				if(tool.canUseSecondaryAbilities(stack)) {
+					event.setFinalState(Registry.getBlock(tool.getPowerToolType().nameOfSecondaryFarmland).defaultBlockState());
+					stack.hurtAndBreak(15, event.getPlayer(), (p_220038_0_) -> {p_220038_0_.broadcastBreakEvent(EquipmentSlot.MAINHAND);});
+				}
+			}
+		}
 	}
 }

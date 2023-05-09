@@ -2,7 +2,9 @@ package me.haydenb.assemblylinemachines.block.misc;
 
 import java.util.function.Function;
 
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -25,14 +27,16 @@ public class BlockModdedSapling extends SaplingBlock {
 		super(new AbstractTreeGrower() {
 
 			private final Lazy<Function<ServerLevel, Holder<ConfiguredFeature<?, ?>>>> featureAccess = Lazy.of(() -> (sl) -> {
-				return sl.registryAccess().registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY).getHolderOrThrow(ResourceKey.create(Registry.CONFIGURED_FEATURE_REGISTRY, featureLocation));
+				return sl.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).getHolderOrThrow(ResourceKey.create(Registries.CONFIGURED_FEATURE, featureLocation));
 			});
 
+			
 			@Override
-			protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource p_204307_, boolean p_204308_) {
+			protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource p_222910_,
+					boolean p_222911_) {
 				return null;
 			}
-
+			
 			@Override
 			public boolean growTree(ServerLevel pLevel, ChunkGenerator pChunkGenerator, BlockPos pPos,
 					BlockState pState, RandomSource pRandom) {

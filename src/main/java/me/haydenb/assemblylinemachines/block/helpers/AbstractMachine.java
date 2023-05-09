@@ -16,7 +16,7 @@ import me.haydenb.assemblylinemachines.client.GUIHelper;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -496,9 +496,9 @@ public abstract class AbstractMachine<A extends AbstractContainerMenu> extends R
 			int y = (this.height - this.imageHeight) / 2;
 			this.blit(x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-			for(Widget w : this.renderables) {
-				if(w instanceof TrueFalseButton) {
-					TrueFalseButton tfb = (TrueFalseButton) w;
+			
+			for(Renderable w : this.renderables) {
+				if(w instanceof TrueFalseButton tfb) {
 					if(tfb.getSupplierOutput()) {
 						int[] blitdata = tfb.getBlitData();
 						this.blit(blitdata[0], blitdata[1], blitdata[2], blitdata[3], blitdata[4], blitdata[5]);

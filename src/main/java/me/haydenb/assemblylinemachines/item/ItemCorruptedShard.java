@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 public class ItemCorruptedShard extends Item implements IGearboxFuel{
 
 	public ItemCorruptedShard() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 	}
 
 

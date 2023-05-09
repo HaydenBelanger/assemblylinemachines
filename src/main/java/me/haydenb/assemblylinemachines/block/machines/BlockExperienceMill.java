@@ -17,7 +17,6 @@ import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -41,6 +40,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.api.distmarker.Dist;
@@ -380,7 +380,7 @@ public class BlockExperienceMill {
 					tas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(IClientFluidTypeExtensions.of(tsfm.tank.getFluid()).getStillTexture());
 				}
 
-				if(tsfm.tank.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
+				if(tsfm.tank.getFluid() == Fluids.WATER) {
 					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				}
 
@@ -405,7 +405,7 @@ public class BlockExperienceMill {
 			}
 
 			if(add != -1) {
-				super.blit(modeB.x, modeB.y, 176, 9 + add, modeB.getWidth(), modeB.getHeight());
+				super.blit(modeB.getX(), modeB.getY(), 176, 9 + add, modeB.getWidth(), modeB.getHeight());
 			}
 
 			if(tsfm.mode == 1 || tsfm.mode == 3) {

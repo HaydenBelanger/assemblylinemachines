@@ -2,8 +2,7 @@ package me.haydenb.assemblylinemachines.crafting;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import com.google.gson.JsonObject;
 
@@ -14,21 +13,28 @@ import me.haydenb.assemblylinemachines.item.ItemUpgrade.Upgrades;
 import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IRecipeCategoryBuilder;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
-import me.haydenb.assemblylinemachines.registry.utils.IFluidHandlerBypass;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.utils.Utils;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
@@ -48,23 +54,37 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 	private final Lazy<Ingredient> inputa;
 	private final Lazy<Ingredient> inputb;
 	private final ItemStack output;
-	private final BathCraftingFluids fluid;
+	private final Fluid fluid;
 	private final int stirs;
 	private final ResourceLocation id;
-	private final int color;
 	private final BathOption type;
 	private final BathPercentage percent;
-
-	public BathCrafting(ResourceLocation id, Lazy<Ingredient> inputa, Lazy<Ingredient> inputb, ItemStack output, int stirs, BathCraftingFluids fluid, int color, BathOption type, BathPercentage percent) {
+	private final Lazy<Integer> fluidTextureColor;
+	private final Lazy<Integer> outputTextureColor;
+	
+	public BathCrafting(ResourceLocation id, Lazy<Ingredient> inputa, Lazy<Ingredient> inputb, ItemStack output, int stirs, Fluid fluid, BathOption type, BathPercentage percent) {
 		this.inputa = inputa;
 		this.inputb = inputb;
 		this.output = output;
 		this.stirs = stirs;
 		this.fluid = fluid;
 		this.id = id;
-		this.color = color;
 		this.type = type;
 		this.percent = percent;
+		this.fluidTextureColor = Lazy.of(() -> {
+			if(fluid.equals(Fluids.WATER)) {
+				return 0xFF5263FF;
+			}
+			int[] cMap = ScreenMath.unpackColor(ScreenMath.getColorFrom(IClientFluidTypeExtensions.of(fluid).getStillTexture()));
+			if(IntStream.of(cMap).average().getAsDouble() <= 100d) {
+				cMap = ScreenMath.multiplyARGBColor(cMap, 1.5f);
+			}
+			return ARGB32.color(cMap[0], cMap[1], cMap[2], cMap[3]);
+		});
+		
+		this.outputTextureColor = Lazy.of(() -> {
+			return ScreenMath.getColorFrom(Minecraft.getInstance().getItemRenderer().getModel(output, null, null, 0).getParticleIcon(ModelData.EMPTY));
+		});
 	}
 
 	@Override
@@ -107,6 +127,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			int sla = 1;
 			int slb = 2;
 			if(data.blockState().is(Registry.getBlock("kinetic_fluid_mixer"))) {
+				if(!fluid.equals(Fluids.LAVA) && !fluid.equals(Fluids.WATER)) return false;
 				sla = 0;
 				slb = 1;
 			}
@@ -141,7 +162,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			IMachineDataBridge data = (IMachineDataBridge) inv;
 			IFluidHandler handler = data.getCraftingFluidHandler(Optional.empty());
 			BiFunction<Integer, FluidAction, FluidStack> drain = handler instanceof IFluidHandlerBypass ? (i, a) -> ((IFluidHandlerBypass) handler).drainBypassRestrictions(i, a) : (i, a) -> handler.drain(i, a);
-			if(handler == null || handler.getFluidInTank(0).getFluid() != fluid.getAssocFluid() || drain.apply(percent.getMB(), FluidAction.SIMULATE).getAmount() != percent.getMB()) return ItemStack.EMPTY;
+			if(handler == null || handler.getFluidInTank(0).getFluid() != fluid || drain.apply(percent.getMB(), FluidAction.SIMULATE).getAmount() != percent.getMB()) return ItemStack.EMPTY;
 
 			int rand = Utils.RAND.nextInt(9) * data.getUpgradeAmount(Upgrades.MACHINE_CONSERVATION);
 			int cons = percent.getMB();
@@ -187,32 +208,39 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 		ArrayList<Item> items = new ArrayList<>();
 		switch(this.type) {
 		case MIXER_ONLY, ALL:
-			items.addAll(List.of(Registry.getItem("kinetic_fluid_mixer"), Registry.getItem("electric_fluid_mixer"), Registry.getItem("mkii_fluid_mixer")));
+			if(fluid.equals(Fluids.WATER) || fluid.equals(Fluids.LAVA)) items.add(Registry.getItem("kinetic_fluid_mixer"));
+			items.addAll(List.of(Registry.getItem("electric_fluid_mixer"), Registry.getItem("mkii_fluid_mixer")));
 			if(this.type == BathOption.MIXER_ONLY) break;
 		case BASIN_ONLY:
 			items.add(Registry.getItem("fluid_bath"));
 		}
 
-		return List.of(inputa.get(), inputb.get(), Ingredient.of(items.toArray(new Item[items.size()])), new FluidStack(fluid.getAssocFluid(), percent.getMB()), output);
+		return List.of(inputa.get(), inputb.get(), Ingredient.of(items.toArray(new Item[items.size()])), new FluidStack(fluid, percent.getMB()), output);
 	}
 
-	public BathCraftingFluids getFluid() {
+	public Fluid getFluid() {
 		return fluid;
 	}
 
 	public int getStirs() {
 		return stirs;
 	}
-
-	public int getColor() {
-		return color;
-	}
-
+	
 	public BathPercentage getPercentage() {
 		return percent;
 	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public int getOutputTextureColor() {
+		return outputTextureColor.get();
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public int getFluidTextureColor() {
+		return fluidTextureColor.get();
+	}
 
-	public static class BathSerializer /*extends ForgeRegistryEntry<RecipeSerializer<?>>*/ implements RecipeSerializer<BathCrafting>{
+	public static class BathSerializer implements RecipeSerializer<BathCrafting>{
 
 		@Override
 		public BathCrafting fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -231,12 +259,12 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 
 				ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 				int stirs = GsonHelper.getAsInt(json, "stirs");
-				BathCraftingFluids fluid = BathCraftingFluids.valueOf(GsonHelper.getAsString(json, "fluid").toUpperCase());
-				if(fluid == BathCraftingFluids.NONE) {
-					throw new IllegalArgumentException("Fluid cannot be 'NONE'.");
+				Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(GsonHelper.getAsString(json, "fluid")));
+				
+				if(fluid == null || fluid.equals(Fluids.EMPTY)) {
+					throw new IllegalArgumentException("Fluid cannot be empty.");
 				}
 
-				int color = Integer.parseInt(GsonHelper.getAsString(json, "mix_color").replace("#", ""), 16);
 				BathOption machineReqd;
 				if(GsonHelper.isValidNode(json, "mixer_type")) {
 					machineReqd = BathOption.valueOf(GsonHelper.getAsString(json, "mixer_type").toUpperCase());
@@ -252,7 +280,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 					percent = BathPercentage.FULL;
 				}
 
-				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, color, machineReqd, percent);
+				return new BathCrafting(recipeId, ingredienta, ingredientb, output, stirs, fluid, machineReqd, percent);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return null;
@@ -267,12 +295,11 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			Ingredient inputb = Ingredient.fromNetwork(buffer);
 			ItemStack output = buffer.readItem();
 			int stirs = buffer.readInt();
-			BathCraftingFluids fluid = buffer.readEnum(BathCraftingFluids.class);
-			int color = buffer.readInt();
+			Fluid fluid = ForgeRegistries.FLUIDS.getValue(buffer.readResourceLocation());
 			BathOption machineReqd = buffer.readEnum(BathOption.class);
 			BathPercentage percent = buffer.readEnum(BathPercentage.class);
 
-			return new BathCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, stirs, fluid, color, machineReqd, percent);
+			return new BathCrafting(recipeId, Lazy.of(() -> inputa), Lazy.of(() -> inputb), output, stirs, fluid, machineReqd, percent);
 		}
 
 		@Override
@@ -281,8 +308,7 @@ public class BathCrafting implements Recipe<Container>, IRecipeCategoryBuilder{
 			recipe.inputb.get().toNetwork(buffer);
 			buffer.writeItem(recipe.output);
 			buffer.writeInt(recipe.stirs);
-			buffer.writeEnum(recipe.fluid);
-			buffer.writeInt(recipe.color);
+			buffer.writeResourceLocation(ForgeRegistries.FLUIDS.getKey(recipe.fluid));
 			buffer.writeEnum(recipe.type);
 			buffer.writeEnum(recipe.percent);
 

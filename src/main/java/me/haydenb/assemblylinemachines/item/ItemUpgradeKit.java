@@ -1,7 +1,6 @@
 package me.haydenb.assemblylinemachines.item;
 
 import me.haydenb.assemblylinemachines.crafting.UpgradeKitCrafting;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -10,7 +9,7 @@ import net.minecraft.world.item.context.UseOnContext;
 public class ItemUpgradeKit extends Item {
 
 	public ItemUpgradeKit() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB).rarity(Rarity.RARE));
+		super(new Item.Properties().rarity(Rarity.RARE));
 	}
 
 	@Override

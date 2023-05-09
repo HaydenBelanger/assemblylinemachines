@@ -1,6 +1,6 @@
 {
     "textures": {
-        "particle": "assemblylinemachines:fluid/glacier_water"
+        "particle": "assemblylinemachines:block/fluid/glacier_water"
     }
     
 }

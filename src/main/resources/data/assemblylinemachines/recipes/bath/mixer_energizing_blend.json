@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "forge:dusts/redstone"
+	},
+	"input_b":{
+		"tag": "forge:dusts/amethyst"
+	},
+	"output":{
+		"item": "assemblylinemachines:energizing_blend",
+		"count": 2
+	},
+	"stirs": 7,
+	"fluid": "minecraft:water",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "HALF"
+}

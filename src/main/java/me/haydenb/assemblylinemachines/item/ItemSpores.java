@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.item;
 
 import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -23,7 +22,7 @@ public class ItemSpores extends Item{
 	private final Block to;
 
 	public ItemSpores(TagKey<Block> from, Block to) {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 		this.from = from;
 		this.to = to;
 	}

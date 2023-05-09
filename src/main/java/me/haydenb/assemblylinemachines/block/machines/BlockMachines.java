@@ -14,9 +14,8 @@ import me.haydenb.assemblylinemachines.block.helpers.MachineBuilder.MachineScree
 import me.haydenb.assemblylinemachines.block.machines.BlockHandGrinder.Blade;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.registry.Registry;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
-import me.haydenb.assemblylinemachines.registry.utils.Utils;
+import me.haydenb.assemblylinemachines.registry.utils.*;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
@@ -302,7 +301,9 @@ public class BlockMachines {
 	//KINETIC FLUID MIXER
 
 	public static Block kineticFluidMixer() {
-		return MachineBuilder.block().hasActiveProperty().voxelShape(Shapes.block(), true).additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE), (builder) -> builder.add(StateProperties.FLUID)).build("kinetic_fluid_mixer");
+		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
+				Block.box(0, 0, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 16, 0),Block.box(8, 5, 0, 9, 6, 0)
+				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true).build("kinetic_fluid_mixer");
 	}
 
 	public static MenuType<?> kineticFluidMixerContainer(){
@@ -312,14 +313,53 @@ public class BlockMachines {
 	public static BlockEntityType<?> kineticFluidMixerEntity(){
 		return MachineBuilder.blockEntity().crankMachine(1).baseProcessingStats(0, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE))
 				.slotInfo(2, 0).outputToRight().allowedInZero().slotExtractableFunction((i) -> false).processesFluids(0, true).hasNoInternalTank()
-				.specialStateModifier((recipe, state) -> state.setValue(StateProperties.FLUID, ((BathCrafting) recipe).getFluid()))
-				.duplicateCheckingGroup(List.of(0, 1)).build("kinetic_fluid_mixer");
+				.duplicateCheckingGroup(List.of(0, 1)).requiresBlockUpdateEveryUpdate().build("kinetic_fluid_mixer");
 	}
-
+	
+	private static final int[][][] KINETIC_DRAW_DATA = {
+			{{82, 84, 1}},
+			{{81, 85, 1}, {82, 84, 0}},
+			{{81, 85, 1}, {82, 84, 0}, {82, 83, 2}},
+			{{82, 84, 1}},
+			{},
+			{{79, 81, 1}, {85, 87, 1}},
+			{{78, 82, 1}, {84, 88, 1}, {79, 81, 0}, {85, 87, 0}},
+			{{78, 82, 1}, {84, 88, 1}, {79, 81, 0}, {85, 87, 0}, {79, 80, 2}, {85, 86, 2}},
+			{{79, 81, 1}, {85, 87, 1}},
+			{},
+			{{76, 78, 1}, {88, 90, 1}},
+			{{75, 79, 1}, {87, 91, 1}, {82, 84, 1}, {76, 78, 0}, {88, 90, 0}},
+			{{75, 79, 1}, {87, 91, 1}, {81, 85, 1}, {76, 78, 0}, {88, 90, 0}, {82, 84, 0}, {76, 77, 2}, {88, 89, 2}},
+			{{76, 78, 1}, {88, 90, 1}, {81, 85, 1}, {82, 84, 0}, {82, 83, 2}},
+			{{82, 84, 1}},
+			{},
+			{{73, 75, 1}, {91, 93, 1}},
+			{{72, 76, 1}, {90, 94, 1}, {73, 75, 0}, {91, 93, 0}},
+			{{71, 77, 1}, {89, 95, 1}, {82, 84, 1}, {72, 76, 0}, {90, 94, 0}},
+			{{71, 77, 1}, {89, 95, 1}, {81, 85, 1}, {72, 76, 0}, {90, 94, 0}, {82, 84, 0}, {72, 73, 2}, {90, 91, 2}},
+			{{72, 76, 1}, {90, 94, 1}, {80, 86, 1}, {73, 75, 0}, {91, 93, 0}, {81, 85, 0}, {73, 74, 2}, {91, 92, 2}},
+			{{73, 75, 1}, {91, 93, 1}, {80, 86, 1}, {81, 85, 0}, {81, 82, 2}},
+			{{81, 85, 1}, {82, 84, 0}, {82, 83, 2}},
+			{{82, 84, 1}}
+	};
+	
 	@OnlyIn(Dist.CLIENT)
 	public static void kineticFluidMixerScreen() {
-		MachineBuilder.screen().doesNotUseFE().doesNotUseFEPT().addBar(71, 19, 0, 0, 24, 24, PBDirection.DU)
-		.stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getSimpleBlitPiece()).buildAndRegister("kinetic_fluid_mixer");
+		MachineBuilder.screen().doesNotUseFE().doesNotUseFEPT().addDrawing((ps, p, xy, r) -> {
+			if(r instanceof BathCrafting recipe) {
+				int bColor = recipe.getFluidTextureColor();
+				int x = xy.getFirst();
+				int y = xy.getSecond();
+				int[] colors = {bColor, ScreenMath.multiplyARGBColor(bColor, 1.4f), ScreenMath.multiplyARGBColor(bColor, 2.2f)};
+				for(int i = 1; i - 1 < KINETIC_DRAW_DATA.length; i++) {
+					if(p > (0.0416f * i)) {
+						for(int[] scanbar : KINETIC_DRAW_DATA[i - 1]) {
+							GuiComponent.fill(ps, x + scanbar[0], y + (43 - i), x + scanbar[1], y + (44 - i), colors[scanbar[2]]);
+						}
+					}
+				}
+			}
+		}).buildAndRegister("kinetic_fluid_mixer");
 	}
 
 	//ELECTRIC FLUID MIXER
@@ -331,8 +371,6 @@ public class BlockMachines {
 				Block.box(0, 2, 0, 3, 5, 1),Block.box(13, 2, 0, 16, 5, 1),
 				Block.box(9, 2, 0, 12, 5, 1),Block.box(4, 2, 0, 7, 5, 1),Block.box(7, 4, 0, 9, 5, 1)
 				).reduce((v1, v2) -> {return Shapes.join(v1, v2, BooleanOp.OR);}).get(), true)
-				.additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE),
-						(builder) -> builder.add(StateProperties.FLUID))
 				.rightClickAction((state, world, pos, player) -> {
 					boolean res = Utils.drainMainHandToHandler(player, ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)));
 					return res ? InteractionResult.CONSUME : null;
@@ -346,43 +384,60 @@ public class BlockMachines {
 
 	public static BlockEntityType<?> electricFluidMixerEntity(){
 		return MachineBuilder.blockEntity().energy(20000).baseProcessingStats(60, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE))
-				.slotInfo(6, 3).processesFluids(4000, true).specialStateModifier((recipe, state) -> {
-					return state.setValue(StateProperties.FLUID, ((BathCrafting) recipe).getFluid());
-				}).duplicateCheckingGroup(List.of(1, 2)).build("electric_fluid_mixer");
+				.slotInfo(6, 3).processesFluids(4000, true).duplicateCheckingGroup(List.of(1, 2)).requiresBlockUpdateEveryUpdate().build("electric_fluid_mixer");
 	}
 
+	public static final int[][][] ELECTRIC_DRAW_DATA = {
+			{{41, 43, 1}},
+			{{40, 44, 1}, {41, 43, 0}},
+			{{40, 44, 1}, {41, 43, 0}, {41, 42, 2}},
+			{{41, 43, 1}},
+			{},
+			{{38, 40, 1}, {44, 46, 1}},
+			{{37, 41, 1}, {43, 47, 1}, {38, 40, 0}, {44, 46, 0}},
+			{{37, 41, 1}, {43, 47, 1}, {38, 40, 0}, {44, 46, 0}, {38, 39, 2}, {44, 45, 2}},
+			{{38, 40, 1}, {44, 46, 1}},
+			{},
+			{{35, 37, 1}, {47, 49, 1}},
+			{{34, 38, 1}, {46, 50, 1}, {41, 43, 1}, {35, 37, 0}, {47, 49, 0}},
+			{{34, 38, 1}, {46, 50, 1}, {40, 44, 1}, {35, 37, 0}, {47, 49, 0}, {41, 43, 0}, {35, 36, 2}, {47, 48, 2}},
+			{{35, 37, 1}, {47, 49, 1}, {40, 44, 1}, {41, 43, 0}, {41, 42, 2}},
+			{{41, 43, 1}}
+	};
+	
 	@OnlyIn(Dist.CLIENT)
 	public static void electricFluidMixerScreen() {
-		MachineBuilder.screen().renderFluidBar(41, 23, 37, 176, 84).stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getElectricBlitPiece())
-		.addBar(95, 34, 0, 0, 15, 16, PBDirection.LR).internalTankSwitchingButton(129, 57, 192, 41, 11, 11).buildAndRegister("electric_fluid_mixer");
+		MachineBuilder.screen().renderFluidBar(41, 23, 37, 176, 84).internalTankSwitchingButton(129, 57, 192, 41, 11, 11).addDrawing((ps, p, xy, r) -> {
+			if(r instanceof BathCrafting recipe) {
+				int bColor = recipe.getFluidTextureColor();
+				int x = xy.getFirst();
+				int y = xy.getSecond();
+				int[] colors = {bColor, ScreenMath.multiplyARGBColor(bColor, 1.4f), ScreenMath.multiplyARGBColor(bColor, 2.2f)};
+				for(int i = 1; i - 1 < ELECTRIC_DRAW_DATA.length; i++) {
+					if(p > (0.066f * i)) {
+						for(int[] scanbar : ELECTRIC_DRAW_DATA[i - 1]) {
+							GuiComponent.fill(ps, x + (94 + i), y + scanbar[0], x + (95 + i), y + scanbar[1], colors[scanbar[2]]);
+						}
+					}
+				}
+			}
+		}).buildAndRegister("electric_fluid_mixer");
 	}
 
 	//MKII FLUID MIXER
 
 	public static Block mkiiFluidMixer() {
 		return MachineBuilder.block().hasActiveProperty().voxelShape(Stream.of(
-				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 2, 16),
-				Block.box(0, 2, 1, 16, 14, 3),Block.box(0, 5, 0, 16, 14, 1),
-				Block.box(0, 2, 0, 3, 5, 1),Block.box(13, 2, 0, 16, 5, 1),
-				Block.box(9, 2, 0, 12, 5, 1),Block.box(4, 2, 0, 7, 5, 1),
-				Block.box(7, 4, 0, 9, 5, 1),Block.box(4, 2, 3, 12, 14, 13),
-				Block.box(0, 2, 13, 16, 14, 16),Block.box(1, 4, 5, 2, 12, 6),
-				Block.box(2, 4, 5, 4, 5, 6),Block.box(2, 11, 5, 4, 12, 6),
-				Block.box(0, 6, 4, 3, 7, 7),Block.box(3, 3, 4, 4, 6, 7),
-				Block.box(3, 10, 4, 4, 13, 7),Block.box(0, 9, 4, 3, 10, 7),
-				Block.box(3, 10, 9, 4, 13, 12),Block.box(2, 11, 10, 4, 12, 11),
-				Block.box(1, 4, 10, 2, 12, 11),Block.box(0, 9, 9, 3, 10, 12),
-				Block.box(0, 6, 9, 3, 7, 12),Block.box(3, 3, 9, 4, 6, 12),
-				Block.box(2, 4, 10, 4, 5, 11),Block.box(14, 4, 10, 15, 12, 11),
-				Block.box(12, 4, 10, 14, 5, 11),Block.box(12, 11, 10, 14, 12, 11),
-				Block.box(13, 6, 9, 16, 7, 12),Block.box(12, 3, 9, 13, 6, 12),
-				Block.box(12, 10, 9, 13, 13, 12),Block.box(13, 9, 9, 16, 10, 12),
-				Block.box(12, 10, 4, 13, 13, 7),Block.box(12, 11, 5, 14, 12, 6),
-				Block.box(14, 4, 5, 15, 12, 6),Block.box(13, 9, 4, 16, 10, 7),
-				Block.box(13, 6, 4, 16, 7, 7),Block.box(12, 3, 4, 13, 6, 7),Block.box(12, 4, 5, 14, 5, 6)
+				Block.box(0, 14, 0, 16, 16, 16),Block.box(0, 0, 0, 16, 2, 16),Block.box(0, 2, 1, 16, 14, 3),Block.box(0, 5, 0, 16, 14, 1),
+				Block.box(0, 2, 0, 3, 5, 1),Block.box(13, 2, 0, 16, 5, 1),Block.box(9, 2, 0, 12, 5, 1),Block.box(4, 2, 0, 7, 5, 1),
+				Block.box(7, 4, 0, 9, 5, 1),Block.box(4, 2, 3, 12, 14, 13),Block.box(0, 2, 13, 16, 14, 16),Block.box(1, 4, 5, 2, 12, 6),
+				Block.box(2, 4, 5, 4, 5, 6),Block.box(2, 11, 5, 4, 12, 6),Block.box(0, 6, 4, 3, 7, 7),Block.box(3, 3, 4, 4, 6, 7),
+				Block.box(3, 10, 4, 4, 13, 7),Block.box(0, 9, 4, 3, 10, 7),Block.box(3, 10, 9, 4, 13, 12),Block.box(2, 11, 10, 4, 12, 11),
+				Block.box(1, 4, 10, 2, 12, 11),Block.box(0, 9, 9, 3, 10, 12),Block.box(0, 6, 9, 3, 7, 12),Block.box(3, 3, 9, 4, 6, 12),
+				Block.box(2, 4, 10, 4, 5, 11),Block.box(14, 4, 10, 15, 12, 11),Block.box(12, 4, 10, 14, 5, 11),Block.box(12, 11, 10, 14, 12, 11),
+				Block.box(13, 6, 9, 16, 7, 12),Block.box(12, 3, 9, 13, 6, 12),Block.box(12, 10, 9, 13, 13, 12),Block.box(13, 9, 9, 16, 10, 12),
+				Block.box(12, 10, 4, 13, 13, 7),Block.box(12, 11, 5, 14, 12, 6),Block.box(14, 4, 5, 15, 12, 6),Block.box(13, 9, 4, 16, 10, 7),Block.box(13, 6, 4, 16, 7, 7),Block.box(12, 3, 4, 13, 6, 7),Block.box(12, 4, 5, 14, 5, 6)
 				).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get(), true)
-				.additionalProperties((state) -> state.setValue(StateProperties.FLUID, BathCraftingFluids.NONE),
-						(builder) -> builder.add(StateProperties.FLUID))
 				.rightClickAction((state, world, pos, player) -> {
 					boolean res = Utils.drainMainHandToHandler(player, ((IMachineDataBridge) world.getBlockEntity(pos)).getCraftingFluidHandler(Optional.of(true)));
 					return res ? InteractionResult.CONSUME : null;
@@ -395,9 +450,8 @@ public class BlockMachines {
 	}
 
 	public static BlockEntityType<?> mkiiFluidMixerEntity(){
-		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(240, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE)).slotInfo(12, 6).specialStateModifier((recipe, state) -> {
-					return state.setValue(StateProperties.FLUID, ((BathCrafting) recipe).getFluid());
-				}).slotIDTransformer((in) -> switch(in) {
+		return MachineBuilder.blockEntity().energy(400000).baseProcessingStats(240, 16).recipeProcessor(Utils.recipeFunction(BathCrafting.BATH_RECIPE))
+				.slotInfo(12, 6).slotIDTransformer((in) -> switch(in) {
 				case 1 -> 2;
 				case 2 -> 3;
 				default -> in;
@@ -406,13 +460,45 @@ public class BlockMachines {
 				case 1 -> 4;
 				case 2 -> 5;
 				default -> in;
-				}).slotExtractableFunction((slot) -> slot < 2).cycleCountModifier(0.5f).processesFluids(8000, true).duplicateCheckingGroups(List.of(List.of(2, 3), List.of(4, 5))).build("mkii_fluid_mixer");
+				}).cycleCountModifier(0.5f).processesFluids(8000, true).duplicateCheckingGroups(List.of(List.of(2, 3), List.of(4, 5))).requiresBlockUpdateEveryUpdate().build("mkii_fluid_mixer");
 	}
 
+	private static final int[][][] MKII_DRAW_DATA = {
+			{{60, 62, 1}},
+			{{59, 63, 1}, {60, 62, 0}, {61, 62, 2}},
+			{{59, 63, 1}, {60, 62, 0}},
+			{{60, 62, 1}},
+			{},
+			{{57, 59, 1}, {63, 65, 1}},
+			{{56, 60, 1}, {62, 66, 1}, {57, 59, 0}, {63, 65, 0}, {64, 65, 2}, {58, 59, 2}},
+			{{56, 60, 1}, {62, 66, 1}, {57, 59, 0}, {63, 65, 0}},
+			{{57, 59, 1}, {63, 65, 1}},
+			{},
+			{{54, 56, 1}, {66, 68, 1}},
+			{{53, 57, 1}, {65, 69, 1}, {60, 62, 1}, {54, 56, 0}, {66, 68, 0}, {55, 56, 2}, {67, 68, 2}},
+			{{53, 57, 1}, {65, 69, 1}, {59, 63, 1}, {54, 56, 0}, {66, 68, 0}, {60, 62, 0}, {61, 62, 2}},
+			{{54, 56, 1}, {66, 68, 1}, {59, 63, 1}, {60, 62, 0}},
+			{{60, 62, 1}}
+	};
+	
 	@OnlyIn(Dist.CLIENT)
 	public static void mkiiFluidMixerScreen() {
-		MachineBuilder.screen().defaultMKIIOptions().renderFluidBar(84, 33, 37, 190, 52).internalTankSwitchingButton(82, 72, 206, 40, 12, 12)
-		.stateBasedBlitPieceModifier((bs) -> bs.getValue(StateProperties.FLUID).getMKIIBlitPiece()).addBar(53, 42, 0, 0, 16, 15, PBDirection.UD, 0, 0, List.of(Pair.of(107, 42))).buildAndRegister("mkii_fluid_mixer");
+		MachineBuilder.screen().defaultMKIIOptions().renderFluidBar(84, 33, 37, 190, 52).internalTankSwitchingButton(82, 72, 206, 40, 12, 12).addDrawing((ps, p, xy, r) -> {
+			if(r instanceof BathCrafting recipe) {
+				int bColor = recipe.getFluidTextureColor();
+				int x = xy.getFirst();
+				int y = xy.getSecond();
+				int[] colors = {bColor, ScreenMath.multiplyARGBColor(bColor, 1.4f), ScreenMath.multiplyARGBColor(bColor, 2.2f)};
+				for(int i = 1; i - 1 < MKII_DRAW_DATA.length; i++) {
+					if(p > (0.066f * i)) {
+						for(int[] scanbar : MKII_DRAW_DATA[i - 1]) {
+							GuiComponent.fill(ps, x + scanbar[0], y + (41 + i), x + scanbar[1], y + (42 + i), colors[scanbar[2]]);
+							GuiComponent.fill(ps, x + scanbar[0] + 54, y + (41 + i), x + scanbar[1] + 54, y + (42 + i), colors[scanbar[2]]);
+						}
+					}
+				}
+			}
+		}).buildAndRegister("mkii_fluid_mixer");
 	}
 
 	//ELECTRIC PURIFIER

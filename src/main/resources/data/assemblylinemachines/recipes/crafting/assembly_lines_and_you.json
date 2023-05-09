@@ -1,0 +1,12 @@
+{
+  "type": "patchouli:shapeless_book_recipe",
+  "ingredients": [
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "tag": "forge:ingots/titanium"
+    }
+  ],
+  "book": "assemblylinemachines:assembly_lines_and_you"
+}

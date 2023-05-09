@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.item;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.item.powertools.IToolWithCharge;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -15,7 +14,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 public class ItemAEFG extends Item implements IToolWithCharge {
 
 	public ItemAEFG() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB).stacksTo(1));
+		super(new Item.Properties().stacksTo(1));
 	}
 
 	@Override

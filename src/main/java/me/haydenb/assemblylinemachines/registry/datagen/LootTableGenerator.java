@@ -1,13 +1,9 @@
 package me.haydenb.assemblylinemachines.registry.datagen;
 
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.*;
 import java.util.stream.Stream;
-
-import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.misc.BlockBlackGranite;
 import me.haydenb.assemblylinemachines.block.misc.BlockCorruptOres;
@@ -15,19 +11,17 @@ import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.CompoundTagBuilder;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
-import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.*;
-import net.minecraft.world.level.storage.loot.LootTable.Builder;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.*;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.*;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
@@ -37,31 +31,23 @@ import net.minecraftforge.data.event.GatherDataEvent;
 
 public class LootTableGenerator extends LootTableProvider {
 
-	private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> providers = ImmutableList.of(Pair.of(GeneratedBlockLoot::new, LootContextParamSets.BLOCK));
-	private final PrintWriter pw;
-
+	
 	public LootTableGenerator(GatherDataEvent event, PrintWriter pw) {
-		super(event.getGenerator());
-		event.getGenerator().addProvider(true, this);
-		this.pw = pw;
+		super(event.getGenerator().getPackOutput(), Collections.emptySet(), List.of(new SubProviderEntry(() -> new GeneratedBlockLoot(pw), LootContextParamSets.EMPTY)));
+			
 	}
+	
+	private static class GeneratedBlockLoot extends BlockLootSubProvider{
 
-	@Override
-	protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootContextParamSet>> getTables() {
-		return providers;
-	}
-
-	@Override
-	protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationtracker) {
-		map.forEach((rl, lootTable) ->{
-			LootTables.validate(validationtracker, rl, lootTable);
-		});
-	}
-
-	private class GeneratedBlockLoot extends BlockLoot{
-
+		private final PrintWriter pw;
+		
+		private GeneratedBlockLoot(PrintWriter pw) {
+			super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags());
+			this.pw = pw;
+		}
+		
 		@Override
-		protected void addTables() {
+		protected void generate() {
 			pw.println("[LOOT TABLES - INFO]: Starting block loot table generation...");
 
 			this.add(Registry.getBlock("titanium_ore"), (b) -> createOreDrop(b, Registry.getItem("raw_titanium")));
@@ -86,16 +72,16 @@ public class LootTableGenerator extends LootTableProvider {
 
 			this.dropWhenSilkTouch(Registry.getBlock("prism_glass"));
 
-			this.add(Registry.getBlock("chaosweed"), BlockLoot::createShearsOnlyDrop);
-			this.add(Registry.getBlock("blooming_chaosweed"), BlockLoot::createShearsOnlyDrop);
-			this.add(Registry.getBlock("tall_chaosweed"), BlockLoot::createDoublePlantShearsDrop);
-			this.add(Registry.getBlock("tall_blooming_chaosweed"), BlockLoot::createDoublePlantShearsDrop);
+			this.add(Registry.getBlock("chaosweed"), BlockLootSubProvider::createShearsOnlyDrop);
+			this.add(Registry.getBlock("blooming_chaosweed"), BlockLootSubProvider::createShearsOnlyDrop);
+			this.add(Registry.getBlock("tall_chaosweed"), BlockLootSubProvider::createDoublePlantShearsDrop);
+			this.add(Registry.getBlock("tall_blooming_chaosweed"), BlockLootSubProvider::createDoublePlantShearsDrop);
 
-			this.add(Registry.getBlock("chaosbark_door"), BlockLoot::createDoorTable);
+			this.add(Registry.getBlock("chaosbark_door"), (bl) -> createDoorTable(bl));
 
-			this.add(Registry.getBlock("slab_black_granite"), BlockLoot::createSlabItemTable);
-			this.add(Registry.getBlock("slab_silt_brick"), BlockLoot::createSlabItemTable);
-			this.add(Registry.getBlock("chaosbark_slab"), BlockLoot::createSlabItemTable);
+			this.add(Registry.getBlock("slab_black_granite"), (bl) -> createSlabItemTable(bl));
+			this.add(Registry.getBlock("slab_silt_brick"), (bl) -> createSlabItemTable(bl));
+			this.add(Registry.getBlock("chaosbark_slab"), (bl) -> createSlabItemTable(bl));
 
 			this.add(Registry.getBlock("chaosbark_leaves"), (b) -> createLeavesDrops(b, Registry.getBlock("chaosbark_sapling"), 0.05f, 0.0625f, 0.083333336f, 0.1f));
 			this.leavesWithAdditionalDrop(Registry.getBlock("cocoa_leaves"), Registry.getBlock("cocoa_sapling"), Items.COCOA_BEANS, 0.05f, 0.0625f, 0.083333336f, 0.1f);
@@ -103,13 +89,14 @@ public class LootTableGenerator extends LootTableProvider {
 			for(Block b : getKnownBlocks()) if(!this.map.containsKey(b.getLootTable()) && !b.getLootTable().equals(BuiltInLootTables.EMPTY) && !b.asItem().equals(Items.AIR)) this.dropSelf(b);
 
 			pw.println("[LOOT TABLES - INFO]: Successfully generated " + this.map.size() + " loot table(s).");
+			
 		}
-
+		
 		@Override
 		protected Iterable<Block> getKnownBlocks() {
 			return Registry.getAllBlocks();
 		}
-
+		
 		private void dynamicOreDrops(Block block, ItemLike resultItem, float min, float max){
 			this.add(block, createSilkTouchDispatchTable(block, applyExplosionDecay(block, LootItem.lootTableItem(resultItem).apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max))).apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE)))));
 		}

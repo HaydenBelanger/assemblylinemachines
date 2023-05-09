@@ -5,7 +5,6 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.*;
@@ -16,11 +15,9 @@ import me.haydenb.assemblylinemachines.registry.PacketHandler;
 import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkHandler.QuantumLinkNetwork;
 import me.haydenb.assemblylinemachines.world.QuantumLinkManager.QuantumLinkStatus;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -41,8 +38,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -323,8 +319,6 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 			int x = leftPos;
 			int y = topPos;
 
-			this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
-
 			idField = new EditBox(this.font, x + 138, y + 9, 20, 9, Component.literal("ID"));
 			idField.setCanLoseFocus(true);
 			idField.setBordered(false);
@@ -395,6 +389,14 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 				default:
 					tooltip = null;
 				}
+				this.addSupplierOverrideTooltipText(() -> {
+					return switch(tsfm.pfi[channel]) {
+						case 0 -> tooltip + " Receive Mode";
+						case 1 -> tooltip + " Send Mode";
+						case 2 -> tooltip + " Disabled";
+						default -> "";
+					};
+				});
 			}
 
 			@Override
@@ -414,30 +416,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 					yoffset += 12;
 				}
 
-				return new int[] {x, y, 176+xoffset, 74+yoffset, 11, 11};
-			}
-
-			@Override
-			public void renderToolTip(PoseStack pMatrixStack, int pMouseX, int pMouseY) {
-				if(this.isHoveredOrFocused()) {
-					List<Component> vals = new ArrayList<>();
-					switch(tsfm.pfi[channel]) {
-					case 0:
-						vals.add(Component.literal(tooltip + " Receive Mode"));
-						vals.add(Component.literal("Will receive " + tooltip + " from other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
-						break;
-					case 1:
-						vals.add(Component.literal(tooltip + " Send Mode"));
-						vals.add(Component.literal("Will transfer " + tooltip + " to other QLs.").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
-						break;
-					case 2:
-						vals.add(Component.literal(tooltip + " Disabled"));
-						vals.add(Component.literal("Will not interact with " + tooltip + ".").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
-						break;
-					}
-
-					renderComponentTooltip(pMatrixStack, vals, pMouseX, pMouseY);
-				}
+				return new int[] {this.getX(), this.getY(), 176+xoffset, 74+yoffset, 11, 11};
 			}
 		}
 
@@ -522,7 +501,7 @@ public class BlockQuantumLink extends BlockScreenBlockEntity<BlockQuantumLink.TE
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
-				if (fs.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
+				if (fs.getFluid() == Fluids.WATER) {
 					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				} else {
 					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

@@ -1,6 +1,6 @@
 {
     "textures": {
-        "particle": "assemblylinemachines:fluid/dark_energy"
+        "particle": "assemblylinemachines:block/fluid/dark_energy"
     }
     
 }

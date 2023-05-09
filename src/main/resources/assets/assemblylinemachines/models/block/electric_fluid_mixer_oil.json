@@ -1,7 +1,0 @@
-{
-	"parent": "assemblylinemachines:block/electric_fluid_mixer",
-	"textures": {
-		"5": "assemblylinemachines:block/mixerfronts/electric_fluid_mixer_oil",
-		"6": "assemblylinemachines:block/electric_furnace_inset_active"
-	}
-}

@@ -1,7 +1,7 @@
 package me.haydenb.assemblylinemachines.client.ter;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockPoweredSpawner.TEPoweredSpawner;
 import net.minecraft.client.Minecraft;
@@ -43,9 +43,9 @@ public class PoweredSpawnerTER implements BlockEntityRendererProvider<TEPoweredS
 						spawner.client_renderRot += 10f;
 					}
 
-					matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, s, spawner.client_renderRot)));
+					matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, s, spawner.client_renderRot)));
 					matrixStackIn.translate(0.0D, -0.2F, 0.0D);
-					matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(-30.0F));
+					matrixStackIn.mulPose(Axis.XP.rotationDegrees(-30.0F));
 					matrixStackIn.scale(f, f, f);
 					Minecraft.getInstance().getEntityRenderDispatcher().render(entity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, matrixStackIn, bufferIn, combinedLightIn);
 

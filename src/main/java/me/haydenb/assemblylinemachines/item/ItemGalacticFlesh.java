@@ -4,7 +4,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.*;
@@ -15,7 +14,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ItemGalacticFlesh extends Item{
 
 	public ItemGalacticFlesh() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB).food(new FoodProperties.Builder().effect(() -> getRandomMobEffect(), 1f).nutrition(6).fast().saturationMod(0.5f).meat().alwaysEat().build()));
+		super(new Item.Properties().food(new FoodProperties.Builder().effect(() -> getRandomMobEffect(), 1f).nutrition(6).fast().saturationMod(0.5f).meat().alwaysEat().build()));
 	}
 
 	private static MobEffectInstance getRandomMobEffect() {

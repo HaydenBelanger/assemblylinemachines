@@ -228,6 +228,9 @@
 	"item.assemblylinemachines.creative_upgrade_kit": "Creative Upgrade Kit",
 	"item.assemblylinemachines.attuned_titanium_rod": "Attuned Titanium Rod",
 	"item.assemblylinemachines.attuned_titanium_gear": "Attuned Titanium Gear",
+	"item.assemblylinemachines.energizing_blend": "Energizing Blend",
+	"item.assemblylinemachines.balanced_blend": "Balanced Blend",
+	"item.assemblylinemachines.energizing_compound": "Energizing Compound",
 	
 	"block.assemblylinemachines.titanium_ore":"Titanium Ore",
 	"block.assemblylinemachines.deepslate_titanium_ore":"Deepslate Titanium Ore",
@@ -425,7 +428,7 @@
 	"gas.assemblylinemachines.ethylene":"Ethylene",
 	"gas.assemblylinemachines.propylene":"Propylene",
 	
-	"itemGroup.assemblylinemachines":"Assembly Line Machines",
+	"item_group.assemblylinemachines.creative_tab":"Assembly Line Machines",
 	
 	"enchantment.assemblylinemachines.overclock":"Overclock",
 	"enchantment.assemblylinemachines.engineers_fury": "Engineer's Fury",

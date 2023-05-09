@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import io.netty.buffer.Unpooled;
@@ -24,6 +25,7 @@ import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.Utils.Consumer4;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -38,6 +40,7 @@ import net.minecraft.data.models.blockstates.PropertyDispatch.QuadFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -212,6 +215,7 @@ public class MachineBuilder {
 		private List<List<Integer>> slotDuplicateCheckingGroups = null;
 		private TriPredicate<Integer, ItemStack, BlockEntity> slotValidator = null;
 		private Pair<Predicate<Integer>, BiFunction<Container, Integer, ItemStack>> getCapturer = null;
+		private boolean updateEveryDataSave = false;
 
 		private MachineBlockEntityBuilder() {}
 
@@ -335,6 +339,11 @@ public class MachineBuilder {
 			this.allowedInZero = true;
 			return this;
 		}
+		
+		public MachineBlockEntityBuilder requiresBlockUpdateEveryUpdate() {
+			this.updateEveryDataSave = true;
+			return this;
+		}
 
 		public BlockEntityType<?> build(String blockName, Block... validBlocks) {
 
@@ -354,6 +363,8 @@ public class MachineBuilder {
 				private boolean useInternalTank = true;
 				private boolean allowCranks = false;
 				private int mkiiPneumaticCompressorMold = 0;
+				private ResourceLocation recipeRl = null;
+				private Recipe<?> recipe = null;
 
 				public MachineBlockEntity(BlockPos pos, BlockState state) {
 					super(Registry.getBlockEntity(blockName), totalSlots, Component.translatable(Registry.getBlock(blockName).getDescriptionId())
@@ -393,8 +404,9 @@ public class MachineBuilder {
 										ItemStack result = recipe.assemble(optRecipePair.getRight().get());
 										if(!result.isEmpty()) {
 											optRecipePair.getMiddle().accept(result);
+											this.recipeRl = recipe.getId();
 											if(executeOnRecipeCompletion != null) executeOnRecipeCompletion.accept(optRecipePair.getRight().get(), recipe);
-											if(specialStateModifier != null) this.getLevel().setBlockAndUpdate(this.getBlockPos(), specialStateModifier.apply(recipe, this.blockState()));
+											if(specialStateModifier != null || updateEveryDataSave) this.getLevel().setBlockAndUpdate(this.getBlockPos(), specialStateModifier != null ? specialStateModifier.apply(recipe, this.blockState()) : this.blockState());
 											sendUpdates = true;
 										}
 									}
@@ -439,6 +451,8 @@ public class MachineBuilder {
 											if(outputs.isEmpty()) {
 												cycles = 0;
 												progress = 0;
+												this.recipeRl = null;
+												this.recipe = null;
 												if(crankable) allowCranks = true;
 
 											}
@@ -556,6 +570,7 @@ public class MachineBuilder {
 					cranks = compound.getInt("assemblylinemachines:cranks");
 					allowCranks = compound.getBoolean("assemblylinemachines:allowcranks");
 					mkiiPneumaticCompressorMold = compound.getInt("assemblylinemachines:mkiipneumaticmold");
+					recipeRl = compound.contains("assemblylinemachines:recipe") ? new ResourceLocation(compound.getString("assemblylinemachines:recipe")) : null;
 				}
 
 				@Override
@@ -571,7 +586,7 @@ public class MachineBuilder {
 					if(cranks != 0) compound.putInt("assemblylinemachines:cranks", cranks);
 					if(allowCranks) compound.putBoolean("assemblylinemachines:allowcranks", allowCranks);
 					if(mkiiPneumaticCompressorMold != 0) compound.putInt("assemblylinemachines:mkiipneumaticmold", mkiiPneumaticCompressorMold);
-
+					if(recipeRl != null) compound.putString("assemblylinemachines:recipe", recipeRl.toString());
 					super.saveAdditional(compound);
 				}
 
@@ -697,6 +712,14 @@ public class MachineBuilder {
 					}
 					return null;
 				}
+				
+				@Override
+				public Recipe<?> getCurrentRecipe() {
+					if((this.recipe == null || !this.recipe.getId().equals(this.recipeRl)) && this.getLevel() != null) {
+						this.recipe = this.getLevel().getRecipeManager().byKey(this.recipeRl).orElse(null);
+					}
+					return this.recipe;
+				}
 
 				class SlotTransformer implements Container, IMachineDataBridge{
 
@@ -805,6 +828,10 @@ public class MachineBuilder {
 					public int getOrSetMKIIPCSelMold(Optional<Integer> set) {
 						return MachineBlockEntity.this.getOrSetMKIIPCSelMold(set);
 					}
+					@Override
+					public Recipe<?> getCurrentRecipe() {
+						return MachineBlockEntity.this.getCurrentRecipe();
+					}
 				}
 			}
 
@@ -825,6 +852,7 @@ public class MachineBuilder {
 			public void receiveButtonPacket(PacketData pd);
 			public BlockState blockState();
 			public int getOrSetMKIIPCSelMold(Optional<Integer> set);
+			public Recipe<?> getCurrentRecipe();
 		}
 	}
 
@@ -911,6 +939,7 @@ public class MachineBuilder {
 		private int fluidOverlayStartY = 0;
 		private int[] tankButtonStats = null;
 		private boolean isMkiiPneumaticCompressor = false;
+		private Consumer4<PoseStack, Float, Pair<Integer, Integer>, Recipe<?>> drawing = null;
 
 		@OnlyIn(Dist.CLIENT)
 		private MachineScreenBuilder() {}
@@ -956,6 +985,11 @@ public class MachineBuilder {
 
 		public MachineScreenBuilder addBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {
 			this.progressBars.add(new ProgressBar(blitx, blity, uvx, uvy, defaultWidth, defaultHeight, direction, frames, frameTime, duplicateAt));
+			return this;
+		}
+		
+		public MachineScreenBuilder addDrawing(Consumer4<PoseStack, Float, Pair<Integer, Integer>, Recipe<?>> drawing) {
+			this.drawing = drawing;
 			return this;
 		}
 
@@ -1056,7 +1090,7 @@ public class MachineBuilder {
 							packet.writeInteger("mold", bid);
 							PacketHandler.INSTANCE.sendToServer(packet);
 						};
-
+						
 						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+37, 190, 72, 12, 12, new TrueFalseButtonSupplier("Rod Mold (Selected)", "Rod Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 1), pcOp));
 						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+50, 190, 84, 12, 12, new TrueFalseButtonSupplier("Plate Mold (Selected)", "Plate Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 2), pcOp));
 						this.addRenderableWidget(new TrueFalseButton(leftPos+82, topPos+63, 190, 96, 12, 12, new TrueFalseButtonSupplier("Gear Mold (Selected)", "Gear Mold", () -> data.getOrSetMKIIPCSelMold(Optional.empty()) == 3), pcOp));
@@ -1086,6 +1120,10 @@ public class MachineBuilder {
 					}
 
 					for(ProgressBarInstance pbi : this.progressBars) pbi.render(x, y);
+					
+					if(drawing != null && data.getProgress() != 0f && data.getCycles() != 0f) {
+						drawing.accept(this.mx, data.getProgress() / data.getCycles(), Pair.of(x, y), data.getCurrentRecipe());
+					}
 				}
 
 				@Override
@@ -1183,7 +1221,11 @@ public class MachineBuilder {
 
 		public enum PBDirection{
 
-			LR,UD, DU, STATIC, SLOT_EMPTY;
+			LR, UD, DU, STATIC, SLOT_EMPTY;
+		}
+		
+		public enum DrawingDirection{
+			HORIZONTAL, VERTICAL;
 		}
 
 		record ProgressBar(int blitx, int blity, int uvx, int uvy, int defaultWidth, int defaultHeight, PBDirection direction, int frames, int frameTime, List<Pair<Integer, Integer>> duplicateAt) {}

@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.item;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -18,7 +17,7 @@ public interface IGearboxFuel {
 		}
 
 		public ItemGearboxFuel(int burnTime, Rarity rarity) {
-			super(new Item.Properties().tab(Registry.CREATIVE_TAB).rarity(rarity));
+			super(new Item.Properties().rarity(rarity));
 			this.burnTime = burnTime;
 		}
 

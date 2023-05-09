@@ -10,7 +10,6 @@
 		"item": "minecraft:magma_block"
 	},
 	"stirs": 9,
-	"fluid": "lava",
-	"mix_color": "#a3380a",
+	"fluid": "minecraft:lava",
 	"drain_percent": "QUARTER"
 }

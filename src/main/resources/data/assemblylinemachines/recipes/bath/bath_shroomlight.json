@@ -10,7 +10,6 @@
 		"item": "minecraft:shroomlight"
 	},
 	"stirs": 6,
-	"fluid": "lava",
-	"mix_color": "#e0e86d",
+	"fluid": "minecraft:lava",
 	"drain_percent": "QUARTER"
 }

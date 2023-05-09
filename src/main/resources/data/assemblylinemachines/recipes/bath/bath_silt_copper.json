@@ -10,7 +10,6 @@
 		"item": "assemblylinemachines:silt_copper"
 	},
 	"stirs": 10,
-	"fluid": "water",
-	"mix_color": "#d65600",
+	"fluid": "minecraft:water",
 	"drain_percent": "QUARTER"
 }

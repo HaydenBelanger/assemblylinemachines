@@ -32,10 +32,29 @@ public class PredicateLazy<T> implements Supplier<T>{
 		if(supplier != null && predicate != null) {
 			T result = supplier.get();
 			if(!predicate.test(result)) return result;
-			instance = supplier.get();
+			instance = result;
 			supplier = null;
 			predicate = null;
 		}
 		return instance;
+	}
+	
+	public static class ClearablePredicateLazy<T> extends PredicateLazy<T>{
+		
+		private ClearablePredicateLazy(Supplier<T> supplier, Predicate<T> predicate) {
+			super(supplier, predicate);
+		}
+		
+		public static <VT> ClearablePredicateLazy<VT> of(Supplier<VT> supplier, Predicate<VT> predicate){
+			return new ClearablePredicateLazy<>(supplier, predicate);
+		}
+
+		public static <VT> ClearablePredicateLazy<VT> of(Supplier<VT> supplier){
+			return new ClearablePredicateLazy<>(supplier, (o) -> true);
+		}
+		
+		public void clear() {
+			super.instance = null;
+		}
 	}
 }

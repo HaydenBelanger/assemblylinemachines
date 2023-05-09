@@ -10,8 +10,7 @@
 		"item": "assemblylinemachines:quantum_fuel"
 	},
 	"stirs": 12,
-	"fluid": "condensed_void",
-	"mix_color": "0",
+	"fluid": "assemblylinemachines:condensed_void",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"
 }

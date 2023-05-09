@@ -32,11 +32,11 @@
 			"type": "crafting",
 			"recipe": "assemblylinemachines:crafting/empowered_conduction_component",
 			"title": "Crafting Components",
-			"text": "$(item)Energized Gold Ingot$() is obtained by combining Redstone Dust and Gold Plate in Alloy Smelter. Plates can be made in the way you would expect."
+			"text": "$(item)Energized Gold Ingot$() is obtained by combining Redstone and Ground Amethyst in a Mixer with Water to get Energizing Blend, and then combining that with Gold in an Alloy Smelter."
 		},
 		{
 			"type": "text",
-			"text": "The Alloy Smelter can make Steel without Lava. You can also get $(5)$(l)Mystium Ingots.$() The tree is as follows:$(li)Combine Ground Lapis Lazuli and Redstone Dust in Mixer with Lava to get $(5)Mystium Blend.$()$(li)Combine Ground Netherite and Energized Gold in Alloy Smelter to get Electrified Netherite Blend.$(li)Combine Mystium Blend and Electrified Netherite Blend in Alloy Smelter to get $(item)Mystium Ingot."
+			"text": "The Alloy Smelter can make Steel without Lava. You can also get $(5)$(l)Mystium Ingots:$()$(li)Combine Grnd. L. Lazuli and Grnd. Amethyst in Mixer with Water, and combine result with Energizing Blend (see previous) in Mixer with Lava to get $(5)Mystium Blend.$()$(li)Combine Ground Netherite and Energized Gold in Alloy Smelter to get Elec. Neth. Blend.$(li)Combine Mystium Blend and Elec. Neth. Blend in Alloy Smelter for $(item)an Ingot."
 		},
 		{
 			"type": "crafting",

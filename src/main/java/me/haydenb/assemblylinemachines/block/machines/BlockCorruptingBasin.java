@@ -14,7 +14,6 @@ import me.haydenb.assemblylinemachines.crafting.WorldCorruptionCrafting;
 import me.haydenb.assemblylinemachines.item.ItemCorruptedShard;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.*;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -36,8 +35,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -279,7 +277,7 @@ public class BlockCorruptingBasin extends BlockScreenBlockEntity<BlockCorrupting
 					spriteMap.put(fs.getFluid(), tas);
 				}
 
-				if (fs.getFluid() == BathCraftingFluids.WATER.getAssocFluid()) {
+				if (fs.getFluid() == Fluids.WATER) {
 					RenderSystem.setShaderColor(0.2470f, 0.4627f, 0.8941f, 1f);
 				} else {
 					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

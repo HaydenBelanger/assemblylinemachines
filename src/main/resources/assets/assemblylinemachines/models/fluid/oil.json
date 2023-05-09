@@ -1,6 +1,6 @@
 {
     "textures": {
-        "particle": "assemblylinemachines:fluid/oil"
+        "particle": "assemblylinemachines:block/fluid/oil"
     }
     
 }

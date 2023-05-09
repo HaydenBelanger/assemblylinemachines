@@ -1,0 +1,17 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"tag": "forge:dusts/energized_gold"
+	},
+	"input_b":{
+		"tag": "forge:dusts/prismatic"
+	},
+	"output":{
+		"item": "assemblylinemachines:energizing_compound",
+		"count": 2
+	},
+	"stirs": 12,
+	"fluid": "assemblylinemachines:naphtha",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "QUARTER"
+}

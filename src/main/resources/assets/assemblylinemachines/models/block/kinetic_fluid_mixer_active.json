@@ -1,0 +1,50 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/cube",
+	"render_type": "cutout_mipped",
+	"textures": {
+		"1": "assemblylinemachines:block/machine_basic_top",
+		"2": "assemblylinemachines:block/machine_basic_side",
+		"3": "assemblylinemachines:block/kinetic_fluid_mixer/simple_fluid_mixer_active",
+		"4": "assemblylinemachines:block/kinetic_fluid_mixer/kineticswirl",
+		"particle": "assemblylinemachines:block/machine_basic_top"
+	},
+	"elements": [
+		{
+			"name": "back",
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"east": {"uv": [0, 0, 16, 16], "texture": "#2"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#2"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#2"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "front",
+			"from": [0, 0, 0],
+			"to": [16, 16, 0],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#3"}
+			}
+		},
+		{
+			"name": "swirl",
+			"from": [2, 2, 0],
+			"to": [14, 14, 0],
+			"faces": {
+				"north": {"uv": [2, 2, 14, 14], "texture": "#4", "tintindex": 0}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

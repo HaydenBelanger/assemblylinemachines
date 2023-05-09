@@ -68,12 +68,22 @@ public class ScreenMath {
 
 	public static int multiplyARGBColor(int argb, float multiplier) {
 		int[] argbSplit = new int[] {ARGB32.alpha(argb), ARGB32.red(argb), ARGB32.green(argb), ARGB32.blue(argb)};
-
-		for(int i = 0; i < argbSplit.length; i++) {
-			argbSplit[i] = Math.round(argbSplit[i] * multiplier);
-		}
+		
+		argbSplit = multiplyARGBColor(argbSplit, multiplier);
 
 		return ARGB32.color(argbSplit[0], argbSplit[1], argbSplit[2], argbSplit[3]);
+	}
+	
+	public static int[] multiplyARGBColor(int[] argb, float multiplier) {
+		for(int i = 0; i < argb.length; i++) {
+			argb[i] = Math.min(255, Math.max(0, Math.round(argb[i] * multiplier)));
+		}
+		
+		return argb;
+	}
+	
+	public static int[] unpackColor(int argb) {
+		return new int[]{ARGB32.alpha(argb), ARGB32.red(argb), ARGB32.green(argb), ARGB32.blue(argb)};
 	}
 
 	public static boolean canFit(ItemStack slotStack, ItemStack newStack) {
@@ -117,10 +127,10 @@ public class ScreenMath {
 	@OnlyIn(Dist.CLIENT)
 	public static int getColorFrom(TextureAtlasSprite sprite) {
 		if (sprite == null) return -1;
-		if (sprite.getFrameCount() == 0) return -1;
+		if(sprite.contents().getUniqueFrames().count() == 0) return -1;
 		float total = 0, red = 0, blue = 0, green = 0;
-		for (int x = 0; x < sprite.getWidth(); x++) {
-			for (int y = 0; y < sprite.getHeight(); y++) {
+		for (int x = 0; x < sprite.contents().width(); x++) {
+			for (int y = 0; y < sprite.contents().height(); y++) {
 				int color = sprite.getPixelRGBA(0, x, y);
 				int alpha = color >> 24 & 0xFF;
 			// if (alpha != 255) continue; // this creates problems for translucent textures

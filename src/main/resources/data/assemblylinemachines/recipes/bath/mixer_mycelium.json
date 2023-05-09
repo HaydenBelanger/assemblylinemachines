@@ -10,8 +10,7 @@
 		"item": "minecraft:mycelium"
 	},
 	"stirs": 5,
-	"fluid": "water",
-	"mix_color": "0",
+	"fluid": "minecraft:water",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"
 }

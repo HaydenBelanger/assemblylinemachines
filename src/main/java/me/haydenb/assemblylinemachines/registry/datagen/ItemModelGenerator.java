@@ -26,13 +26,13 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ItemModelGenerator extends ItemModelProvider {
 
 	private final PrintWriter writer;
-	private final Collection<Path> inputFolders;
+	private final Collection<Path> inputs;
 
-	public ItemModelGenerator(GatherDataEvent event, PrintWriter writer) {
-		super(event.getGenerator(), AssemblyLineMachines.MODID, event.getExistingFileHelper());
+	public ItemModelGenerator(GatherDataEvent event, PrintWriter writer, Collection<Path> inputs) {
+		super(event.getGenerator().getPackOutput(), AssemblyLineMachines.MODID, event.getExistingFileHelper());
 		this.writer = writer;
-		this.inputFolders = event.getGenerator().getInputFolders();
-
+		this.inputs = inputs;
+		
 		event.getGenerator().addProvider(true, this);
 	}
 	@Override
@@ -40,7 +40,7 @@ public class ItemModelGenerator extends ItemModelProvider {
 
 		writer.println("[ITEM MODELS - INFO]: Starting item model generation...");
 		List<File> files = new ArrayList<>();
-		for(Path p : inputFolders) {
+		for(Path p : inputs) {
 			File f = new File(p.toString() + "/assets/" + AssemblyLineMachines.MODID + "/models/item/");
 			files.addAll(Lists.newArrayList(f.listFiles()));
 		}
@@ -112,7 +112,6 @@ public class ItemModelGenerator extends ItemModelProvider {
 	}
 
 	private void bucket(String bucketItem, ResourceLocation fluid) {
-
 		class BucketLoader extends CustomLoaderBuilder<ItemModelBuilder>{
 
 			private static final ResourceLocation BUCKET_LOADER = new ResourceLocation("forge", "fluid_container");

@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.item;
 
 import java.util.List;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
@@ -13,7 +12,7 @@ public class ItemReactorOutput extends Item {
 	private final Component quality;
 
 	public ItemReactorOutput(Component quality) {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 		this.quality = quality;
 	}
 

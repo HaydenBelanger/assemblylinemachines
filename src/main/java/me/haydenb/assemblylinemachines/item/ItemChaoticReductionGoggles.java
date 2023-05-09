@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ItemChaoticReductionGoggles extends ArmorItem {
 
 	public ItemChaoticReductionGoggles() {
-		super(ItemTiers.CRG.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(ItemTiers.CRG.getArmorTier(), EquipmentSlot.HEAD, new Item.Properties());
 	}
 
 	@Override

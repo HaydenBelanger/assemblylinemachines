@@ -135,8 +135,9 @@ public interface IToolWithCharge{
 					}
 					@Override
 					public boolean canReceive() {
-						return true;
+						return getEnergyStored() < getMaxEnergyStored();
 					}
+					
 					@Override
 					public boolean canExtract() {
 						return false;

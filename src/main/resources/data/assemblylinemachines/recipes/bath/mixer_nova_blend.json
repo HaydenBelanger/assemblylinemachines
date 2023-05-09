@@ -11,8 +11,7 @@
 		"count": 2
 	},
 	"stirs": 8,
-	"fluid": "condensed_void",
-	"mix_color": "#000000",
+	"fluid": "assemblylinemachines:condensed_void",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "FULL"
 }

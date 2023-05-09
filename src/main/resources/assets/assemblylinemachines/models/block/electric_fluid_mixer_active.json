@@ -1,0 +1,135 @@
+{
+	"parent": "block/cube",
+	"render_type": "cutout_mipped",
+	"textures": {
+		"2": "assemblylinemachines:block/machine_basic_side",
+		"3": "assemblylinemachines:block/machine_basic_top",
+		"4": "assemblylinemachines:block/electric_fluid_mixer/electric_fluid_mixer",
+		"5": "assemblylinemachines:block/electric_fluid_mixer/electric_fluid_mixer_active",
+		"6": "assemblylinemachines:block/electric_furnace_inset_active",
+		"7": "assemblylinemachines:block/electric_fluid_mixer/electricswirl",
+		"particle": "assemblylinemachines:block/machine_basic_top"
+	},
+	"elements": [
+		{
+			"name": "Bottom",
+			"from": [0, 14, 0],
+			"to": [16, 16, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 22, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 2], "texture": "#5"},
+				"east": {"uv": [0, 0, 16, 2], "texture": "#2"},
+				"south": {"uv": [0, 0, 16, 2], "texture": "#2"},
+				"west": {"uv": [0, 0, 16, 2], "texture": "#2"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [0, 0, 0],
+			"to": [16, 2, 16],
+			"faces": {
+				"north": {"uv": [0, 14, 16, 16], "texture": "#4"},
+				"east": {"uv": [0, 14, 16, 16], "texture": "#2"},
+				"south": {"uv": [0, 14, 16, 16], "texture": "#2"},
+				"west": {"uv": [0, 14, 16, 16], "texture": "#2"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Sides",
+			"from": [0, 2, 1],
+			"to": [16, 14, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 10, 9]},
+			"faces": {
+				"north": {"uv": [0, 1, 16, 13], "texture": "#6"},
+				"east": {"uv": [0, 2, 15, 14], "texture": "#2"},
+				"south": {"uv": [0, 2, 16, 14], "texture": "#2"},
+				"west": {"uv": [1, 2, 16, 14], "texture": "#2"}
+			}
+		},
+		{
+			"name": "Front",
+			"from": [0, 5, 0],
+			"to": [16, 14, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"north": {"uv": [0, 2, 16, 11], "texture": "#5"},
+				"east": {"uv": [0, 2, 1, 11], "texture": "#2"},
+				"west": {"uv": [0, 2, 1, 11], "texture": "#2"},
+				"down": {"uv": [0, 0, 16, 1], "texture": "#4"}
+			}
+		},
+		{
+			"name": "FrontRad1",
+			"from": [0, 2, 0],
+			"to": [3, 5, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 10, 8]},
+			"faces": {
+				"north": {"uv": [13, 11, 16, 14], "texture": "#4"},
+				"east": {"uv": [0, 0, 1, 3], "texture": "#4"},
+				"west": {"uv": [0, 11, 1, 14], "texture": "#2"}
+			}
+		},
+		{
+			"name": "FrontRad2",
+			"from": [13, 2, 0],
+			"to": [16, 5, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [21, 10, 8]},
+			"faces": {
+				"north": {"uv": [0, 11, 3, 14], "texture": "#4"},
+				"east": {"uv": [0, 11, 1, 14], "texture": "#2"},
+				"west": {"uv": [0, 0, 1, 3], "texture": "#4"}
+			}
+		},
+		{
+			"name": "FrontRad3",
+			"from": [9, 2, 0],
+			"to": [12, 5, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [17, 10, 8]},
+			"faces": {
+				"north": {"uv": [4, 11, 7, 14], "texture": "#5"},
+				"east": {"uv": [0, 0, 1, 3], "texture": "#4"},
+				"west": {"uv": [0, 0, 1, 3], "texture": "#4"}
+			}
+		},
+		{
+			"name": "FrontRad4",
+			"from": [4, 2, 0],
+			"to": [7, 5, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [12, 10, 8]},
+			"faces": {
+				"north": {"uv": [9, 11, 12, 14], "texture": "#5"},
+				"east": {"uv": [0, 0, 1, 3], "texture": "#4"},
+				"west": {"uv": [0, 0, 1, 3], "texture": "#4"}
+			}
+		},
+		{
+			"name": "FrontRad5",
+			"from": [7, 4, 0],
+			"to": [9, 5, 1],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14, 10, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 1], "texture": "#4"},
+				"down": {"uv": [0, 0, 2, 1], "texture": "#4"}
+			}
+		},
+		{
+			"name": "swirl",
+			"from": [3, 4, 0],
+			"to": [13, 14, 0],
+			"faces": {
+				"north": {"uv": [3, 3, 13, 13], "texture": "#7", "tintindex": 0}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "VoxelShapes",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+		}
+	]
+}

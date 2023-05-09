@@ -21,23 +21,25 @@ Recipe namespace: `assemblylinemachines:bath`.
     For the *Simple Fluid Mixer*, 1 would be equal to a minimum of 2 seconds of processing time, depending on the regularity of a Crank/Gearbox use. For example, `stirs: 8` would last for 16 seconds, as long as the block is supplied with Crank power at least once a second.  
     For the *Electric Fluid Mixer*, 1 is equal to 2.88 seconds of processing time. So for example, `stirs: 8` would last for 23.04 seconds of processing. Every Speed Upgrade in the machine will cut the processing time in half.
 
-- `fluid`: String, required  
-*The fluid that is required to process the recipe. Options include `water`, `lava`, `oil`, `condensed_void`, or `naphtha`.*
+- `fluid`: Namespace, required  
+*The namespace for the fluid that should be used in this recipe.*
 
 !!! tip
 	The fluid used in an Electric Fluid Mixer is impacted by the Machine Conservation upgrade. Depending on the number of upgrades, the amount of fluid consumed will be reduced by 25%, 50%, or 75%.
 
 !!! warning
-    If the fluid is not `water` or `lava`, the only machine allowed for the recipe will be the Electric Fluid Mixer, as the other two early-game machines do not work with anything else.
+    If the fluid is not `minecraft:water` or `minecraft:lava`, the only machine allowed for the recipe will be the Electric Fluid Mixer, as the other two early-game machines do not work with anything else.
 
-??? warning "1.18+ Warning"
+??? warning "Major Update Change Warnings"
 	**1.18-1.3.5+ only:** If you include any Stirring Stick, a Water Bucket, a Lava Bucket, or a Potion as one of the inputs, the recipe will fail to load.
 
+	**1.19.3-1.5+ only:** `fluid` must now include the Mod ID in the namespace, and can now support any value and not just predetermined ones. Prior to this version, `fluid` needed to be a String only and be any one of `water`, `lava`, `oil`, `condensed_void`, or `naphtha`, or the recipe would fail to load.
+
 - `mix_color`: String hex code, required  
-*The color the liquid will show in the basin when crafted in the Fluid Bath. This option does not have an effect on the Simple or Electric Fluid Mixer, and can be set to 0 safely when using `mixer_type: MIXER_ONLY`.*
+*The color the liquid will show in the basin when crafted in the Fluid Bath. This option does not have an effect on the Simple or Electric Fluid Mixer, and can be set to 0 safely when using `mixer_type: MIXER_ONLY` or a Fluid Bath-incompatible fluid type.*
 
 - `mixer_type`: String, *optional*  
-*The type of machine that can perform this recipe. Options include `MIXER_ONLY` or `BASIN_ONLY`. If unset, all machines will allow processing.*
+*The type of machine that can perform this recipe. Options include `MIXER_ONLY` or `BASIN_ONLY`. If unset, all machines will allow processing, unless you are using a Fluid Bath-incompatible fluid type.*
 
 - `drain_percent`: String, *optional*  
 *The amount of fluid that will be drained from the machine when an operation is concluded, in increments of full buckets/1000 mB. Options include `FULL`, `HALF`, or `QUARTER`. If unset, `FULL` will be used.*
@@ -61,7 +63,7 @@ To demonstrate, both of the mod's Silt recipes will be shown to demonstrate the 
 		"item": "assemblylinemachines:silt"
 	},
 	"stirs": 4,
-	"fluid": "water",
+	"fluid": "minecraft:water",
 	"mix_color": "#b8b4ab",
 	"mixer_type": "BASIN_ONLY",
 	"drain_percent": "QUARTER"
@@ -82,7 +84,7 @@ To demonstrate, both of the mod's Silt recipes will be shown to demonstrate the 
 		"count": 4
 	},
 	"stirs": 4,
-	"fluid": "water",
+	"fluid": "minecraft:water",
 	"mix_color": "0",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"

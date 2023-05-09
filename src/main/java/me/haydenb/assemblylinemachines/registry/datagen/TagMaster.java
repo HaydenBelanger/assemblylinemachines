@@ -12,7 +12,7 @@ import com.mojang.datafixers.util.Pair;
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.datagen.TagMaster.DataProviderContainer.ItemDataProvider;
-import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -21,6 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
@@ -99,8 +100,8 @@ public class TagMaster {
 		//Additions to Forge tags.
 		ListMultimap<String, Pair<String, String>> forgeTags = ArrayListMultimap.create();
 		forgeTags.putAll("dusts", List.of(Pair.of("charcoal", "ground_charcoal"), Pair.of("coal", "ground_coal"), Pair.of("steel", "ground_steel"), Pair.of("amethyst", "ground_amethyst"),
-				Pair.of("copper", "ground_copper"), Pair.of("electrified_netherite", "electrified_netherite_blend"),
-				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"),
+				Pair.of("copper", "ground_copper"), Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("energized_gold", "energizing_blend"),
+				Pair.of("gold", "ground_gold"), Pair.of("iron", "ground_iron"), Pair.of("lapis", "ground_lapis_lazuli"), Pair.of("attuned_titanium", "balanced_blend"),
 				Pair.of("mystium", "mystium_blend"), Pair.of("netherite", "ground_netherite"), Pair.of("titanium", "ground_titanium"),
 				Pair.of("flerovium", "ground_flerovium"), Pair.of("diamond", "ground_diamond"), Pair.of("novasteel", "nova_blend"), Pair.of("prismatic", "prismatic_dust"), Pair.of("emerald", "ground_emerald"),
 				Pair.of("electrified_netherite", "electrified_netherite_blend"), Pair.of("sawdust", "sawdust;warped_sawdust;crimson_sawdust;chaotic_sawdust"), Pair.of("chromium", "ground_chromium")));
@@ -115,7 +116,7 @@ public class TagMaster {
 		forgeTags.putAll("plates", List.of(Pair.of("attuned_titanium", "attuned_titanium_plate"), Pair.of("chromium", "chromium_plate"), Pair.of("pure_copper", "pure_copper_plate"),
 				Pair.of("energized_gold", "energized_gold_plate"), Pair.of("pure_gold", "pure_gold_plate"), Pair.of("pure_iron", "pure_iron_plate"), Pair.of("mystium", "mystium_plate"),
 				Pair.of("stainless_steel", "stainless_steel_plate"), Pair.of("pure_steel", "pure_steel_plate"), Pair.of("pure_titanium", "pure_titanium_plate"), Pair.of("flerovium", "flerovium_plate"),
-				Pair.of("novasteel", "novasteel_plate"), Pair.of("graphene", "graphene_plate")));
+				Pair.of("novasteel", "novasteel_plate"), Pair.of("graphene", "graphene_plate"), Pair.of("wooden", "wooden_board")));
 		forgeTags.putAll("rods", List.of(Pair.of("steel", "steel_rod"), Pair.of("graphene", "graphene_rod"), Pair.of("titanium", "titanium_rod"), Pair.of("novasteel", "novasteel_rod"),
 				Pair.of("mystium", "mystium_rod"), Pair.of("iron", "iron_rod"), Pair.of("gold", "gold_rod"), Pair.of("copper", "copper_rod"), Pair.of("chromium", "chromium_rod"), Pair.of("attuned_titanium", "attuned_titanium_rod")));
 		forgeTags.putAll("sheets", List.of(Pair.of("plastic", "plastic_sheet"), Pair.of("rubber", "rubber_sheet")));
@@ -259,12 +260,12 @@ public class TagMaster {
 		public class BlockDataProvider extends BlockTagsProvider{
 
 			public BlockDataProvider() {
-				super(event.getGenerator(), AssemblyLineMachines.MODID, event.getExistingFileHelper());
+				super(event.getGenerator().getPackOutput(), event.getLookupProvider(), AssemblyLineMachines.MODID, event.getExistingFileHelper());
 				event.getGenerator().addProvider(true, this);
 			}
 
 			@Override
-			protected void addTags() {
+			protected void addTags(HolderLookup.Provider provider) {
 				writer.println("[BLOCK TAGGING - INFO]: Starting general block tagging...");
 				TagMaster.tagAllInMaster(container, TagType.BLOCK);
 
@@ -321,12 +322,12 @@ public class TagMaster {
 		public class ItemDataProvider extends ItemTagsProvider{
 
 			public ItemDataProvider() {
-				super(event.getGenerator(), blockProvider, AssemblyLineMachines.MODID, event.getExistingFileHelper());
+				super(event.getGenerator().getPackOutput(), event.getLookupProvider(), blockProvider, AssemblyLineMachines.MODID, event.getExistingFileHelper());
 				event.getGenerator().addProvider(true, this);
 			}
 
 			@Override
-			protected void addTags() {
+			protected void addTags(HolderLookup.Provider provider) {
 				writer.println("[ITEM TAGGING - INFO]: Starting general item tagging...");
 				TagMaster.tagAllInMaster(container, TagType.ITEM);
 			}

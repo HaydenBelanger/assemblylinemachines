@@ -1,6 +1,0 @@
-{
-	"name": "Блоки",
-	"description": "Этот раздел расскажет о доступных машинах.$(p)Для удобства просмотра рецептов рекомендуется использовать $(l:https://www.curseforge.com/minecraft/mc-mods/jei)Just Enough Items$().",
-	"icon": "assemblylinemachines:electric_fluid_mixer",
-	"sortnum": 1
-}

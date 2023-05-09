@@ -13,7 +13,7 @@
 			"type": "spotlight",
 			"item": "assemblylinemachines:attuned_titanium_ingot",
 			"link_recipe": true,
-			"text": "Place $(thing)1 Ender Pearl and 1 Mystium Blend$() as the filter items, and $(item)1 Pure Titanium Ingot$() in the main spot, to get $(9)1 Attuned Titanium Ingot.$()"
+			"text": "Place $(thing)1 Ender Pearl and 1 Balanced Blend$() as the filter items, and $(item)1 Pure Titanium Ingot$() in the main spot, to get $(9)1 Attuned Titanium Ingot.$()"
 		},
 		{
 			"type": "spotlight",

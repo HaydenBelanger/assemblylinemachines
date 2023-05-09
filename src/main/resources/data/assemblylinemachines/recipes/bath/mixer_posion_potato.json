@@ -10,8 +10,7 @@
 		"item": "minecraft:poisonous_potato"
 	},
 	"stirs": 5,
-	"fluid": "dark_energy",
-	"mix_color": "0",
+	"fluid": "assemblylinemachines:dark_energy",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"
 }

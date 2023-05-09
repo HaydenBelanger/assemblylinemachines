@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "minecraft:carrot"
+	},
+	"input_b":{
+		"item": "minecraft:beetroot"
+	},
+	"output":{
+		"item": "assemblylinemachines:glacier_sauce"
+	},
+	"stirs": 3,
+	"fluid": "assemblylinemachines:glacier_water",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "QUARTER"
+}

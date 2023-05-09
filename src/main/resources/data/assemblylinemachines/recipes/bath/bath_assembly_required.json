@@ -10,7 +10,6 @@
 		"item": "assemblylinemachines:music_disc_assembly_required"
 	},
 	"stirs": 25,
-	"fluid": "lava",
-	"mix_color": "#b713ba",
+	"fluid": "minecraft:lava",
 	"drain_percent": "FULL"
 }

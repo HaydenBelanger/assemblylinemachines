@@ -1,6 +1,6 @@
 {
     "textures": {
-        "particle": "assemblylinemachines:fluid/condensed_void"
+        "particle": "assemblylinemachines:block/fluid/condensed_void"
     }
     
 }

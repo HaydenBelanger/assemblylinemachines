@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.item;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids;
 import me.haydenb.assemblylinemachines.world.CapabilityChunkFluids.IChunkFluidCapability;
@@ -17,7 +16,7 @@ public class ItemDowsingRod extends Item {
 
 
 	public ItemDowsingRod() {
-		super(new Item.Properties().stacksTo(1).tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties().stacksTo(1));
 	}
 
 	@Override

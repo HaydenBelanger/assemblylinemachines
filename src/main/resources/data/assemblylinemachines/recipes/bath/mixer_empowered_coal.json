@@ -11,8 +11,7 @@
 		"count": 2
 	},
 	"stirs": 5,
-	"fluid": "lava",
-	"mix_color": "0",
+	"fluid": "minecraft:lava",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "HALF"
 }

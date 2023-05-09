@@ -1,25 +1,17 @@
 package me.haydenb.assemblylinemachines.registry.utils;
 
-import java.util.function.Supplier;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-import org.apache.commons.lang3.text.WordUtils;
-
-import com.mojang.datafixers.util.Pair;
-
-import me.haydenb.assemblylinemachines.registry.Registry;
-import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.level.block.state.properties.*;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-
-@SuppressWarnings("deprecation")
 public class StateProperties {
 
 	public static final BooleanProperty MACHINE_ACTIVE = BooleanProperty.create("active");
 	public static final IntegerProperty BATTERY_PERCENT_STATE = IntegerProperty.create("fullness", 0, 4);
 
+	/*
 	public static final EnumProperty<BathCraftingFluids> FLUID = EnumProperty.create("fluid", BathCraftingFluids.class);
 
+	
 	public static enum BathCraftingFluids implements StringRepresentable {
 		NONE(), WATER(Fluids.WATER, false, new Pair<>(176, 0), new Pair<>(176, 52), Pair.of(190, 89), new Pair<>(0, 238)), LAVA(Fluids.LAVA, false, new Pair<>(200, 0), new Pair<>(176, 68), Pair.of(190, 104), new Pair<>(30, 238)), OIL(() -> Registry.getFluid("oil"), true, null, new Pair<>(176, 153), Pair.of(190, 149), new Pair<>(75, 238)),
 		NAPHTHA(() -> Registry.getFluid("naphtha"), true, null, new Pair<>(176, 137), Pair.of(190, 134), new Pair<>(45, 238)), CONDENSED_VOID(() -> Registry.getFluid("condensed_void"), true, null, new Pair<>(176, 121), Pair.of(190, 119), new Pair<>(15, 238)),
@@ -32,7 +24,8 @@ public class StateProperties {
 		private final Pair<Integer, Integer> electricBlitPiece;
 		private final Pair<Integer, Integer> mkIIBlitPiece;
 		private final Pair<Integer, Integer> jeiBlitPiece;
-
+		
+		
 		BathCraftingFluids(Supplier<Fluid> f, boolean electricMixerOnly, Pair<Integer, Integer> simpleBlitPiece, Pair<Integer, Integer> electricBlitPiece, Pair<Integer, Integer> mkIIBlitPiece, Pair<Integer, Integer> jeiBlitPiece){
 			this.f = f;
 			this.fx = null;
@@ -89,7 +82,7 @@ public class StateProperties {
 
 		}
 
-
+		
 		public String getFriendlyName() {
 			return WordUtils.capitalizeFully(toString().toLowerCase().replace("_", " "));
 		}
@@ -128,5 +121,7 @@ public class StateProperties {
 		}
 	}
 
+	*/
+	
 	public static final BooleanProperty PURIFIER_STATES = BooleanProperty.create("enhanced");
 }

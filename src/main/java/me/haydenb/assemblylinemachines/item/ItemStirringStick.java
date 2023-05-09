@@ -1,6 +1,5 @@
 package me.haydenb.assemblylinemachines.item;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -10,7 +9,7 @@ public class ItemStirringStick extends Item {
 	final TemperatureResistance sr;
 	final boolean burnable;
 	public ItemStirringStick(TemperatureResistance sr, boolean burnable, int durability) {
-		super(new Item.Properties().defaultDurability(durability).tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties().defaultDurability(durability));
 		this.sr = sr;
 		this.burnable = burnable;
 	}

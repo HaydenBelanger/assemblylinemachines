@@ -10,8 +10,7 @@
 		"item": "assemblylinemachines:miniature_black_hole"
 	},
 	"stirs": 15,
-	"fluid": "condensed_void",
-	"mix_color": "0",
+	"fluid": "assemblylinemachines:condensed_void",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "FULL"
 }

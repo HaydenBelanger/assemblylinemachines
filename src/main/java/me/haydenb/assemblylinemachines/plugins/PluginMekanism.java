@@ -1,30 +1,13 @@
 package me.haydenb.assemblylinemachines.plugins;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
-import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.block.fluids.SplitFluid.SpecialRenderFluidType;
-import me.haydenb.assemblylinemachines.registry.Registry;
-import mekanism.api.Action;
-import mekanism.api.MekanismAPI;
-import mekanism.api.chemical.gas.*;
-import mekanism.common.capabilities.Capabilities;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor.ARGB32;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegisterEvent;
 
 public class PluginMekanism {
 
+	/*
 	public static final Lazy<MekanismInterface> INTERFACE = Lazy.of(() -> {
 		if(ModList.get().isLoaded("mekanism")) {
 			try {
@@ -33,6 +16,11 @@ public class PluginMekanism {
 				e.printStackTrace();
 			}
 		}
+		return new MekanismInterface() {};
+	});
+	*/
+	
+	public static final Lazy<MekanismInterface> INTERFACE = Lazy.of(() -> {
 		return new MekanismInterface() {};
 	});
 
@@ -46,6 +34,7 @@ public class PluginMekanism {
 
 	}
 
+	/*
 	static class MekanismPresent implements MekanismInterface{
 
 		private final BiMap<Fluid, Gas> gas = HashBiMap.create();
@@ -122,4 +111,5 @@ public class PluginMekanism {
 			return LazyOptional.empty();
 		}
 	}
+	*/
 }

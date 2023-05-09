@@ -11,8 +11,7 @@
 		"count": 4
 	},
 	"stirs": 4,
-	"fluid": "water",
-	"mix_color": "0",
+	"fluid": "minecraft:water",
 	"mixer_type": "MIXER_ONLY",
 	"drain_percent": "QUARTER"
 }

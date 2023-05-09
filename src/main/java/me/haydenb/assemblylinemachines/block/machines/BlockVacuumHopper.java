@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Stream;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
 import me.haydenb.assemblylinemachines.registry.PacketHandler;

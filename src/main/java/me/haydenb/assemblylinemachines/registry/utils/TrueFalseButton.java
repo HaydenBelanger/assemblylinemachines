@@ -1,13 +1,16 @@
 package me.haydenb.assemblylinemachines.registry.utils;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -16,71 +19,60 @@ public class TrueFalseButton extends Button {
 
 	public final int blitx;
 	public final int blity;
-
 	private final TrueFalseButton.TrueFalseButtonSupplier supplier;
 
+	
 	public TrueFalseButton(int x, int y, int blitx, int blity, int width, int height, TrueFalseButton.TrueFalseButtonSupplier supplier, OnPress onPress) {
-		super(x, y, width, height, Component.literal(""), onPress, new OnTooltip() {
-			@Override
-			public void onTooltip(Button pButton, PoseStack mx, int mouseX, int mouseY) {
-				Minecraft minecraft = Minecraft.getInstance();
-				if(supplier.getTrueText() != null && supplier.getFalseText() != null && supplier.get()) {
-					minecraft.screen.renderComponentTooltip(mx, Arrays.asList(Component.literal(supplier.getTrueText())), mouseX, mouseY);
-				}else {
-					minecraft.screen.renderComponentTooltip(mx, Arrays.asList(Component.literal(supplier.getFalseText())), mouseX, mouseY);
-				}
-
-			}
-		});
+		super(x, y, width, height, Component.literal(""), onPress, Button.DEFAULT_NARRATION);
+		
 		this.blitx = blitx;
 		this.blity = blity;
 		this.supplier = supplier;
 
+		this.setTooltip(supplier);
 	}
 
 	public TrueFalseButton(int x, int y, int width, int height, String text, OnPress onPress) {
-		super(x, y, width, height, Component.literal(""), onPress, new OnTooltip() {
-			@Override
-			public void onTooltip(Button pButton, PoseStack mx, int mouseX, int mouseY) {
-				Minecraft minecraft = Minecraft.getInstance();
-				if(text != null) {
-					minecraft.screen.renderComponentTooltip(mx, Arrays.asList(Component.literal(text)), mouseX, mouseY);
-				}
-
-			}
-		});
-		this.blitx = 0;
-		this.blity = 0;
-		this.supplier = null;
-
+		this(x, y, 0, 0, width, height, new TrueFalseButtonSupplier(text, text, () -> false), onPress);
 	}
-
+	
+	
 	@Override
-	public void renderButton(PoseStack mx, int mouseX, int mouseY, float partialTicks) {
-		if(this.isHoveredOrFocused()) {
-			this.renderToolTip(mx, mouseX, mouseY);
+	public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+		if(this.isValidClickButton(0)) {
+			super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
 		}
-
+		
 	}
-
+	
+	@Override
+	public void renderButton(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+		
+	}
+	
 	public int[] getBlitData() {
-		return new int[]{x, y, blitx, blity, width, height};
+		return new int[]{this.getX(), this.getY(), blitx, blity, width, height};
 	}
 
 	public boolean getSupplierOutput() {
-		if(supplier == null) {
-			return false;
-		}
 		return supplier.get();
 	}
+	
+	public void addSupplierOverrideTooltipText(Supplier<String> overrideTooltipText) {
+		supplier.overrideTooltipText = overrideTooltipText;
+	}
 
-	public static class TrueFalseButtonSupplier {
+	public static class TrueFalseButtonSupplier extends Tooltip {
 		private final String trueText;
 		private final String falseText;
-
+		
+		private Pair<String, List<FormattedCharSequence>> cachedTooltip = null;
+		private Supplier<String> overrideTooltipText = null;
+		
 		private final Supplier<Boolean> supplier;
 
 		public TrueFalseButtonSupplier(String trueText, String falseText, Supplier<Boolean> supplier) {
+			super(Component.literal(""), null);
 			this.trueText = trueText;
 			this.falseText = falseText;
 			this.supplier = supplier;
@@ -97,14 +89,21 @@ public class TrueFalseButton extends Button {
 		public String getFalseText() {
 			return falseText;
 		}
-
-		@Deprecated
-		public String getTextFromSupplier() {
-			if(get()) {
-				return trueText;
-			}else {
-				return falseText;
+		
+		public String getCurrentText() {
+			return this.get() ? trueText : falseText;
+		}
+		
+		@Override
+		public List<FormattedCharSequence> toCharSequence(Minecraft minecraft) {
+			String currentText = overrideTooltipText != null ? overrideTooltipText.get() : getCurrentText();
+			if(currentText == null) currentText = "";
+			
+			if(cachedTooltip == null || !cachedTooltip.getFirst().equals(currentText)) {
+				cachedTooltip = Pair.of(currentText, splitTooltip(minecraft, Component.literal(currentText)));
 			}
+			
+			return cachedTooltip.getSecond();
 		}
 	}
 }

@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.item;
 import com.google.common.cache.*;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
@@ -24,7 +23,7 @@ public class ItemMobCrystal extends Item{
 	private static final String TRANSLATION_TAG = Util.makeDescriptionId("item", new ResourceLocation(AssemblyLineMachines.MODID, "mob_crystal_tuned"));
 
 	public ItemMobCrystal() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 
 
 	}

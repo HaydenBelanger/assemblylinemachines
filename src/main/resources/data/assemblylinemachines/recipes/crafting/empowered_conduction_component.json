@@ -1,18 +1,21 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"iri",
-		"rgr",
-		"iri"
+		"pmp",
+		"crc",
+		"pmp"
 	],
 	"key":{
-		"i":{
+		"p":{
+			"tag": "forge:plates/energized_gold"
+		},
+		"m":{
+			"tag": "forge:dusts/mystium"
+		},
+		"c":{
 			"item": "assemblylinemachines:conduction_component"
 		},
 		"r":{
-			"tag": "forge:ingots/energized_gold"
-		},
-		"g":{
 			"tag": "forge:storage_blocks/redstone"
 		}
 	},

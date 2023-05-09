@@ -5,7 +5,6 @@ import java.util.Optional;
 import me.haydenb.assemblylinemachines.block.energy.BlockBatteryCell.TEBatteryCell;
 import me.haydenb.assemblylinemachines.block.machines.BlockBottomlessStorageUnit.TEBottomlessStorageUnit;
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -22,7 +21,7 @@ public class ItemCreativeUpgradeKit extends Item {
 	public static final Rarity CREATIVE_RARITY = Rarity.create("CREATIVE", ChatFormatting.DARK_PURPLE);
 
 	public ItemCreativeUpgradeKit() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB).rarity(CREATIVE_RARITY));
+		super(new Item.Properties().rarity(CREATIVE_RARITY));
 	}
 
 	@Override

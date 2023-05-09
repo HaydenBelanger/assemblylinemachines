@@ -13,7 +13,7 @@ issueTrackerURL="https://github.com/HaydenBelanger/assemblylinemachines/issues"
 [[dependencies.assemblylinemachines]]
     modId="forge"
     mandatory=true
-    versionRange="[43.1.3,)" #mandatory
+    versionRange="[44.1.1,)" #mandatory
     ordering="NONE"
     side="BOTH"
 [[dependencies.assemblylinemachines]]

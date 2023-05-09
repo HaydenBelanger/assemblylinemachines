@@ -10,7 +10,6 @@
 		"item": "minecraft:crying_obsidian"
 	},
 	"stirs": 10,
-	"fluid": "lava",
-	"mix_color": "#0a0c57",
+	"fluid": "minecraft:lava",
 	"drain_percent": "FULL"
 }

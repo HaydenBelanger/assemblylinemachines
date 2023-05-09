@@ -1,0 +1,16 @@
+{
+	"type": "assemblylinemachines:bath",
+	"input_a":{
+		"item": "assemblylinemachines:empowered_coal"
+	},
+	"input_b":{
+		"tag": "forge:dusts/energized_gold"
+	},
+	"output":{
+		"item": "assemblylinemachines:empowered_fuel"
+	},
+	"stirs": 10,
+	"fluid": "assemblylinemachines:naphtha",
+	"mixer_type": "MIXER_ONLY",
+	"drain_percent": "QUARTER"
+}

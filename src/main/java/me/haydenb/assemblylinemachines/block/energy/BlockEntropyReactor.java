@@ -40,7 +40,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.*;
-import net.minecraft.world.level.Explosion.BlockInteraction;
+import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -1007,7 +1007,7 @@ public class BlockEntropyReactor extends BlockScreenBlockEntity<BlockEntropyReac
 			}
 
 			if(!hasUpgrade && entropy > 0.98f && ALMConfig.getServerConfig().reactorExplosions().get()) {
-				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, BlockInteraction.DESTROY);
+				this.getLevel().explode(null, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), 20f, true, ExplosionInteraction.BLOCK);
 				entropy = 0f;
 			}
 

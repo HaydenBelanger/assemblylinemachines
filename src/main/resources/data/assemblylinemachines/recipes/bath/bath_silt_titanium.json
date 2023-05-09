@@ -10,7 +10,6 @@
 		"item": "assemblylinemachines:silt_titanium"
 	},
 	"stirs": 10,
-	"fluid": "water",
-	"mix_color": "#ffffff",
+	"fluid": "minecraft:water",
 	"drain_percent": "QUARTER"
 }

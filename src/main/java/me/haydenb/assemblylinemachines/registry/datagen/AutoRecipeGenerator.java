@@ -50,24 +50,24 @@ public class AutoRecipeGenerator extends RecipeProvider {
 
 
 	private final PrintWriter writer;
-	private final Collection<Path> inputFolders;
+	private final Collection<Path> inputs;
 
-	public AutoRecipeGenerator(GatherDataEvent event, PrintWriter openPw) {
-		super(event.getGenerator());
+	public AutoRecipeGenerator(GatherDataEvent event, PrintWriter openPw, Collection<Path> inputs) {
+		super(event.getGenerator().getPackOutput());
 
-		this.inputFolders = event.getGenerator().getInputFolders();
 		this.writer = openPw;
+		this.inputs = inputs;
 		event.getGenerator().addProvider(true, this);
 	}
 
 	@Override
-	protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
+	protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
 
-		if(inputFolders.size() == 0) {
+		if(this.inputs.size() == 0) {
 			writer.println("[FURNACE RECIPES - WARNING]: Datagen was not provided with any input folders, so no Blasting to Furnace auto-recipes will be generated.");
 		}else {
-			writer.println("[FURNACE RECIPES - INFO]: Starting Blasting to Furnace recipe auto-conversion with " + inputFolders.size() + " input folder(s)...");
-			for(Path p : inputFolders) {
+			writer.println("[FURNACE RECIPES - INFO]: Starting Blasting to Furnace recipe auto-conversion with " + this.inputs.size() + " input folder(s)...");
+			for(Path p : this.inputs) {
 				File f = new File(p.toString() + "/data/" + AssemblyLineMachines.MODID.toLowerCase() + "/recipes/blasting/");
 				writer.println("[FURNACE RECIPES - INFO]: Using input directory \"" + f.getPath() + "\"...");
 				this.concursivelyCopyRecipe(consumer, f.getPath());
@@ -102,7 +102,7 @@ public class AutoRecipeGenerator extends RecipeProvider {
 
 		//Builtin
 		new Builder(recipes, "raw_novasteel").alloy("flerovium", 1, "attuned_titanium", 1, 2);
-		new Builder(recipes, "energized_gold").alloy(Pair.of("dusts", "redstone"), 3, Pair.of("ingots", "pure_gold"), 1, 1).storageBlock(false).plate(4, RecipeState.CONDITIONAL);
+		new Builder(recipes, "energized_gold").alloy(Pair.of("dusts", "energized_gold"), 4, Pair.of("ingots", "pure_gold"), 1, 1).storageBlock(false).plate(4, RecipeState.CONDITIONAL);
 		new Builder(recipes, "coal").alternateInput(Ingredient.of(Items.COAL)).grinder(true, false, false, Blade.PUREGOLD, 4).storageBlock(true);
 		new Builder(recipes, "diamond").alternateInput(Ingredient.of(getNamed("forge", "gems/diamond"))).grinder(true, false, false, Blade.PUREGOLD, 2).storageBlock(true);
 		new Builder(recipes, "lapis").alternateInput(Ingredient.of(getNamed("forge", "gems/lapis"))).grinder(true, true, false, Blade.TITANIUM, 8).storageBlock(true);
@@ -361,15 +361,15 @@ public class AutoRecipeGenerator extends RecipeProvider {
 		private ConfigCondition condition = null;
 
 		public AdvancementlessResult(ResourceLocation rl, Ingredient input, Item result, float experience, int processingTime) {
-			this.recipe = new SimpleCookingRecipeBuilder.Result(rl, "", input, result, experience, processingTime, null, null, RecipeSerializer.SMELTING_RECIPE);
+			this.recipe = new SimpleCookingRecipeBuilder.Result(rl, "", CookingBookCategory.MISC, input, result, experience, processingTime, null, null, RecipeSerializer.SMELTING_RECIPE);
 		}
 
 		public AdvancementlessResult(ResourceLocation rl, Item result, int numberOfResult, List<String> pattern, Map<Character, Ingredient> key) {
-			this.recipe = new ShapedRecipeBuilder.Result(rl, result, numberOfResult, "", pattern, key, null, null);
+			this.recipe = new ShapedRecipeBuilder.Result(rl, result, numberOfResult, "", CraftingBookCategory.MISC, pattern, key, null, null);
 		}
 
 		public AdvancementlessResult(ResourceLocation rl, Item result, int numberOfResult, List<Ingredient> ingredients) {
-			this.recipe = new ShapelessRecipeBuilder.Result(rl, result, numberOfResult, "", ingredients, null, null);
+			this.recipe = new ShapelessRecipeBuilder.Result(rl, result, numberOfResult, "", CraftingBookCategory.MISC, ingredients, null, null);
 		}
 
 		public AdvancementlessResult configCondition(String fieldName, boolean enableOn) {

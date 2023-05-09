@@ -13,8 +13,8 @@ public class GUIHelper {
 
 		float zLevel = 0;
 
-		int iconWidth = icon.getWidth();
-		int iconHeight = icon.getHeight();
+		int iconWidth = icon.contents().width();
+		int iconHeight = icon.contents().height();
 
 		// number of rows & cols of full size icons
 		int fullCols = width / iconWidth;

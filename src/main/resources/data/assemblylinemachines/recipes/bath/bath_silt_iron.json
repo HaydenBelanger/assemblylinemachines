@@ -10,7 +10,6 @@
 		"item": "assemblylinemachines:silt_iron"
 	},
 	"stirs": 10,
-	"fluid": "water",
-	"mix_color": "#e6e6e6",
+	"fluid": "minecraft:water",
 	"drain_percent": "QUARTER"
 }

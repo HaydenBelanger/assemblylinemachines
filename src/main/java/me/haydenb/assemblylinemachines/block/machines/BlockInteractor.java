@@ -18,9 +18,9 @@ import me.haydenb.assemblylinemachines.registry.PacketHandler.PacketData;
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig;
 import me.haydenb.assemblylinemachines.registry.config.ALMConfig.DebugOptions;
-import me.haydenb.assemblylinemachines.registry.utils.*;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
+import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton;
 import me.haydenb.assemblylinemachines.registry.utils.TrueFalseButton.TrueFalseButtonSupplier;
+import me.haydenb.assemblylinemachines.registry.utils.Utils;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -70,14 +70,14 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 	public BlockInteractor() {
 		super(Block.Properties.of(Material.METAL).strength(4f, 15f).sound(SoundType.METAL), "interactor",
 				BlockInteractor.TEInteractor.class);
-		this.registerDefaultState(this.stateDefinition.any().setValue(StateProperties.FLUID, BathCraftingFluids.NONE).setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
 	}
 
 
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-		builder.add(StateProperties.FLUID).add(HorizontalDirectionalBlock.FACING);
+		builder.add(HorizontalDirectionalBlock.FACING);
 	}
 
 	@Override
@@ -392,7 +392,7 @@ public class BlockInteractor extends BlockScreenBlockEntity<BlockInteractor.TEIn
 			}
 
 			if(add != -1) {
-				super.blit(modeB.x, modeB.y, 176, 0 + add, modeB.getWidth(), modeB.getHeight());
+				super.blit(modeB.getX(), modeB.getY(), 176, 0 + add, modeB.getWidth(), modeB.getHeight());
 			}
 		}
 

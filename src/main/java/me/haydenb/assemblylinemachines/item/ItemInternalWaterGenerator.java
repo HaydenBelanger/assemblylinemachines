@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.item;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.block.machines.BlockFluidTank.TEFluidTank;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -16,7 +15,7 @@ import net.minecraft.world.level.material.Fluids;
 public class ItemInternalWaterGenerator extends Item {
 
 	public ItemInternalWaterGenerator() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 	}
 
 	@Override

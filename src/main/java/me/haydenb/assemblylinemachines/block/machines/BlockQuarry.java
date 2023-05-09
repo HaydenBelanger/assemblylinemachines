@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.block.machines;
 
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.block.helpers.ALMTicker;
@@ -496,19 +495,12 @@ public class BlockQuarry extends BlockScreenBlockEntity<BlockQuarry.TEQuarry>{
 		}
 
 		@Override
-		public void renderToolTip(PoseStack mx, int mouseX, int mouseY) {
-			if(te.min == null || te.max == null) {
-				super.renderToolTip(mx, mouseX, mouseY);
-			}
-		}
-
-		@Override
 		public int[] getBlitData() {
 			if(te.min == null || te.max == null) {
 				return super.getBlitData();
 			}
 
-			return new int[] {x, y, 131, 4, width, height};
+			return new int[] {this.getX(), this.getY(), 131, 4, width, height};
 		}
 
 		@Override

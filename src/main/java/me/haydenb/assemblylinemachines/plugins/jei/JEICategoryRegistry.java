@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
+import me.haydenb.assemblylinemachines.block.machines.BlockMachines;
 import me.haydenb.assemblylinemachines.crafting.*;
 import me.haydenb.assemblylinemachines.crafting.FluidInGroundRecipe.FluidInGroundCriteria;
 import me.haydenb.assemblylinemachines.crafting.GeneratorFluidCrafting.GeneratorFluidTypes;
@@ -17,10 +18,10 @@ import me.haydenb.assemblylinemachines.plugins.jei.RecipeCategoryBuilder.IInfoPr
 import me.haydenb.assemblylinemachines.registry.Registry;
 import me.haydenb.assemblylinemachines.registry.utils.FormattingHelper;
 import me.haydenb.assemblylinemachines.registry.utils.ScreenMath;
-import me.haydenb.assemblylinemachines.registry.utils.StateProperties.BathCraftingFluids;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.gui.ITickTimer;
 import mezz.jei.api.gui.drawable.*;
 import mezz.jei.api.gui.drawable.IDrawableAnimated.StartDirection;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -28,6 +29,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.*;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -140,17 +142,19 @@ public class JEICategoryRegistry implements IModPlugin{
 			CATEGORY_REGISTRY.add(new RecipeCategoryBuilder(guiHelper, "bathing", "Fluid Bath Crafting")
 					.background("gui_set_a", 0, 197, 87, 41).icon(Registry.getBlock("electric_fluid_mixer"))
 					.draw(new TriConsumer<>() {
-						private HashMap<BathCraftingFluids, IDrawableAnimated> progressBars = new HashMap<>();
+						ITickTimer timer = guiHelper.createTickTimer(100, 16, false);
 						@Override
 						public void accept(Recipe<?> k, PoseStack v, Pair<Double, Double> s) {
-							if(k instanceof BathCrafting) {
-								BathCrafting recipe = (BathCrafting) k;
-								IDrawableAnimated anim = progressBars.get(recipe.getFluid());
-								if(anim == null) {
-									anim = guiHelper.drawableBuilder(RecipeCategoryBuilder.getGUIPath("gui_set_a"), recipe.getFluid().getJeiBlitPiece().getFirst(), recipe.getFluid().getJeiBlitPiece().getSecond(), 15, 16).buildAnimated(200, StartDirection.LEFT, false);
-									progressBars.put(recipe.getFluid(), anim);
+							if(k instanceof BathCrafting recipe) {
+								int bColor = recipe.getFluidTextureColor();
+								int[] colors = {bColor, ScreenMath.multiplyARGBColor(bColor, 1.4f), ScreenMath.multiplyARGBColor(bColor, 2.2f)};
+								for(int i = 1; i - 1 < BlockMachines.ELECTRIC_DRAW_DATA.length; i++) {
+									if(timer.getValue() > i) {
+										for(int[] scanbar : BlockMachines.ELECTRIC_DRAW_DATA[i - 1]) {
+											GuiComponent.fill(v, 41 + i, scanbar[0] - 29, 42 + i, scanbar[1] - 29, colors[scanbar[2]]);
+										}
+									}
 								}
-								anim.draw(v, 42, 5);
 							}
 						}
 					}).slots((i) -> switch(i) {

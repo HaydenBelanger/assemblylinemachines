@@ -5,9 +5,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import com.mojang.blaze3d.shaders.FogShape;
-import com.mojang.math.Vector3f;
 
 import me.haydenb.assemblylinemachines.AssemblyLineMachines;
 import me.haydenb.assemblylinemachines.registry.Registry;
@@ -131,8 +131,8 @@ public class SplitFluid extends ForgeFlowingFluid {
 
 		public SpecialRenderFluidType(Properties properties, String textureName, boolean hasFlowing) {
 			super(properties);
-			stillTexture = new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + textureName);
-			flowingTexture = hasFlowing ? new ResourceLocation(AssemblyLineMachines.MODID, "fluid/" + textureName + "_flowing") : null;
+			stillTexture = new ResourceLocation(AssemblyLineMachines.MODID, "block/fluid/" + textureName);
+			flowingTexture = hasFlowing ? new ResourceLocation(AssemblyLineMachines.MODID, "block/fluid/" + textureName + "_flowing") : null;
 		}
 
 		public SpecialRenderFluidType color(int red, int green, int blue) {

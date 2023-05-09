@@ -1,6 +1,6 @@
 {
     "textures": {
-        "particle": "assemblylinemachines:fluid/liquid_experience"
+        "particle": "assemblylinemachines:block/fluid/liquid_experience"
     }
     
 }

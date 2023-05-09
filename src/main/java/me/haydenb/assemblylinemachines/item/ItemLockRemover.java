@@ -3,7 +3,6 @@ package me.haydenb.assemblylinemachines.item;
 import java.util.List;
 
 import me.haydenb.assemblylinemachines.block.helpers.AbstractMachine;
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,7 +15,7 @@ import net.minecraft.world.level.Level;
 public class ItemLockRemover extends Item {
 
 	public ItemLockRemover() {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 	}
 
 	@Override

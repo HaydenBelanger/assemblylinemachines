@@ -1,13 +1,16 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"sss",
+		"rsr",
 		"gwg",
-		"sss"
+		"rsr"
 	],
 	"key":{
+		"r":{
+			"tag": "forge:rods/novasteel"
+		},
 		"g":{
-			"item": "assemblylinemachines:prism_glass"
+			"tag": "forge:glass_panes"
 		},
 		"s":{
 			"tag": "forge:plates/novasteel"

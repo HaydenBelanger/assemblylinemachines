@@ -1,5 +1,6 @@
 package me.haydenb.assemblylinemachines.block.misc;
 
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.mojang.authlib.GameProfile;
@@ -68,13 +69,13 @@ public class CorruptTallGrassBlock extends TallGrassBlock {
 
 		@Override
 		public void place(LevelAccessor level, BlockState state, BlockPos pos, int flag) {
-			DoublePlantBlock.placeAt(level, state, pos, flag);
+			DoublePlantBlock.placeAt(level, state, pos, flag); 
 		}
 	}
 
 	public static class CorruptFlowerBlock extends FlowerBlock{
 
-		public CorruptFlowerBlock(MobEffect pSuspiciousStewEffect, int pEffectDuration, int lightValue) {
+		public CorruptFlowerBlock(Supplier<MobEffect> pSuspiciousStewEffect, int pEffectDuration, int lightValue) {
 			super(pSuspiciousStewEffect, pEffectDuration, Block.Properties.of(Material.PLANT).noCollission().instabreak().sound(SoundType.GRASS).lightLevel((state) -> lightValue));
 		}
 

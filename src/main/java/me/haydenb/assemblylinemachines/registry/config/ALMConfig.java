@@ -34,12 +34,10 @@ public class ALMConfig {
 	}
 
 	/**Config for anything accessed only on client-side during startup post-registry.*/
-	public static final record Client(BooleanValue customTooltipColors, BooleanValue customTooltipFrames, BooleanValue receiveGuideBook, BooleanValue receiveUpdateMessages) {
+	public static final record Client(BooleanValue receiveGuideBook, BooleanValue receiveUpdateMessages) {
 
 		public Client(Builder builder) {
 			this(
-				builder.comment("Do you want to render custom tooltip frame colors for some specific items?", "If false, the tooltip will be standard.").define("customTooltipColors", true),
-				builder.comment("Do you want to render custom tooltip frame textures for some specific items?", "If false, the tooltip will be standard. This has no effect if customTooltipColors is false.").define("customTooltipFrames", true),
 				builder.comment("Do you want to receive a copy of Assembly Lines & You when you first connect to a server and you have Patchouli installed?", "This may be overridden by the server.").define("receiveGuideBook", true),
 				builder.comment("Do you want to receive mod update messages when the mod is out of date and you connect to a server?").define("receiveUpdateMessages", true)
 			);

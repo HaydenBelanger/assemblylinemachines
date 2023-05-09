@@ -2,7 +2,6 @@ package me.haydenb.assemblylinemachines.item;
 
 import java.util.Iterator;
 
-import me.haydenb.assemblylinemachines.registry.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -19,7 +18,7 @@ public class ItemFertilizer extends Item{
 
 	private final int range;
 	public ItemFertilizer(int range) {
-		super(new Item.Properties().tab(Registry.CREATIVE_TAB));
+		super(new Item.Properties());
 		this.range = range;
 	}
 

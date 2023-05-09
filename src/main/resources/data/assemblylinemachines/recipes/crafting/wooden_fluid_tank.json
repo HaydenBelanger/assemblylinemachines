@@ -1,18 +1,21 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"pattern":[
-		"ttt",
-		"wbw",
-		"ttt"
+		"rsr",
+		"gwg",
+		"rsr"
 	],
 	"key":{
-		"t":{
-			"item": "assemblylinemachines:wooden_board"
+		"r":{
+			"tag": "forge:rods/wooden"
 		},
-		"w":{
+		"g":{
 			"tag": "forge:glass_panes"
 		},
-		"b":{
+		"s":{
+			"tag": "forge:plates/wooden"
+		},
+		"w":{
 			"item": "minecraft:bucket"
 		}
 	},
